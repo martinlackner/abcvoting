@@ -1,5 +1,7 @@
-# approval-multiwinner
-Python implementations of approval-based multi-winner rules
+# Python implementations of approval-based multi-winner rules
+
+Approval-based multi-winner rules are voting methods for selecting a committee, i.e., a fixed-size subset of candidates. We recommend a suvey by Faliszewski, Skowron, Slinko, and Talmon [1] as an introduction to this topic and for further reference.
+The following approval-based multi-winner rules are implemented:
 
 * Approval Voting (AV)
 
@@ -17,15 +19,39 @@ Python implementations of approval-based multi-winner rules
 
 * Reverse Sequential Chamberlin-Courant (revseq-CC)
 
-* Phragmen's rules
+* Phragmen's sequential rule (see [2])
   
-  - Phragmen's sequential rule
-
-  - maxPhragmen without lexicographic tie-breaking [Gurobi req.]
- 
-  - maxPhragmen without lexicographic tie-breaking, refined [Gurobi req.]
- 
-  - varPhragmen [Gurobi req.]
-
-
 * Monroe [Gurobi optional]
+
+Computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). To use these, the module [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html) is required.
+
+## Example
+
+The following code computes the Proportional Approval Voting (PAV) rule for a profile with 6 voters and 5 candidates.
+
+```
+from preferences import Profile
+import rules_approval
+
+profile = Profile(5)
+profile.add_preferences([[0,1,2],[0,1],[0,1],[1,2],[3,4],[3,4]])
+committeesize = 3
+print rules_approval.compute_pav(profile,committeesize,ilp=False)
+```
+The output is 
+```
+[[0, 1, 3], [0, 1, 4]]
+```
+which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples can be found in [examples.py](examples.py).
+
+## Acknowledgements
+
+Piotr Faliszewski, Andrzej Kaczmarczyk, Dominik Peters, and Piotr Skowron have contributed code to this package and provided help with technical and scientific questions.
+
+## References
+
+[1] Piotr Faliszewski, Piotr Skowron, Arkadii Slinko, and Nimrod Talmon. Multiwinner voting: A
+new challenge for social choice theory. In Ulle Endriss, editor, Trends in Computational Social
+Choice, chapter 2, pages 27–47. AI Access, 2017. http://research.illc.uva.nl/COST-IC1205/BookDocs/Chapters/TrendsCOMSOC-02.pdf
+
+[2] Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner. Phragmén's Voting Methods and Justified Representation. In Proceedings of the 31st AAAI Conference on Artificial Intelligence (AAAI 2017), pages 406-413, AAAI Press, 2017. http://martin.lackner.xyz/publications/phragmen.pdf
