@@ -14,9 +14,7 @@ def __enough_approved_candiates(profile, committeesize):
     for pref in profile.preferences:
         appr.update(pref.approved)
     if len(appr) < committeesize:
-        print "committeesize =",committeesize,"is larger than number of approved candidates"
-        print profile
-        exit()
+        raise Exception("committeesize = "+str(committeesize)+" is larger than number of approved candidates")
 
 # returns score function given its name 
 def __get_scorefct(scorefct_str, committeesize):
@@ -36,8 +34,7 @@ def __get_scorefct(scorefct_str, committeesize):
         param = mpq(scorefct_str[5:])
         return functools.partial(__lp_av_score_fct, l=param)    
     else:
-        print "Error: scoring function", scorefct_str, "does not exist."
-        sys.exit()
+        raise Exception("Scoring function", scorefct_str, "does not exist.")
 
 
 # sorts a list of committees, converts them to lists, and removes duplicates
@@ -56,7 +53,6 @@ def __getcandidatesthatcontributeleast(profile, comm,utilityfct):
         if not c in comm:
             marg_util_cand[c] = max(marg_util_cand) + 1 # do not choose candidates that already have been removed 
     # find smallest elements in marg_util_cand and return indices
-    #print "__getcandidatesthatcontributeleast:",comm, [cand for cand in range(profile.num_cand) if marg_util_cand[cand] == min(marg_util_cand)], min(marg_util_cand), marg_util_cand
     return [cand for cand in range(profile.num_cand) if marg_util_cand[cand] == min(marg_util_cand)], min(marg_util_cand)
 
 
@@ -72,22 +68,20 @@ def thiele_score(profile,committee,scorefct_str="pav"):
     return score
 
 # computes arbitrary Thiele methods via branch-and-bound
-def compute_thiele_methods_branchandbound(profile,committeesize,scorefct_str,tiebreaking=False):
+def compute_thiele_methods_branchandbound(profile,committeesize,scorefct_str,resolute=False):
     __enough_approved_candiates(profile, committeesize)
     scorefct = __get_scorefct(scorefct_str,committeesize)
 
     best_committees = []
-    init_com = compute_seq_thiele_methods_with_tiebreaking(profile,committeesize,scorefct_str)
+    init_com = compute_seq_thiele_methods_with_resolute(profile,committeesize,scorefct_str)
     best_score = thiele_score(profile, init_com[0],scorefct_str)
     part_coms = [[]]
     while part_coms:
         part_com = part_coms.pop(0)
         if len(part_com) == committeesize:  #potential committee, check if at least as good as previous best committee
             score = thiele_score(profile,part_com,scorefct_str)
-            #print score, best_score, part_com, score == best_score, len(part_coms) == 0 or not tiebreaking, score > best_score
             if score == best_score:
-                if len(best_committees) == 0 or not tiebreaking:
-                    best_committees.append(part_com) 
+                best_committees.append(part_com) 
             elif score > best_score:
                 best_committees = [part_com]
                 best_score = score
@@ -102,36 +96,41 @@ def compute_thiele_methods_branchandbound(profile,committeesize,scorefct_str,tie
             if upper_bound >= best_score:
                 for c in range(largest_cand+1,profile.num_cand-missing_candidates+1):
                     part_coms.insert(0,part_com+[c])
-    return __sort_committees(best_committees)
+    
+    committees = __sort_committees(best_committees)
+    if resolute:
+        return [committees[0]]
+    else:
+        return committees
 
 
 # Sequential PAV
-def compute_seqpav(profile,committeesize,tiebreaking=False):
-    if tiebreaking:
-        return compute_seq_thiele_methods_with_tiebreaking(profile,committeesize,'pav')
+def compute_seqpav(profile,committeesize,resolute=False):
+    if resolute:
+        return compute_seq_thiele_methods_with_resolute(profile,committeesize,'pav')
     else:
         return compute_seq_thiele_methods(profile,committeesize,'pav')
     
 # Reverse Sequential PAV
-def compute_revseqpav(profile,committeesize,tiebreaking=False):
-    if tiebreaking:
-        return compute_revseq_thiele_methods_with_tiebreaking(profile,committeesize,'pav')
+def compute_revseqpav(profile,committeesize,resolute=False):
+    if resolute:
+        return compute_revseq_thiele_methods_with_resolute(profile,committeesize,'pav')
     else:
         return compute_revseq_thiele_methods(profile,committeesize,'pav')
 
 
 # Sequential Chamberlin-Courant
-def compute_seqcc(profile,committeesize,tiebreaking=False):
-    if tiebreaking:
-        return compute_seq_thiele_methods_with_tiebreaking(profile,committeesize,'cc')
+def compute_seqcc(profile,committeesize,resolute=False):
+    if resolute:
+        return compute_seq_thiele_methods_with_resolute(profile,committeesize,'cc')
     else:
         return compute_seq_thiele_methods(profile,committeesize,'cc')
     
 
 # Reverse Sequential Chamberlin-Courant
-def compute_revseqcc(profile,committeesize,tiebreaking=False):
-    if tiebreaking:
-        return compute_revseq_thiele_methods_with_tiebreaking(profile,committeesize,'cc')
+def compute_revseqcc(profile,committeesize,resolute=False):
+    if resolute:
+        return compute_revseq_thiele_methods_with_resolute(profile,committeesize,'cc')
     else:
         return compute_revseq_thiele_methods(profile,committeesize,'cc')
 
@@ -198,11 +197,11 @@ def __additional_thiele_scores(profile, committee, scorefct):
     return marg
 
 # Satisfaction Approval Voting (SAV)
-def compute_sav(profile,committeesize, tiebreaking=False):
-    return compute_av(profile, committeesize, tiebreaking, sav=True)
+def compute_sav(profile,committeesize, resolute=False):
+    return compute_av(profile, committeesize, resolute, sav=True)
 
 # Approval Voting (AV)
-def compute_av(profile, committeesize, tiebreaking=False, sav=False):
+def compute_av(profile, committeesize, resolute=False, sav=False):
     __enough_approved_candiates(profile, committeesize)
 
     appr_scores = [0] * profile.num_cand
@@ -217,13 +216,13 @@ def compute_av(profile, committeesize, tiebreaking=False, sav=False):
     cutoff = sorted(appr_scores)[-committeesize]  # smallest score to be in the committee
     certain_cand = [c for c in range(profile.num_cand) if appr_scores[c] > cutoff]
     possible_cand =  [c for c in range(profile.num_cand) if appr_scores[c]==cutoff]
-    if tiebreaking:
+    if resolute:
         return __sort_committees([(certain_cand + possible_cand[:committeesize-len(certain_cand)])])
     else:
         return __sort_committees([(certain_cand + list(selection)) for selection in itertools.combinations(possible_cand, committeesize-len(certain_cand))])
 
 
-# Thiele methods
+# Sequential Thiele methods without resolute
 def compute_seq_thiele_methods(profile,committeesize,scorefct_str):
     __enough_approved_candiates(profile, committeesize)
     scorefct = __get_scorefct(scorefct_str, committeesize)
@@ -246,8 +245,8 @@ def compute_seq_thiele_methods(profile,committeesize,scorefct_str):
                 comm_scores[com] = score
     return __sort_committees(comm_scores.keys())
 
-
-def compute_seq_thiele_methods_with_tiebreaking(profile,committeesize,scorefct_str):
+# Sequential Thiele methods with resolute
+def compute_seq_thiele_methods_with_resolute(profile,committeesize,scorefct_str):
     __enough_approved_candiates(profile, committeesize)
     scorefct = __get_scorefct(scorefct_str, committeesize)
 
@@ -258,7 +257,8 @@ def compute_seq_thiele_methods_with_tiebreaking(profile,committeesize,scorefct_s
         committee.append(additional_score_cand.index(max(additional_score_cand)))
     return [sorted(committee)]
     
-    
+ 
+# Reverse Sequential Thiele methods without resolute
 def compute_revseq_thiele_methods(profile,committeesize,scorefct_str):
     __enough_approved_candiates(profile, committeesize)
     scorefct = __get_scorefct(scorefct_str, committeesize)
@@ -281,7 +281,8 @@ def compute_revseq_thiele_methods(profile,committeesize,scorefct_str):
     return __sort_committees(comm_scores.keys())
 
 
-def compute_revseq_thiele_methods_with_tiebreaking(profile,committeesize,scorefct_str):
+# Reverse Sequential Thiele methods with resolute
+def compute_revseq_thiele_methods_with_resolute(profile,committeesize,scorefct_str):
     __enough_approved_candiates(profile, committeesize)
     scorefct = __get_scorefct(scorefct_str, committeesize)
 
@@ -293,8 +294,8 @@ def compute_revseq_thiele_methods_with_tiebreaking(profile,committeesize,scorefc
     return [sorted(list(committee))]
 
 
-
-def compute_seqphragmen(profile, committeesize, tiebreaking=False):
+# Phragmen's Sequential Rule
+def compute_seqphragmen(profile, committeesize, resolute=False):
     __enough_approved_candiates(profile, committeesize)
 
     load = {v:0 for v in profile.preferences}
@@ -329,29 +330,34 @@ def compute_seqphragmen(profile, committeesize, tiebreaking=False):
         for com, load in com_loads_next.iteritems():
             if max(load) <= cutoff:
                 com_loads[com] = load
-    if tiebreaking:
-        return [com_loads.keys()[0]]
+    
+    committees = __sort_committees(com_loads.keys())
+    if resolute:
+        return [committees[0]]
     else:
-        return __sort_committees(com_loads.keys())
-
-def hamming(a,b,elements):
-    diffs = 0
-    for x in elements:
-        if (x in a and not x in b) or (x in b and not x in a):
-            diffs += 1
-    return diffs
-
-def mavscore(committee, profile):
-    score = 0
-    for vote in profile.preferences:
-        hamdistance = hamming(vote.approved,committee,range(profile.num_cand))
-        if hamdistance > score:
-            score = hamdistance
-    return score
+        return committees
 
 
 # Maximin Approval Voting
-def compute_mav(profile, committeesize, tiebreaking = False):
+def compute_mav(profile, committeesize, resolute = False):
+
+    def hamming(a,b,elements):
+        diffs = 0
+        for x in elements:
+            if (x in a and not x in b) or (x in b and not x in a):
+                diffs += 1
+        return diffs
+
+    def mavscore(committee, profile):
+        score = 0
+        for vote in profile.preferences:
+            hamdistance = hamming(vote.approved,committee,range(profile.num_cand))
+            if hamdistance > score:
+                score = hamdistance
+        return score
+
+    __enough_approved_candiates(profile, committeesize)
+    
     opt_committees = []
     opt_mavscore = profile.num_cand + 1
     for comm in itertools.combinations(range(profile.num_cand),committeesize):
@@ -361,39 +367,39 @@ def compute_mav(profile, committeesize, tiebreaking = False):
             opt_mavscore = score
         elif mavscore(comm, profile) == opt_mavscore:
             opt_committees.append(comm)
-    if tiebreaking:
+    
+    opt_committees = __sort_committees(opt_committees)
+    if resolute:
         return [opt_committees[0]]
     else:
         return __sort_committees(opt_committees)
 
 
 # Proportional Approval Voting
-def compute_pav(profile, committeesize, ilp=True, tiebreaking = False):
+def compute_pav(profile, committeesize, ilp=True, resolute=False):
     if ilp:
-        return rules_approval_ilp.compute_thiele_methods_ilp(profile,committeesize,'pav', tiebreaking)
+        return rules_approval_ilp.compute_thiele_methods_ilp(profile,committeesize,'pav', resolute)
     else:
-        return compute_thiele_methods_branchandbound(profile,committeesize,'pav', tiebreaking)
+        return compute_thiele_methods_branchandbound(profile,committeesize,'pav', resolute)
 
 
 # Chamberlin-Courant
-def compute_cc(profile, committeesize, ilp=True,tiebreaking = False):
+def compute_cc(profile, committeesize, ilp=True, resolute=False):
     if ilp:
-        return rules_approval_ilp.compute_thiele_methods_ilp(profile,committeesize,'cc', tiebreaking)
+        return rules_approval_ilp.compute_thiele_methods_ilp(profile,committeesize,'cc', resolute)
     else:
-        return compute_thiele_methods_branchandbound(profile,committeesize,'cc', tiebreaking)
+        return compute_thiele_methods_branchandbound(profile,committeesize,'cc', resolute)
 
 
-
-def compute_monroe(profile, committeesize, ilp=True, tiebreaking=True):
-    if ilp and tiebreaking:
-        return rules_approval_ilp.compute_monroe_ilp(profile,committeesize)
-    elif not ilp:
-        return compute_monroe_bruteforce(profile, committeesize, tiebreaking)
+# Monroe's rule
+def compute_monroe(profile, committeesize, ilp=True, resolute=False):
+    if ilp:
+        return rules_approval_ilp.compute_monroe_ilp(profile,committeesize, resolute)
     else:
-        raise Exception("Monroe not implemented as ILP without tiebreaking")
+        return compute_monroe_bruteforce(profile, committeesize, resolute)
 
 
-def monroescore(committee, profile):
+def __monroescore(committee, profile):
     graph = {}
     sizeofdistricts = len(profile.preferences) / len(committee)
     for cand in committee:
@@ -407,7 +413,10 @@ def monroescore(committee, profile):
     return len(m)
     
 
-def compute_monroe_bruteforce(profile, committeesize, tiebreaking=False):
+# Monroe's rule, computed via (brute-force) matching
+def compute_monroe_bruteforce(profile, committeesize, resolute=False):
+    __enough_approved_candiates(profile, committeesize)
+    
     if not profile.has_unit_weights():
         raise Exception("Monroe is only defined for unit weights (weight=1)")
     if len(profile.preferences) % committeesize != 0:
@@ -415,20 +424,22 @@ def compute_monroe_bruteforce(profile, committeesize, tiebreaking=False):
     opt_committees = []
     opt_monroescore = -1
     for comm in itertools.combinations(range(profile.num_cand),committeesize):
-        score = monroescore(comm, profile)
-        #print comm, score
+        score = __monroescore(comm, profile)
         if score > opt_monroescore:
             opt_committees = [comm]
             opt_monroescore = score
-        elif monroescore(comm, profile) == opt_monroescore:
+        elif __monroescore(comm, profile) == opt_monroescore:
             opt_committees.append(comm)
-    if tiebreaking:
-        return [list(opt_committees[0])]
+    
+    opt_committees = __sort_committees(opt_committees)
+    if resolute:
+        return [opt_committees[0]]
     else:
-        return __sort_committees(opt_committees)
+        return opt_committees
 
 
 
+# nicely print a list of committees 
 def print_committees(committees, print_max=10):
     if committees is None:
         print "Error: no committees returned"

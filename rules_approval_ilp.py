@@ -3,12 +3,12 @@ import rules_approval
 from preferences import Profile
 from preferences import DichotomousPreferences
 
-def compute_thiele_methods_ilp(profile, committeesize, scorefct_str, tiebreaking=False):
+def compute_thiele_methods_ilp(profile, committeesize, scorefct_str, resolute=False):
     rules_approval.__enough_approved_candiates(profile, committeesize)
     scorefct = rules_approval.__get_scorefct(scorefct_str, committeesize)
     
     m = gb.Model()
-    C = list(range(profile.num_cand))
+    cands = list(range(profile.num_cand))
 
     # a binary variable indicating whether c is in the committee
     in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_comm")
@@ -20,7 +20,7 @@ def compute_thiele_methods_ilp(profile, committeesize, scorefct_str, tiebreaking
             utility[(v,l)] = m.addVar(ub=1.0)
 
     # constraint: the committee has the required size
-    m.addConstr(gb.quicksum(in_committee[c] for c in C) == committeesize)
+    m.addConstr(gb.quicksum(in_committee[c] for c in cands) == committeesize)
 
     # constraint: utilities are consistent with actual committee
     for v in profile.preferences:
@@ -32,12 +32,12 @@ def compute_thiele_methods_ilp(profile, committeesize, scorefct_str, tiebreaking
 
     m.setParam('OutputFlag', False)
 
-    if tiebreaking:
+    if resolute:
         m.setParam('PoolSearchMode', 0)
     else:
         # output all optimal committees
         m.setParam('PoolSearchMode', 2)
-        m.setParam('PoolSolutions', 11)  
+        m.setParam('PoolSolutions', 20) 
         m.setParam('PoolGap',0)  # ignore suboptimal committees
         
     m.optimize()
@@ -49,25 +49,30 @@ def compute_thiele_methods_ilp(profile, committeesize, scorefct_str, tiebreaking
     committees = []
     for sol in range(m.SolCount):
         m.setParam('SolutionNumber', sol)  
-        committees.append([c for c in C if in_committee[c].Xn >= 0.99])
+        committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
 
-    if len(committees)>10:
-        print "Warning ("+scorefct_str+"): more than 10 committees found; returning first 10 (",scorefct_str,")"
-        committees = committees[:10]
+    #~ if len(committees)>10:
+        #~ print "Warning ("+scorefct_str+"): more than 10 committees found; returning first 10 (",scorefct_str,")"
+        #~ committees = committees[:10]
 
-    if tiebreaking:
+    committees = rules_approval.__sort_committees(committees)
+
+    if resolute:
         return [committees[0]]
+    else:
+        return committees
 
-    return rules_approval.__sort_committees(committees)
 
 
+def compute_monroe_ilp(profile, committeesize, resolute):
+    rules_approval.__enough_approved_candiates(profile, committeesize)
 
-def compute_monroe_ilp(profile, committeesize):
-    
     # Monroe is only defined for unit weights
     if not profile.has_unit_weights():
         raise Exception("Monroe is only defined for unit weights (weight=1)")
+        
     num_voters = len(profile.preferences)
+    cands = list(range(profile.num_cand))
     
     #~ Alternative: split voters -> generate new profile with all weights = 1
     #~ prof2 = Profile(profile.num_cand)
@@ -106,22 +111,36 @@ def compute_monroe_ilp(profile, committeesize):
     # optimization objective
     m.setObjective(satisfaction, gb.GRB.MAXIMIZE)
 
+    #~ m.setParam('OutputFlag', False)
+
     m.setParam('OutputFlag', False)
 
-    # output all optimal committees
-    #m.setParam('PoolSearchMode', 2)
-    #m.setParam('PoolSolutions', 11)  
-    #m.setParam('PoolGap',0)  # ignore suboptimal committees
-
+    if resolute:
+        m.setParam('PoolSearchMode', 0)
+    else:
+        # output all optimal committees
+        m.setParam('PoolSearchMode', 2)
+        m.setParam('PoolSolutions', 11)  
+        m.setParam('PoolGap',0)  # ignore suboptimal committees
+        
     m.optimize()
-    
+
     if m.Status != 2:
-            print "Warning (Monroe): solutions may not be optimal. (Gurobi return code", m.Status, ")"
-            return
+        print "Warning ("+scorefct_str+"): solutions may ne incomplete or not optimal. (Gurobi return code", m.Status, ")"
 
-    opt = satisfaction.x
+    # extract committees from model
+    committees = []
+    for sol in range(m.SolCount):
+        m.setParam('SolutionNumber', sol)  
+        committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
 
-    com = [c for c in range(profile.num_cand) if in_committee[c].x >= 0.99]
-    
-    return [com]
+    #~ if len(committees)>10:
+        #~ print "Warning (Monroe): more than 10 committees found; returning first 10"
+        #~ committees = committees[:10]
 
+    committees = rules_approval.__sort_committees(committees)
+
+    if resolute:
+        return [committees[0]]
+    else:
+        return committees
