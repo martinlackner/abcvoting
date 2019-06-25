@@ -1,4 +1,4 @@
-# Python implementations of approval-based multi-winner rules
+# approval-multiwinner: Python implementations of approval-based multi-winner rules
 
 Approval-based multi-winner rules are voting methods for selecting a committee, i.e., a fixed-size subset of candidates. We recommend a suvey by Faliszewski, Skowron, Slinko, and Talmon [1] as an introduction to this topic and for further reference.
 The following approval-based multi-winner rules are implemented:
@@ -29,7 +29,7 @@ Computationally hard rules are also implemented via the ILP solver [Gurobi](http
 
 The following code computes the Proportional Approval Voting (PAV) rule for a profile with 6 voters and 5 candidates.
 
-```
+```python
 from preferences import Profile
 import rules_approval
 
