@@ -1,6 +1,6 @@
 # approval-multiwinner: Python implementations of approval-based multi-winner rules
 
-Approval-based multi-winner rules are voting methods for selecting a committee, i.e., a fixed-size subset of candidates. We recommend a suvey by Faliszewski, Skowron, Slinko, and Talmon [1] as an introduction to this topic and for further reference.
+Approval-based multi-winner rules are voting methods for selecting a committee, i.e., a fixed-size subset of candidates. We recommend the suvey by Faliszewski, Skowron, Slinko, and Talmon [1] as an introduction to this topic and for further reference.
 The following approval-based multi-winner rules are implemented:
 
 * Approval Voting (AV)
@@ -23,7 +23,7 @@ The following approval-based multi-winner rules are implemented:
   
 * Monroe [Gurobi optional]
 
-Computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). To use these, the module [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html) is required.
+Computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). These methods require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
 
 ## Example
 
@@ -44,9 +44,15 @@ The output is
 ```
 which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples can be found in [examples.py](examples.py).
 
+## Comments
+
+* All voting methods have a parameter `resolute`. If it set to true, only one winning committee is computed.
+* For ILP implementations via Gurobi it is not guaranteed that all winning committees are computed even if `resolute = False`.
+
+
 ## Acknowledgements
 
-Piotr Faliszewski, Andrzej Kaczmarczyk, Dominik Peters, and Piotr Skowron have contributed code to this package and provided help with technical and scientific questions.
+Piotr Faliszewski, Andrzej Kaczmarczyk, Dominik Peters, and Piotr Skowron have contributed code to this package and provided help with technical and scientific questions. The [Hopcroft-Karp bipartite matching algorithm](bipartite_matching) is part of the [ActiveState Code Recipes](https://github.com/ActiveState/code) and was implemented by David Eppstein.
 
 ## References
 
