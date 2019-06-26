@@ -1,3 +1,7 @@
+# Unit tests 
+
+# Author: Martin Lackner
+
 import unittest
 
 
@@ -39,8 +43,27 @@ class TestApprovalMultiwinner(unittest.TestCase):
             with self.assertRaises(Exception):
                 rules_approval.method(rule,profile,committeesize,resolute=True)
        
-       
-    def test_mwrules0(self):
+    
+    def test_mwrules_weightsconsidered(self):
+        from preferences import Profile
+        from preferences import DichotomousPreferences
+        import rules_approval
+        
+        self.longMessage = True
+        
+        profile = Profile(3)
+        profile.add_preferences(DichotomousPreferences([0],3))
+        profile.add_preferences(DichotomousPreferences([1],3))
+        profile.add_preferences(DichotomousPreferences([0]))
+        committeesize = 2
+        
+        for rule in rules_approval.mwrules.keys():
+            if rule[:6] == "monroe":
+                continue  # Monroe only works with unit weights
+            self.assertEqual(rules_approval.method(rule,profile,committeesize),[[0,1]], msg = rule+" failed")
+            
+                
+    def test_mwrules_correct_simple(self):
         from preferences import Profile
         import rules_approval
         
@@ -54,29 +77,29 @@ class TestApprovalMultiwinner(unittest.TestCase):
             self.assertEqual(len(rules_approval.method(rule,profile,committeesize)),6, msg = rule+" failed")
             
         for rule in rules_approval.mwrules.keys():
-            self.assertEqual(len(rules_approval.method(rule,profile,committeesize,resolute=True)),1, msg = rule+" with resolute")
+            self.assertEqual(len(rules_approval.method(rule,profile,committeesize,resolute=True)),1, msg = rule+" with resolute=True")
 
 
-    def test_mwrules1(self):
+    def test_mwrules_correct_advanced(self):
         
         def runmwtests(tests):
             for rule in tests.keys():
-                self.assertEqual(rules_approval.method(rule,profile,committeesize,resolute=False),tests[rule], msg = rule+" failed")
-                self.assertEqual(len(rules_approval.method(rule,profile,committeesize,resolute=True)), 1, msg = rule+" failed with resolute: "+str(len(rules_approval.method(rule,profile,committeesize,resolute=True)))+" committees")
-                self.assertTrue(rules_approval.method(rule,profile,committeesize,resolute=True)[0] in tests[rule], msg = rule+" failed with resolute"+str(rules_approval.method(rule,profile,committeesize,resolute=True)[0]))
+                self.assertEqual(rules_approval.method(rule,profile,committeesize,resolute=False),tests[rule], msg = rule+" failed: "+str(rules_approval.method(rule,profile,committeesize,resolute=True)))
+                self.assertEqual(len(rules_approval.method(rule,profile,committeesize,resolute=True)), 1, msg = rule+" failed with resolute=True: "+str(len(rules_approval.method(rule,profile,committeesize,resolute=True)))+" committees")
+                self.assertTrue(rules_approval.method(rule,profile,committeesize,resolute=True)[0] in tests[rule], msg = rule+" failed with resolute=True: "+str(rules_approval.method(rule,profile,committeesize,resolute=True)))
 
         from preferences import Profile
         import rules_approval
         self.longMessage = True
 
-        tests = {
+        tests1 = {
             "seqpav" : [[0, 1, 4, 5],[ 0, 2, 4, 5],[ 0, 3, 4, 5 ], [ 1, 2, 4, 5 ], [1, 3, 4, 5 ], [2, 3, 4, 5]],
             "av" : [[0, 1, 4, 5],[ 0, 2, 4, 5],[ 0, 3, 4, 5 ], [ 1, 2, 4, 5 ], [1, 3, 4, 5 ], [2, 3, 4, 5]],
             "sav" : [[0, 1, 2, 3],[ 0, 1, 2, 4],[0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0,1,4,5], [0, 2, 3, 4], [0, 2, 3, 5], [0, 2, 4, 5], [0, 3, 4, 5],  [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
             "pav-ilp" : [[0, 1, 4, 5],[ 0, 2, 4, 5],[ 0, 3, 4, 5 ], [ 1, 2, 4, 5 ], [1, 3, 4, 5 ], [2, 3, 4, 5]],
             "pav-noilp" : [[0, 1, 4, 5],[ 0, 2, 4, 5],[ 0, 3, 4, 5 ], [ 1, 2, 4, 5 ], [1, 3, 4, 5 ], [2, 3, 4, 5]],
             "revseqpav" : [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "mav" : [[0, 1, 2, 3],[ 0, 1, 2, 4],[0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0,1,4,5], [0, 2, 3, 4], [0, 2, 3, 5], [0, 2, 4, 5], [0, 3, 4, 5],  [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "mav-noilp" : [[0, 1, 2, 3],[ 0, 1, 2, 4],[0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0,1,4,5], [0, 2, 3, 4], [0, 2, 3, 5], [0, 2, 4, 5], [0, 3, 4, 5],  [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
             "phrag" : [[0, 1, 4, 5],[0, 2, 4, 5],[0, 3, 4, 5], [1, 2, 4, 5],[1, 3, 4, 5],[2, 3, 4, 5]],
             "cc-ilp" : [[0,1,2,3]],
             "cc-noilp" : [[0,1,2,3]],
@@ -91,7 +114,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
         preflist = [[0,4,5],[0],[1,4,5],[1],[2,4,5],[2],[3,4,5],[3]]
         profile.add_preferences(preflist)
 
-        runmwtests(tests)
+        runmwtests(tests1)
         
         # and now with reversed preflist
         preflist.reverse()
@@ -99,8 +122,33 @@ class TestApprovalMultiwinner(unittest.TestCase):
             p.reverse()
         profile = Profile(6)
         profile.add_preferences(preflist)
-        runmwtests(tests)
+        runmwtests(tests1)
         
+        # and another profile
+        profile = Profile(5)
+        committeesize = 3
+        preflist = [[0,1,2],[0,1,2],[0,1,2],[0,1,2],[0,1,2],[0,1],[3,4],[3,4],[3]]
+        profile.add_preferences(preflist)
+        
+        tests2 = {
+            "seqpav" : [[0, 1, 3]],
+            "av" : [[0, 1, 2]],
+            "sav" : [[0, 1, 3]],
+            "pav-ilp" : [[0, 1, 3]],
+            "pav-noilp" : [[0, 1, 3]],
+            "revseqpav" : [[0, 1, 3]],
+            "mav-noilp" : [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
+            "phrag" : [[0, 1, 3]],
+            "cc-ilp" : [[0,1,3],[0,2,3],[0,3,4],[1,2,3],[1,3,4],],
+            "cc-noilp" : [[0,1,3],[0,2,3],[0,3,4],[1,2,3],[1,3,4],],
+            "seqcc" : [[0,1,3],[0,2,3],[0,3,4],[1,2,3],[1,3,4],],
+            "revseqcc" : [[0,1,3],[0,2,3],[0,3,4],[1,2,3],[1,3,4],],
+            "monroe-ilp" : [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
+            "monroe-noilp" : [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
+            }
+        
+        runmwtests(tests2)
+
 
 if __name__ == '__main__':
     unittest.main()

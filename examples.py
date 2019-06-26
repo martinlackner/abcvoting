@@ -1,5 +1,7 @@
 # Simple examples
 
+# Author: Martin Lackner
+
 from preferences import *
 import rules_approval
 

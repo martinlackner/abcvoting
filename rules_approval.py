@@ -1,4 +1,6 @@
-# implementations of many approval-based multwinner voting rules
+# Implementations of many approval-based multwinner voting rules
+
+# Author: Martin Lackner
 
 import sys
 import itertools
@@ -339,7 +341,10 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
 
 
 # Maximin Approval Voting
-def compute_mav(profile, committeesize, resolute = False):
+def compute_mav(profile, committeesize, ilp=False, resolute = False):
+
+    if ilp:
+        raise NotImplementedError("MAV is not implemented as an ILP.")
 
     def hamming(a,b,elements):
         diffs = 0
@@ -420,7 +425,7 @@ def compute_monroe_bruteforce(profile, committeesize, resolute=False):
     if not profile.has_unit_weights():
         raise Exception("Monroe is only defined for unit weights (weight=1)")
     if len(profile.preferences) % committeesize != 0:
-        raise Exception("compute_monroe_bruteforce() currently works only if the number of voters is divisible by the committee size")
+        raise NotImplementedError("compute_monroe_bruteforce() currently works only if the number of voters is divisible by the committee size")
     opt_committees = []
     opt_monroescore = -1
     for comm in itertools.combinations(range(profile.num_cand),committeesize):

@@ -1,3 +1,8 @@
+# Collection of approval-based multiwinner rules and
+# methods to run all implemented rules on a given profile
+
+# Author: Martin Lackner
+
 import rules_approval
 
 mwrules = {
@@ -14,7 +19,7 @@ mwrules = {
     "cc-noilp" : "Chamberlin-Courant (CC) via branch-and-bound",
     "seqcc" : "Sequential Chamberlin-Courant (seq-CC)",
     "revseqcc" : "Reverse Sequential Chamberlin-Courant (revseq-CC)",
-    "mav" : "Maximin Approval Voting",
+    "mav-noilp" : "Maximin Approval Voting via brute-force",
         }
 
 def method(name, profile, committeesize, resolute=False):
@@ -44,8 +49,8 @@ def method(name, profile, committeesize, resolute=False):
         return rules_approval.compute_seqcc(profile,committeesize,resolute=resolute)
     elif name == "revseqcc":
         return rules_approval.compute_revseqcc(profile,committeesize,resolute=resolute)
-    elif name == "mav":
-        return rules_approval.compute_mav(profile,committeesize,resolute=resolute)
+    elif name == "mav-noilp":
+        return rules_approval.compute_mav(profile,committeesize,ilp=False,resolute=resolute)
     else:
         raise NotImplementedError("method "+str(name)+" not known")
 

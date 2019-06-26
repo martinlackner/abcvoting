@@ -1,3 +1,8 @@
+# Approval-based multiwinner rules implemented as an integer linear
+# program (ILP) with Gurobi
+
+# Author: Martin Lackner
+
 import gurobipy as gb
 import rules_approval
 from preferences import Profile
@@ -47,20 +52,20 @@ def compute_thiele_methods_ilp(profile, committeesize, scorefct_str, resolute=Fa
 
     # extract committees from model
     committees = []
-    for sol in range(m.SolCount):
-        m.setParam('SolutionNumber', sol)  
+    if resolute:
         committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
+    else:
+        for sol in range(m.SolCount):
+            m.setParam('SolutionNumber', sol)  
+            committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
 
     #~ if len(committees)>10:
-        #~ print "Warning ("+scorefct_str+"): more than 10 committees found; returning first 10 (",scorefct_str,")"
+        #~ print "Warning (Monroe): more than 10 committees found; returning first 10"
         #~ committees = committees[:10]
 
     committees = rules_approval.__sort_committees(committees)
 
-    if resolute:
-        return [committees[0]]
-    else:
-        return committees
+    return committees
 
 
 
@@ -130,9 +135,12 @@ def compute_monroe_ilp(profile, committeesize, resolute):
 
     # extract committees from model
     committees = []
-    for sol in range(m.SolCount):
-        m.setParam('SolutionNumber', sol)  
+    if resolute:
         committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
+    else:
+        for sol in range(m.SolCount):
+            m.setParam('SolutionNumber', sol)  
+            committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
 
     #~ if len(committees)>10:
         #~ print "Warning (Monroe): more than 10 committees found; returning first 10"
@@ -140,7 +148,4 @@ def compute_monroe_ilp(profile, committeesize, resolute):
 
     committees = rules_approval.__sort_committees(committees)
 
-    if resolute:
-        return [committees[0]]
-    else:
-        return committees
+    return committees
