@@ -2,7 +2,7 @@
 
 ## Python implementations of approval-based multi-winner rules
 
-Approval-based multi-winner rules are voting methods for selecting a committee, i.e., a fixed-size subset of candidates. We recommend the suvey by Faliszewski, Skowron, Slinko, and Talmon [1] as an introduction to this topic and for further reference.
+Approval-based multi-winner rules are voting methods for selecting a committee, i.e., a fixed-size subset of candidates. We recommend the suvey by Faliszewski et al. [1] as an introduction to this topic and for further reference.
 The following approval-based multi-winner rules are implemented:
 
 * Approval Voting (AV)
@@ -27,8 +27,6 @@ The following approval-based multi-winner rules are implemented:
 
 * Maximin Approval Voting 
 
-Computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). These methods require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
-
 ## Example
 
 The following code computes the Proportional Approval Voting (PAV) rule for a profile with 6 voters and 5 candidates.
@@ -50,6 +48,7 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 
 ## Comments
 
+* Most computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). These methods require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
 * All voting methods have a parameter `resolute`. If it set to true, only one winning committee is computed.
 * For ILP implementations via Gurobi it is not guaranteed that all winning committees are computed even if `resolute = False`.
 
