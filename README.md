@@ -25,6 +25,8 @@ The following approval-based multi-winner rules are implemented:
   
 * Monroe [Gurobi optional]
 
+* Maximin Approval Voting 
+
 Computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). These methods require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
 
 ## Example
