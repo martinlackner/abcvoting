@@ -3,14 +3,20 @@
 
 # Author: Martin Lackner
 
-import gurobipy as gb
-import rules_approval
-from preferences import Profile
-from preferences import DichotomousPreferences
+
+from preferences import Profile, DichotomousPreferences
+from committees import *
+import score_functions as sf
+try:
+    import gurobipy as gb
+except:
+	None
+	# Gurobi not available
+
 
 def compute_thiele_methods_ilp(profile, committeesize, scorefct_str, resolute=False):
-    rules_approval.__enough_approved_candiates(profile, committeesize)
-    scorefct = rules_approval.__get_scorefct(scorefct_str, committeesize)
+    enough_approved_candiates(profile, committeesize)
+    scorefct = sf.get_scorefct(scorefct_str, committeesize)
     
     m = gb.Model()
     cands = list(range(profile.num_cand))
@@ -63,14 +69,14 @@ def compute_thiele_methods_ilp(profile, committeesize, scorefct_str, resolute=Fa
         #~ print "Warning (Monroe): more than 10 committees found; returning first 10"
         #~ committees = committees[:10]
 
-    committees = rules_approval.__sort_committees(committees)
+    committees = sort_committees(committees)
 
     return committees
 
 
 
 def compute_monroe_ilp(profile, committeesize, resolute):
-    rules_approval.__enough_approved_candiates(profile, committeesize)
+    enough_approved_candiates(profile, committeesize)
 
     # Monroe is only defined for unit weights
     if not profile.has_unit_weights():
@@ -131,7 +137,7 @@ def compute_monroe_ilp(profile, committeesize, resolute):
     m.optimize()
 
     if m.Status != 2:
-        print "Warning ("+scorefct_str+"): solutions may ne incomplete or not optimal. (Gurobi return code", m.Status, ")"
+        print "Warning (Monroe): solutions may ne incomplete or not optimal. (Gurobi return code", m.Status, ")"
 
     # extract committees from model
     committees = []
@@ -146,6 +152,6 @@ def compute_monroe_ilp(profile, committeesize, resolute):
         #~ print "Warning (Monroe): more than 10 committees found; returning first 10"
         #~ committees = committees[:10]
 
-    committees = rules_approval.__sort_committees(committees)
+    committees = sort_committees(committees)
 
     return committees

@@ -2,6 +2,7 @@
 
 # Author: Martin Lackner
 
+
 import unittest
 
 
@@ -39,9 +40,9 @@ class TestApprovalMultiwinner(unittest.TestCase):
         
         for rule in rules_approval.mwrules.keys():
             with self.assertRaises(Exception):
-                rules_approval.method(rule,profile,committeesize)
+                rules_approval.compute_rule(rule,profile,committeesize)
             with self.assertRaises(Exception):
-                rules_approval.method(rule,profile,committeesize,resolute=True)
+                rules_approval.compute_rule(rule,profile,committeesize,resolute=True)
        
     
     def test_mwrules_weightsconsidered(self):
@@ -60,7 +61,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
         for rule in rules_approval.mwrules.keys():
             if rule[:6] == "monroe":
                 continue  # Monroe only works with unit weights
-            self.assertEqual(rules_approval.method(rule,profile,committeesize),[[0,1]], msg = rule+" failed")
+            self.assertEqual(rules_approval.compute_rule(rule,profile,committeesize),[[0,1]], msg = rule+" failed")
             
                 
     def test_mwrules_correct_simple(self):
@@ -74,19 +75,19 @@ class TestApprovalMultiwinner(unittest.TestCase):
         committeesize = 2
         
         for rule in rules_approval.mwrules.keys():
-            self.assertEqual(len(rules_approval.method(rule,profile,committeesize)),6, msg = rule+" failed")
+            self.assertEqual(len(rules_approval.compute_rule(rule,profile,committeesize)),6, msg = rule+" failed")
             
         for rule in rules_approval.mwrules.keys():
-            self.assertEqual(len(rules_approval.method(rule,profile,committeesize,resolute=True)),1, msg = rule+" with resolute=True")
+            self.assertEqual(len(rules_approval.compute_rule(rule,profile,committeesize,resolute=True)),1, msg = rule+" with resolute=True")
 
 
     def test_mwrules_correct_advanced(self):
         
         def runmwtests(tests):
             for rule in tests.keys():
-                self.assertEqual(rules_approval.method(rule,profile,committeesize,resolute=False),tests[rule], msg = rule+" failed: "+str(rules_approval.method(rule,profile,committeesize,resolute=True)))
-                self.assertEqual(len(rules_approval.method(rule,profile,committeesize,resolute=True)), 1, msg = rule+" failed with resolute=True: "+str(len(rules_approval.method(rule,profile,committeesize,resolute=True)))+" committees")
-                self.assertTrue(rules_approval.method(rule,profile,committeesize,resolute=True)[0] in tests[rule], msg = rule+" failed with resolute=True: "+str(rules_approval.method(rule,profile,committeesize,resolute=True)))
+                self.assertEqual(rules_approval.compute_rule(rule,profile,committeesize,resolute=False),tests[rule], msg = rule+" failed: "+str(rules_approval.compute_rule(rule,profile,committeesize,resolute=True)))
+                self.assertEqual(len(rules_approval.compute_rule(rule,profile,committeesize,resolute=True)), 1, msg = rule+" failed with resolute=True: "+str(len(rules_approval.compute_rule(rule,profile,committeesize,resolute=True)))+" committees")
+                self.assertTrue(rules_approval.compute_rule(rule,profile,committeesize,resolute=True)[0] in tests[rule], msg = rule+" failed with resolute=True: "+str(rules_approval.compute_rule(rule,profile,committeesize,resolute=True)))
 
         from preferences import Profile
         import rules_approval

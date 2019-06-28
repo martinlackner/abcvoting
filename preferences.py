@@ -2,6 +2,7 @@
 
 # Author: Martin Lackner
 
+
 class Profile(object):
     def __init__(self, num_cand, cand_names = None):
         self.num_cand = num_cand
@@ -42,7 +43,7 @@ class Profile(object):
         return iter(self.preferences)
 
     def __str__(self):
-        return 'Profile with %d votes and %d candidates: ' % (len(self.preferences), self.num_cand) + ', '.join(map(str, self.preferences))
+        return 'profile with %d votes and %d candidates: ' % (len(self.preferences), self.num_cand) + ', '.join(map(str, self.preferences))
 
 
 

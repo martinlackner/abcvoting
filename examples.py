@@ -2,8 +2,10 @@
 
 # Author: Martin Lackner
 
+
 from preferences import *
 import rules_approval
+import committees
 
 
 ilp=True
@@ -12,13 +14,14 @@ try:
 except:
     ilp=False
 
-
 num_cand = 5
 profile = Profile(num_cand)
 profile.add_preferences([[0,1,2],[0,1],[0,1],[1,2],[3,4],[3,4]])
 committeesize = 3
+print "Computing a committe of size",committeesize,"with Proportional Approval Voting given a", profile
+print "Output:"
 output = rules_approval.compute_pav(profile,committeesize,ilp=ilp)
-rules_approval.print_committees(output)
+committees.print_committees(output)
 
 print "****************************************"
 
