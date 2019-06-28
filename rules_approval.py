@@ -7,7 +7,6 @@ import sys
 import itertools
 from gmpy2 import mpq
 import rules_approval_ilp
-import functools
 from bipartite_matching import matching 
 from committees import sort_committees, enough_approved_candiates, print_committees
 import score_functions as sf

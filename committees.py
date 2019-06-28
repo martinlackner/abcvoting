@@ -1,4 +1,4 @@
-# Sorting, printing, ... committees 
+# Basic functions for committees (i.e., subsets of candidates) 
 
 # Author: Martin Lackner
 
