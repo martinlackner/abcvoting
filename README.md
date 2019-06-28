@@ -49,7 +49,7 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 ## Comments
 
 * Most computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). These methods require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
-* All voting methods have a parameter `resolute`. If it set to true, only one winning committee is computed.
+* All voting methods have a parameter `resolute`. If it is set to true, only one winning committee is computed.
 * For ILP implementations via Gurobi it is not guaranteed that all winning committees are computed even if `resolute = False`.
 
 
