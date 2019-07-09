@@ -8,15 +8,19 @@ import rules_approval
 import committees
 
 
+# See whether the Gurobi ILP solver is available
+
 ilp = True
 try:
-    import gurobipy
+    import gurobipy  # pylint: disable=unused-import
 except ImportError:
     ilp = False
     print "ILP solver Gurobi not available (import gurobipy failed)."
     print
 
 print "****************************************"
+
+# Compute PAV with our without Gurobi
 
 num_cand = 5
 profile = Profile(num_cand)
@@ -28,6 +32,8 @@ output = rules_approval.compute_pav(profile, committeesize, ilp=ilp)
 committees.print_committees(output)
 
 print "****************************************"
+
+# Compute all implemented multiwinner rules
 
 num_cand = 6
 profile = Profile(num_cand)
