@@ -1,4 +1,4 @@
-# Basic functions for committees (i.e., subsets of candidates) 
+# Basic functions for committees (i.e., subsets of candidates)
 
 # Author: Martin Lackner
 
@@ -14,10 +14,10 @@ def enough_approved_candiates(profile, committeesize):
     for pref in profile.preferences:
         appr.update(pref.approved)
     if len(appr) < committeesize:
-        raise Exception("committeesize = "+str(committeesize)+" is larger than number of approved candidates")
+        raise Exception("committeesize = " + str(committeesize) + " is larger than number of approved candidates")
 
 
-# nicely print a list of committees 
+# nicely print a list of committees
 def print_committees(committees, print_max=10):
     if committees is None:
         print "Error: no committees returned"
@@ -25,12 +25,10 @@ def print_committees(committees, print_max=10):
     if len(committees) == 1:
         print " 1 committee"
     else:
-        if len(committees)>print_max:
+        if len(committees) > print_max:
             print " ", len(committees), "committees, printing ", print_max, "of them"
         else:
             print " ", len(committees), "committees"
     for com in sorted(map(tuple, committees[:print_max])):
         print "    {", ", ".join(map(str, com)), "}"
-    print 
-
-
+    print

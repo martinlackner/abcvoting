@@ -36,9 +36,9 @@ from preferences import Profile
 import rules_approval
 
 profile = Profile(5)
-profile.add_preferences([[0,1,2],[0,1],[0,1],[1,2],[3,4],[3,4]])
+profile.add_preferences([[0,1,2], [0,1], [0,1], [1,2], [3,4], [3,4]])
 committeesize = 3
-print rules_approval.compute_pav(profile,committeesize,ilp=False)
+print rules_approval.compute_pav(profile, committeesize, ilp=False)
 ```
 The output is 
 ```
