@@ -12,7 +12,9 @@ class TestApprovalMultiwinner(unittest.TestCase):
         from preferences import DichotomousPreferences
         num_cand = 7
         prof = Profile(num_cand)
-        self.assertEqual(prof.add_preferences(DichotomousPreferences([0, 4, 5])), None)
+        self.assertEqual(prof.add_preferences(
+            DichotomousPreferences([0, 4, 5])),
+            None)
         with self.assertRaises(Exception):
             prof.add_preferences(DichotomousPreferences([num_cand]))
         with self.assertRaises(Exception):
@@ -42,7 +44,8 @@ class TestApprovalMultiwinner(unittest.TestCase):
             with self.assertRaises(Exception):
                 rules_approval.compute_rule(rule, profile, committeesize)
             with self.assertRaises(Exception):
-                rules_approval.compute_rule(rule, profile, committeesize, resolute=True)
+                rules_approval.compute_rule(rule, profile,
+                                            committeesize, resolute=True)
 
     def test_mwrules_weightsconsidered(self):
         from preferences import Profile
@@ -60,7 +63,8 @@ class TestApprovalMultiwinner(unittest.TestCase):
         for rule in rules_approval.MWRULES.keys():
             if rule[:6] == "monroe":
                 continue  # Monroe only works with unit weights
-            self.assertEqual(rules_approval.compute_rule(rule, profile, committeesize),
+            self.assertEqual(rules_approval.compute_rule(rule, profile,
+                                                         committeesize),
                              [[0, 1]],
                              msg=rule + " failed")
 
@@ -75,43 +79,62 @@ class TestApprovalMultiwinner(unittest.TestCase):
         committeesize = 2
 
         for rule in rules_approval.MWRULES.keys():
-            self.assertEqual(len(rules_approval.compute_rule(rule, profile, committeesize)),
-                             6,
-                             msg=rule + " failed")
+            self.assertEqual(len(rules_approval.compute_rule(rule, profile,
+                                                             committeesize)),
+                             6, msg=rule + " failed")
 
         for rule in rules_approval.MWRULES.keys():
-            self.assertEqual(len(rules_approval.compute_rule(rule, profile, committeesize, resolute=True)),
-                             1,
-                             msg=rule + " with resolute=True")
+            self.assertEqual(len(rules_approval.compute_rule(rule, profile,
+                                                             committeesize,
+                                                             resolute=True)),
+                             1, msg=rule + " failed with resolute=True")
 
     def test_mwrules_correct_advanced(self):
         def runmwtests(tests, committeesize):
             for rule in tests.keys():
-                self.assertEqual(rules_approval.compute_rule(rule, profile, committeesize, resolute=False),
-                                 tests[rule],
-                                 msg=rule + " failed: " + str(rules_approval.compute_rule(rule, profile, committeesize, resolute=True)))
-                self.assertEqual(len(rules_approval.compute_rule(rule, profile, committeesize, resolute=True)),
-                                 1,
-                                 msg=rule + " failed with resolute=True: " + str(len(rules_approval.compute_rule(rule, profile, committeesize, resolute=True))) + " committees")
-                self.assertTrue(rules_approval.compute_rule(rule, profile, committeesize, resolute=True)[0] in tests[rule],
-                                msg=rule + " failed with resolute=True: " + str(rules_approval.compute_rule(rule, profile, committeesize, resolute=True)))
+                output = rules_approval.compute_rule(rule, profile,
+                                                     committeesize,
+                                                     resolute=False)
+                self.assertEqual(output, tests[rule],
+                                 msg=rule + " failed")
+                output = rules_approval.compute_rule(rule, profile,
+                                                     committeesize,
+                                                     resolute=True)
+                self.assertEqual(len(output), 1,
+                                 msg=rule + " failed with resolute=True")
+                self.assertTrue(output[0] in tests[rule],
+                                msg=rule + " failed with resolute=True")
 
         from preferences import Profile
         import rules_approval
         self.longMessage = True
 
         tests1 = {
-            "seqpav": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "av": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "sav": [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5], [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "pav-ilp": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "pav-noilp": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "revseqpav": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "mav-noilp": [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5], [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "phrag": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "seqpav": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
+                       [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "av": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
+                   [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "sav": [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4],
+                    [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
+                    [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5],
+                    [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "pav-ilp": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
+                        [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "pav-noilp": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
+                          [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "revseqpav": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
+                          [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "mav-noilp": [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5],
+                          [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5],
+                          [0, 2, 3, 4], [0, 2, 3, 5], [0, 2, 4, 5],
+                          [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5],
+                          [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "phrag": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
+                      [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
             "cc-ilp": [[0, 1, 2, 3]],
             "cc-noilp": [[0, 1, 2, 3]],
-            "seqcc": [[0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 2, 3, 4], [0, 2, 3, 5], [1, 2, 3, 4], [1, 2, 3, 5]],
+            "seqcc": [[0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5],
+                      [0, 2, 3, 4], [0, 2, 3, 5], [1, 2, 3, 4], [1, 2, 3, 5]],
             "revseqcc": [[0, 1, 2, 3]],
             "monroe-ilp": [[0, 1, 2, 3]],
             "monroe-noilp": [[0, 1, 2, 3]],
@@ -119,7 +142,8 @@ class TestApprovalMultiwinner(unittest.TestCase):
 
         profile = Profile(6)
         committeesize = 4
-        preflist = [[0, 4, 5], [0], [1, 4, 5], [1], [2, 4, 5], [2], [3, 4, 5], [3]]
+        preflist = [[0, 4, 5], [0], [1, 4, 5], [1],
+                    [2, 4, 5], [2], [3, 4, 5], [3]]
         profile.add_preferences(preflist)
 
         runmwtests(tests1, committeesize)
@@ -135,7 +159,8 @@ class TestApprovalMultiwinner(unittest.TestCase):
         # and another profile
         profile = Profile(5)
         committeesize = 3
-        preflist = [[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1], [3, 4], [3, 4], [3]]
+        preflist = [[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2],
+                    [0, 1, 2], [0, 1], [3, 4], [3, 4], [3]]
         profile.add_preferences(preflist)
 
         tests2 = {
@@ -147,10 +172,14 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "revseqpav": [[0, 1, 3]],
             "mav-noilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
             "phrag": [[0, 1, 3]],
-            "cc-ilp": [[0, 1, 3], [0, 2, 3], [0, 3, 4], [1, 2, 3], [1, 3, 4]],
-            "cc-noilp": [[0, 1, 3], [0, 2, 3], [0, 3, 4], [1, 2, 3], [1, 3, 4]],
-            "seqcc": [[0, 1, 3], [0, 2, 3], [0, 3, 4], [1, 2, 3], [1, 3, 4]],
-            "revseqcc": [[0, 1, 3], [0, 2, 3], [0, 3, 4], [1, 2, 3], [1, 3, 4]],
+            "cc-ilp": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
+                       [1, 2, 3], [1, 3, 4]],
+            "cc-noilp": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
+                         [1, 2, 3], [1, 3, 4]],
+            "seqcc": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
+                      [1, 2, 3], [1, 3, 4]],
+            "revseqcc": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
+                         [1, 2, 3], [1, 3, 4]],
             "monroe-ilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
             "monroe-noilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
         }

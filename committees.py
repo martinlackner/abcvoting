@@ -14,7 +14,8 @@ def enough_approved_candiates(profile, committeesize):
     for pref in profile.preferences:
         appr.update(pref.approved)
     if len(appr) < committeesize:
-        raise Exception("committeesize = " + str(committeesize) + " is larger than number of approved candidates")
+        raise Exception("committeesize = " + str(committeesize)
+                        + " is larger than number of approved candidates")
 
 
 # nicely print a list of committees
@@ -26,7 +27,8 @@ def print_committees(committees, print_max=10):
         print " 1 committee"
     else:
         if len(committees) > print_max:
-            print " ", len(committees), "committees, printing ", print_max, "of them"
+            print " ", len(committees), "committees,",
+            print "printing ", print_max, "of them"
         else:
             print " ", len(committees), "committees"
     for com in sorted(map(tuple, committees[:print_max])):

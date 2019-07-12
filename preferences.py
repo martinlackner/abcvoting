@@ -28,7 +28,8 @@ class Profile(object):
             pref.is_valid(self.num_cand)
             self.preferences.append(pref)
         else:
-            raise Exception("Object of type", type(pref), "not suitable as preferences")
+            raise Exception("Object of type", type(pref),
+                            "not suitable as preferences")
 
     def totalweight(self):
         return reduce(lambda acc, prof: acc + prof.weight, self.preferences, 0)
@@ -43,7 +44,9 @@ class Profile(object):
         return iter(self.preferences)
 
     def __str__(self):
-        return 'profile with %d votes and %d candidates: ' % (len(self.preferences), self.num_cand) + ', '.join(map(str, self.preferences))
+        return ('profile with %d votes and %d candidates: '
+                % (len(self.preferences), self.num_cand)
+                + ', '.join(map(str, self.preferences)))
 
 
 class DichotomousPreferences():

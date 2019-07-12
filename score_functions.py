@@ -20,7 +20,8 @@ def get_scorefct(scorefct_str, committeesize):
         return functools.partial(__geom_score_fct, base=base)
     elif scorefct_str.startswith('generalizedcc'):
         param = mpq(scorefct_str[13:])
-        return functools.partial(__generalizedcc_score_fct, ell=param, committeesize=committeesize)
+        return functools.partial(__generalizedcc_score_fct, ell=param,
+                                 committeesize=committeesize)
     elif scorefct_str.startswith('lp-av'):
         param = mpq(scorefct_str[5:])
         return functools.partial(__lp_av_score_fct, ell=param)
@@ -28,7 +29,8 @@ def get_scorefct(scorefct_str, committeesize):
         raise Exception("Scoring function", scorefct_str, "does not exist.")
 
 
-# computes the Thiele score of a committee subject to a given score function (scorefct_str)
+# computes the Thiele score of a committee subject to
+# a given score function (scorefct_str)
 def thiele_score(profile, committee, scorefct_str="pav"):
     scorefct = get_scorefct(scorefct_str, len(committee))
     score = 0
@@ -41,7 +43,9 @@ def thiele_score(profile, committee, scorefct_str="pav"):
 
 
 def __generalizedcc_score_fct(i, ell, committeesize):
-    # corresponds to (1,1,1,..,1,0,..0) of length *committeesize* with *ell* zeros
+    # corresponds to (1,1,1,..,1,0,..0) of length *committeesize*
+    #  with *ell* zeros
+    # e.g.:
     # ell = committeesize - 1 ... Chamberlin-Courant
     # ell = 0 ... Approval Voting
     if i > committeesize - ell:
@@ -95,13 +99,15 @@ def cumulative_score_fct(scorefct, cand_in_com):
 
 
 # returns a list of length num_cand
-# the i-th entry contains the marginal score increase gained by adding candidate i
+# the i-th entry contains the marginal score increase
+#  gained by adding candidate i
 def additional_thiele_scores(profile, committee, scorefct):
     marg = [0] * profile.num_cand
     for pref in profile.preferences:
         for c in pref.approved:
             if pref.approved & set(committee):
-                marg[c] += pref.weight * scorefct(len(pref.approved & set(committee)) + 1)
+                marg[c] += pref.weight * scorefct(len(pref.approved &
+                                                      set(committee)) + 1)
             else:
                 marg[c] += pref.weight * scorefct(1)
     for c in committee:
