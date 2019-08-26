@@ -9,7 +9,7 @@ def sort_committees(committees):
 
 
 # verifies whether a sufficient number of approved candidates exists
-def enough_approved_candiates(profile, committeesize):
+def enough_approved_candidates(profile, committeesize):
     appr = set()
     for pref in profile.preferences:
         appr.update(pref.approved)

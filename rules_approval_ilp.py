@@ -4,7 +4,7 @@
 # Author: Martin Lackner
 
 
-from committees import enough_approved_candiates, sort_committees
+from committees import enough_approved_candidates, sort_committees
 import score_functions as sf
 try:
     import gurobipy as gb
@@ -15,7 +15,7 @@ except ImportError:
 def compute_thiele_methods_ilp(profile, committeesize,
                                scorefct_str, resolute=False):
 
-    enough_approved_candiates(profile, committeesize)
+    enough_approved_candidates(profile, committeesize)
     scorefct = sf.get_scorefct(scorefct_str, committeesize)
 
     m = gb.Model()
@@ -80,7 +80,7 @@ def compute_thiele_methods_ilp(profile, committeesize,
 
 
 def compute_monroe_ilp(profile, committeesize, resolute):
-    enough_approved_candiates(profile, committeesize)
+    enough_approved_candidates(profile, committeesize)
 
     # Monroe is only defined for unit weights
     if not profile.has_unit_weights():

@@ -4,10 +4,9 @@
 
 
 class Profile(object):
-    def __init__(self, num_cand, cand_names=None):
+    def __init__(self, num_cand):
         self.num_cand = num_cand
         self.preferences = []
-        self.cand_names = cand_names if cand_names else {}
 
     def add_preferences(self, pref):
         if type(pref) is list:

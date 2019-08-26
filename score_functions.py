@@ -3,7 +3,10 @@
 # Author: Martin Lackner
 
 
-from gmpy2 import mpq
+try:
+    from gmpy2 import mpq as Fraction
+except ImportError:
+    from fractions import Fraction
 import functools
 
 
@@ -16,14 +19,14 @@ def get_scorefct(scorefct_str, committeesize):
     elif scorefct_str == 'av':
         return __av_score_fct
     elif scorefct_str[:4] == 'geom':
-        base = mpq(scorefct_str[4:])
+        base = Fraction(scorefct_str[4:])
         return functools.partial(__geom_score_fct, base=base)
     elif scorefct_str.startswith('generalizedcc'):
-        param = mpq(scorefct_str[13:])
+        param = Fraction(scorefct_str[13:])
         return functools.partial(__generalizedcc_score_fct, ell=param,
                                  committeesize=committeesize)
     elif scorefct_str.startswith('lp-av'):
-        param = mpq(scorefct_str[5:])
+        param = Fraction(scorefct_str[5:])
         return functools.partial(__lp_av_score_fct, ell=param)
     else:
         raise Exception("Scoring function", scorefct_str, "does not exist.")
@@ -63,21 +66,21 @@ def __lp_av_score_fct(i, ell):
     if i == 1:
         return 1
     else:
-        return i ** mpq(1, ell) - (i - 1) ** mpq(1, ell)
+        return i ** Fraction(1, ell) - (i - 1) ** Fraction(1, ell)
 
 
 def __geom_score_fct(i, base):
     if i == 0:
         return 0
     else:
-        return mpq(1, base**i)
+        return Fraction(1, base**i)
 
 
 def __pav_score_fct(i):
     if i == 0:
         return 0
     else:
-        return mpq(1, i)
+        return Fraction(1, i)
 
 
 def __av_score_fct(i):
