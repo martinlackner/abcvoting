@@ -55,8 +55,10 @@ def compute_thiele_methods_ilp(profile, committeesize,
     else:
         # output all optimal committees
         m.setParam('PoolSearchMode', 2)
-        m.setParam('PoolSolutions', 20)  # output at most 20 solutions
-        m.setParam('PoolGap', 0)  # ignore suboptimal committees
+        # abort after (roughly) 100 optimal solutions
+        m.setParam('PoolSolutions', 100)
+        # ignore suboptimal committees
+        m.setParam('PoolGap', 0)
 
     m.optimize()
 
@@ -156,8 +158,10 @@ def compute_monroe_ilp(profile, committeesize, resolute):
     else:
         # output all optimal committees
         m.setParam('PoolSearchMode', 2)
-        m.setParam('PoolSolutions', 11)
-        m.setParam('PoolGap', 0)  # ignore suboptimal committees
+        # abort after (roughly) 100 optimal solutions
+        m.setParam('PoolSolutions', 100)
+        # ignore suboptimal committees
+        m.setParam('PoolGap', 0)
 
     m.optimize()
 
