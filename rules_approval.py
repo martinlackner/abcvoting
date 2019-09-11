@@ -1,4 +1,4 @@
-# Implementations of many approval-based multwinner voting rules
+# Implementations of many approval-based multiwinner voting rules
 
 # Authors: Martin Lackner, Stefan Forster
 
@@ -446,20 +446,6 @@ def compute_monroe(profile, committeesize, ilp=True, resolute=False):
         return compute_monroe_bruteforce(profile, committeesize, resolute)
 
 
-def __monroescore_matching(profile, committee):
-    graph = {}
-    sizeofdistricts = len(profile.preferences) / len(committee)
-    for cand in committee:
-        interestedvoters = []
-        for i in range(len(profile.preferences)):
-            if cand in profile.preferences[i].approved:
-                interestedvoters.append(i)
-        for j in range(sizeofdistricts):
-            graph[str(cand) + "/" + str(j)] = interestedvoters
-    m, _, _ = matching.bipartiteMatch(graph)
-    return len(m)
-
-
 def __monroescore(profile, committee, comm_size):
     """Returns Monroe score of a given committee"""
     G = nx.DiGraph()
@@ -468,22 +454,22 @@ def __monroescore(profile, committee, comm_size):
     lower_bound = floor(Fraction(len(profile.preferences), comm_size))
     # number of voters that will be contribute to the excess
     # of the lower bounds of districts
-    overflow = len(voters) - comm_size * lower_bound 
+    overflow = len(voters) - comm_size * lower_bound
     # add a sink node for the overflow
-    G.add_node('sink', demand = overflow)
+    G.add_node('sink', demand=overflow)
     for i in committee:
-        G.add_node(i, demand = lower_bound)
-        G.add_edge(i, 'sink', weight = 0, capacity = 1)
+        G.add_node(i, demand=lower_bound)
+        G.add_edge(i, 'sink', weight=0, capacity=1)
     for i in range(len(voters)):
         voter_name = 'v' + str(i)
-        G.add_node(voter_name, demand = -1)
+        G.add_node(voter_name, demand=-1)
         for cand in committee:
             if cand in voters[i].approved:
-                G.add_edge(voter_name, cand, weight = 0, capacity = 1)
+                G.add_edge(voter_name, cand, weight=0, capacity=1)
             else:
-                G.add_edge(voter_name, cand, weight = 1, capacity = 1)
+                G.add_edge(voter_name, cand, weight=1, capacity=1)
     # compute the minimal cost assignment of voters to candidates,
-    # i.e. the misplaced candidates, and subtract it from the total number
+    # i.e. the unrepresented voters, and subtract it from the total number
     # of voters
     return len(voters) - nx.capacity_scaling(G)[0]
 
