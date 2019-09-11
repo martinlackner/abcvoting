@@ -1,6 +1,6 @@
 # Implementations of many approval-based multwinner voting rules
 
-# Author: Martin Lackner
+# Authors: Martin Lackner, Stefan Forster
 
 
 import sys
@@ -10,7 +10,8 @@ try:
 except ImportError:
     from fractions import Fraction
 from rules_approval_ilp import compute_monroe_ilp, compute_thiele_methods_ilp
-from bipartite_matching import matching
+import networkx as nx
+from math import floor
 from committees import sort_committees,\
                        enough_approved_candidates,\
                        print_committees
@@ -30,7 +31,7 @@ MWRULES = {
     "revseqpav": "Reverse Sequential Prop. Approval Voting (revseq-PAV)",
     "phrag": "Phragmen's sequential rule (seq-Phragmen)",
     "monroe-ilp": "Monroe's rule via ILP",
-    "monroe-noilp": "Monroe's rule via matching algorithm",
+    "monroe-noilp": "Monroe's rule via flow algorithm",
     "cc-ilp": "Chamberlin-Courant (CC) via ILP",
     "cc-noilp": "Chamberlin-Courant (CC) via branch-and-bound",
     "seqcc": "Sequential Chamberlin-Courant (seq-CC)",
@@ -40,6 +41,7 @@ MWRULES = {
 
 
 def compute_rule(name, profile, committeesize, resolute=False):
+    """Returns the list of winner committees according to the named rule"""
     if name == "seqpav":
         return compute_seqpav(profile, committeesize, resolute=resolute)
     elif name == "revseqpav":
@@ -80,6 +82,7 @@ def compute_rule(name, profile, committeesize, resolute=False):
 
 
 def allrules(profile, committeesize, ilp=True, include_resolute=False):
+    """Prints the winner committees for all implemented rules"""
     for rule in MWRULES.keys():
         if not ilp and "-ilp" in rule:
             continue
@@ -143,6 +146,7 @@ def compute_thiele_methods_branchandbound(profile, committeesize,
 
 # Sequential PAV
 def compute_seqpav(profile, committeesize, resolute=False):
+    """Returns the list of winner committees according sequential PAV"""
     if resolute:
         return compute_seq_thiele_resolute(profile, committeesize, 'pav')
     else:
@@ -160,6 +164,7 @@ def compute_revseqpav(profile, committeesize, resolute=False):
 
 # Sequential Chamberlin-Courant
 def compute_seqcc(profile, committeesize, resolute=False):
+    """Returns the list of winner committees according to sequential CC"""
     if resolute:
         return compute_seq_thiele_resolute(profile, committeesize, 'cc')
     else:
@@ -182,6 +187,7 @@ def compute_sav(profile, committeesize, resolute=False):
 
 # Approval Voting (AV)
 def compute_av(profile, committeesize, resolute=False, sav=False):
+    """Returns the list of winner committees according to Approval Voting"""
     enough_approved_candidates(profile, committeesize)
 
     appr_scores = [0] * profile.num_cand
@@ -317,6 +323,7 @@ def compute_revseq_thiele_methods_resolute(profile, committeesize,
 
 # Phragmen's Sequential Rule
 def compute_seqphragmen(profile, committeesize, resolute=False):
+    """Returns the list of winner committees according to sequential Phragmen"""
     enough_approved_candidates(profile, committeesize)
 
     load = {v: 0 for v in profile.preferences}
@@ -368,6 +375,7 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
 
 # Maximin Approval Voting
 def compute_mav(profile, committeesize, ilp=False, resolute=False):
+    """Returns the list of winner committees according to Maximin AV"""
 
     if ilp:
         raise NotImplementedError("MAV is not implemented as an ILP.")
@@ -409,6 +417,7 @@ def compute_mav(profile, committeesize, ilp=False, resolute=False):
 
 # Proportional Approval Voting
 def compute_pav(profile, committeesize, ilp=True, resolute=False):
+    """Returns the list of winner committees according to Proportional AV"""
     if ilp:
         return compute_thiele_methods_ilp(profile, committeesize,
                                           'pav', resolute)
@@ -419,6 +428,7 @@ def compute_pav(profile, committeesize, ilp=True, resolute=False):
 
 # Chamberlin-Courant
 def compute_cc(profile, committeesize, ilp=True, resolute=False):
+    """Returns the list of winner committees according to Chamblerlin-Courant"""
     if ilp:
         return compute_thiele_methods_ilp(profile, committeesize,
                                           'cc', resolute)
@@ -429,13 +439,14 @@ def compute_cc(profile, committeesize, ilp=True, resolute=False):
 
 # Monroe's rule
 def compute_monroe(profile, committeesize, ilp=True, resolute=False):
+    """Returns the list of winner committees according to Monroe's rule"""
     if ilp:
         return compute_monroe_ilp(profile, committeesize, resolute)
     else:
         return compute_monroe_bruteforce(profile, committeesize, resolute)
 
 
-def __monroescore(committee, profile):
+def __monroescore_matching(profile, committee):
     graph = {}
     sizeofdistricts = len(profile.preferences) / len(committee)
     for cand in committee:
@@ -449,24 +460,49 @@ def __monroescore(committee, profile):
     return len(m)
 
 
+def __monroescore(profile, committee, comm_size):
+    """Returns Monroe score of a given committee"""
+    G = nx.DiGraph()
+    voters = profile.preferences
+    # the lower bound of the size of districts
+    lower_bound = floor(Fraction(len(profile.preferences), comm_size))
+    # number of voters that will be contribute to the excess
+    # of the lower bounds of districts
+    overflow = len(voters) - comm_size * lower_bound 
+    # add a sink node for the overflow
+    G.add_node('sink', demand = overflow)
+    for i in committee:
+        G.add_node(i, demand = lower_bound)
+        G.add_edge(i, 'sink', weight = 0, capacity = 1)
+    for i in range(len(voters)):
+        voter_name = 'v' + str(i)
+        G.add_node(voter_name, demand = -1)
+        for cand in committee:
+            if cand in voters[i].approved:
+                G.add_edge(voter_name, cand, weight = 0, capacity = 1)
+            else:
+                G.add_edge(voter_name, cand, weight = 1, capacity = 1)
+    # compute the minimal cost assignment of voters to candidates,
+    # i.e. the misplaced candidates, and subtract it from the total number
+    # of voters
+    return len(voters) - nx.capacity_scaling(G)[0]
+
+
 # Monroe's rule, computed via (brute-force) matching
 def compute_monroe_bruteforce(profile, committeesize, resolute=False):
+    """Returns the list of winner committees via brute-force Monroe's rule"""
     enough_approved_candidates(profile, committeesize)
 
     if not profile.has_unit_weights():
         raise Exception("Monroe is only defined for unit weights (weight=1)")
-    if len(profile.preferences) % committeesize != 0:
-        raise NotImplementedError("compute_monroe_bruteforce() currently " +
-                                  "works only if the number of voters is" +
-                                  " divisible by the committee size")
     opt_committees = []
     opt_monroescore = -1
     for comm in combinations(range(profile.num_cand), committeesize):
-        score = __monroescore(comm, profile)
+        score = __monroescore(profile, comm, committeesize)
         if score > opt_monroescore:
             opt_committees = [comm]
             opt_monroescore = score
-        elif __monroescore(comm, profile) == opt_monroescore:
+        elif __monroescore(profile, comm, committeesize) == opt_monroescore:
             opt_committees.append(comm)
 
     opt_committees = sort_committees(opt_committees)
