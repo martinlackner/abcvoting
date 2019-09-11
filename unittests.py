@@ -6,6 +6,29 @@
 import unittest
 
 
+def run_test_instance(unittestinstance, profile, committeesize, tests):
+    import rules_approval
+
+    # all rules used?
+    for rule in rules_approval.MWRULES:
+        unittestinstance.assertTrue(rule in tests.keys())
+
+    for rule in tests.keys():
+        output = rules_approval.compute_rule(rule, profile,
+                                             committeesize,
+                                             resolute=False)
+        unittestinstance.assertEqual(
+            output, tests[rule], msg=rules_approval.MWRULES[rule] + " failed")
+        output = rules_approval.compute_rule(
+            rule, profile, committeesize, resolute=True)
+        unittestinstance.assertEqual(
+            len(output), 1,
+            msg=rules_approval.MWRULES[rule] + " failed with resolute=True")
+        unittestinstance.assertTrue(
+            output[0] in tests[rule],
+            msg=rules_approval.MWRULES[rule] + " failed with resolute=True")
+
+
 class TestApprovalMultiwinner(unittest.TestCase):
     def test_createprofiles(self):
         from preferences import Profile
@@ -61,7 +84,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
         committeesize = 2
 
         for rule in rules_approval.MWRULES.keys():
-            if rule[:6] == "monroe" or rule[3:] == "monroe":
+            if "monroe" in rule:
                 continue  # Monroe only works with unit weights
             self.assertEqual(rules_approval.compute_rule(rule, profile,
                                                          committeesize),
@@ -108,7 +131,6 @@ class TestApprovalMultiwinner(unittest.TestCase):
     def test_mwrules_correct_advanced_1(self):
 
         from preferences import Profile
-        import rules_approval
         self.longMessage = True
 
         profile = Profile(6)
@@ -148,19 +170,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "monroe-noilp": [[0, 1, 2, 3]],
         }
 
-        for rule in tests1.keys():
-            output = rules_approval.compute_rule(rule, profile,
-                                                 committeesize,
-                                                 resolute=False)
-            self.assertEqual(output, tests1[rule],
-                             msg=rule + " failed")
-            output = rules_approval.compute_rule(rule, profile,
-                                                 committeesize,
-                                                 resolute=True)
-            self.assertEqual(len(output), 1,
-                             msg=rule + " failed with resolute=True")
-            self.assertTrue(output[0] in tests1[rule],
-                            msg=rule + " failed with resolute=True")
+        run_test_instance(self, profile, committeesize, tests1)
 
         # and now with reversed preflist
         preflist.reverse()
@@ -174,26 +184,11 @@ class TestApprovalMultiwinner(unittest.TestCase):
                     [2, 4, 5], [2], [3, 4, 5], [3]]
         profile.add_preferences(preflist)
 
-        for rule in tests1.keys():
-            output = rules_approval.compute_rule(rule, profile,
-                                                 committeesize,
-                                                 resolute=False)
-            self.assertEqual(output, tests1[rule],
-                             msg=rules_approval.MWRULES[rule] + " failed")
-            output = rules_approval.compute_rule(rule, profile,
-                                                 committeesize,
-                                                 resolute=True)
-            self.assertEqual(len(output), 1,
-                             msg=rules_approval.MWRULES[rule] +
-                             " failed with resolute=True")
-            self.assertTrue(output[0] in tests1[rule],
-                            msg=rules_approval.MWRULES[rule] +
-                            " failed with resolute=True")
+        run_test_instance(self, profile, committeesize, tests1)
 
     def test_mwrules_correct_advanced_2(self):
 
         from preferences import Profile
-        import rules_approval
         self.longMessage = True
 
         # and another profile
@@ -224,26 +219,11 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "monroe-noilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
         }
 
-        for rule in tests2.keys():
-            output = rules_approval.compute_rule(rule, profile,
-                                                 committeesize,
-                                                 resolute=False)
-            self.assertEqual(output, tests2[rule],
-                             msg=rules_approval.MWRULES[rule] + " failed")
-            output = rules_approval.compute_rule(rule, profile,
-                                                 committeesize,
-                                                 resolute=True)
-            self.assertEqual(len(output), 1,
-                             msg=rules_approval.MWRULES[rule] +
-                             " failed with resolute=True")
-            self.assertTrue(output[0] in tests2[rule],
-                            msg=rules_approval.MWRULES[rule] +
-                            " failed with resolute=True")
+        run_test_instance(self, profile, committeesize, tests2)
 
     def test_mwrules_correct_advanced_3(self):
 
         from preferences import Profile
-        import rules_approval
         self.longMessage = True
 
         # and a third profile
@@ -294,21 +274,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
                              [1, 2, 4, 5]],
         }
 
-        for rule in tests3.keys():
-            output = rules_approval.compute_rule(rule, profile,
-                                                 committeesize,
-                                                 resolute=False)
-            self.assertEqual(output, tests3[rule],
-                             msg=rules_approval.MWRULES[rule] + " failed")
-            output = rules_approval.compute_rule(rule, profile,
-                                                 committeesize,
-                                                 resolute=True)
-            self.assertEqual(len(output), 1,
-                             msg=rules_approval.MWRULES[rule] +
-                             " failed with resolute=True")
-            self.assertTrue(output[0] in tests3[rule],
-                            msg=rules_approval.MWRULES[rule] +
-                            " failed with resolute=True")
+        run_test_instance(self, profile, committeesize, tests3)
 
 
 if __name__ == '__main__':
