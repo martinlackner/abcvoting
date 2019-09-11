@@ -11,15 +11,15 @@ The following approval-based multi-winner rules are implemented:
 
 * Proportional Approval Voting (PAV) [Gurobi optional]
 
-* Sequential Proportional Approval Voting (seq-PAV)
+* Sequential Proportional Approval Voting
 
-* Reverse Sequential Proportional Approval Voting (revseq-PAV)
+* Reverse Sequential Proportional Approval Voting
 
 * Approval Chamberlin-Courant (CC) [Gurobi optional]
 
-* Sequential Chamberlin-Courant (seq-CC)
+* Sequential Chamberlin-Courant
 
-* Reverse Sequential Chamberlin-Courant (revseq-CC)
+* Reverse Sequential Chamberlin-Courant
 
 * Phragmen's sequential rule (see [2])
   
@@ -55,7 +55,7 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 * For ILP implementations via Gurobi it is not guaranteed that all winning committees are computed even if `resolute = False`.
 
 
-## Acknowledgements
+## Contributors
 
 The following people have contributed code to this package and provided help with technical and scientific questions. In alphabetic order:
 
@@ -70,6 +70,7 @@ The following people have contributed code to this package and provided help wit
 * [Dominik Peters](http://dominik-peters.de/)
 
 * [Piotr Skowron](https://www.mimuw.edu.pl/~ps219737/)
+
 
 ## References
 
