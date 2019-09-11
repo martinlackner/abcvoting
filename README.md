@@ -57,7 +57,19 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 
 ## Acknowledgements
 
-Piotr Faliszewski, Andrzej Kaczmarczyk, Dominik Peters, and Piotr Skowron have contributed code to this package and provided help with technical and scientific questions. The [Hopcroft-Karp bipartite matching algorithm](bipartite_matching) is part of the [ActiveState Code Recipes](https://github.com/ActiveState/code) and was implemented by David Eppstein.
+The following people have contributed code to this package and provided help with technical and scientific questions. In alphabetic order:
+
+* [Piotr Faliszewski](http://home.agh.edu.pl/~faliszew/)
+
+* [Stefan Schlomo Forster](https://github.com/stefanschlomoforster)
+
+* [Andrzej Kaczmarczyk](http://www.user.tu-berlin.de/droores/)
+
+* [Martin Lackner](http://martin.lackner.xyz/)
+
+* [Dominik Peters](http://dominik-peters.de/)
+
+* [Piotr Skowron](https://www.mimuw.edu.pl/~ps219737/)
 
 ## References
 
