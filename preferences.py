@@ -19,16 +19,21 @@ class Profile(object):
                 # list of integer-lists or DichotomousPreferences
                 for p in pref:
                     if type(p) is list:
-                        self.preferences.append(DichotomousPreferences(p))
-                    else:
+                        newpref = DichotomousPreferences(p)
+                        newpref.is_valid(self.num_cand)
+                        self.preferences.append(newpref)
+                    elif isinstance(p, DichotomousPreferences):
                         p.is_valid(self.num_cand)
                         self.preferences.append(p)
+                    else:
+                        raise Exception("Object of type " + str(type(p)) +
+                                        " not suitable as preferences")
         elif isinstance(pref, DichotomousPreferences):
             pref.is_valid(self.num_cand)
             self.preferences.append(pref)
         else:
-            raise Exception("Object of type", type(pref),
-                            "not suitable as preferences")
+            raise Exception("Object of type " + str(type(p)) +
+                            " not suitable as preferences")
 
     def totalweight(self):
         return reduce(lambda acc, prof: acc + prof.weight, self.preferences, 0)
@@ -43,9 +48,16 @@ class Profile(object):
         return iter(self.preferences)
 
     def __str__(self):
-        return ('profile with %d votes and %d candidates: '
-                % (len(self.preferences), self.num_cand)
-                + ', '.join(map(str, self.preferences)))
+        if self.has_unit_weights():
+            return ("weighted profile with %d votes and %d candidates: "
+                    % (len(self.preferences), self.num_cand)
+                    + ", ".join(map(str, self.preferences)))
+        else:
+            output = ("profile with %d votes and %d candidates: "
+                      % (len(self.preferences), self.num_cand))
+            for p in self.preferences:
+                output += str(p.weight) + "*" + str(p) + ", "
+            return output
 
 
 class DichotomousPreferences():
@@ -60,6 +72,7 @@ class DichotomousPreferences():
     def is_valid(self, num_cand):
         for c in self.approved:
             if c < 0 or c >= num_cand:
-                raise Exception(self, " not valid for num_cand =", num_cand)
+                raise Exception(str(self) + " not valid for num_cand = " +
+                                str(num_cand))
 
         return True
