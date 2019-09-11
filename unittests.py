@@ -89,6 +89,22 @@ class TestApprovalMultiwinner(unittest.TestCase):
                                                              resolute=True)),
                              1, msg=rule + " failed with resolute=True")
 
+    def test_monroe_indivisible(self):
+        from preferences import Profile
+        import rules_approval
+
+        self.longMessage = True
+
+        profile = Profile(4)
+        profile.add_preferences([[0], [0], [0], [1, 2], [1, 2], [1], [3]])
+        committeesize = 3
+
+        self.assertEqual(
+            rules_approval.compute_monroe(profile, committeesize,
+                                          ilp=True, resolute=False),
+            [[0, 1, 2], [0, 1, 3], [0, 2, 3]])
+        # max Monroe score is 6 (even for committee [0, 1, 3])
+
     def test_mwrules_correct_advanced(self):
         def runmwtests(tests, committeesize):
             for rule in tests.keys():
