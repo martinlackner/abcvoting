@@ -122,11 +122,12 @@ class TestApprovalMultiwinner(unittest.TestCase):
         profile.add_preferences([[0], [0], [0], [1, 2], [1, 2], [1], [3]])
         committeesize = 3
 
-        self.assertEqual(
-            rules_approval.compute_monroe(profile, committeesize,
-                                          ilp=True, resolute=False),
-            [[0, 1, 2], [0, 1, 3], [0, 2, 3]])
-        # max Monroe score is 6 (even for committee [0, 1, 3])
+        for ilp in [True, False]:
+            # max Monroe score is 6 (even for committee [0, 1, 3])
+            self.assertEqual(
+                rules_approval.compute_monroe(profile, committeesize,
+                                              ilp=ilp, resolute=False),
+                [[0, 1, 2], [0, 1, 3], [0, 2, 3]])
 
     def test_mwrules_correct_advanced_1(self):
 
