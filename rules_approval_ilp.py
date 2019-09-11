@@ -86,7 +86,8 @@ def compute_monroe_ilp(profile, committeesize, resolute):
 
     # Monroe is only defined for unit weights
     if not profile.has_unit_weights():
-        raise Exception("Monroe is only defined for unit weights (weight=1)")
+        raise NotImplementedError("Monroe is only defined for" +
+                                  " unit weights (weight=1)")
 
     num_voters = len(profile.preferences)
     cands = list(range(profile.num_cand))
