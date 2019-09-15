@@ -9,7 +9,8 @@ try:
     from gmpy2 import mpq as Fraction
 except ImportError:
     from fractions import Fraction
-from rules_approval_ilp import compute_monroe_ilp, compute_thiele_methods_ilp
+from rules_approval_ilp import compute_monroe_ilp, compute_thiele_methods_ilp,\
+                               compute_maximin_ilp, compute_minimax_ilp
 import networkx as nx
 from committees import sort_committees,\
                        enough_approved_candidates,\
@@ -35,7 +36,10 @@ MWRULES = {
     "cc-noilp": "Chamberlin-Courant (CC) via branch-and-bound",
     "seqcc": "Sequential Chamberlin-Courant (seq-CC)",
     "revseqcc": "Reverse Sequential Chamberlin-Courant (revseq-CC)",
-    "mav-noilp": "Maximin Approval Voting via brute-force",
+    "maximin-ilp": "Maximin Approval Voting via ILP",
+    "maximin-noilp": "Maximin Approval Voting via brute-force",
+    "minimax-ilp": "Minimax Approval Voting via ILP",
+    "minimax-noilp": "Minimax Approval Voting via brute-force",
 }
 
 
@@ -73,9 +77,18 @@ def compute_rule(name, profile, committeesize, resolute=False):
         return compute_seqcc(profile, committeesize, resolute=resolute)
     elif name == "revseqcc":
         return compute_revseqcc(profile, committeesize, resolute=resolute)
-    elif name == "mav-noilp":
-        return compute_mav(profile, committeesize,
-                           ilp=False, resolute=resolute)
+    elif name == "maximin-ilp":
+        return compute_maximin(profile, committeesize,
+                               ilp=True, resolute=resolute)
+    elif name == "maximin-noilp":
+        return compute_maximin(profile, committeesize,
+                               ilp=False, resolute=resolute)
+    elif name == "minimax-ilp":
+        return compute_minimax(profile, committeesize,
+                               ilp=True, resolute=resolute)
+    elif name == "minimax-noilp":
+        return compute_minimax(profile, committeesize,
+                               ilp=False, resolute=resolute)
     else:
         raise NotImplementedError("voting method " + str(name) + " not known")
 
@@ -374,11 +387,11 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
 
 
 # Maximin Approval Voting
-def compute_mav(profile, committeesize, ilp=False, resolute=False):
+def compute_maximin(profile, committeesize, ilp=False, resolute=False):
     """Returns the list of winning committees according to Maximin AV"""
 
     if ilp:
-        raise NotImplementedError("MAV is not implemented as an ILP.")
+        compute_maximin_ilp(profile, committeesize, resolute)
 
     def hamming(a, b, elements):
         diffs = 0
@@ -387,7 +400,7 @@ def compute_mav(profile, committeesize, ilp=False, resolute=False):
                 diffs += 1
         return diffs
 
-    def mavscore(committee, profile):
+    def maximinscore(committee, profile):
         score = 0
         for vote in profile.preferences:
             hamdistance = hamming(vote.approved, committee,
@@ -399,13 +412,52 @@ def compute_mav(profile, committeesize, ilp=False, resolute=False):
     enough_approved_candidates(profile, committeesize)
 
     opt_committees = []
-    opt_mavscore = profile.num_cand + 1
+    opt_maximinscore = profile.num_cand + 1
     for comm in combinations(range(profile.num_cand), committeesize):
-        score = mavscore(comm, profile)
-        if score < opt_mavscore:
+        score = maximinscore(comm, profile)
+        if score < opt_maximinscore:
             opt_committees = [comm]
-            opt_mavscore = score
-        elif mavscore(comm, profile) == opt_mavscore:
+            opt_maximinscore = score
+        elif maximinscore(comm, profile) == opt_maximinscore:
+            opt_committees.append(comm)
+
+    opt_committees = sort_committees(opt_committees)
+    if resolute:
+        return [opt_committees[0]]
+    else:
+        return sort_committees(opt_committees)
+
+# Minimax Approval Voting
+def compute_minimax(profile, committeesize, ilp=False, resolute=False):
+    """Returns the list of winning committees according to Minimax AV"""
+
+    if ilp:
+        compute_minimax_ilp(profile, committeesize, resolute)
+
+    def hamming(a, b, elements):
+        diffs = 0
+        for x in elements:
+            if (x in a and x not in b) or (x in b and x not in a):
+                diffs += 1
+        return diffs
+
+    def minimaxscore(committee, profile):
+        score = 0
+        for vote in profile.preferences:
+            score += hamming(vote.approved, committee,
+                             range(profile.num_cand))
+        return score
+
+    enough_approved_candidates(profile, committeesize)
+
+    opt_committees = []
+    opt_minimaxscore = len(profile.preferences) * profile.num_cand + 1
+    for comm in combinations(range(profile.num_cand), committeesize):
+        score = minimaxscore(comm, profile)
+        if score < opt_minimaxscore:
+            opt_committees = [comm]
+            opt_minimaxscore = score
+        elif minimaxscore(comm, profile) == opt_minimaxscore:
             opt_committees.append(comm)
 
     opt_committees = sort_committees(opt_committees)
