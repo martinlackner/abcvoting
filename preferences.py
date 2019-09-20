@@ -5,6 +5,9 @@
 
 class Profile(object):
     def __init__(self, num_cand):
+        if num_cand is not int and num_cand > 0:
+            raise ValueError(str(num_cand) +
+                             " is not a valid number of candidates")
         self.num_cand = num_cand
         self.preferences = []
 
@@ -49,11 +52,11 @@ class Profile(object):
 
     def __str__(self):
         if self.has_unit_weights():
-            return ("weighted profile with %d votes and %d candidates: "
+            return ("profile with %d votes and %d candidates: "
                     % (len(self.preferences), self.num_cand)
                     + ", ".join(map(str, self.preferences)))
         else:
-            output = ("profile with %d votes and %d candidates: "
+            output = ("weighted profile with %d votes and %d candidates: "
                       % (len(self.preferences), self.num_cand))
             for p in self.preferences:
                 output += str(p.weight) + "*" + str(p) + ", "
