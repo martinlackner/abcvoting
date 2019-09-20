@@ -15,6 +15,7 @@ from committees import sort_committees,\
                        enough_approved_candidates,\
                        print_committees
 import score_functions as sf
+from bipartite_matching import matching
 
 
 ########################################################################
@@ -446,15 +447,36 @@ def compute_monroe(profile, committeesize, ilp=True, resolute=False):
         return compute_monroe_bruteforce(profile, committeesize, resolute)
 
 
-def __monroescore(profile, committee, comm_size):
-    """Returns Monroe score of a given committee"""
+def monroescore_matching(profile, committee):
+    """Returns Monroe score of a given committee.
+    Uses a matching-based algorithm that works only if 
+    committeesize divides the number of voters"""
+    graph = {}
+    sizeofdistricts = len(profile.preferences) / len(committee)
+    for cand in committee:
+        interestedvoters = []
+        for i in range(len(profile.preferences)):
+            if cand in profile.preferences[i].approved:
+                interestedvoters.append(i)
+        for j in range(sizeofdistricts):
+            graph[str(cand) + "/" + str(j)] = interestedvoters
+    m, _, _ = matching.bipartiteMatch(graph)
+    return len(m)
+
+
+def monroescore_flowbased(profile, committee, committeesize=0):
+    """Returns Monroe score of a given committee.
+    Uses a flow-based algorithm that works even if
+    committeesize does not divide the number of voters"""
     G = nx.DiGraph()
     voters = profile.preferences
+    if committeesize == 0:
+        committeesize = len(committee)
     # the lower bound of the size of districts
-    lower_bound = len(profile.preferences) // comm_size
+    lower_bound = len(profile.preferences) // committeesize
     # number of voters that will be contribute to the excess
     # of the lower bounds of districts
-    overflow = len(voters) - comm_size * lower_bound
+    overflow = len(voters) - committeesize * lower_bound
     # add a sink node for the overflow
     G.add_node('sink', demand=overflow)
     for i in committee:
@@ -475,20 +497,27 @@ def __monroescore(profile, committee, comm_size):
 
 
 # Monroe's rule, computed via (brute-force) matching
-def compute_monroe_bruteforce(profile, committeesize, resolute=False):
+def compute_monroe_bruteforce(profile, committeesize,
+                              resolute=False, flowbased=True):
     """Returns the list of winning committees via brute-force Monroe's rule"""
     enough_approved_candidates(profile, committeesize)
 
     if not profile.has_unit_weights():
         raise Exception("Monroe is only defined for unit weights (weight=1)")
+
+    if profile.totalweight() % committeesize != 0 or flowbased:
+        monroescore = monroescore_flowbased
+    else:
+        monroescore = monroescore_matching
+
     opt_committees = []
     opt_monroescore = -1
     for comm in combinations(range(profile.num_cand), committeesize):
-        score = __monroescore(profile, comm, committeesize)
+        score = monroescore(profile, comm)
         if score > opt_monroescore:
             opt_committees = [comm]
             opt_monroescore = score
-        elif __monroescore(profile, comm, committeesize) == opt_monroescore:
+        elif monroescore(profile, comm) == opt_monroescore:
             opt_committees.append(comm)
 
     opt_committees = sort_committees(opt_committees)

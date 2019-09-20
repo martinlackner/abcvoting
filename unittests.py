@@ -277,6 +277,23 @@ class TestApprovalMultiwinner(unittest.TestCase):
 
         run_test_instance(self, profile, committeesize, tests3)
 
+    def test_monroescore(self):
+        from preferences import Profile
+        from rules_approval import monroescore_flowbased, monroescore_matching
+        self.longMessage = True
+
+        # and a third profile
+        profile = Profile(6)
+        preflist = [[0, 1], [1], [1, 3], [4], [2], [1, 5, 3]]
+        profile.add_preferences(preflist)
+
+        self.assertEqual(monroescore_flowbased(profile, [1, 3, 2]), 5)
+        self.assertEqual(monroescore_matching(profile, [1, 3, 2]), 5)
+        self.assertEqual(monroescore_flowbased(profile, [2, 1, 5]), 4)
+        self.assertEqual(monroescore_matching(profile, [2, 1, 5]), 4)
+        self.assertEqual(monroescore_flowbased(profile, [2, 4, 5]), 3)
+        self.assertEqual(monroescore_matching(profile, [2, 5, 4]), 3)
+
 
 if __name__ == '__main__':
     unittest.main()
