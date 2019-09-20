@@ -5,7 +5,7 @@
 
 class Profile(object):
     def __init__(self, num_cand):
-        if num_cand is not int and num_cand > 0:
+        if num_cand <= 0:
             raise ValueError(str(num_cand) +
                              " is not a valid number of candidates")
         self.num_cand = num_cand
