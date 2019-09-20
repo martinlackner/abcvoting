@@ -1,4 +1,4 @@
-# Implementations of many approval-based multi-winner voting rules
+# Implementations of approval-based multi-winner voting rules
 
 # Authors: Martin Lackner, Stefan Forster
 
@@ -18,8 +18,7 @@ import score_functions as sf
 
 
 ########################################################################
-# Collection of approval-based multi-winner rules #######################
-########################################################################
+
 
 MWRULES = {
     "av": "Approval Voting",
