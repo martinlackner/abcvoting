@@ -1,9 +1,12 @@
-# approval-multiwinner
+# abcvoting
 
-## Python implementations of approval-based multi-winner rules
+## Python implementations of approval-based committee (multi-winner) rules
 
-Approval-based multi-winner rules are voting methods for selecting a committee, i.e., a fixed-size subset of candidates. We recommend the suvey by Faliszewski et al. [1] as an introduction to this topic and for further reference.
-The following approval-based multi-winner rules are implemented:
+Approval-based committee rules (ABC rules) are voting methods for selecting a committee, i.e., a fixed-size subset of candidates.
+ABC rules are also known as approval-based multi-winner rules.
+The input of such rules are [approval ballots](https://en.wikipedia.org/wiki/Approval_voting#/media/File:Approval_ballot.svg).
+We recommend the survey by Faliszewski et al. [1] as an introduction to this topic and for further reference.
+The following ABC rules are implemented:
 
 * Approval Voting (AV)
 
@@ -25,7 +28,7 @@ The following approval-based multi-winner rules are implemented:
   
 * Monroe [Gurobi optional]
 
-* Maximin Approval Voting 
+* Minimax Approval Voting [3]
 
 ## Example
 
@@ -57,19 +60,13 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 
 ## Contributors
 
-The following people have contributed code to this package and provided help with technical and scientific questions. In alphabetic order:
-
-* [Piotr Faliszewski](http://home.agh.edu.pl/~faliszew/)
-
-* [Stefan Schlomo Forster](https://github.com/stefanschlomoforster)
-
-* [Andrzej Kaczmarczyk](http://www.user.tu-berlin.de/droores/)
-
-* [Martin Lackner](http://martin.lackner.xyz/)
-
-* [Dominik Peters](http://dominik-peters.de/)
-
-* [Piotr Skowron](https://www.mimuw.edu.pl/~ps219737/)
+The following people have contributed code to this package and provided help with technical and scientific questions (in alphabetic order):
+[Piotr Faliszewski](http://home.agh.edu.pl/~faliszew/),
+[Stefan Schlomo Forster](https://github.com/stefanschlomoforster),
+[Andrzej Kaczmarczyk](http://www.user.tu-berlin.de/droores/),
+[Martin Lackner](http://martin.lackner.xyz/),
+[Dominik Peters](http://dominik-peters.de/), 
+[Piotr Skowron](https://www.mimuw.edu.pl/~ps219737/).
 
 
 ## References
@@ -79,3 +76,5 @@ new challenge for social choice theory. In Ulle Endriss, editor, Trends in Compu
 Choice, chapter 2, pages 27–47. AI Access, 2017. http://research.illc.uva.nl/COST-IC1205/BookDocs/Chapters/TrendsCOMSOC-02.pdf
 
 [2] Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner. Phragmén's Voting Methods and Justified Representation. In Proceedings of the 31st AAAI Conference on Artificial Intelligence (AAAI 2017), pages 406-413, AAAI Press, 2017. http://martin.lackner.xyz/publications/phragmen.pdf
+
+[3] Steven J Brams, D Marc Kilgour, and M Remzi Sanver. A minimax procedure for electing committees. Public Choice, 132(3-4):401–420, 2007.

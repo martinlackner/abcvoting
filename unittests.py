@@ -1,7 +1,5 @@
 # Unit tests
 
-# Author: Martin Lackner
-
 
 import unittest
 
@@ -279,7 +277,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
 
     def test_monroescore(self):
         from preferences import Profile
-        from rules_approval import monroescore_flowbased, monroescore_matching
+        from score_functions import monroescore_flowbased, monroescore_matching
         self.longMessage = True
 
         # and a third profile

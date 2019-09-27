@@ -1,8 +1,6 @@
 # Approval-based multiwinner rules implemented as an integer linear
 # program (ILP) with Gurobi
 
-# Author: Martin Lackner
-
 
 from committees import enough_approved_candidates, sort_committees
 import score_functions as sf

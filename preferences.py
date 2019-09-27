@@ -1,7 +1,5 @@
 # Dichotomous (approval) preferences and profiles
 
-# Author: Martin Lackner
-
 
 class Profile(object):
     def __init__(self, num_cand):

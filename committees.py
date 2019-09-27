@@ -1,7 +1,5 @@
 # Basic functions for committees (i.e., subsets of candidates)
 
-# Author: Martin Lackner
-
 
 # sorts a list of committees, converts them to lists, and removes duplicates
 def sort_committees(committees):
