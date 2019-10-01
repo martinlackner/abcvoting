@@ -1,4 +1,4 @@
-# Score functions for Thiele methods
+# Calculating scores
 
 
 try:
