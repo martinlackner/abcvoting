@@ -28,7 +28,7 @@ The following ABC rules are implemented:
   
 * Monroe [Gurobi optional]
 
-* Minimax Approval Voting [3]
+* Minimax Approval Voting (see [3])
 
 ## Example
 
