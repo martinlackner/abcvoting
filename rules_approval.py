@@ -323,7 +323,7 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
     enough_approved_candidates(profile, committeesize)
 
     load = {v: 0 for v in profile.preferences}
-    com_loads = {(): load}
+    comm_loads = {(): load}
 
     approvers_weight = {}
     for c in range(profile.num_cand):
@@ -333,8 +333,8 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
 
     # build committees starting with the empty set
     for _ in range(0, committeesize):
-        com_loads_next = {}
-        for committee, load in com_loads.iteritems():
+        comm_loads_next = {}
+        for committee, load in comm_loads.iteritems():
             approvers_load = {}
             for c in range(profile.num_cand):
                 approvers_load[c] = sum(v.weight * load[v]
@@ -354,15 +354,19 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
                             new_load[v] = new_maxload[c]
                         else:
                             new_load[v] = load[v]
-                    com_loads_next[tuple(sorted(committee + (c,)))] = new_load
+                    comm_loads_next[tuple(sorted(committee + (c,)))] = new_load
         # remove suboptimal committees
-        com_loads = {}
-        cutoff = min([max(load) for load in com_loads_next.values()])
-        for com, load in com_loads_next.iteritems():
+        comm_loads = {}
+        cutoff = min([max(load) for load in comm_loads_next.values()])
+        for com, load in comm_loads_next.iteritems():
             if max(load) <= cutoff:
-                com_loads[com] = load
+                comm_loads[com] = load
+        if resolute:
+            committees = sort_committees(comm_loads.keys())
+            comm = tuple(committees[0])
+            comm_loads = {comm: comm_loads[comm]}
 
-    committees = sort_committees(com_loads.keys())
+    committees = sort_committees(comm_loads.keys())
     if resolute:
         return [committees[0]]
     else:
@@ -370,7 +374,7 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
 
 
 # Maximin Approval Voting
-def compute_mav(profile, committeesize, ilp=False, resolute=False):
+def compute_mav(profile, committeesize, ilp=True, resolute=False):
     """Returns the list of winning committees according to Maximin AV"""
 
     if ilp:
