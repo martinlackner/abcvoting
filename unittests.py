@@ -127,6 +127,24 @@ class TestApprovalMultiwinner(unittest.TestCase):
                                               ilp=ilp, resolute=False),
                 [[0, 1, 2], [0, 1, 3], [0, 2, 3]])
 
+    # this test shows that tiebreaking is not (yet)
+    # implemented for opt-Phragmen
+    def test_optphrag_notiebreaking(self):
+        from preferences import Profile
+        from rules_approval import compute_rule
+
+        self.longMessage = True
+
+        profile = Profile(6)
+        profile.add_preferences([[0], [0], [1, 3], [1, 3], [1, 4],
+                                 [2, 4], [2, 5], [2, 5]])
+        committeesize = 3
+
+        self.assertEqual(
+                len(compute_rule("optphrag", profile, committeesize,
+                                 resolute=False)),
+                12)
+
     def test_mwrules_correct_advanced_1(self):
 
         from preferences import Profile
@@ -160,6 +178,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
                           [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
             "phrag": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
                       [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "optphrag": [[0, 1, 2, 3]],
             "cc-ilp": [[0, 1, 2, 3]],
             "cc-noilp": [[0, 1, 2, 3]],
             "seqcc": [[0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5],
@@ -206,6 +225,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "revseqpav": [[0, 1, 3]],
             "mav-noilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
             "phrag": [[0, 1, 3]],
+            "optphrag": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
             "cc-ilp": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
                        [1, 2, 3], [1, 3, 4]],
             "cc-noilp": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
@@ -243,6 +263,11 @@ class TestApprovalMultiwinner(unittest.TestCase):
                           [0, 2, 3, 4], [0, 2, 3, 5],
                           [0, 2, 4, 5]],
             "phrag": [[0, 1, 2, 4]],
+            "optphrag": [[0, 1, 2, 3], [0, 1, 2, 4],
+                         [0, 1, 2, 5], [0, 2, 3, 4],
+                         [0, 2, 3, 5], [0, 2, 4, 5],
+                         [1, 2, 3, 4], [1, 2, 3, 5],
+                         [1, 2, 4, 5]],
             "cc-ilp": [[0, 1, 2, 3], [0, 1, 2, 4],
                        [0, 1, 2, 5], [0, 2, 3, 4],
                        [0, 2, 3, 5], [0, 2, 4, 5],

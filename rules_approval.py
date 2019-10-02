@@ -7,7 +7,8 @@ try:
     from gmpy2 import mpq as Fraction
 except ImportError:
     from fractions import Fraction
-from rules_approval_ilp import compute_monroe_ilp, compute_thiele_methods_ilp
+from rules_approval_ilp import compute_monroe_ilp, compute_thiele_methods_ilp,\
+                               compute_optphragmen_ilp
 from committees import sort_committees,\
                        enough_approved_candidates,\
                        print_committees
@@ -25,6 +26,7 @@ MWRULES = {
     "seqpav": "Sequential Proportional Approval Voting (seq-PAV)",
     "revseqpav": "Reverse Sequential Prop. Approval Voting (revseq-PAV)",
     "phrag": "Phragmen's sequential rule (seq-Phragmen)",
+    "optphrag": "Phragmen's optimization rule (opt-Phragmen)",
     "monroe-ilp": "Monroe's rule via ILP",
     "monroe-noilp": "Monroe's rule via flow algorithm",
     "cc-ilp": "Chamberlin-Courant (CC) via ILP",
@@ -72,6 +74,9 @@ def compute_rule(name, profile, committeesize, resolute=False):
     elif name == "mav-noilp":
         return compute_mav(profile, committeesize,
                            ilp=False, resolute=resolute)
+    elif name == "optphrag":
+        return compute_optphragmen_ilp(profile, committeesize,
+                                       resolute=resolute)
     else:
         raise NotImplementedError("voting method " + str(name) + " not known")
 

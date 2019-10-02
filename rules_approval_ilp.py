@@ -148,8 +148,6 @@ def compute_monroe_ilp(profile, committeesize, resolute):
     # optimization objective
     m.setObjective(satisfaction, gb.GRB.MAXIMIZE)
 
-    # m.setParam('OutputFlag', False)
-
     m.setParam('OutputFlag', False)
 
     if resolute:
@@ -177,10 +175,86 @@ def compute_monroe_ilp(profile, committeesize, resolute):
             m.setParam('SolutionNumber', sol)
             committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
 
-    # if len(committees)>10:
-    #    print "Warning (Monroe): more than 10 committees found;",
-    #    print "returning first 10"
-    #    committees = committees[:10]
+    committees = sort_committees(committees)
+
+    return committees
+
+
+# opt-Phragmen
+#
+# Warning: does not include the tie-breaking mechanism as specified
+# in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
+# Phragmen's Voting Methods and Justified Representation.
+# http://martin.lackner.xyz/publications/phragmen.pdf
+#
+# Instead: minimizes the maximum load
+def compute_optphragmen_ilp(profile, committeesize,
+                            resolute=False):
+
+    enough_approved_candidates(profile, committeesize)
+
+    cands = list(range(profile.num_cand))
+
+    m = gb.Model()
+    m.setParam('OutputFlag', False)
+
+    # a binary variable indicating whether c is in the committee
+    in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY,
+                             name="in_comm")
+
+    load = {}
+    for c in cands:
+        for v in profile.preferences:
+            load[(v, c)] = m.addVar(ub=1.0, lb=0.0)
+
+    # constraint: the committee has the required size
+    m.addConstr(gb.quicksum(in_committee[c] for c in cands) == committeesize)
+
+    for c in cands:
+        for v in profile.preferences:
+            if c not in v.approved:
+                m.addConstr(load[(v, c)] == 0)
+
+    # a candidate's load is distributed among his approvers
+    for c in cands:
+        m.addConstr(gb.quicksum(v.weight * load[(v, c)]
+                                for v in profile.preferences if c in cands)
+                    == in_committee[c])
+
+    loadbound = m.addVar(name="loadbound")
+    for v in profile.preferences:
+        m.addConstr(gb.quicksum(load[(v, c)]
+                                for c in v.approved)
+                    <= loadbound)
+    m.setObjective(loadbound, gb.GRB.MINIMIZE)
+
+    m.setParam('OutputFlag', False)
+
+    if resolute:
+        m.setParam('PoolSearchMode', 0)
+    else:
+        # output all optimal committees
+        m.setParam('PoolSearchMode', 2)
+        # abort after (roughly) 100 optimal solutions
+        m.setParam('PoolSolutions', 100)
+        # ignore suboptimal committees
+        m.setParam('PoolGap', 0)
+
+    m.optimize()
+
+    if m.Status != 2:
+        print ("Warning (opt-Phragmen): solutions may be "
+               + "incomplete or not optimal.")
+        print "(Gurobi return code", m.Status, ")"
+
+    # extract committees from model
+    committees = []
+    if resolute:
+        committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
+    else:
+        for sol in range(m.SolCount):
+            m.setParam('SolutionNumber', sol)
+            committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
 
     committees = sort_committees(committees)
 
