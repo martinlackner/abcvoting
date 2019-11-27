@@ -14,6 +14,8 @@ import networkx as nx
 def get_scorefct(scorefct_str, committeesize):
     if scorefct_str == 'pav':
         return __pav_score_fct
+    elif scorefct_str == 'slav':
+        return __slav_score_fct
     elif scorefct_str == 'cc':
         return __cc_score_fct
     elif scorefct_str == 'av':
@@ -81,6 +83,13 @@ def __pav_score_fct(i):
         return 0
     else:
         return Fraction(1, i)
+
+
+def __slav_score_fct(i):
+    if i == 0:
+        return 0
+    else:
+        return Fraction(1, 2*i - 1)
 
 
 def __av_score_fct(i):

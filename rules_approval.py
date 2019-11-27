@@ -25,6 +25,9 @@ MWRULES = {
     "pav-noilp": "Proportional Approval Voting (PAV) via branch-and-bound",
     "seqpav": "Sequential Proportional Approval Voting (seq-PAV)",
     "revseqpav": "Reverse Sequential Prop. Approval Voting (revseq-PAV)",
+    "slav-ilp": "Sainte-Lague Approval Voting (SLAV) via ILP",
+    "slav-noilp": "Sainte-Lague Approval Voting (SLAV) via branch-and-bound",
+    "seqslav": "Sequential Sainte-Lague Approval Voting (seq-SLAV)",
     "phrag": "Phragmen's sequential rule (seq-Phragmen)",
     "optphrag": "Phragmen's optimization rule (opt-Phragmen)",
     "monroe-ilp": "Monroe's rule via ILP",
@@ -53,6 +56,14 @@ def compute_rule(name, profile, committeesize, resolute=False):
     elif name == "pav-noilp":
         return compute_pav(profile, committeesize,
                            ilp=False, resolute=resolute)
+    elif name == "seqslav":
+        return compute_seqslav(profile, committeesize, resolute=resolute)
+    elif name == "slav-ilp":
+        return compute_slav(profile, committeesize,
+                            ilp=True, resolute=resolute)
+    elif name == "slav-noilp":
+        return compute_slav(profile, committeesize,
+                            ilp=False, resolute=resolute)
     elif name == "phrag":
         return compute_seqphragmen(profile, committeesize, resolute=resolute)
     elif name == "monroe-ilp":
@@ -151,6 +162,15 @@ def compute_seqpav(profile, committeesize, resolute=False):
         return compute_seq_thiele_resolute(profile, committeesize, 'pav')
     else:
         return compute_seq_thiele_methods(profile, committeesize, 'pav')
+
+
+# Sequential SLAV
+def compute_seqslav(profile, committeesize, resolute=False):
+    """Returns the list of winning committees according sequential SLAV"""
+    if resolute:
+        return compute_seq_thiele_resolute(profile, committeesize, 'slav')
+    else:
+        return compute_seq_thiele_methods(profile, committeesize, 'slav')
 
 
 # Reverse Sequential PAV
@@ -429,6 +449,17 @@ def compute_pav(profile, committeesize, ilp=True, resolute=False):
     else:
         return compute_thiele_methods_branchandbound(profile, committeesize,
                                                      'pav', resolute)
+
+
+# Sainte-Lague Approval Voting
+def compute_slav(profile, committeesize, ilp=True, resolute=False):
+    """Returns the list of winning committees according to Proportional AV"""
+    if ilp:
+        return compute_thiele_methods_ilp(profile, committeesize,
+                                          'slav', resolute)
+    else:
+        return compute_thiele_methods_branchandbound(profile, committeesize,
+                                                     'slav', resolute)
 
 
 # Chamberlin-Courant

@@ -18,6 +18,10 @@ The following ABC rules are implemented:
 
 * Reverse Sequential Proportional Approval Voting
 
+* Sainte-Lagu&euml; Approval Voting (SLAV) [4]
+
+* Sequential Sainte-Lagu&euml; Approval Voting [4]
+
 * Approval Chamberlin-Courant (CC) [Gurobi optional]
 
 * Sequential Chamberlin-Courant
@@ -78,3 +82,7 @@ Choice, chapter 2, pages 27–47. AI Access, 2017. http://research.illc.uva.nl/C
 [2] Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner. Phragmén's Voting Methods and Justified Representation. In Proceedings of the 31st AAAI Conference on Artificial Intelligence (AAAI 2017), pages 406-413, AAAI Press, 2017. http://martin.lackner.xyz/publications/phragmen.pdf
 
 [3] Steven J Brams, D Marc Kilgour, and M Remzi Sanver. A minimax procedure for electing committees. Public Choice, 132(3-4):401–420, 2007.
+
+[4] Martin Lackner, Piotr Skowron.
+A Quantitative Analysis of Multi-Winner Rules. CoRR abs/1801.01527. 2018. https://arxiv.org/abs/1801.01527
+

@@ -12,6 +12,7 @@ def run_test_instance(unittestinstance, profile, committeesize, tests):
         unittestinstance.assertTrue(rule in tests.keys())
 
     for rule in tests.keys():
+
         output = rules_approval.compute_rule(rule, profile,
                                              committeesize,
                                              resolute=False)
@@ -149,9 +150,9 @@ class TestApprovalMultiwinner(unittest.TestCase):
 
         from preferences import Profile
         self.longMessage = True
+        committeesize = 4
 
         profile = Profile(6)
-        committeesize = 4
         preflist = [[0, 4, 5], [0], [1, 4, 5], [1],
                     [2, 4, 5], [2], [3, 4, 5], [3]]
         profile.add_preferences(preflist)
@@ -186,6 +187,20 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "revseqcc": [[0, 1, 2, 3]],
             "monroe-ilp": [[0, 1, 2, 3]],
             "monroe-noilp": [[0, 1, 2, 3]],
+            "slav-ilp": [[0, 1, 2, 3],
+                         [0, 1, 2, 4], [0, 1, 2, 5],
+                         [0, 1, 3, 4], [0, 1, 3, 5],
+                         [0, 2, 3, 4], [0, 2, 3, 5],
+                         [1, 2, 3, 4], [1, 2, 3, 5]],
+            "slav-noilp": [[0, 1, 2, 3],
+                           [0, 1, 2, 4], [0, 1, 2, 5],
+                           [0, 1, 3, 4], [0, 1, 3, 5],
+                           [0, 2, 3, 4], [0, 2, 3, 5],
+                           [1, 2, 3, 4], [1, 2, 3, 5]],
+            "seqslav": [[0, 1, 2, 4], [0, 1, 2, 5],
+                        [0, 1, 3, 4], [0, 1, 3, 5],
+                        [0, 2, 3, 4], [0, 2, 3, 5],
+                        [1, 2, 3, 4], [1, 2, 3, 5]],
         }
 
         run_test_instance(self, profile, committeesize, tests1)
@@ -195,11 +210,6 @@ class TestApprovalMultiwinner(unittest.TestCase):
         for p in preflist:
             p.reverse()
         profile = Profile(6)
-        profile.add_preferences(preflist)
-        profile = Profile(6)
-        committeesize = 4
-        preflist = [[0, 4, 5], [0], [1, 4, 5], [1],
-                    [2, 4, 5], [2], [3, 4, 5], [3]]
         profile.add_preferences(preflist)
 
         run_test_instance(self, profile, committeesize, tests1)
@@ -236,6 +246,9 @@ class TestApprovalMultiwinner(unittest.TestCase):
                          [1, 2, 3], [1, 3, 4]],
             "monroe-ilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
             "monroe-noilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
+            "seqslav": [[0, 1, 3]],
+            "slav-ilp": [[0, 1, 3]],
+            "slav-noilp": [[0, 1, 3]],
         }
 
         run_test_instance(self, profile, committeesize, tests2)
@@ -296,6 +309,9 @@ class TestApprovalMultiwinner(unittest.TestCase):
                              [0, 2, 3, 5], [0, 2, 4, 5],
                              [1, 2, 3, 4], [1, 2, 3, 5],
                              [1, 2, 4, 5]],
+            "seqslav": [[0, 1, 2, 4]],
+            "slav-ilp": [[0, 1, 2, 4]],
+            "slav-noilp": [[0, 1, 2, 4]],
         }
 
         run_test_instance(self, profile, committeesize, tests3)
