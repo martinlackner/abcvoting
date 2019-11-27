@@ -64,10 +64,8 @@ class Profile(object):
 class DichotomousPreferences():
     def __init__(self, approved, weight=1):
         self.approved = set(approved)
-        if approved:
+        if approved:  # empty approval sets are fine
             self.is_valid(max(approved) + 1)
-        else:
-            self.is_valid(0)
         self.weight = weight
 
     def __str__(self):
