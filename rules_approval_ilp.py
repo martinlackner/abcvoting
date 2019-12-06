@@ -259,3 +259,78 @@ def compute_optphragmen_ilp(profile, committeesize,
     committees = sort_committees(committees)
 
     return committees
+
+
+def compute_minimaxav_ilp(profile, committeesize, resolute=False):
+    enough_approved_candidates(profile, committeesize)
+
+    voters = profile.preferences
+    num_voters = len(voters)
+    cands = range(profile.num_cand)
+
+    m = gb.Model()
+
+    # optimization goal: variable "sum_difference"
+    max_hamdistance = m.addVar(vtype=gb.GRB.INTEGER, name="max_hamdistance")
+
+    # a list of committee members
+    in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY,
+                             name="in_comm")
+    m.addConstr(gb.quicksum(in_committee[c] for c in cands)
+                == committeesize)
+
+    # the single differences between the committee and the voters
+    difference = m.addVars(profile.num_cand, num_voters, vtype=gb.GRB.INTEGER,
+                           name="diff")
+
+    for i in cands:
+        for j in range(num_voters):
+            if i in voters[j].approved:
+                # constraint for the case that the candidate is approved
+                m.addConstr(difference[i, j] == 1 - in_committee[i])
+            else:
+                # constraint for the case that the candidate isn't approved
+                m.addConstr(difference[i, j] == in_committee[i])
+
+    for j in range(num_voters):
+        # maximum hamming distance is greater of equal than any individual one
+        m.addConstr(max_hamdistance >= gb.quicksum(difference[i, j]
+                                                   for i in cands
+                                                   )
+                    )
+
+    # optimization objective
+    m.setObjective(max_hamdistance, gb.GRB.MINIMIZE)
+
+    # m.setParam('OutputFlag', False)
+
+    m.setParam('OutputFlag', False)
+
+    if resolute:
+        m.setParam('PoolSearchMode', 0)
+    else:
+        # output all optimal committees
+        m.setParam('PoolSearchMode', 2)
+        # abort after (roughly) 100 optimal solutions
+        m.setParam('PoolSolutions', 1000)
+        # ignore suboptimal committees
+        m.setParam('PoolGap', 0)
+
+    m.optimize()
+
+    if m.Status != 2:
+        print "Warning (Minimax AV): solutions may be incomplete or not optimal."
+        print "(Gurobi return code", m.Status, ")"
+
+    # extract committees from model
+    committees = []
+    if resolute:
+        committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
+    else:
+        for sol in range(m.SolCount):
+            m.setParam('SolutionNumber', sol)
+            committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
+
+    committees = sort_committees(committees)
+
+    return committees

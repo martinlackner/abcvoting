@@ -8,7 +8,7 @@ try:
 except ImportError:
     from fractions import Fraction
 from rules_approval_ilp import compute_monroe_ilp, compute_thiele_methods_ilp,\
-                               compute_optphragmen_ilp
+                               compute_optphragmen_ilp, compute_minimaxav_ilp
 from committees import sort_committees,\
                        enough_approved_candidates,\
                        print_committees
@@ -36,7 +36,8 @@ MWRULES = {
     "cc-noilp": "Chamberlin-Courant (CC) via branch-and-bound",
     "seqcc": "Sequential Chamberlin-Courant (seq-CC)",
     "revseqcc": "Reverse Sequential Chamberlin-Courant (revseq-CC)",
-    "mav-noilp": "Maximin Approval Voting via brute-force",
+    "minimaxav-noilp": "Minimax Approval Voting via brute-force",
+    "minimaxav-ilp": "Minimax Approval Voting via ILP",
 }
 
 
@@ -82,9 +83,12 @@ def compute_rule(name, profile, committeesize, resolute=False):
         return compute_seqcc(profile, committeesize, resolute=resolute)
     elif name == "revseqcc":
         return compute_revseqcc(profile, committeesize, resolute=resolute)
-    elif name == "mav-noilp":
-        return compute_mav(profile, committeesize,
-                           ilp=False, resolute=resolute)
+    elif name == "minimaxav-noilp":
+        return compute_minimaxav(profile, committeesize,
+                                 ilp=False, resolute=resolute)
+    elif name == "minimaxav-ilp":
+        return compute_minimaxav(profile, committeesize,
+                                 ilp=True, resolute=resolute)
     elif name == "optphrag":
         return compute_optphragmen_ilp(profile, committeesize,
                                        resolute=resolute)
@@ -398,12 +402,12 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
         return committees
 
 
-# Maximin Approval Voting
-def compute_mav(profile, committeesize, ilp=True, resolute=False):
-    """Returns the list of winning committees according to Maximin AV"""
+# Minimax Approval Voting
+def compute_minimaxav(profile, committeesize, ilp=True, resolute=False):
+    """Returns the list of winning committees according to Minimax AV"""
 
     if ilp:
-        raise NotImplementedError("MAV is not implemented as an ILP.")
+        return compute_minimaxav_ilp(profile, committeesize, resolute)
 
     def hamming(a, b, elements):
         diffs = 0
