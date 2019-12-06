@@ -77,18 +77,19 @@ class TestApprovalMultiwinner(unittest.TestCase):
         self.longMessage = True
 
         profile = Profile(3)
-        profile.add_preferences(DichotomousPreferences([0], 3))
-        profile.add_preferences(DichotomousPreferences([1], 3))
         profile.add_preferences(DichotomousPreferences([0]))
-        committeesize = 2
+        profile.add_preferences(DichotomousPreferences([0]))
+        profile.add_preferences(DichotomousPreferences([1], 5))
+        profile.add_preferences(DichotomousPreferences([0]))
+        committeesize = 1
 
         for rule in rules_approval.MWRULES.keys():
             if "monroe" in rule:
-                continue  # Monroe only works with unit weights
-            self.assertEqual(rules_approval.compute_rule(rule, profile,
-                                                         committeesize),
-                             [[0, 1]],
-                             msg=rule + " failed")
+                # Monroe only works with unit weights
+                continue
+            result = rules_approval.compute_rule(rule, profile, committeesize)
+            self.assertTrue([1] in result,
+                            msg=rule + " failed"+str(result))
 
     def test_mwrules_correct_simple(self):
         from preferences import Profile
