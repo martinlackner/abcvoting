@@ -14,7 +14,7 @@ def load_sois_from_dir(dir_name, max_approval_percent=1.0):
 	if file_dir is not None:
 		files = sorted(files)  # sorts from oldest to newest if name is sortable by date (YYYYMMDD)
 		for f in files:
-			if f.endswith('.soi'):
+			if f.endswith('.soi') or f.endswith('.toi'):
 				''' # can be added if not all soi from a directory are needed.
 				if from_date is not None or to_date is not None:
 					date = f.split("_")[-1].split(".soi")[0]
@@ -38,7 +38,8 @@ def get_file_names(dir_name):
 		file_dir = dir_path
 		files = filenames
 		break
-	print files, file_dir, input_path, script_dir
+	if len(files) == 0:
+		raise Exception("No files found in", input_path)
 	return file_dir, files
 
 
@@ -83,8 +84,10 @@ def add_candidate(rank, appr_set):
 		candidates = candidate[1:-1].split(",")
 		for c in candidates:
 			appr_set.append(int(c.strip()))
+		return len(candidate)
 	else:
 		appr_set.append(int(candidate))
+		return 1
 
 
 def read_election_file(filename, max_approval_percent=0.8):
@@ -105,7 +108,7 @@ def read_election_file(filename, max_approval_percent=0.8):
 		profile = []
 		for i in range(unique_orders):
 			line = f.readline().strip()
-			parts = line.split(";")
+			parts = line.split(",")
 			count = int(parts[0])
 			ranking = parts[1:]
 			vote = []
@@ -118,12 +121,22 @@ def read_election_file(filename, max_approval_percent=0.8):
 				profile.append(copy(vote))
 
 		used_candidate_count = len(unique_candidates)
+		used_candidate_map = {}
+		normalized_profile = []
+		normalize_map = {}
+		j = 0
+		for i in unique_candidates:
+			normalize_map[i] = j
+			used_candidate_map[j] = candidate_map[i]
+			j += 1
+		for vote in profile:
+			normalized_vote = []
+			for c in vote:
+				normalized_vote.append(normalize_map[c])
+			normalized_profile.append(normalized_vote)
+		if len(normalized_profile) != voter_count:
+			raise Exception("Missing voters.")
+		return used_candidate_map, normalized_profile, used_candidate_count
 
-		if len(profile) != voter_count:
-			print("Error: Missing voters")
 
-		return candidate_map, profile, used_candidate_count
-
-
-print load_sois_from_dir("/data/")
 

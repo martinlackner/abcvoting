@@ -1,6 +1,7 @@
 # Simple examples
 
-
+import sys
+sys.path.insert(0, '..')
 from preferences import Profile
 import rules_approval
 import committees

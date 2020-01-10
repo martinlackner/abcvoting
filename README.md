@@ -51,7 +51,7 @@ The output is
 ```
 [[0, 1, 3], [0, 1, 4]]
 ```
-which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples can be found in [examples.py](examples.py).
+which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples can be found in [examples/examples.py](examples/examples.py).
 
 ## Comments
 
