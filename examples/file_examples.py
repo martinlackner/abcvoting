@@ -35,3 +35,18 @@ for candidate_map, rankings, cand_count in profiles:
     committees.print_committees(output)
 
     print "****************************************"
+
+
+# Example to read a single file
+candidate_map, rankings, cand_count = \
+    file_reader.read_election_file("./examples/toi_examples/ex_2010.toi",
+                                   0.5)
+
+profile = Profile(cand_count)
+profile.add_preferences(rankings)
+print "Computing a committe of size", committeesize,
+print "with the Proportional Approval Voting (PAV) rule"
+print "given a", profile
+print "Output:"
+output = rules_approval.compute_pav(profile, committeesize, ilp=ilp)
+committees.print_committees(output)

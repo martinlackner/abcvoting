@@ -24,7 +24,7 @@ def load_sois_from_dir(dir_name, max_approval_percent=1.0):
 						break
 				'''
 				candidate_map, profile, used_candidate_count = read_election_file(
-					os.path.join(file_dir, f), max_approval_percent)
+					f, max_approval_percent, file_dir= file_dir)
 				profiles.append((candidate_map, profile, used_candidate_count))
 
 	return profiles
@@ -90,7 +90,11 @@ def add_candidate(rank, appr_set):
 		return 1
 
 
-def read_election_file(filename, max_approval_percent=0.8):
+def read_election_file(filename, max_approval_percent=0.8, file_dir=None):
+	if file_dir == None:
+		filename = os.path.join(script_dir, filename)
+	else:
+		filename = os.path.join(file_dir, filename)
 	with open(filename, "r") as f:
 		line = f.readline()
 		candidate_count = int(line.strip())
