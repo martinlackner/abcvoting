@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Approval-based multiwinner rules implemented as an integer linear
 # program (ILP) with Gurobi
 
@@ -61,9 +62,9 @@ def compute_thiele_methods_ilp(profile, committeesize,
     m.optimize()
 
     if m.Status != 2:
-        print "Warning (" + scorefct_str + "):",
-        print "solutions may be incomplete or not optimal."
-        print "(Gurobi return code", m.Status, ")"
+        print("Warning (" + scorefct_str + "):", end=' ')
+        print("solutions may be incomplete or not optimal.")
+        print("(Gurobi return code", m.Status, ")")
 
     # extract committees from model
     committees = []
@@ -163,8 +164,8 @@ def compute_monroe_ilp(profile, committeesize, resolute):
     m.optimize()
 
     if m.Status != 2:
-        print "Warning (Monroe): solutions may be incomplete or not optimal."
-        print "(Gurobi return code", m.Status, ")"
+        print("Warning (Monroe): solutions may be incomplete or not optimal.")
+        print("(Gurobi return code", m.Status, ")")
 
     # extract committees from model
     committees = []
@@ -243,9 +244,9 @@ def compute_optphragmen_ilp(profile, committeesize,
     m.optimize()
 
     if m.Status != 2:
-        print ("Warning (opt-Phragmen): solutions may be "
+        print("Warning (opt-Phragmen): solutions may be "
                + "incomplete or not optimal.")
-        print "(Gurobi return code", m.Status, ")"
+        print("(Gurobi return code", m.Status, ")")
 
     # extract committees from model
     committees = []
@@ -266,7 +267,7 @@ def compute_minimaxav_ilp(profile, committeesize, resolute=False):
 
     voters = profile.preferences
     num_voters = len(voters)
-    cands = range(profile.num_cand)
+    cands = list(range(profile.num_cand))
 
     m = gb.Model()
 
@@ -319,8 +320,8 @@ def compute_minimaxav_ilp(profile, committeesize, resolute=False):
     m.optimize()
 
     if m.Status != 2:
-        print "Warning (Minimax AV): solutions may be incomplete or not optimal."
-        print "(Gurobi return code", m.Status, ")"
+        print("Warning (Minimax AV): solutions may be incomplete or not optimal.")
+        print("(Gurobi return code", m.Status, ")")
 
     # extract committees from model
     committees = []

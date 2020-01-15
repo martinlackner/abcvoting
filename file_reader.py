@@ -1,15 +1,13 @@
+from __future__ import print_function
 import os
 from copy import copy
 
 script_dir = os.path.dirname(__file__)
-print script_dir
 
 
 def load_sois_from_dir(dir_name, max_approval_percent=1.0):
 	file_dir, files = get_file_names(dir_name)
 
-	approval_profiles = []
-	all_voters = set()
 	profiles = []
 	if file_dir is not None:
 		files = sorted(files)  # sorts from oldest to newest if name is sortable by date (YYYYMMDD)
@@ -24,7 +22,7 @@ def load_sois_from_dir(dir_name, max_approval_percent=1.0):
 						break
 				'''
 				candidate_map, profile, used_candidate_count = read_election_file(
-					f, max_approval_percent, file_dir= file_dir)
+					f, max_approval_percent, file_dir=file_dir)
 				profiles.append((candidate_map, profile, used_candidate_count))
 
 	return profiles
@@ -90,7 +88,35 @@ def add_candidate(rank, appr_set):
 		return 1
 
 
-def read_election_file(filename, max_approval_percent=0.8, file_dir=None):
+def read_election_file(filename, max_approval_percent=0.8,
+					   file_dir=None):
+	"""Reads a single election file (soi or toi).
+	
+	Parameters:
+		
+		filename: str
+			Name of the file.
+		
+		max_approval_percent: float
+			Indicates how many candidates of the ranking are approved.
+			If a voter has 10 candidates and this value is 0.8,
+			then 8 candidates are taken as approval set.
+			
+		file_dir: str
+			Absolute path to the directory that contains the file.
+			If None a relative path to this file is chosen.
+			
+	Returns:
+		used_candidate_map: dict
+			dictionary with normalized candidate ids to names.
+		
+		normalized_profile:  list
+			list of lists that represent approval sets.
+			 
+		used_candidate_count: int
+			Number of candidates within the profile.
+			
+		"""
 	if file_dir == None:
 		filename = os.path.join(script_dir, filename)
 	else:

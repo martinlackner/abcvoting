@@ -132,7 +132,7 @@ def monroescore_matching(profile, committee):
     Uses a matching-based algorithm that works only if
     committeesize divides the number of voters"""
     graph = {}
-    sizeofdistricts = len(profile.preferences) / len(committee)
+    sizeofdistricts = len(profile.preferences) // len(committee)
     for cand in committee:
         interestedvoters = []
         for i in range(len(profile.preferences)):

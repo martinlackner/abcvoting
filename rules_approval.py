@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # Implementations of approval-based multi-winner voting rules
 
 
@@ -98,15 +100,15 @@ def compute_rule(name, profile, committeesize, resolute=False):
 
 def allrules(profile, committeesize, ilp=True, include_resolute=False):
     """Prints the winning committees for all implemented rules"""
-    for rule in MWRULES.keys():
+    for rule in list(MWRULES.keys()):
         if not ilp and "-ilp" in rule:
             continue
-        print MWRULES[rule] + ":"
+        print(MWRULES[rule] + ":")
         com = compute_rule(rule, profile, committeesize)
         print_committees(com)
 
         if include_resolute:
-            print MWRULES[rule] + " (with tie-breaking):"
+            print(MWRULES[rule] + " (with tie-breaking):")
             com = compute_rule(rule, profile, committeesize, resolute=True)
             print_committees(com)
 
@@ -250,7 +252,7 @@ def compute_seq_thiele_methods(profile, committeesize, scorefct_str):
     # build committees starting with the empty set
     for _ in range(0, committeesize):
         comm_scores_next = {}
-        for committee, score in comm_scores.iteritems():
+        for committee, score in comm_scores.items():
             # marginal utility gained by adding candidate to the committee
             additional_score_cand = sf.additional_thiele_scores(
                                         profile, committee, scorefct)
@@ -263,10 +265,10 @@ def compute_seq_thiele_methods(profile, committeesize, scorefct_str):
         # remove suboptimal committees
         comm_scores = {}
         cutoff = max(comm_scores_next.values())
-        for com, score in comm_scores_next.iteritems():
+        for com, score in comm_scores_next.items():
             if score >= cutoff:
                 comm_scores[com] = score
-    return sort_committees(comm_scores.keys())
+    return sort_committees(list(comm_scores.keys()))
 
 
 # Sequential Thiele methods with resolute
@@ -315,7 +317,7 @@ def compute_revseq_thiele_methods(profile, committeesize, scorefct_str):
 
     for _ in range(0, profile.num_cand - committeesize):
         comm_scores_next = {}
-        for committee, score in comm_scores.iteritems():
+        for committee, score in comm_scores.items():
             cands_to_remove, score_reduction = \
                 __least_relevant_cands(profile, committee, scorefct)
             for c in cands_to_remove:
@@ -324,10 +326,10 @@ def compute_revseq_thiele_methods(profile, committeesize, scorefct_str):
         # remove suboptimal committees
         comm_scores = {}
         cutoff = max(comm_scores_next.values())
-        for com, score in comm_scores_next.iteritems():
+        for com, score in comm_scores_next.items():
             if score >= cutoff:
                 comm_scores[com] = score
-    return sort_committees(comm_scores.keys())
+    return sort_committees(list(comm_scores.keys()))
 
 
 # Reverse Sequential Thiele methods with resolute
@@ -363,7 +365,7 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
     # build committees starting with the empty set
     for _ in range(0, committeesize):
         comm_loads_next = {}
-        for committee, load in comm_loads.iteritems():
+        for committee, load in comm_loads.items():
             approvers_load = {}
             for c in range(profile.num_cand):
                 approvers_load[c] = sum(v.weight * load[v]
@@ -374,7 +376,7 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
                            for c in range(profile.num_cand)]
             for c in range(profile.num_cand):
                 if c in committee:
-                    new_maxload[c] = sys.maxint
+                    new_maxload[c] = sys.maxsize
             for c in range(profile.num_cand):
                 if new_maxload[c] <= min(new_maxload):
                     new_load = {}
@@ -387,15 +389,15 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
         # remove suboptimal committees
         comm_loads = {}
         cutoff = min([max(load) for load in comm_loads_next.values()])
-        for com, load in comm_loads_next.iteritems():
+        for com, load in comm_loads_next.items():
             if max(load) <= cutoff:
                 comm_loads[com] = load
         if resolute:
-            committees = sort_committees(comm_loads.keys())
+            committees = sort_committees(list(comm_loads.keys()))
             comm = tuple(committees[0])
             comm_loads = {comm: comm_loads[comm]}
 
-    committees = sort_committees(comm_loads.keys())
+    committees = sort_committees(list(comm_loads.keys()))
     if resolute:
         return [committees[0]]
     else:
@@ -420,7 +422,7 @@ def compute_minimaxav(profile, committeesize, ilp=True, resolute=False):
         score = 0
         for vote in profile.preferences:
             hamdistance = hamming(vote.approved, committee,
-                                  range(profile.num_cand))
+                                  list(range(profile.num_cand)))
             if hamdistance > score:
                 score = hamdistance
         return score
@@ -429,7 +431,7 @@ def compute_minimaxav(profile, committeesize, ilp=True, resolute=False):
 
     opt_committees = []
     opt_mavscore = profile.num_cand + 1
-    for comm in combinations(range(profile.num_cand), committeesize):
+    for comm in combinations(list(range(profile.num_cand)), committeesize):
         score = mavscore(comm, profile)
         if score < opt_mavscore:
             opt_committees = [comm]
@@ -503,7 +505,7 @@ def compute_monroe_bruteforce(profile, committeesize,
 
     opt_committees = []
     opt_monroescore = -1
-    for comm in combinations(range(profile.num_cand), committeesize):
+    for comm in combinations(list(range(profile.num_cand)), committeesize):
         score = monroescore(profile, comm)
         if score > opt_monroescore:
             opt_committees = [comm]

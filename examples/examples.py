@@ -1,5 +1,5 @@
 # Simple examples
-
+from __future__ import print_function
 import sys
 sys.path.insert(0, '..')
 from preferences import Profile
@@ -14,10 +14,10 @@ try:
     import gurobipy  # pylint: disable=unused-import
 except ImportError:
     ilp = False
-    print "ILP solver Gurobi not available (import gurobipy failed)."
-    print
+    print("ILP solver Gurobi not available (import gurobipy failed).")
+    print()
 
-print "****************************************"
+print("****************************************")
 
 # Compute PAV with our without Gurobi
 
@@ -25,14 +25,14 @@ num_cand = 5
 profile = Profile(num_cand)
 profile.add_preferences([[0, 1, 2], [0, 1], [0, 1], [1, 2], [3, 4], [3, 4]])
 committeesize = 3
-print "Computing a committe of size", committeesize,
-print "with the Proportional Approval Voting (PAV) rule"
-print "given a", profile
-print "Output:"
+print("Computing a committe of size", committeesize, end =' ')
+print("with the Proportional Approval Voting (PAV) rule")
+print("given a", profile)
+print("Output:")
 output = rules_approval.compute_pav(profile, committeesize, ilp=ilp)
 committees.print_committees(output)
 
-print "****************************************"
+print("****************************************")
 
 # Compute all implemented multiwinner rules
 

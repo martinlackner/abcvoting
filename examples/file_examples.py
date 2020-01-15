@@ -1,3 +1,4 @@
+from __future__ import print_function
 
 import sys
 sys.path.insert(0, '..')
@@ -14,10 +15,10 @@ try:
     import gurobipy  # pylint: disable=unused-import
 except ImportError:
     ilp = False
-    print "ILP solver Gurobi not available (import gurobipy failed)."
-    print
+    print("ILP solver Gurobi not available (import gurobipy failed).")
+    print()
 
-print "****************************************"
+print("****************************************")
 
 
 profiles = file_reader.load_sois_from_dir("./examples/toi_examples/",
@@ -27,14 +28,14 @@ committeesize = 2
 for candidate_map, rankings, cand_count in profiles:
     profile = Profile(cand_count)
     profile.add_preferences(rankings)
-    print "Computing a committe of size", committeesize,
-    print "with the Proportional Approval Voting (PAV) rule"
-    print "given a", profile
-    print "Output:"
+    print("Computing a committe of size", committeesize, end=' ')
+    print("with the Proportional Approval Voting (PAV) rule")
+    print("given a", profile)
+    print("Output:")
     output = rules_approval.compute_pav(profile, committeesize, ilp=ilp)
     committees.print_committees(output)
 
-    print "****************************************"
+    print("****************************************")
 
 
 # Example to read a single file
@@ -44,9 +45,9 @@ candidate_map, rankings, cand_count = \
 
 profile = Profile(cand_count)
 profile.add_preferences(rankings)
-print "Computing a committe of size", committeesize,
-print "with the Proportional Approval Voting (PAV) rule"
-print "given a", profile
-print "Output:"
+print("Computing a committe of size", committeesize, end=' ')
+print("with the Proportional Approval Voting (PAV) rule")
+print("given a", profile)
+print("Output:")
 output = rules_approval.compute_pav(profile, committeesize, ilp=ilp)
 committees.print_committees(output)
