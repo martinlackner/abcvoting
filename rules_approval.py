@@ -1,5 +1,4 @@
 from __future__ import print_function
-from __future__ import absolute_import
 # Implementations of approval-based multi-winner voting rules
 
 
@@ -388,9 +387,9 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
                     comm_loads_next[tuple(sorted(committee + (c,)))] = new_load
         # remove suboptimal committees
         comm_loads = {}
-        cutoff = min([max(load) for load in comm_loads_next.values()])
+        cutoff = min([max(load.values()) for load in comm_loads_next.values()])
         for com, load in comm_loads_next.items():
-            if max(load) <= cutoff:
+            if max(load.values()) <= cutoff:
                 comm_loads[com] = load
         if resolute:
             committees = sort_committees(list(comm_loads.keys()))
