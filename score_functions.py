@@ -156,7 +156,7 @@ def monroescore_flowbased(profile, committee, committeesize=0):
     lower_bound = len(profile.preferences) // committeesize
     # number of voters that will be contribute to the excess
     # of the lower bounds of districts
-    overflow = len(voters) - committeesize * lower_bound
+    overflow = len(voters) - len(committee) * lower_bound
     # add a sink node for the overflow
     G.add_node('sink', demand=overflow)
     for i in committee:
@@ -165,6 +165,12 @@ def monroescore_flowbased(profile, committee, committeesize=0):
     for i in range(len(voters)):
         voter_name = 'v' + str(i)
         G.add_node(voter_name, demand=-1)
+        # in case that the committeesize is larger than the proposed
+        # committee use the sink node to get rid of the excess votes
+        if len(committee) < committeesize:
+            G.add_edge(voter_name, 'sink', weight=1, capacity=1)
+        # make the edges between non-approved candidates and voters expensive,
+        # the edges between approved candidates free
         for cand in committee:
             if cand in voters[i].approved:
                 G.add_edge(voter_name, cand, weight=0, capacity=1)

@@ -33,6 +33,7 @@ MWRULES = {
     "optphrag": "Phragmen's optimization rule (opt-Phragmen)",
     "monroe-ilp": "Monroe's rule via ILP",
     "monroe-noilp": "Monroe's rule via flow algorithm",
+    "gmmonroe": "Greedy Marginal Monroe's rule",
     "cc-ilp": "Chamberlin-Courant (CC) via ILP",
     "cc-noilp": "Chamberlin-Courant (CC) via branch-and-bound",
     "seqcc": "Sequential Chamberlin-Courant (seq-CC)",
@@ -74,6 +75,8 @@ def compute_rule(name, profile, committeesize, resolute=False):
     elif name == "monroe-noilp":
         return compute_monroe(profile, committeesize,
                               ilp=False, resolute=resolute)
+    elif name == "gmmonroe":
+        return compute_gmmonroe(profile, committeesize, resolute=resolute)
     elif name == "cc-ilp":
         return compute_cc(profile, committeesize,
                           ilp=True, resolute=resolute)
@@ -511,6 +514,46 @@ def compute_monroe_bruteforce(profile, committeesize,
             opt_monroescore = score
         elif monroescore(profile, comm) == opt_monroescore:
             opt_committees.append(comm)
+
+    opt_committees = sort_committees(opt_committees)
+    if resolute:
+        return [opt_committees[0]]
+    else:
+        return opt_committees
+
+
+def compute_gmmonroe(profile, committeesize, resolute=False):
+    enough_approved_candidates(profile, committeesize)
+    if not profile.has_unit_weights():
+        raise Exception("Greedy Marginal Monroe is only defined \
+                        for unit weights (weight=1)")
+    if profile.totalweight() % committeesize != 0:
+        raise Exception("Greedy Marginal Monroe is only defined \
+                        when number of voters is divisible by committee size")
+
+    # start with an empty committee
+    opt_committees = [set()]
+
+    for i in range(committeesize):
+        possible_extensions = []
+        for comm in opt_committees:
+            opt_monroescore = -1
+            possible_candidates = []
+            # extend the already found committees in a greedy way
+            for element in set(range(profile.num_cand)) - comm:
+                score = sf.monroescore_flowbased(profile, comm | {element},
+                                                 committeesize)
+                if score >= opt_monroescore:
+                    possible_candidates.append(element)
+                if score > opt_monroescore:
+                    possible_candidates = [element]
+                    opt_monroescore = score
+            # extemd the committee by their respective extension elements
+            for candidate in possible_candidates:
+                new_comm = comm | {candidate}
+                possible_extensions.append(new_comm)
+        # replace the committees of the smaller size by their extensions
+        opt_committees = [set(c) for c in set(map(tuple, possible_extensions))]
 
     opt_committees = sort_committees(opt_committees)
     if resolute:
