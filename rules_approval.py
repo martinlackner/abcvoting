@@ -40,6 +40,7 @@ MWRULES = {
     "revseqcc": "Reverse Sequential Chamberlin-Courant (revseq-CC)",
     "minimaxav-noilp": "Minimax Approval Voting via brute-force",
     "minimaxav-ilp": "Minimax Approval Voting via ILP",
+    "rule_x": "Rule X",
 }
 
 
@@ -96,6 +97,8 @@ def compute_rule(name, profile, committeesize, resolute=False):
     elif name == "optphrag":
         return compute_optphragmen_ilp(profile, committeesize,
                                        resolute=resolute)
+    elif name == "rule_x":
+        return compute_rule_x(profile, committeesize, resolute=resolute)
     else:
         raise NotImplementedError("voting method " + str(name) + " not known")
 
@@ -560,3 +563,126 @@ def compute_gmmonroe(profile, committeesize, resolute=False):
         return [opt_committees[0]]
     else:
         return opt_committees
+
+
+def compute_rule_x(profile, committeesize, resolute=False):
+    enough_approved_candidates(profile, committeesize)
+
+    num_voters = len(profile.preferences)
+    price = Fraction(num_voters, committeesize)
+
+    # TODO unfair advantage with weight > 0
+    start_budget = {v: Fraction(profile.preferences[v].weight, 1) for v in range(num_voters)}
+    cands = range(profile.num_cand)
+    committees = [(start_budget, set())]
+    final_committees = []
+
+    for i in range(committeesize):
+        next_committees = []
+        for committee in committees:
+            budget = committee[0]
+            q_affordability = {}
+            curr_cands = set(cands) - committee[1]
+            for c in curr_cands:
+                approved_by = set()
+                for v, vote in enumerate(profile.preferences):
+                    if c in vote.approved and budget[v] > 0.0:
+                        approved_by.add(v)
+                too_poor = set()
+                already_available = Fraction(0)
+                rich = set(approved_by)
+                q = 0.0
+                while already_available < price and q == 0.0 and len(rich) > 0:
+                    fair_split = Fraction(price-already_available, len(rich))
+                    still_rich = set()
+                    for v in rich:
+                        if budget[v] <= fair_split:
+                            too_poor.add(v)
+                            already_available += budget[v]
+                        else:
+                            still_rich.add(v)
+                    if len(still_rich) == len(rich):
+                        q = fair_split
+                        q_affordability[c] = q
+                    elif already_available == price:
+                        q = fair_split
+                        q_affordability[c] = q
+                    else:
+                        rich = still_rich
+
+            if len(q_affordability) > 0:
+                min_q = min(q_affordability.values())
+                cheapest_split = [c for c in q_affordability
+                                  if q_affordability[c] == min_q]
+
+                for c in cheapest_split:
+                    b = dict(committee[0])
+                    for v, vote in enumerate(profile.preferences):
+                        if c in vote.approved:
+                            b[v] -= min(budget[v], min_q)
+                    comm = set(committee[1])
+                    comm.add(c)
+                    next_committees.append((b, comm))
+
+            else:  # no affordable candidate remains
+                comms = fill_remaining_committee(committee, curr_cands,
+                                                 committeesize, profile)
+                for b, comm in comms:
+                    final_committees.append(comm)
+
+        committees = next_committees
+    for comm in committees:
+        # remove duplicates
+        if comm[1] not in final_committees:
+            final_committees.append(comm[1])
+
+    committees = sort_committees(final_committees)
+    if resolute:
+        if len(committees) > 0:
+            return [committees[0]]
+        else:
+            return []
+    else:
+        return committees
+
+
+# Rule X has no definition of how to fill remaining committee spots
+# this function takes the candidates with the most remaining budget
+# selecting one candidate depletes all budgets of the voters that
+# approve that candidate.
+# This can produce multiple possible committees.
+def fill_remaining_committee(committee, curr_cands, committee_size,
+                             profile):
+    missing = committee_size - len(committee[1])
+    committees = [committee]
+    for _ in range(missing):
+        next_comms = []
+        for comm in committees:
+            budget, appr_set = comm
+            remaining_cands = curr_cands - appr_set
+            budget_support = {}
+            for cand in remaining_cands:
+                budget_support[cand] = 0
+                for v, vote in enumerate(profile.preferences):
+                    if cand in vote.approved:
+                        budget_support[cand] += budget[v]
+
+            max_support = max(budget_support.values())
+            winners = [c for c in remaining_cands
+                       if budget_support[c] == max_support]
+            for c in winners:
+                budget_c = {}
+                for voter, value in budget.items():
+                    if c in profile.preferences[voter].approved:
+                        budget_c[voter] = 0
+                    else:
+                        budget_c[voter] = value
+                next_comms.append((budget_c, appr_set.union([c])))
+
+        committees = next_comms
+
+    return committees
+
+
+
+

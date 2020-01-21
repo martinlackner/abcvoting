@@ -88,6 +88,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
                 # Monroe only works with unit weights
                 continue
             result = rules_approval.compute_rule(rule, profile, committeesize)
+            print(result)
             self.assertTrue([1] in result,
                             msg=rule + " failed"+str(result))
 
@@ -210,6 +211,9 @@ class TestApprovalMultiwinner(unittest.TestCase):
                         [0, 1, 3, 4], [0, 1, 3, 5],
                         [0, 2, 3, 4], [0, 2, 3, 5],
                         [1, 2, 3, 4], [1, 2, 3, 5]],
+            "rule_x": [[0, 1, 4, 5], [0, 2, 4, 5],
+                       [0, 3, 4, 5], [1, 2, 4, 5],
+                       [1, 3, 4, 5], [2, 3, 4, 5]]
         }
 
         run_test_instance(self, profile, committeesize, tests1)
@@ -260,6 +264,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "seqslav": [[0, 1, 3]],
             "slav-ilp": [[0, 1, 3]],
             "slav-noilp": [[0, 1, 3]],
+            "rule_x": [[0, 1, 3]]
         }
 
         run_test_instance(self, profile, committeesize, tests2)
@@ -329,6 +334,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "seqslav": [[0, 1, 2, 4]],
             "slav-ilp": [[0, 1, 2, 4]],
             "slav-noilp": [[0, 1, 2, 4]],
+            "rule_x": [[0, 1, 2, 4]],
         }
 
         run_test_instance(self, profile, committeesize, tests3)
