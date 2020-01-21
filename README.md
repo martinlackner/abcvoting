@@ -56,6 +56,7 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 ## Comments
 
 * This module requires Python 2.7+ or 3.6+.
+* The used modules can be found in [requirements.txt](requirements.txt), the two following are not always required.
 * Most computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). The corresponding functions require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
 * Some functions use fractions (e.g., `compute_seqphragmen`). These compute significantly faster if the module [gmpy2](https://gmpy2.readthedocs.io/) is available. If gmpy2 is not available, the much slower Python module [fractions](https://docs.python.org/2/library/fractions.html) is used.
 * All voting methods have a parameter `resolute`. If it is set to true, only one winning committee is computed. In most cases,  `resolute=True` speeds up the computation. 
