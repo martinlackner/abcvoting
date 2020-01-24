@@ -566,13 +566,19 @@ def compute_gmmonroe(profile, committeesize, resolute=False):
 
 
 def compute_rule_x(profile, committeesize, resolute=False):
+    """Returns the list of winning candidates according to rule x.
+    But rule x does stop if not enough budget is there to finance a
+    candidate. As this is not optimal the committee is filled with the
+    candidates that have the most remaining budget as support."""
     enough_approved_candidates(profile, committeesize)
-
+    if not profile.has_unit_weights():
+        raise Exception("Rule X is only defined \
+                            for unit weights (weight=1)")
     num_voters = len(profile.preferences)
     price = Fraction(num_voters, committeesize)
 
-    # TODO unfair advantage with weight > 0
-    start_budget = {v: Fraction(profile.preferences[v].weight, 1) for v in range(num_voters)}
+
+    start_budget = {v: Fraction(1, 1) for v in range(num_voters)}
     cands = range(profile.num_cand)
     committees = [(start_budget, set())]
     final_committees = []

@@ -84,11 +84,10 @@ class TestApprovalMultiwinner(unittest.TestCase):
         committeesize = 1
 
         for rule in rules_approval.MWRULES.keys():
-            if "monroe" in rule:
+            if "monroe" in rule or "rule_x" in rule:
                 # Monroe only works with unit weights
                 continue
             result = rules_approval.compute_rule(rule, profile, committeesize)
-            print(result)
             self.assertTrue([1] in result,
                             msg=rule + " failed"+str(result))
 
