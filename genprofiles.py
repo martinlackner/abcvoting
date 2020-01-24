@@ -243,7 +243,7 @@ def generate_2d_points(agents, mode, sigma):
 
     # normal distribution, 1/3 of agents centered on (-0.5,-0.5),
     #                      2/3 of agents on (0.5,0.5)
-    if mode == "eucl2":
+    if mode == "twogroups":
         for i in range(int(len(agents) // 3)):
             points[agents[i]] = (random.gauss(-0.5, sigma),
                                  random.gauss(-0.5, sigma))
@@ -278,7 +278,3 @@ def get_profile_from_points(voters, cands, voter_points,
                        if distances[c] <= mindist * appr_threshold]
 
     return list(profile.values())
-
-
-print(random_2d_points_party_list_profile(10, 4, 2, "eucl2",
-                                    "uniform_square", 0.3))
