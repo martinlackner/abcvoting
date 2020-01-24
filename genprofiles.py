@@ -2,6 +2,7 @@
 
 import random
 from time import time
+from scipy.spatial.distance import euclidean
 
 random.seed(time())
 
@@ -101,8 +102,54 @@ def random_IC_party_list_profile(num_cand, num_voters, num_parties,
     return apprsets
 
 
+def random_2d_points_profile(num_cand, num_voters, candpointmode,
+                             voterpointmode, sigma,
+                             approval_threshold):
+    """Generates profiles from randomly generated 2d points according
+    to some distributions with the given sigma."""
+    voters = list(range(num_voters))
+    cands = list(range(num_cand))
+
+    voter_points = generate_2d_points(voters, voterpointmode,
+                                      sigma)
+    cand_points = generate_2d_points(cands, candpointmode,
+                                     sigma)
+
+    apprsets = get_profile_from_points(voters, cands, voter_points,
+                                       cand_points, approval_threshold)
+
+    return apprsets
+
+
+def random_2d_points_party_list_profile(num_cand, num_voters,
+                                        num_parties,  partypointmode,
+                                        voterpointmode, sigma,
+                                        uniform=False):
+    """Generates profiles from randomly generated 2d points according
+    to some distributions with the given sigma.
+    This selects parties for each voter, the parties are either
+    uniform (equal size) or randomly generated (at least 1) candidate
+    lists."""
+    parties = list(range(num_parties))
+    party_cands = distribute_candidates_to_parties(
+        num_cand, parties, uniform=uniform)
+    voters = list(range(num_voters))
+
+    voter_points = generate_2d_points(voters, voterpointmode, sigma)
+    party_points = generate_2d_points(parties, partypointmode, sigma)
+
+    party_sets = get_profile_from_points(voters, parties, voter_points,
+                                         party_points, 1.0)
+
+    apprsets = []
+    for p in party_sets:
+        apprsets.append(party_cands[p[0]])
+
+    return apprsets
+
+
 def random_mallows_profile(num_cand, num_voters, setsize, dispersion):
-    """Genearates a Mallows Profile after the definition for
+    """Generates a Mallows Profile after the definition for
     repeated insertion  mode (RIM) in
     https://icml.cc/2011/papers/135_icmlpaper.pdf"""
     if not (0 <= dispersion <= 1):
@@ -187,3 +234,51 @@ def distribute_candidates_to_parties(num_cand, parties, uniform):
             party = random.choice(parties)
             party_cands[party].append(cand)
         return party_cands
+
+
+def generate_2d_points(agents, mode, sigma):
+    """Generates a list of 2d coordinates subject to
+    various distributions."""
+    points = {}
+
+    # normal distribution, 1/3 of agents centered on (-0.5,-0.5),
+    #                      2/3 of agents on (0.5,0.5)
+    if mode == "eucl2":
+        for i in range(int(len(agents) // 3)):
+            points[agents[i]] = (random.gauss(-0.5, sigma),
+                                 random.gauss(-0.5, sigma))
+        for i in range(int(len(agents) // 3), len(agents)):
+            points[agents[i]] = (random.gauss(0.5, sigma),
+                                 random.gauss(0.5, sigma))
+    # normal distribution
+    elif mode == "normal":
+        for i in range(len(agents)):
+            points[agents[i]] = (random.gauss(0., sigma),
+                                 random.gauss(0., sigma))
+    elif mode == "uniform_square":
+        for a in agents:
+            points[a] = (random.uniform(-1, 1),
+                         random.uniform(-1, 1))
+    else:
+        print("mode", mode, "not known")
+        quit()
+    return points
+
+
+def get_profile_from_points(voters, cands, voter_points,
+                            cand_points, appr_threshold):
+    """Generates a list of approval sets from 2d points according to
+    appr_threshold."""
+    profile = {}
+    for v in voters:
+        distances = {c: euclidean(voter_points[v], cand_points[c])
+                     for c in cands}
+        mindist = min(distances.values())
+        profile[v] = [c for c in cands
+                       if distances[c] <= mindist * appr_threshold]
+
+    return list(profile.values())
+
+
+print(random_2d_points_party_list_profile(10, 4, 2, "eucl2",
+                                    "uniform_square", 0.3))

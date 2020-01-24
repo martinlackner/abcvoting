@@ -1,5 +1,6 @@
 future==0.18.2
 networkx==2.4
+scipy==1.4.1
 gurobipy==9.0.0
 gmpy2==2.0.8
 
