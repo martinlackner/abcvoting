@@ -26,19 +26,9 @@ profiles = {}
 profiles["random_urn"] = genprofiles.random_urn_profile(c_count, 3,
                                                         5, 0.4)
 
-# The methods with the uniform parameter and not set to True
-# are not guaranteed to return a profile with votes for
-# more than one candidate
-p = genprofiles.\
-    random_urn_party_list_profile(c_count, 3, 2, 0.4, uniform=False)
-approved = set()
-for appr in p:
-    approved = approved.union(appr)
-if len(approved) >= committeesize:
-    profiles["random_urn_party_list"] = p
-else:
-    print("random_urn_party_list did not generate a profile with "
-          + "enough approved candidates")
+
+profiles["random_urn_party_list"] = genprofiles.\
+    random_urn_party_list_profile(c_count, 3, 2, 0.4, uniform=True)
 profiles["random_IC"] = genprofiles.random_IC_profile(c_count, 3, 4)
 profiles["random_IC_party_list"] = \
     genprofiles.random_IC_party_list_profile(c_count, 3, 2,
@@ -68,3 +58,29 @@ for gen_profile_name, rankings in profiles.items():
     committees.print_committees(output)
 
     print("****************************************")
+
+
+# The methods with the uniform parameter and not set to True
+# are not guaranteed to return a profile with votes for
+# more than one candidate
+while True:
+    profile = Profile(c_count)
+    rankings = genprofiles.random_IC_party_list_profile(
+        10, 2, 3, uniform=False)
+    profile.add_preferences(rankings)
+    try:
+        committees.enough_approved_candidates(profile, committeesize)
+        print("Computing a committe of size", committeesize, end=' ')
+        print("with the Proportional Approval Voting (PAV) rule")
+        print("given a randomly generated profile through the method",
+              "random_IC_party_list")
+        print(profile)
+        print("Output:")
+        output = rules_approval.compute_pav(profile, committeesize,
+                                            ilp=ilp)
+        committees.print_committees(output)
+
+        print("****************************************")
+        break
+    except Exception:
+        pass
