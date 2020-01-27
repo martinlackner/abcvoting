@@ -1,9 +1,9 @@
 from __future__ import print_function
 # Implementations of approval-based multi-winner voting rules
-
-
+import math
 import sys
 from itertools import combinations
+
 try:
     from gmpy2 import mpq as Fraction
 except ImportError:
@@ -33,13 +33,14 @@ MWRULES = {
     "optphrag": "Phragmen's optimization rule (opt-Phragmen)",
     "monroe-ilp": "Monroe's rule via ILP",
     "monroe-noilp": "Monroe's rule via flow algorithm",
+    "greedy-monroe": "Greedy Monroe rule",
     "cc-ilp": "Chamberlin-Courant (CC) via ILP",
     "cc-noilp": "Chamberlin-Courant (CC) via branch-and-bound",
     "seqcc": "Sequential Chamberlin-Courant (seq-CC)",
     "revseqcc": "Reverse Sequential Chamberlin-Courant (revseq-CC)",
     "minimaxav-noilp": "Minimax Approval Voting via brute-force",
     "minimaxav-ilp": "Minimax Approval Voting via ILP",
-    "rule_x": "Rule X",
+    "rule-x": "Rule X",
 }
 
 
@@ -75,6 +76,8 @@ def compute_rule(name, profile, committeesize, resolute=False):
     elif name == "monroe-noilp":
         return compute_monroe(profile, committeesize,
                               ilp=False, resolute=resolute)
+    elif name == "greedy-monroe":
+        return compute_greedy_monroe(profile, committeesize)
     elif name == "cc-ilp":
         return compute_cc(profile, committeesize,
                           ilp=True, resolute=resolute)
@@ -94,10 +97,11 @@ def compute_rule(name, profile, committeesize, resolute=False):
     elif name == "optphrag":
         return compute_optphragmen_ilp(profile, committeesize,
                                        resolute=resolute)
-    elif name == "rule_x":
+    elif name == "rule-x":
         return compute_rule_x(profile, committeesize, resolute=resolute)
     else:
-        raise NotImplementedError("voting method " + str(name) + " not known")
+        raise NotImplementedError("voting method " + str(name)
+                                  + " not known")
 
 
 def allrules(profile, committeesize, ilp=True, include_resolute=False):
@@ -522,6 +526,50 @@ def compute_monroe_bruteforce(profile, committeesize,
         return opt_committees
 
 
+def compute_greedy_monroe(profile, committeesize):
+    """"Returns the winning committee of the greedy monroe.
+    Always selects the candidate with the highest approval.
+    Always removes the first n/k (rounding depends) voters that approve
+    with the selected candidate.
+    """
+    enough_approved_candidates(profile, committeesize)
+    if not profile.has_unit_weights():
+        raise Exception("Greedy Monroe is only defined for unit weights"
+                        + " (weight=1)")
+    v = list(enumerate(list(profile.preferences)))
+    voters = sorted(v, key=lambda p: list(p[1].approved))  
+
+    n = len(voters)  # number of voters
+    cands = set(range(profile.num_cand))
+
+    not_s, committee = (voters, set())
+    for t in range(1, committeesize+1):
+        remaining_cands = cands - committee
+        approval = {c: 0 for c in remaining_cands}
+        for nr, voter in not_s:
+            for c in voter.approved:
+                if c in remaining_cands:
+                    approval[c] += 1
+        max_approval = max(approval.values())
+        winner = [c for c in remaining_cands
+                  if approval[c] == max_approval][0]
+        if t <= n - committeesize * math.floor(n / committeesize):
+            to_remove = math.ceil(float(n) / committeesize)
+        else:
+            to_remove = math.floor(n / committeesize)
+        to_remove = min(max_approval, to_remove)
+        next_voters = []
+        for nr, voter in not_s:
+            if to_remove > 0 and winner in voter.approved:
+                to_remove -= 1
+            else:
+                next_voters.append((nr, voter))
+        not_s = next_voters
+        committee.add(winner)
+
+    return sort_committees([committee])
+
+
 def compute_rule_x(profile, committeesize, resolute=False):
     """Returns the list of winning candidates according to rule x.
     But rule x does stop if not enough budget is there to finance a
@@ -533,7 +581,6 @@ def compute_rule_x(profile, committeesize, resolute=False):
                             for unit weights (weight=1)")
     num_voters = len(profile.preferences)
     price = Fraction(num_voters, committeesize)
-
 
     start_budget = {v: Fraction(1, 1) for v in range(num_voters)}
     cands = range(profile.num_cand)
@@ -592,8 +639,13 @@ def compute_rule_x(profile, committeesize, resolute=False):
                                                  committeesize, profile)
                 for b, comm in comms:
                     final_committees.append(comm)
-
-        committees = next_committees
+        if resolute:
+            if len(next_committees) > 0:
+                committees = [next_committees[0]]
+            else:
+                committees = []
+        else:
+            committees = next_committees
     for comm in committees:
         # remove duplicates
         if comm[1] not in final_committees:
@@ -609,13 +661,15 @@ def compute_rule_x(profile, committeesize, resolute=False):
         return committees
 
 
-# Rule X has no definition of how to fill remaining committee spots
-# this function takes the candidates with the most remaining budget
-# selecting one candidate depletes all budgets of the voters that
-# approve that candidate.
-# This can produce multiple possible committees.
 def fill_remaining_committee(committee, curr_cands, committee_size,
                              profile):
+    """
+    Rule X has no definition of how to fill remaining committee spots
+    this function takes the candidates with the most remaining budget
+    selecting one candidate depletes all budgets of the voters that
+    approve that candidate.
+    This can produce multiple possible committees.
+    """
     missing = committee_size - len(committee[1])
     committees = [committee]
     for _ in range(missing):
@@ -645,7 +699,3 @@ def fill_remaining_committee(committee, curr_cands, committee_size,
         committees = next_comms
 
     return committees
-
-
-
-
