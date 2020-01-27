@@ -537,7 +537,7 @@ def compute_greedy_monroe(profile, committeesize):
         raise Exception("Greedy Monroe is only defined for unit weights"
                         + " (weight=1)")
     v = list(enumerate(list(profile.preferences)))
-    voters = sorted(v, key=lambda p: list(p[1].approved))  
+    voters = sorted(v, key=lambda p: sorted(p[1].approved))
 
     n = len(voters)  # number of voters
     cands = set(range(profile.num_cand))

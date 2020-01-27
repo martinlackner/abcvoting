@@ -165,7 +165,7 @@ def random_mallows_profile(num_cand, num_voters, setsize, dispersion):
             pos = select_pos(distribution)
             vote.insert(pos, reference_ranking[i])
 
-        rankings.append(sorted(vote[:setsize]))
+        rankings.append(vote[:setsize])
 
     return rankings
 
@@ -216,13 +216,15 @@ def distribute_candidates_to_parties(num_cand, parties, uniform):
         if num_cand % len(parties) != 0:
             raise Exception("To uniformly distribute candidates "
                             + "between parties the number of candidates"
-                            + "needs to be divisible by the number of"
-                            + "parties.")
+                            + " needs to be divisible by the number of"
+                            + " parties.")
         party_cands = {}
         party_size = int(num_cand / len(parties))
+        cands = set(range(num_cand))
         for i, party in enumerate(parties):
-            party_cands[party] = list(range(party_size*i,
-                                            party_size*(i+1)))
+            appr = random.sample(cands, party_size)
+            party_cands[party] = appr
+            cands = cands - set(appr)
         return party_cands
     else:  # not uniform
         num_parties = len(parties)
