@@ -1,8 +1,8 @@
-from __future__ import print_function
 # Approval-based multiwinner rules implemented as an integer linear
 # program (ILP) with Gurobi
 
 
+from __future__ import print_function
 from committees import enough_approved_candidates, sort_committees
 import score_functions as sf
 try:

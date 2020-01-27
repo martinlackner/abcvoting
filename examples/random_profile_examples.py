@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import sys
+import random
 sys.path.insert(0, '..')
 
 import genprofiles
@@ -9,7 +10,6 @@ import rules_approval
 import committees
 
 # See whether the Gurobi ILP solver is available
-
 ilp = True
 try:
     import gurobipy  # pylint: disable=unused-import
@@ -20,11 +20,13 @@ except ImportError:
 
 print("****************************************")
 
+random.seed(31415)
+
 committeesize = 3
 c_count = 10
 profiles = {}
 profiles["random_urn"] = genprofiles.random_urn_profile(c_count, 3,
-                                                        5, 0.4)
+                                                        2, 0.4)
 
 
 profiles["random_urn_party_list"] = genprofiles.\
@@ -48,7 +50,7 @@ print("****************************************")
 for gen_profile_name, rankings in profiles.items():
     profile = Profile(c_count)
     profile.add_preferences(rankings)
-    print("Computing a committe of size", committeesize, end=' ')
+    print("Computing a committee of size", committeesize, end=' ')
     print("with the Proportional Approval Voting (PAV) rule")
     print("given a randomly generated profile through the method",
           gen_profile_name)
