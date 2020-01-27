@@ -132,7 +132,7 @@ def monroescore_matching(profile, committee):
     Uses a matching-based algorithm that works only if
     committeesize divides the number of voters"""
     graph = {}
-    sizeofdistricts = len(profile.preferences) / len(committee)
+    sizeofdistricts = len(profile.preferences) // len(committee)
     for cand in committee:
         interestedvoters = []
         for i in range(len(profile.preferences)):
@@ -144,14 +144,13 @@ def monroescore_matching(profile, committee):
     return len(m)
 
 
-def monroescore_flowbased(profile, committee, committeesize=0):
+def monroescore_flowbased(profile, committee):
     """Returns Monroe score of a given committee.
     Uses a flow-based algorithm that works even if
     committeesize does not divide the number of voters"""
     G = nx.DiGraph()
     voters = profile.preferences
-    if committeesize == 0:
-        committeesize = len(committee)
+    committeesize = len(committee)
     # the lower bound of the size of districts
     lower_bound = len(profile.preferences) // committeesize
     # number of voters that will be contribute to the excess

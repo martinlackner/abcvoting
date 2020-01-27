@@ -84,7 +84,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
         committeesize = 1
 
         for rule in rules_approval.MWRULES.keys():
-            if "monroe" in rule:
+            if "monroe" in rule or "rule-x" in rule:
                 # Monroe only works with unit weights
                 continue
             result = rules_approval.compute_rule(rule, profile, committeesize)
@@ -102,6 +102,8 @@ class TestApprovalMultiwinner(unittest.TestCase):
         committeesize = 2
 
         for rule in rules_approval.MWRULES.keys():
+            if rule == "greedy-monroe":   # always returns one committee
+                continue
             self.assertEqual(len(rules_approval.compute_rule(rule, profile,
                                                              committeesize)),
                              6, msg=rule + " failed")
@@ -193,6 +195,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "revseqcc": [[0, 1, 2, 3]],
             "monroe-ilp": [[0, 1, 2, 3]],
             "monroe-noilp": [[0, 1, 2, 3]],
+            "greedy-monroe": [[0, 2, 3, 4]],
             "slav-ilp": [[0, 1, 2, 3],
                          [0, 1, 2, 4], [0, 1, 2, 5],
                          [0, 1, 3, 4], [0, 1, 3, 5],
@@ -207,6 +210,9 @@ class TestApprovalMultiwinner(unittest.TestCase):
                         [0, 1, 3, 4], [0, 1, 3, 5],
                         [0, 2, 3, 4], [0, 2, 3, 5],
                         [1, 2, 3, 4], [1, 2, 3, 5]],
+            "rule-x": [[0, 1, 4, 5], [0, 2, 4, 5],
+                       [0, 3, 4, 5], [1, 2, 4, 5],
+                       [1, 3, 4, 5], [2, 3, 4, 5]]
         }
 
         run_test_instance(self, profile, committeesize, tests1)
@@ -253,9 +259,11 @@ class TestApprovalMultiwinner(unittest.TestCase):
                          [1, 2, 3], [1, 3, 4]],
             "monroe-ilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
             "monroe-noilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
+            "greedy-monroe": [[0, 1, 3]],
             "seqslav": [[0, 1, 3]],
             "slav-ilp": [[0, 1, 3]],
             "slav-noilp": [[0, 1, 3]],
+            "rule-x": [[0, 1, 3]]
         }
 
         run_test_instance(self, profile, committeesize, tests2)
@@ -319,9 +327,11 @@ class TestApprovalMultiwinner(unittest.TestCase):
                              [0, 2, 3, 5], [0, 2, 4, 5],
                              [1, 2, 3, 4], [1, 2, 3, 5],
                              [1, 2, 4, 5]],
+            "greedy-monroe": [[0, 1, 2, 3]],
             "seqslav": [[0, 1, 2, 4]],
             "slav-ilp": [[0, 1, 2, 4]],
             "slav-noilp": [[0, 1, 2, 4]],
+            "rule-x": [[0, 1, 2, 4]],
         }
 
         run_test_instance(self, profile, committeesize, tests3)
