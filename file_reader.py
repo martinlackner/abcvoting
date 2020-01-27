@@ -5,7 +5,30 @@ from copy import copy
 script_dir = os.path.dirname(__file__)
 
 
-def load_sois_from_dir(dir_name, max_approval_percent=1.0):
+def load_election_files_from_dir(dir_name, max_approval_percent=1.0):
+	"""Loads all election files (toi, soi) from the given dir.
+
+	Parameters:
+		dir_name: str
+			relative path to the root of this project.
+		max_approval_percent: float (0, 1]
+			how many of the candidates within a ranking  should be
+			used for the approval set.
+			E.g. if a ranking has 10 candidates, max_approval_percent is
+			0.5 then 5 candidates are considered.
+			In case of toi files this can be more if the last candidate
+			that would normally be taken is tied with other candidates.
+			E.g. 1, 2, 3, 4, {5, 6}, 7,8, 9, 10: with 0.5 it would end
+			with 5 but 6 is also included. apprset=[1, 2, 3, 4, 5, 6]
+
+		Returns:
+			candidate_map: dict
+				dict from normalized candidate ids to candidate names
+			profile: list of lists
+				list of approval set lists for each voter one
+			used_candidate_count: int
+				number of candidates that are within the profile
+		"""
 	file_dir, files = get_file_names(dir_name)
 
 	profiles = []
@@ -15,7 +38,7 @@ def load_sois_from_dir(dir_name, max_approval_percent=1.0):
 			if f.endswith('.soi') or f.endswith('.toi'):
 				''' # can be added if not all soi from a directory are needed.
 				if from_date is not None or to_date is not None:
-					date = f.split("_")[-1].split(".soi")[0]
+					date = f.split("_")[-1].split(".")[-1]
 					if from_date is not None and date < from_date:
 						continue
 					if to_date is not None and date > to_date:

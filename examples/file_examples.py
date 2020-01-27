@@ -21,8 +21,8 @@ except ImportError:
 print("****************************************")
 
 
-profiles = file_reader.load_sois_from_dir("./examples/toi_examples/",
-                                          max_approval_percent=0.7)
+profiles = file_reader.load_election_files_from_dir("./examples/toi_examples/",
+                                                    max_approval_percent=0.7)
 committeesize = 2
 
 for candidate_map, rankings, cand_count in profiles:
