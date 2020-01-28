@@ -48,7 +48,7 @@ print("****************************************")
 for gen_profile_name, rankings in profiles.items():
     profile = Profile(c_count)
     profile.add_preferences(rankings)
-    print("Computing a committe of size", committeesize, end=' ')
+    print("Computing a committee of size", committeesize, end=' ')
     print("with the Proportional Approval Voting (PAV) rule")
     print("given a randomly generated profile through the method",
           gen_profile_name)
@@ -70,7 +70,7 @@ while True:
     profile.add_preferences(rankings)
     try:
         committees.enough_approved_candidates(profile, committeesize)
-        print("Computing a committe of size", committeesize, end=' ')
+        print("Computing a committee of size", committeesize, end=' ')
         print("with the Proportional Approval Voting (PAV) rule")
         print("given a randomly generated profile through the method",
               "random_IC_party_list")

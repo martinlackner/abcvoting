@@ -21,14 +21,10 @@ except ImportError:
 print("****************************************")
 
 
-profiles = file_reader.load_election_files_from_dir("./examples/toi_examples/",
-                                                    max_approval_percent=0.7)
-committeesize = 2
-
-for candidate_map, rankings, cand_count in profiles:
+def compute(rankings, cand_count):
     profile = Profile(cand_count)
     profile.add_preferences(rankings)
-    print("Computing a committe of size", committeesize, end=' ')
+    print("Computing a committee of size", committeesize, end=' ')
     print("with the Proportional Approval Voting (PAV) rule")
     print("given a", profile)
     print("Output:")
@@ -38,16 +34,27 @@ for candidate_map, rankings, cand_count in profiles:
     print("****************************************")
 
 
+profiles = file_reader.load_election_files_from_dir("./examples/toi_examples/",
+                                                    max_approval_percent=0.7)
+committeesize = 2
+
+for candidate_map, rankings, cand_count in profiles:
+    compute(rankings, cand_count)
+
+
 # Example to read a single file
 candidate_map, rankings, cand_count = \
     file_reader.read_election_file("./examples/toi_examples/ex_2010.toi",
                                    0.5)
 
-profile = Profile(cand_count)
-profile.add_preferences(rankings)
-print("Computing a committe of size", committeesize, end=' ')
-print("with the Proportional Approval Voting (PAV) rule")
-print("given a", profile)
-print("Output:")
-output = rules_approval.compute_pav(profile, committeesize, ilp=ilp)
-committees.print_committees(output)
+compute(rankings, cand_count)
+
+
+# Example with setsize
+candidate_map, rankings, cand_count = \
+    file_reader.read_election_file("./examples/toi_examples/ex_2010.toi",
+                                   setsize=1)
+
+compute(rankings, cand_count)
+
+
