@@ -84,8 +84,10 @@ class TestApprovalMultiwinner(unittest.TestCase):
         committeesize = 1
 
         for rule in rules_approval.MWRULES.keys():
-            if "monroe" in rule or "rule-x" in rule:
-                # Monroe only works with unit weights
+            if "monroe" in rule or "rule-x" in rule \
+                    or rule == "phragmen-enestroem":
+                # Monroe, rule x and enestroem only work with
+                # unit weights:
                 continue
             result = rules_approval.compute_rule(rule, profile, committeesize)
             self.assertTrue([1] in result,
@@ -212,7 +214,10 @@ class TestApprovalMultiwinner(unittest.TestCase):
                         [1, 2, 3, 4], [1, 2, 3, 5]],
             "rule-x": [[0, 1, 4, 5], [0, 2, 4, 5],
                        [0, 3, 4, 5], [1, 2, 4, 5],
-                       [1, 3, 4, 5], [2, 3, 4, 5]]
+                       [1, 3, 4, 5], [2, 3, 4, 5]],
+            "phragmen-enestroem": [[0, 1, 4, 5], [0, 2, 4, 5],
+                                   [0, 3, 4, 5], [1, 2, 4, 5],
+                                   [1, 3, 4, 5], [2, 3, 4, 5]],
         }
 
         run_test_instance(self, profile, committeesize, tests1)
@@ -263,7 +268,8 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "seqslav": [[0, 1, 3]],
             "slav-ilp": [[0, 1, 3]],
             "slav-noilp": [[0, 1, 3]],
-            "rule-x": [[0, 1, 3]]
+            "rule-x": [[0, 1, 3]],
+            "phragmen-enestroem": [[0, 1, 3]],
         }
 
         run_test_instance(self, profile, committeesize, tests2)
@@ -332,6 +338,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "slav-ilp": [[0, 1, 2, 4]],
             "slav-noilp": [[0, 1, 2, 4]],
             "rule-x": [[0, 1, 2, 4]],
+            "phragmen-enestroem": [[0, 1, 2, 4]],
         }
 
         run_test_instance(self, profile, committeesize, tests3)

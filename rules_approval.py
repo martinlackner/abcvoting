@@ -41,6 +41,7 @@ MWRULES = {
     "minimaxav-noilp": "Minimax Approval Voting via brute-force",
     "minimaxav-ilp": "Minimax Approval Voting via ILP",
     "rule-x": "Rule X",
+    "phragmen-enestroem": "Phragmen's first method / Enestroeom’s method",
 }
 
 
@@ -99,6 +100,9 @@ def compute_rule(name, profile, committeesize, resolute=False):
                                        resolute=resolute)
     elif name == "rule-x":
         return compute_rule_x(profile, committeesize, resolute=resolute)
+    elif name == "phragmen-enestroem":
+        return compute_phragmen_enestroem(profile, committeesize,
+                                          resolute=resolute)
     else:
         raise NotImplementedError("voting method " + str(name)
                                   + " not known")
@@ -574,7 +578,9 @@ def compute_rule_x(profile, committeesize, resolute=False):
     """Returns the list of winning candidates according to rule x.
     But rule x does stop if not enough budget is there to finance a
     candidate. As this is not optimal the committee is filled with the
-    candidates that have the most remaining budget as support."""
+    candidates that have the most remaining budget as support.
+    Rule from:
+    https://arxiv.org/pdf/1911.11747.pdf (Page 7)"""
     enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise Exception("Rule X is only defined \
@@ -699,3 +705,72 @@ def fill_remaining_committee(committee, curr_cands, committee_size,
         committees = next_comms
 
     return committees
+
+
+def compute_phragmen_enestroem(profile, committeesize, resolute=False):
+    """"Returns the winning committees with
+    Phragmen's first method (Enestroem's method) –
+    STV with unordered ballots
+    In every step the candidate with the highest combined budget of
+    their supporters gets into a committee.
+    For equal voting power multiple committees are computed.
+    Method from:
+    https://arxiv.org/pdf/1611.08826.pdf (18.5, Page 59)
+    """
+    enough_approved_candidates(profile, committeesize)
+    if not profile.has_unit_weights():
+        raise Exception("Phragmen Enestroem is only defined \
+                            for unit weights (weight=1)")
+    num_voters = len(profile.preferences)
+    price = Fraction(num_voters, committeesize)
+
+    start_budget = {v: Fraction(1, 1) for v in range(num_voters)}
+    cands = range(profile.num_cand)
+    committees = [(start_budget, set())]
+
+    for i in range(committeesize):
+        next_committees = []
+        for committee in committees:
+            budget, comm = committee
+            curr_cands = set(cands) - comm
+            support = {c: 0 for c in curr_cands}
+            for nr, pref in enumerate(profile.preferences):
+                voting_power = budget[nr]
+                if voting_power <= 0:
+                    continue
+                for cand in pref.approved:
+                    if cand in curr_cands:
+                        support[cand] += voting_power
+            max_support = max(support.values())
+            winners = [c for c, s in support.items()
+                       if s == max_support]
+            for cand in winners:
+                b = dict(budget)  # new copy of budget
+                if max_support > price:  # supporters can afford it
+                    # (voting_power - price) / voting_power
+                    multiplier = Fraction(max_support - price,
+                                          max_support)
+                else:  # set supporters to 0
+                    multiplier = 0
+                for nr, pref in enumerate(profile.preferences):
+                    if cand in pref.approved:
+                        b[nr] *= multiplier
+                c = comm.union([cand])  # new committee with candidate
+                next_committees.append((b, c))
+
+        if resolute:  # only one is requested
+            if len(next_committees) > 0:
+                committees = [next_committees[0]]
+            else:
+                committees = []
+        else:
+            committees = next_committees
+    committees = [comm for b, comm in committees]
+    committees = sort_committees(committees)
+    if resolute:
+        if len(committees) > 0:
+            return [committees[0]]
+        else:
+            return []
+    else:
+        return committees

@@ -38,6 +38,8 @@ The following ABC rules are implemented:
 
 * Rule X
 
+*  Phragmen's first method (Enestroem's method) 
+
 ## Example
 
 The following code computes the Proportional Approval Voting (PAV) rule for a profile with 6 voters and 5 candidates.
