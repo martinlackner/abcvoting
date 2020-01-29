@@ -43,6 +43,7 @@ MWRULES = {
     "minimaxav-noilp": "Minimax Approval Voting via brute-force",
     "minimaxav-ilp": "Minimax Approval Voting via ILP",
     "rule-x": "Rule X",
+    "phragmen-enestroem": "Phragmen's first method / Enestroeom’s method",
 }
 
 
@@ -101,6 +102,9 @@ def compute_rule(name, profile, committeesize, resolute=False):
                                        resolute=resolute)
     elif name == "rule-x":
         return compute_rule_x(profile, committeesize, resolute=resolute)
+    elif name == "phragmen-enestroem":
+        return compute_phragmen_enestroem(profile, committeesize,
+                                          resolute=resolute)
     else:
         raise NotImplementedError("voting method " + str(name)
                                   + " not known")
@@ -532,19 +536,21 @@ def compute_greedy_monroe(profile, committeesize):
     """"Returns the winning committee of the greedy monroe.
     Always selects the candidate with the highest approval.
     Always removes the first n/k (rounding depends) voters that approve
-    with the selected candidate.
+    with the selected candidate. (voter sorted by their rankings)
     """
     enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise Exception("Greedy Monroe is only defined for unit weights"
                         + " (weight=1)")
     v = list(enumerate(list(profile.preferences)))
+    # list of tuples (nr, Preferences)
+    # sorted by sorted approved list of preferences
     voters = sorted(v, key=lambda p: sorted(p[1].approved))
 
     n = len(voters)  # number of voters
     cands = set(range(profile.num_cand))
 
-    not_s, committee = (voters, set())
+    not_s, committee = (voters, set())  # not_s .. not satisfied voters
     for t in range(1, committeesize+1):
         remaining_cands = cands - committee
         approval = {c: 0 for c in remaining_cands}
@@ -555,10 +561,15 @@ def compute_greedy_monroe(profile, committeesize):
         max_approval = max(approval.values())
         winner = [c for c in remaining_cands
                   if approval[c] == max_approval][0]
+
+        # round how many are removed, either up or down
         if t <= n - committeesize * math.floor(n / committeesize):
             to_remove = math.ceil(float(n) / committeesize)
         else:
             to_remove = math.floor(n / committeesize)
+
+        # not more than the voters that approve
+        # the candidate can be removed
         to_remove = min(max_approval, to_remove)
         next_voters = []
         for nr, voter in not_s:
@@ -576,7 +587,9 @@ def compute_rule_x(profile, committeesize, resolute=False):
     """Returns the list of winning candidates according to rule x.
     But rule x does stop if not enough budget is there to finance a
     candidate. As this is not optimal the committee is filled with the
-    candidates that have the most remaining budget as support."""
+    candidates that have the most remaining budget as support.
+    Rule from:
+    https://arxiv.org/pdf/1911.11747.pdf (Page 7)"""
     enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise Exception("Rule X is only defined \
@@ -639,6 +652,8 @@ def compute_rule_x(profile, committeesize, resolute=False):
             else:  # no affordable candidate remains
                 comms = fill_remaining_committee(committee, curr_cands,
                                                  committeesize, profile)
+                # after filling the remaining spots these committees
+                # have size committeesize
                 for b, comm in comms:
                     final_committees.append(comm)
         if resolute:
@@ -648,10 +663,10 @@ def compute_rule_x(profile, committeesize, resolute=False):
                 committees = []
         else:
             committees = next_committees
-    for comm in committees:
-        # remove duplicates
-        if comm[1] not in final_committees:
-            final_committees.append(comm[1])
+
+    # The committees that could be fully filled with Rule X:
+    for b, comm in committees:  # budget and committee
+        final_committees.append(comm)
 
     committees = sort_committees(final_committees)
     if resolute:
@@ -666,8 +681,8 @@ def compute_rule_x(profile, committeesize, resolute=False):
 def fill_remaining_committee(committee, curr_cands, committee_size,
                              profile):
     """
-    Rule X has no definition of how to fill remaining committee spots
-    this function takes the candidates with the most remaining budget
+    Rule X has no definition of how to fill remaining committee spots.
+    This function takes the candidates with the most remaining budget
     selecting one candidate depletes all budgets of the voters that
     approve that candidate.
     This can produce multiple possible committees.
@@ -701,3 +716,78 @@ def fill_remaining_committee(committee, curr_cands, committee_size,
         committees = next_comms
 
     return committees
+
+
+def compute_phragmen_enestroem(profile, committeesize, resolute=False):
+    """"Returns the winning committees with
+    Phragmen's first method (Enestroem's method) –
+    STV with unordered ballots
+    In every step the candidate with the highest combined budget of
+    their supporters gets into a committee.
+    For equal voting power multiple committees are computed.
+    Method from:
+    https://arxiv.org/pdf/1611.08826.pdf (18.5, Page 59)
+    """
+    enough_approved_candidates(profile, committeesize)
+    if not profile.has_unit_weights():
+        raise Exception("Phragmen Enestroem is only defined \
+                            for unit weights (weight=1)")
+    num_voters = len(profile.preferences)
+    price = Fraction(num_voters, committeesize)
+
+    start_budget = {v: Fraction(1, 1) for v in range(num_voters)}
+    cands = range(profile.num_cand)
+
+    committees = [(start_budget, set())]
+    for i in range(committeesize):
+        # here the committees with i+1 candidates are
+        # stored (together with budget)
+        next_committees = []
+        # loop in case multiple possible committees
+        # with i filled candidates
+        for committee in committees:
+            budget, comm = committee
+            curr_cands = set(cands) - comm
+            support = {c: 0 for c in curr_cands}
+            for nr, pref in enumerate(profile.preferences):
+                voting_power = budget[nr]
+                if voting_power <= 0:
+                    continue
+                for cand in pref.approved:
+                    if cand in curr_cands:
+                        support[cand] += voting_power
+            max_support = max(support.values())
+            winners = [c for c, s in support.items()
+                       if s == max_support]
+            for cand in winners:
+                b = dict(budget)  # new copy of budget
+                if max_support > price:  # supporters can afford it
+                    # (voting_power - price) / voting_power
+                    multiplier = Fraction(max_support - price,
+                                          max_support)
+                else:  # set supporters to 0
+                    multiplier = 0
+                for nr, pref in enumerate(profile.preferences):
+                    if cand in pref.approved:
+                        b[nr] *= multiplier
+                c = comm.union([cand])  # new committee with candidate
+                next_committees.append((b, c))
+
+        if resolute:  # only one is requested
+            if len(next_committees) > 0:
+                committees = [next_committees[0]]
+            else:  # should not happen
+                committees = []
+                raise Exception("phragmen enestroem failed to find "
+                                + "next candidate for", committees)
+        else:
+            committees = next_committees
+    committees = [comm for b, comm in committees]
+    committees = sort_committees(committees)
+    if resolute:
+        if len(committees) > 0:
+            return [committees[0]]
+        else:
+            return []
+    else:
+        return committees

@@ -8,12 +8,14 @@ from copy import copy
 script_dir = os.path.dirname(__file__)
 
 
-def load_election_files_from_dir(dir_name, max_approval_percent=1.0):
+def load_election_files_from_dir(dir_name, max_approval_percent=1.0,
+                                 setsize=None):
     """Loads all election files (toi, soi) from the given dir.
 
     Parameters:
         dir_name: str
             relative path to the root of this project.
+
         max_approval_percent: float (0, 1]
             how many of the candidates within a ranking  should be
             used for the approval set.
@@ -23,6 +25,12 @@ def load_election_files_from_dir(dir_name, max_approval_percent=1.0):
             that would normally be taken is tied with other candidates.
             E.g. 1, 2, 3, 4, {5, 6}, 7,8, 9, 10: with 0.5 it would end
             with 5 but 6 is also included. apprset=[1, 2, 3, 4, 5, 6]
+
+        setsize: int
+            If set max_approval_percent is ignored and this number is
+            taken to decide how many alternatives are taken per voter.
+            If the candidate on the position setsize is tied, those
+            tied candidates are also taken.
 
         Returns:
             candidate_map: dict
@@ -48,7 +56,7 @@ def load_election_files_from_dir(dir_name, max_approval_percent=1.0):
                         break
                 '''
                 candidate_map, profile, used_candidate_count = read_election_file(
-                    f, max_approval_percent, file_dir=file_dir)
+                    f, max_approval_percent, setsize=setsize, file_dir=file_dir)
                 profiles.append((candidate_map, profile, used_candidate_count))
 
     return profiles
@@ -86,12 +94,11 @@ def get_vote(threshold, ranking):
                     threshold -= 1
             else:
                 curr_voters += "," + voter
-                # count += 1
                 if "}" in voter:
                     count = add_candidate(curr_voters, appr_set)
                     curr_voters = ""
                     threshold -= count  # or -= 1
-                    # count = 0
+
                 else:
                     continue
         else:
@@ -100,6 +107,8 @@ def get_vote(threshold, ranking):
 
 
 def add_candidate(rank, appr_set):
+    """Adds the candidates in the string rank to appr_set.
+    Returns the number of candidates added."""
     candidate = rank.strip()
     if candidate.find("{") != -1:
         if candidate[0] != "{" or candidate[-1] != "}":
@@ -114,8 +123,8 @@ def add_candidate(rank, appr_set):
         return 1
 
 
-def read_election_file(filename, max_approval_percent=0.8,
-                       file_dir=None):
+def read_election_file(filename, max_approval_percent=1.0,
+                       setsize=None, file_dir=None):
     """Reads a single election file (soi or toi).
 
     Parameters:
@@ -127,6 +136,10 @@ def read_election_file(filename, max_approval_percent=0.8,
             Indicates how many candidates of the ranking are approved.
             If a voter has 10 candidates and this value is 0.8,
             then 8 candidates are taken as approval set.
+
+        setsize: int
+            If not None max_approval_percent is ignored and this decides
+            the number of candidates per approval set
 
         file_dir: str
             Absolute path to the directory that contains the file.
@@ -166,9 +179,12 @@ def read_election_file(filename, max_approval_percent=0.8,
             line = f.readline().strip()
             parts = line.split(",")
             count = int(parts[0])
-            ranking = parts[1:]
+            ranking = parts[1:]  # ranking starts after count
             vote = []
-            take_cands = max(1, int(len(ranking)*max_approval_percent))
+            if setsize:
+                take_cands = min(setsize, len(ranking))
+            else:
+                take_cands = max(1, int(len(ranking)*max_approval_percent))
             if take_cands > 0:
                 vote = get_vote(take_cands, ranking)
                 for cand in vote:
