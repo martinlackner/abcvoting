@@ -20,6 +20,7 @@ except ImportError:
 
 print("****************************************")
 
+committeesize = 2
 
 def compute(rankings, cand_count):
     profile = Profile(cand_count)
@@ -36,7 +37,6 @@ def compute(rankings, cand_count):
 
 profiles = file_reader.load_election_files_from_dir("./examples/toi_examples/",
                                                     max_approval_percent=0.7)
-committeesize = 2
 
 for candidate_map, rankings, cand_count in profiles:
     compute(rankings, cand_count)
@@ -51,7 +51,7 @@ compute(rankings, cand_count)
 
 
 # Example with setsize
-candidate_map, rankings, cand_count = \
+_, rankings, cand_count = \
     file_reader.read_election_file("./examples/toi_examples/ex_2010.toi",
                                    setsize=1)
 
