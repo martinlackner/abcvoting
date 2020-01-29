@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import sys
+import random
 sys.path.insert(0, '..')
 
 import genprofiles
@@ -9,7 +10,6 @@ import rules_approval
 import committees
 
 # See whether the Gurobi ILP solver is available
-
 ilp = True
 try:
     import gurobipy  # pylint: disable=unused-import
@@ -19,7 +19,6 @@ except ImportError:
     print()
 
 print("****************************************")
-
 
 committeesize = 3
 c_count = 10
@@ -34,11 +33,7 @@ def compute(ranking_list, cand_count, gen_profile_name):
     computing the rule.
     This method returns False in case of too few approved candidates."""
     profile = Profile(c_count)
-    profile.add_preferences(ranking_list)
-    try:
-        committees.enough_approved_candidates(profile, committeesize)
-    except Exception:
-        return False
+    profile.add_preferences(rankings)
     print("Computing a committee of size", committeesize, end=' ')
     print("with the Proportional Approval Voting (PAV) rule")
     print("given a randomly generated profile through the method",

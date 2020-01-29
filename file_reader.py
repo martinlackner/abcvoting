@@ -1,3 +1,6 @@
+# load preflib files (SOI or TOI)
+
+
 from __future__ import print_function
 import os
 from copy import copy
@@ -123,12 +126,12 @@ def add_candidate(rank, appr_set):
 def read_election_file(filename, max_approval_percent=1.0,
                        setsize=None, file_dir=None):
     """Reads a single election file (soi or toi).
-    
+
     Parameters:
-        
+
         filename: str
             Name of the file.
-        
+
         max_approval_percent: float
             Indicates how many candidates of the ranking are approved.
             If a voter has 10 candidates and this value is 0.8,
@@ -137,21 +140,21 @@ def read_election_file(filename, max_approval_percent=1.0,
         setsize: int
             If not None max_approval_percent is ignored and this decides
             the number of candidates per approval set
-            
+
         file_dir: str
             Absolute path to the directory that contains the file.
             If None a relative path to this file is chosen.
-            
+
     Returns:
         used_candidate_map: dict
             dictionary with normalized candidate ids to names.
-        
+
         normalized_profile:  list
             list of lists that represent approval sets.
 
         used_candidate_count: int
             Number of candidates within the profile.
-            
+
         """
     if file_dir is None:
         filename = os.path.join(script_dir, filename)
@@ -181,7 +184,7 @@ def read_election_file(filename, max_approval_percent=1.0,
             if setsize:
                 take_cands = min(setsize, len(ranking))
             else:
-                take_cands = int(len(ranking)*max_approval_percent)
+                take_cands = max(1, int(len(ranking)*max_approval_percent))
             if take_cands > 0:
                 vote = get_vote(take_cands, ranking)
                 for cand in vote:
@@ -206,6 +209,3 @@ def read_election_file(filename, max_approval_percent=1.0,
         if len(normalized_profile) != voter_count:
             raise Exception("Missing voters.")
         return used_candidate_map, normalized_profile, used_candidate_count
-
-
-

@@ -1,5 +1,7 @@
-from __future__ import print_function
 # Implementations of approval-based multi-winner voting rules
+
+
+from __future__ import print_function
 import math
 import sys
 from itertools import combinations
@@ -600,7 +602,7 @@ def compute_rule_x(profile, committeesize, resolute=False):
     committees = [(start_budget, set())]
     final_committees = []
 
-    for i in range(committeesize):
+    for _ in range(committeesize):
         next_committees = []
         for committee in committees:
             budget = committee[0]

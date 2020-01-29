@@ -1,13 +1,10 @@
+# random generation of approval profiles
 
 
 import random
-from time import time
 from scipy.spatial.distance import euclidean
 
-random.seed(time())
 
-
-# Author: Martin Lackner
 def random_urn_profile(num_cand, num_voters, setsize, replace):
     """Generate Polya Urn profile with fixed size approval sets."""
     currsize = 1.
@@ -159,7 +156,7 @@ def random_mallows_profile(num_cand, num_voters, setsize, dispersion):
     insert_dist = compute_mallows_insert_distributions(
         num_cand, dispersion)
     rankings = []
-    for v in range(num_voters):
+    for _ in range(num_voters):
         vote = []
         for i, distribution in enumerate(insert_dist):
             pos = select_pos(distribution)
@@ -277,6 +274,6 @@ def get_profile_from_points(voters, cands, voter_points,
                      for c in cands}
         mindist = min(distances.values())
         profile[v] = [c for c in cands
-                       if distances[c] <= mindist * appr_threshold]
+                      if distances[c] <= mindist * appr_threshold]
 
     return list(profile.values())

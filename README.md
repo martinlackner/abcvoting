@@ -34,9 +34,9 @@ The following ABC rules are implemented:
 
 * Minimax Approval Voting (see [3])
 
-* Greedy Monroe
+* Greedy Monroe (see [5])
 
-* Rule X
+* Rule X (see [6])
 
 *  Phragmen's first method (Enestroem's method) 
 
@@ -62,7 +62,7 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 ## Comments
 
 * This module requires Python 2.7+ or 3.6+.
-* The used modules can be found in [requirements.txt](requirements.txt), the two following are not always required.
+* The used modules can be found in [requirements.txt](requirements.txt).
 * Most computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). The corresponding functions require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
 * Some functions use fractions (e.g., `compute_seqphragmen`). These compute significantly faster if the module [gmpy2](https://gmpy2.readthedocs.io/) is available. If gmpy2 is not available, the much slower Python module [fractions](https://docs.python.org/2/library/fractions.html) is used.
 * All voting methods have a parameter `resolute`. If it is set to true, only one winning committee is computed. In most cases,  `resolute=True` speeds up the computation. 
@@ -75,6 +75,7 @@ The following people have contributed code to this package and provided help wit
 [Piotr Faliszewski](http://home.agh.edu.pl/~faliszew/),
 [Stefan Schlomo Forster](https://github.com/stefanschlomoforster),
 [Andrzej Kaczmarczyk](http://www.user.tu-berlin.de/droores/),
+[Benjamin Krenn](https://github.com/benjaminkrenn),
 [Martin Lackner](http://martin.lackner.xyz/),
 [Dominik Peters](http://dominik-peters.de/), 
 [Piotr Skowron](https://www.mimuw.edu.pl/~ps219737/).
@@ -91,5 +92,11 @@ Choice, chapter 2, pages 27–47. AI Access, 2017. http://research.illc.uva.nl/C
 [3] Steven J Brams, D Marc Kilgour, and M Remzi Sanver. A minimax procedure for electing committees. Public Choice, 132(3-4):401–420, 2007.
 
 [4] Martin Lackner, Piotr Skowron.
-A Quantitative Analysis of Multi-Winner Rules. CoRR abs/1801.01527. 2018. https://arxiv.org/abs/1801.01527
+A Quantitative Analysis of Multi-Winner Rules. arXiv preprint arXiv:1801.01527. 2018. https://arxiv.org/abs/1801.01527
 
+[5] Properties of multiwinner voting rules.
+Edith Elkind, Piotr Faliszewski, Piotr Skowron, and Arkadii Slinko. 
+Social Choice and Welfare volume 48, pages 599–632. 2017. https://link.springer.com/article/10.1007/s00355-017-1026-z
+
+[6] Peters, Dominik, and Piotr Skowron. 
+Proportionality and the Limits of Welfarism. arXiv preprint arXiv:1911.11747. 2019. https://arxiv.org/abs/1911.11747
