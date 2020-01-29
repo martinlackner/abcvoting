@@ -18,7 +18,7 @@ The following ABC rules are implemented:
 
 * Reverse Sequential Proportional Approval Voting
 
-* Sainte-Lagu&euml; Approval Voting (SLAV) [4]
+* Sainte-Lagu&euml; Approval Voting (SLAV) [Gurobi optional] [4]
 
 * Sequential Sainte-Lagu&euml; Approval Voting [4]
 
@@ -28,7 +28,7 @@ The following ABC rules are implemented:
 
 * Reverse Sequential Chamberlin-Courant
 
-* Phragmen's sequential rule (see [2])
+* Phragmén's sequential rule (see [2])
   
 * Monroe [Gurobi optional]
 
@@ -38,7 +38,7 @@ The following ABC rules are implemented:
 
 * Rule X (see [6])
 
-*  Phragmen's first method (Enestroem's method) 
+*  Phragmén's First Method (Enestr&ouml;m's Method) [7]
 
 ## Example
 
@@ -100,3 +100,6 @@ Social Choice and Welfare volume 48, pages 599–632. 2017. https://link.springe
 
 [6] Peters, Dominik, and Piotr Skowron. 
 Proportionality and the Limits of Welfarism. arXiv preprint arXiv:1911.11747. 2019. https://arxiv.org/abs/1911.11747
+
+[7] Janson, Svante.
+Phragmén's and Thiele's election methods. arXiv preprint arXiv:1611.08826. 2016. https://arxiv.org/pdf/1611.08826.pdf
