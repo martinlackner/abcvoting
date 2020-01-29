@@ -34,6 +34,10 @@ def compute(ranking_list, cand_count, gen_profile_name):
     This method returns False in case of too few approved candidates."""
     profile = Profile(c_count)
     profile.add_preferences(rankings)
+    try:
+        committees.enough_approved_candidates(profile, committeesize)
+    except Exception:
+        return False
     print("Computing a committee of size", committeesize, end=' ')
     print("with the Proportional Approval Voting (PAV) rule")
     print("given a randomly generated profile through the method",
