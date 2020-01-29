@@ -51,13 +51,11 @@ def compute(ranking_list, cand_count, gen_profile_name):
     return True
 
 
-
-rankings = genprofiles.random_urn_profile(c_count, 3,
-                                          5, 0.4)
-if not compute(rankings, c_count, "random_urn"):
-    print("This should not be possible as setsize=5 is larger than",
-          "committeesize", committeesize)
-
+while True:
+    rankings = genprofiles.random_urn_profile(c_count, 3,
+                                              2, 0.4)
+    if compute(rankings, c_count, "random_urn"):
+        break
 while True:
     rankings = genprofiles.\
         random_urn_party_list_profile(c_count, 3, 2, 0.4, uniform=False)
