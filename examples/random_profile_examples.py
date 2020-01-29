@@ -20,6 +20,9 @@ except ImportError:
 
 print("****************************************")
 
+
+random.seed(31415)
+
 committeesize = 3
 c_count = 10
 

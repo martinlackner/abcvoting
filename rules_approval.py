@@ -729,13 +729,11 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
     https://arxiv.org/pdf/1611.08826.pdf (18.5, Page 59)
     """
     enough_approved_candidates(profile, committeesize)
-    if not profile.has_unit_weights():
-        raise Exception("Phragmen Enestroem is only defined \
-                            for unit weights (weight=1)")
     num_voters = len(profile.preferences)
-    price = Fraction(num_voters, committeesize)
 
-    start_budget = {v: Fraction(1, 1) for v in range(num_voters)}
+    start_budget = {v: Fraction(profile.preferences[v].weight) for v in range(num_voters)}
+    price = Fraction(sum(start_budget.values()), committeesize)
+
     cands = range(profile.num_cand)
 
     committees = [(start_budget, set())]

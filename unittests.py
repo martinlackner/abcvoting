@@ -84,10 +84,8 @@ class TestApprovalMultiwinner(unittest.TestCase):
         committeesize = 1
 
         for rule in rules_approval.MWRULES.keys():
-            if "monroe" in rule or "rule-x" in rule \
-                    or rule == "phragmen-enestroem":
-                # Monroe, rule x and enestroem only work with
-                # unit weights:
+            if "monroe" in rule or "rule-x" in rule:
+                # Monroe and rule x only work with unit weights:
                 continue
             result = rules_approval.compute_rule(rule, profile, committeesize)
             self.assertTrue([1] in result,
