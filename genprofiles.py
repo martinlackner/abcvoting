@@ -78,6 +78,10 @@ def random_IC_profile(num_cand, num_voters, setsize):
     the fix size of setsize."""
     apprsets = []
     for _ in range(num_voters):
+        # the following could be faster thant the used random.sample
+        # r = list(range(num_cand))
+        # random.shuffle(r)
+        # randset = r[:setsize]
         randset = random.sample(range(num_cand), setsize)
         apprsets.append(randset)
 
