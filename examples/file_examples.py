@@ -22,6 +22,7 @@ print("****************************************")
 
 committeesize = 2
 
+
 def compute(rankings, cand_count):
     profile = Profile(cand_count)
     profile.add_preferences(rankings)
@@ -45,7 +46,7 @@ for candidate_map, rankings, cand_count in profiles:
 # Example to read a single file
 candidate_map, rankings, cand_count = \
     file_reader.read_election_file("./examples/toi_examples/ex_2010.toi",
-                                   0.5)
+                                   max_approval_percent=0.5)
 
 compute(rankings, cand_count)
 
@@ -56,5 +57,3 @@ _, rankings, cand_count = \
                                    setsize=1)
 
 compute(rankings, cand_count)
-
-

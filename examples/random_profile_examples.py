@@ -85,7 +85,7 @@ if not compute(rankings, c_count, "random_mallows"):
           "committeesize", committeesize)
 
 while True:
-    rankings= genprofiles.\
+    rankings = genprofiles.\
         random_2d_points_profile(c_count, 4, "twogroups",
                                  "uniform_square", 0.5, 1.9)
     if compute(rankings, c_count, "random_2d_points"):

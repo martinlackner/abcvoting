@@ -43,7 +43,7 @@ MWRULES = {
     "minimaxav-noilp": "Minimax Approval Voting via brute-force",
     "minimaxav-ilp": "Minimax Approval Voting via ILP",
     "rule-x": "Rule X",
-    "phragmen-enestroem": "Phragmen's first method / Enestroeom’s method",
+    "phragmen-enestroem": "Phragmen's first method / Enestroeom's method",
 }
 
 
@@ -720,8 +720,7 @@ def fill_remaining_committee(committee, curr_cands, committee_size,
 
 def compute_phragmen_enestroem(profile, committeesize, resolute=False):
     """"Returns the winning committees with
-    Phragmen's first method (Enestroem's method) –
-    STV with unordered ballots
+    Phragmen's first method (Enestroem's method).
     In every step the candidate with the highest combined budget of
     their supporters gets into a committee.
     For equal voting power multiple committees are computed.
@@ -739,7 +738,7 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
     cands = range(profile.num_cand)
 
     committees = [(start_budget, set())]
-    for i in range(committeesize):
+    for _ in range(committeesize):
         # here the committees with i+1 candidates are
         # stored (together with budget)
         next_committees = []
@@ -778,7 +777,7 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
                 committees = [next_committees[0]]
             else:  # should not happen
                 committees = []
-                raise Exception("phragmen enestroem failed to find "
+                raise Exception("Phragmen-Enestroem failed to find "
                                 + "next candidate for", committees)
         else:
             committees = next_committees

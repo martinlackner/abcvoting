@@ -26,7 +26,7 @@ num_cand = 5
 profile = Profile(num_cand)
 profile.add_preferences([[0, 1, 2], [0, 1], [0, 1], [1, 2], [3, 4], [3, 4]])
 committeesize = 3
-print("Computing a committee of size", committeesize, end =' ')
+print("Computing a committee of size", committeesize, end=' ')
 print("with the Proportional Approval Voting (PAV) rule")
 print("given a", profile)
 print("Output:")
