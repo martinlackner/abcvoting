@@ -84,10 +84,10 @@ class TestApprovalMultiwinner(unittest.TestCase):
         committeesize = 1
 
         for rule in rules_approval.MWRULES.keys():
-            if "monroe" in rule or "rule-x" in rule \
-                    or rule == "phragmen-enestroem":
-                # Monroe, rule x and enestroem only work with
-                # unit weights:
+            if (("monroe" in rule
+                 or "lexminimaxav" in rule
+                 or rule in ["rule-x", "phragmen-enestroem"])):
+                # Some rules only work with unit weights:
                 continue
             result = rules_approval.compute_rule(rule, profile, committeesize)
             self.assertTrue([1] in result,
@@ -187,6 +187,8 @@ class TestApprovalMultiwinner(unittest.TestCase):
                               [0, 2, 3, 4], [0, 2, 3, 5], [0, 2, 4, 5],
                               [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5],
                               [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "lexminimaxav-noilp": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
+                                   [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
             "phrag": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
                       [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
             "optphrag": [[0, 1, 2, 3]],
@@ -252,6 +254,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "revseqpav": [[0, 1, 3]],
             "minimaxav-noilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
             "minimaxav-ilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
+            "lexminimaxav-noilp": [[0, 1, 3]],
             "phrag": [[0, 1, 3]],
             "optphrag": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
             "cc-ilp": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
@@ -299,6 +302,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
             "minimaxav-ilp": [[0, 1, 2, 3], [0, 1, 2, 4],
                               [0, 2, 3, 4], [0, 2, 3, 5],
                               [0, 2, 4, 5]],
+            "lexminimaxav-noilp": [[0, 1, 2, 4]],
             "phrag": [[0, 1, 2, 4]],
             "optphrag": [[0, 1, 2, 3], [0, 1, 2, 4],
                          [0, 1, 2, 5], [0, 2, 3, 4],

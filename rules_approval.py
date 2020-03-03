@@ -14,7 +14,8 @@ from rules_approval_ilp import compute_monroe_ilp, compute_thiele_methods_ilp,\
                                compute_optphragmen_ilp, compute_minimaxav_ilp
 from committees import sort_committees,\
                        enough_approved_candidates,\
-                       print_committees
+                       print_committees,\
+                       hamming
 import score_functions as sf
 
 
@@ -42,6 +43,8 @@ MWRULES = {
     "revseqcc": "Reverse Sequential Chamberlin-Courant (revseq-CC)",
     "minimaxav-noilp": "Minimax Approval Voting via brute-force",
     "minimaxav-ilp": "Minimax Approval Voting via ILP",
+    "lexminimaxav-noilp":
+        "Lexicographic Minimax Approval Voting via brute-force",
     "rule-x": "Rule X",
     "phragmen-enestroem": "Phragmen's first method / Enestroeom's method",
 }
@@ -94,6 +97,9 @@ def compute_rule(name, profile, committeesize, resolute=False):
     elif name == "minimaxav-noilp":
         return compute_minimaxav(profile, committeesize,
                                  ilp=False, resolute=resolute)
+    elif name == "lexminimaxav-noilp":
+        return compute_lexminimaxav(profile, committeesize,
+                                    ilp=False, resolute=resolute)
     elif name == "minimaxav-ilp":
         return compute_minimaxav(profile, committeesize,
                                  ilp=True, resolute=resolute)
@@ -423,18 +429,10 @@ def compute_minimaxav(profile, committeesize, ilp=True, resolute=False):
     if ilp:
         return compute_minimaxav_ilp(profile, committeesize, resolute)
 
-    def hamming(a, b, elements):
-        diffs = 0
-        for x in elements:
-            if (x in a and x not in b) or (x in b and x not in a):
-                diffs += 1
-        return diffs
-
     def mavscore(committee, profile):
         score = 0
         for vote in profile.preferences:
-            hamdistance = hamming(vote.approved, committee,
-                                  list(range(profile.num_cand)))
+            hamdistance = hamming(vote.approved, committee)
             if hamdistance > score:
                 score = hamdistance
         return score
@@ -449,6 +447,42 @@ def compute_minimaxav(profile, committeesize, ilp=True, resolute=False):
             opt_committees = [comm]
             opt_mavscore = score
         elif mavscore(comm, profile) == opt_mavscore:
+            opt_committees.append(comm)
+
+    opt_committees = sort_committees(opt_committees)
+    if resolute:
+        return [opt_committees[0]]
+    else:
+        return sort_committees(opt_committees)
+
+
+# Lexicographic Minimax Approval Voting
+def compute_lexminimaxav(profile, committeesize, ilp=False, resolute=False):
+    """Returns the list of winning committees
+       according to Lexicographic Minimax AV"""
+
+    if ilp:
+        raise NotImplemented
+
+    enough_approved_candidates(profile, committeesize)
+    if not profile.has_unit_weights():
+        raise Exception("Lexicographic Minimax Approval Voting\
+                         is only defined for unit weights (weight=1)")
+
+    opt_committees = []
+    opt_distances = [profile.num_cand + 1] * len(profile.preferences)
+    for comm in combinations(list(range(profile.num_cand)), committeesize):
+        distances = sorted([hamming(vote.approved, comm)
+                            for vote in profile.preferences],
+                           reverse=True)
+        for i in range(len(distances)):
+            if opt_distances[i] < distances[i]:
+                break
+            if opt_distances[i] > distances[i]:
+                opt_distances = distances
+                opt_committees = [comm]
+                break
+        else:
             opt_committees.append(comm)
 
     opt_committees = sort_committees(opt_committees)
