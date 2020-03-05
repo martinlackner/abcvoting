@@ -231,6 +231,10 @@ class TestApprovalMultiwinner(unittest.TestCase):
         profile = Profile(6)
         profile.add_preferences(preflist)
 
+        # Greedy Monroe yields a different result
+        # for a different voter ordering
+        tests1["greedy-monroe"] = [[0, 1, 2, 4]]
+
         run_test_instance(self, profile, committeesize, tests1)
 
     def test_mwrules_correct_advanced_2(self):
@@ -337,7 +341,7 @@ class TestApprovalMultiwinner(unittest.TestCase):
                              [0, 2, 3, 5], [0, 2, 4, 5],
                              [1, 2, 3, 4], [1, 2, 3, 5],
                              [1, 2, 4, 5]],
-            "greedy-monroe": [[0, 1, 2, 3]],
+            "greedy-monroe": [[0, 1, 2, 4]],
             "seqslav": [[0, 1, 2, 4]],
             "slav-ilp": [[0, 1, 2, 4]],
             "slav-noilp": [[0, 1, 2, 4]],
