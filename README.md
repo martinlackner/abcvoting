@@ -12,17 +12,17 @@ The following ABC rules are implemented:
 
 * Satisfaction Approval Voting (SAV)
 
-* Proportional Approval Voting (PAV) [Gurobi optional]
+* Proportional Approval Voting (PAV)
 
-* Sequential Proportional Approval Voting
+* Sequential Proportional Approval Voting (seq-PAV)
 
-* Reverse Sequential Proportional Approval Voting
+* Reverse Sequential Proportional Approval Voting (revseq-PAV)
 
-* Sainte-Lagu&euml; Approval Voting (SLAV) [Gurobi optional] [4]
+* Sainte-Lagu&euml; Approval Voting (SLAV) [4]
 
 * Sequential Sainte-Lagu&euml; Approval Voting [4]
 
-* Approval Chamberlin-Courant (CC) [Gurobi optional]
+* Approval Chamberlin-Courant (CC)
 
 * Sequential Chamberlin-Courant
 
@@ -30,7 +30,7 @@ The following ABC rules are implemented:
 
 * Phragmén's sequential rule (see [2])
   
-* Monroe [Gurobi optional]
+* Monroe's rule
 
 * Minimax Approval Voting (see [3])
 
@@ -38,7 +38,7 @@ The following ABC rules are implemented:
 
 * Rule X (see [6])
 
-*  Phragmén's First Method (Enestr&ouml;m's Method) [7]
+* Phragmén's First Method (Enestr&ouml;m's Method) [7]
 
 ## Example
 
@@ -69,9 +69,9 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 * For ILP implementations via Gurobi it is not guaranteed that all winning committees are computed even if `resolute = False`.
 
 
-## Contributors
+## Acknowledgements
 
-The following people have contributed code to this package and provided help with technical and scientific questions (in alphabetic order):
+The following people have contributed code to this package or provided help with technical and scientific questions (in alphabetic order):
 [Piotr Faliszewski](http://home.agh.edu.pl/~faliszew/),
 [Stefan Schlomo Forster](https://github.com/stefanschlomoforster),
 [Andrzej Kaczmarczyk](http://www.user.tu-berlin.de/droores/),
