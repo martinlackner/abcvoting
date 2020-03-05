@@ -567,52 +567,48 @@ def compute_monroe_bruteforce(profile, committeesize,
 
 
 def compute_greedy_monroe(profile, committeesize):
-    """"Returns the winning committee of the greedy monroe.
-    Always selects the candidate with the highest approval.
-    Always removes the first n/k (rounding depends) voters that approve
-    with the selected candidate. (voter sorted by their rankings)
+    """"Returns the winning committees according to Greedy Monroe.
     """
     enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise Exception("Greedy Monroe is only defined for unit weights"
                         + " (weight=1)")
-    v = list(enumerate(list(profile.preferences)))
-    # list of tuples (nr, Preferences)
-    # sorted by sorted approved list of preferences
-    voters = sorted(v, key=lambda p: sorted(p[1].approved))
 
-    n = len(voters)  # number of voters
-    cands = set(range(profile.num_cand))
+    num_voters = len(profile.preferences)
+    committee = []
 
-    not_s, committee = (voters, set())  # not_s .. not satisfied voters
-    for t in range(1, committeesize+1):
-        remaining_cands = cands - committee
-        approval = {c: 0 for c in remaining_cands}
-        for nr, voter in not_s:
-            for c in voter.approved:
-                if c in remaining_cands:
-                    approval[c] += 1
-        max_approval = max(approval.values())
-        winner = [c for c in remaining_cands
-                  if approval[c] == max_approval][0]
+    # remaining voters
+    remaining_voters = list(range(num_voters))
+    remaining_cands = set(range(profile.num_cand))
 
-        # round how many are removed, either up or down
-        if t <= n - committeesize * math.floor(n / committeesize):
-            to_remove = math.ceil(float(n) / committeesize)
+    for t in range(committeesize):
+        maxapprovals = -1
+        selected = None
+        for c in remaining_cands:
+            approvals = len([i for i in remaining_voters
+                             if c in profile.preferences[i].approved])
+            if approvals > maxapprovals:
+                maxapprovals = approvals
+                selected = c
+        print(selected, maxapprovals, [i for i in remaining_voters
+                     if selected in profile.preferences[i].approved])
+
+        # determine how many voters are removed (at most)
+        if t < num_voters - committeesize * (num_voters // committeesize):
+            num_remove = num_voters // committeesize + 1
         else:
-            to_remove = math.floor(n / committeesize)
+            num_remove = num_voters // committeesize
 
-        # not more than the voters that approve
-        # the candidate can be removed
-        to_remove = min(max_approval, to_remove)
-        next_voters = []
-        for nr, voter in not_s:
-            if to_remove > 0 and winner in voter.approved:
-                to_remove -= 1
-            else:
-                next_voters.append((nr, voter))
-        not_s = next_voters
-        committee.add(winner)
+        # only voters that approve the chosen candidate
+        # are removed
+        to_remove = [i for i in remaining_voters
+                     if selected in profile.preferences[i].approved]
+        if len(to_remove) > num_remove:
+            to_remove = to_remove[:num_remove]
+        remaining_voters = [i for i in remaining_voters
+                            if i not in to_remove]
+        committee.append(selected)
+        remaining_cands.remove(selected)
 
     return sort_committees([committee])
 
