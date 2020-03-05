@@ -130,7 +130,9 @@ def additional_thiele_scores(profile, committee, scorefct):
 def monroescore_matching(profile, committee):
     """Returns Monroe score of a given committee.
     Uses a matching-based algorithm that works only if
-    committeesize divides the number of voters"""
+    the committee size divides the number of voters"""
+    if len(profile.preferences) % len(committee) != 0:
+        raise ValueError
     graph = {}
     sizeofdistricts = len(profile.preferences) // len(committee)
     for cand in committee:
