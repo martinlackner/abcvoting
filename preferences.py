@@ -12,6 +12,9 @@ class Profile(object):
         self.num_cand = num_cand
         self.preferences = []
 
+    def __len__(self):
+        return len(self.preferences)
+
     def add_preferences(self, pref):
         if type(pref) is list:
             if len(pref) == 0:
@@ -53,14 +56,15 @@ class Profile(object):
 
     def __str__(self):
         if self.has_unit_weights():
-            return ("profile with %d votes and %d candidates: "
+            return ("profile with %d votes and %d candidates:\n "
                     % (len(self.preferences), self.num_cand)
-                    + ", ".join(map(str, self.preferences)))
+                    + ",\n ".join(map(str, self.preferences)))
         else:
-            output = ("weighted profile with %d votes and %d candidates: "
+            output = ("weighted profile with %d votes and %d candidates:\n"
                       % (len(self.preferences), self.num_cand))
             for p in self.preferences:
-                output += str(p.weight) + "*" + str(p) + ", "
+                output += " " + str(p.weight) + " * " + str(p) + ",\n"
+            output = output[:-2]
             return output
 
 
