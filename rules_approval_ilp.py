@@ -88,7 +88,7 @@ def compute_monroe_ilp(profile, committeesize, resolute):
         raise NotImplementedError("Monroe is only defined for" +
                                   " unit weights (weight=1)")
 
-    num_voters = len(profile.preferences)
+    num_voters = len(profile)
     cands = list(range(profile.num_cand))
 
     # Alternative: split voters -> generate new profile with all weights = 1
@@ -111,9 +111,9 @@ def compute_monroe_ilp(profile, committeesize, resolute):
                 == committeesize)
 
     # a partition of voters into committeesize many sets
-    partition = m.addVars(profile.num_cand, len(profile.preferences),
+    partition = m.addVars(profile.num_cand, len(profile),
                           vtype=gb.GRB.INTEGER, lb=0, name="partition")
-    for i in range(len(profile.preferences)):
+    for i in range(len(profile)):
         # every voter has to be part of a voter partition set
         m.addConstr(gb.quicksum(partition[(j, i)]
                                 for j in cands)
@@ -122,19 +122,19 @@ def compute_monroe_ilp(profile, committeesize, resolute):
         # every voter set in the partition has to contain
         # at least (num_voters // committeesize) candidates
         m.addConstr(gb.quicksum(partition[(i, j)]
-                                for j in range(len(profile.preferences)))
+                                for j in range(len(profile)))
                     >= (num_voters // committeesize
                         - num_voters * (1 - in_committee[i])))
         # every voter set in the partition has to contain
         # at most ceil(num_voters/committeesize) candidates
         m.addConstr(gb.quicksum(partition[(i, j)]
-                                for j in range(len(profile.preferences)))
+                                for j in range(len(profile)))
                     <= (num_voters // committeesize
                         + bool(num_voters % committeesize)
                         + num_voters * (1 - in_committee[i])))
         # if in_committee[i] = 0 then partition[(i,j) = 0
         m.addConstr(gb.quicksum(partition[(i, j)]
-                                for j in range(len(profile.preferences)))
+                                for j in range(len(profile)))
                     <= num_voters * in_committee[i])
 
     m.update()
@@ -142,7 +142,7 @@ def compute_monroe_ilp(profile, committeesize, resolute):
     # constraint for objective variable "satisfaction"
     m.addConstr(gb.quicksum(partition[(i, j)] *
                             (i in profile.preferences[j].approved)
-                            for j in range(len(profile.preferences))
+                            for j in range(len(profile))
                             for i in cands)
                 >= satisfaction)
 

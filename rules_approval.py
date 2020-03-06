@@ -470,7 +470,7 @@ def compute_lexminimaxav(profile, committeesize, ilp=False, resolute=False):
                          is only defined for unit weights (weight=1)")
 
     opt_committees = []
-    opt_distances = [profile.num_cand + 1] * len(profile.preferences)
+    opt_distances = [profile.num_cand + 1] * len(profile)
     for comm in combinations(list(range(profile.num_cand)), committeesize):
         distances = sorted([hamming(vote.approved, comm)
                             for vote in profile.preferences],
@@ -574,7 +574,7 @@ def compute_greedy_monroe(profile, committeesize):
         raise Exception("Greedy Monroe is only defined for unit weights"
                         + " (weight=1)")
 
-    num_voters = len(profile.preferences)
+    num_voters = len(profile)
     committee = []
 
     # remaining voters
@@ -624,7 +624,7 @@ def compute_rule_x(profile, committeesize, resolute=False):
     if not profile.has_unit_weights():
         raise Exception("Rule X is only defined \
                             for unit weights (weight=1)")
-    num_voters = len(profile.preferences)
+    num_voters = len(profile)
     price = Fraction(num_voters, committeesize)
 
     start_budget = {v: Fraction(1, 1) for v in range(num_voters)}
@@ -758,7 +758,7 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
     https://arxiv.org/pdf/1611.08826.pdf (18.5, Page 59)
     """
     enough_approved_candidates(profile, committeesize)
-    num_voters = len(profile.preferences)
+    num_voters = len(profile)
 
     start_budget = {v: Fraction(profile.preferences[v].weight) for v in range(num_voters)}
     price = Fraction(sum(start_budget.values()), committeesize)

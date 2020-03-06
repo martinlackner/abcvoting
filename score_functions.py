@@ -131,13 +131,13 @@ def monroescore_matching(profile, committee):
     """Returns Monroe score of a given committee.
     Uses a matching-based algorithm that works only if
     the committee size divides the number of voters"""
-    if len(profile.preferences) % len(committee) != 0:
+    if len(profile) % len(committee) != 0:
         raise ValueError
     graph = {}
-    sizeofdistricts = len(profile.preferences) // len(committee)
+    sizeofdistricts = len(profile) // len(committee)
     for cand in committee:
         interestedvoters = []
-        for i in range(len(profile.preferences)):
+        for i in range(len(profile)):
             if cand in profile.preferences[i].approved:
                 interestedvoters.append(i)
         for j in range(sizeofdistricts):
@@ -154,7 +154,7 @@ def monroescore_flowbased(profile, committee):
     voters = profile.preferences
     committeesize = len(committee)
     # the lower bound of the size of districts
-    lower_bound = len(profile.preferences) // committeesize
+    lower_bound = len(profile) // committeesize
     # number of voters that will be contribute to the excess
     # of the lower bounds of districts
     overflow = len(voters) - committeesize * lower_bound
