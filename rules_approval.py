@@ -2,13 +2,13 @@
 
 
 from __future__ import print_function
-import math
 import sys
 from itertools import combinations
 
 try:
     from gmpy2 import mpq as Fraction
 except ImportError:
+    print("Warning: gmpy2 not found, resorting to Python's fractions")
     from fractions import Fraction
 from rules_approval_ilp import compute_monroe_ilp, compute_thiele_methods_ilp,\
                                compute_optphragmen_ilp, compute_minimaxav_ilp
@@ -590,8 +590,9 @@ def compute_greedy_monroe(profile, committeesize):
             if approvals > maxapprovals:
                 maxapprovals = approvals
                 selected = c
-        print(selected, maxapprovals, [i for i in remaining_voters
-                     if selected in profile.preferences[i].approved])
+        print(selected, maxapprovals,
+              [i for i in remaining_voters
+               if selected in profile.preferences[i].approved])
 
         # determine how many voters are removed (at most)
         if t < num_voters - committeesize * (num_voters // committeesize):
@@ -760,7 +761,8 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
     enough_approved_candidates(profile, committeesize)
     num_voters = len(profile)
 
-    start_budget = {v: Fraction(profile.preferences[v].weight) for v in range(num_voters)}
+    start_budget = {v: Fraction(profile.preferences[v].weight)
+                    for v in range(num_voters)}
     price = Fraction(sum(start_budget.values()), committeesize)
 
     cands = range(profile.num_cand)
