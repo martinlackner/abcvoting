@@ -6,7 +6,7 @@ sys.path.insert(0, '..')
 
 import genprofiles
 from preferences import Profile
-import rules_approval
+from abcvoting import rules_approval
 import committees
 
 # See whether the Gurobi ILP solver is available

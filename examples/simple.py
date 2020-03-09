@@ -4,7 +4,7 @@ from __future__ import print_function
 import sys
 sys.path.insert(0, '..')
 from preferences import Profile
-import rules_approval
+from abcvoting import rules_approval
 import committees
 
 
