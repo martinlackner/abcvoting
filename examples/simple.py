@@ -1,11 +1,13 @@
-# Simple examples
+"""
+Simple examples for abcvoting
+"""
 
 from __future__ import print_function
 import sys
 sys.path.insert(0, '..')
-from preferences import Profile
+from abcvoting.preferences import Profile
 from abcvoting import rules_approval
-import committees
+from abcvoting import committees
 
 
 # See whether the Gurobi ILP solver is available
@@ -20,7 +22,7 @@ except ImportError:
 
 print("****************************************")
 
-# Compute PAV with our without Gurobi
+# Compute PAV with or without Gurobi
 
 num_cand = 5
 profile = Profile(num_cand)
