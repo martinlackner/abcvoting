@@ -14,8 +14,8 @@ def enough_approved_candidates(profile, committeesize):
     for pref in profile.preferences:
         appr.update(pref.approved)
     if len(appr) < committeesize:
-        raise Exception("committeesize = " + str(committeesize)
-                        + " is larger than number of approved candidates")
+        raise ValueError("committeesize = " + str(committeesize)
+                         + " is larger than number of approved candidates")
 
 
 # nicely print a list of committees

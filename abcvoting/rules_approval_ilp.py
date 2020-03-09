@@ -1,6 +1,7 @@
-# Approval-based multiwinner rules implemented as an integer linear
-# program (ILP) with Gurobi
-
+"""
+Approval-based multiwinner rules implemented as a integer linear
+programs (ILPs) with Gurobi (https://www.gurobi.com/)
+"""
 
 from __future__ import print_function
 from committees import enough_approved_candidates, sort_committees
@@ -245,7 +246,7 @@ def compute_optphragmen_ilp(profile, committeesize,
 
     if m.Status != 2:
         print("Warning (opt-Phragmen): solutions may be "
-               + "incomplete or not optimal.")
+              + "incomplete or not optimal.")
         print("(Gurobi return code", m.Status, ")")
 
     # extract committees from model
@@ -320,7 +321,8 @@ def compute_minimaxav_ilp(profile, committeesize, resolute=False):
     m.optimize()
 
     if m.Status != 2:
-        print("Warning (Minimax AV): solutions may be incomplete or not optimal.")
+        print("Warning (Minimax AV): solutions may be incomplete"
+              + " or not optimal.")
         print("(Gurobi return code", m.Status, ")")
 
     # extract committees from model

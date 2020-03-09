@@ -33,14 +33,14 @@ class Profile(object):
                         p.is_valid(self.num_cand)
                         self.preferences.append(p)
                     else:
-                        raise Exception("Object of type " + str(type(p)) +
+                        raise TypeError("Object of type " + str(type(p)) +
                                         " not suitable as preferences")
         elif isinstance(pref, DichotomousPreferences):
             pref.is_valid(self.num_cand)
             self.preferences.append(pref)
         else:
-            raise Exception("Object of type " + str(type(p)) +
-                            " not suitable as preferences")
+            raise ValueError("Object of type " + str(type(p)) +
+                             " not suitable as preferences")
 
     def totalweight(self):
         return reduce(lambda acc, prof: acc + prof.weight, self.preferences, 0)
@@ -81,7 +81,7 @@ class DichotomousPreferences():
     def is_valid(self, num_cand):
         for c in self.approved:
             if c < 0 or c >= num_cand:
-                raise Exception(str(self) + " not valid for num_cand = " +
-                                str(num_cand))
+                raise ValueError(str(self) + " not valid for num_cand = " +
+                                 str(num_cand))
 
         return True
