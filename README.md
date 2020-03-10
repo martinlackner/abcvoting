@@ -1,4 +1,5 @@
-![Unittests badge](https://github.com/lumbric/abcvoting/workflows/Unittests/badge.svg)
+[![MIT License](https://img.shields.io/github/license/martinlackner/abcvoting.svg)](https://choosealicense.com/licenses/mit/)
+[![Unittests badge](https://github.com/martinlackner/abcvoting/workflows/Unittests/badge.svg)](https://github.com/martinlackner/abcvoting/actions)
 
 # abcvoting
 
