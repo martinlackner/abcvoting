@@ -4,7 +4,7 @@ Random generation of approval profiles
 
 
 import random
-from math import abs, sqrt
+from math import fabs, sqrt
 
 
 def random_urn_profile(num_cand, num_voters, setsize, replace):
@@ -121,7 +121,7 @@ def random_2d_points_profile(num_cand, num_voters, candpointmode,
 
 
 def random_2d_points_party_list_profile(num_cand, num_voters,
-                                        num_parties,  partypointmode,
+                                        num_parties, partypointmode,
                                         voterpointmode, sigma,
                                         uniform=False):
     """Generates profiles from randomly generated 2d points according
@@ -230,7 +230,7 @@ def distribute_candidates_to_parties(num_cand, parties, uniform):
         party_cands = {}
         num_random_cands = num_cand - num_parties
         for i, party in enumerate(parties):
-            party_cands[party] = [num_random_cands+i]
+            party_cands[party] = [num_random_cands + i]
         for cand in range(num_random_cands):
             party = random.choice(parties)
             party_cands[party].append(cand)
@@ -267,7 +267,7 @@ def generate_2d_points(agents, mode, sigma):
 
 
 def euclidean(p1, p2):
-    return sqrt(abs(p1[0] - p2[0])**2 + abs(p1[1] - p2[1])**2)
+    return sqrt(fabs(p1[0] - p2[0])**2 + fabs(p1[1] - p2[1])**2)
 
 
 def get_profile_from_points(voters, cands, voter_points,
