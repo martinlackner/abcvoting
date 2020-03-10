@@ -38,20 +38,20 @@ The following ABC rules are implemented:
 
 * Rule X (see [6])
 
-* Phragmén's First Method (Enestr&ouml;m's Method) [7]
+* Phragmén's First Method (Enestr&ouml;m's Method) (see [7])
 
 ## Example
 
-The following code computes the Proportional Approval Voting (PAV) rule for a profile with 6 voters and 5 candidates.
+The following code computes the Proportional Approval Voting (PAV) rule for a profile with 6 voters and 5 candidates. Candidates correspond to the numbers 0 to 4.
 
 ```python
-from preferences import Profile
-from abcvoting import rules_approval
+from abcvoting.preferences import Profile
+from abcvoting import abcrules
 
 profile = Profile(5)
 profile.add_preferences([[0,1,2], [0,1], [0,1], [1,2], [3,4], [3,4]])
 committeesize = 3
-print rules_approval.compute_pav(profile, committeesize, ilp=False)
+print abcrules.compute_pav(profile, committeesize, ilp=False)
 ```
 The output is 
 ```
@@ -61,7 +61,7 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 
 ## Comments
 
-* This module requires Python 2.7+ or 3.6+.
+* This module requires Python 2.7 or 3.6+.
 * The used modules can be found in [requirements.txt](requirements.txt).
 * Most computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). The corresponding functions require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
 * Some functions use fractions (e.g., `compute_seqphragmen`). These compute significantly faster if the module [gmpy2](https://gmpy2.readthedocs.io/) is available. If gmpy2 is not available, the much slower Python module [fractions](https://docs.python.org/2/library/fractions.html) is used.
