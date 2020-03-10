@@ -16,6 +16,10 @@ def test_invalidpreferences():
     "num_cand", [6, 7, 8]
 )
 def test_invalidprofiles(num_cand):
+    with pytest.raises(ValueError):
+        Profile(0)
+    with pytest.raises(ValueError):
+        Profile(-8)
     profile = Profile(num_cand)
     pref = DichotomousPreferences([num_cand])
     with pytest.raises(ValueError):
@@ -24,6 +28,8 @@ def test_invalidprofiles(num_cand):
         profile.add_preferences([0, 4, 5, "1"])
     with pytest.raises(TypeError):
         profile.add_preferences(["1", 0, 4, 5])
+    with pytest.raises(TypeError):
+        profile.add_preferences({1: [1, 2]})
 
 
 @pytest.mark.parametrize(
@@ -31,6 +37,7 @@ def test_invalidprofiles(num_cand):
 )
 def test_unitweights(num_cand):
     profile = Profile(num_cand)
+    profile.add_preferences([])
     profile.add_preferences(DichotomousPreferences([0, 4, 5]))
     profile.add_preferences([0, 4, 5])
     p1 = DichotomousPreferences([0, 4, 5])
@@ -42,3 +49,14 @@ def test_unitweights(num_cand):
     assert not profile.has_unit_weights()
 
     assert profile.totalweight() == 6.4
+
+@pytest.mark.parametrize(
+    "num_cand", [6, 7, 8]
+)
+def test_iterate(num_cand):
+    profile = Profile(num_cand)
+    profile.add_preferences(DichotomousPreferences([1, 3, 5], 3))
+    profile.add_preferences([0, 4, 5])
+    assert len(profile) == 2
+    for p in profile:
+        assert type(p) is DichotomousPreferences

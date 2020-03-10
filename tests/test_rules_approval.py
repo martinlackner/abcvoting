@@ -1,10 +1,10 @@
 """
-Unit tests for rules_approval.py and rules_approval_ilp.py
+Unit tests for abcrules.py and abcrules_ilp.py
 """
 
 import pytest
 from abcvoting.preferences import Profile, DichotomousPreferences
-from abcvoting import rules_approval
+from abcvoting import abcrules
 
 
 class CollectInstances():
@@ -203,7 +203,7 @@ testinsts = CollectInstances()
     "resolute", [True, False]
 )
 @pytest.mark.parametrize(
-    "rule", rules_approval.MWRULES
+    "rule", abcrules.MWRULES
 )
 def test_abcrules__toofewcandidates(rule, resolute):
 
@@ -213,11 +213,11 @@ def test_abcrules__toofewcandidates(rule, resolute):
     profile.add_preferences(preflist)
 
     with pytest.raises(ValueError):
-        rules_approval.compute_rule(rule, profile, committeesize, resolute)
+        abcrules.compute_rule(rule, profile, committeesize, resolute)
 
 
 @pytest.mark.parametrize(
-    "rule", rules_approval.MWRULES
+    "rule", abcrules.MWRULES
 )
 def test_abcrules_weightsconsidered(rule):
     profile = Profile(3)
@@ -235,13 +235,13 @@ def test_abcrules_weightsconsidered(rule):
     if "minimaxav" in rule:
         # Minimax AV ignores weights by definition
         return
-    result = rules_approval.compute_rule(rule, profile, committeesize)
+    result = abcrules.compute_rule(rule, profile, committeesize)
     assert len(result) == 1
     assert result[0] == [1]
 
 
 @pytest.mark.parametrize(
-    "rule", rules_approval.MWRULES
+    "rule", abcrules.MWRULES
 )
 def test_abcrules_correct_simple(rule):
     profile = Profile(4)
@@ -251,9 +251,9 @@ def test_abcrules_correct_simple(rule):
     if rule == "greedy-monroe":   # always returns one committee
         return
 
-    assert len(rules_approval.compute_rule(
+    assert len(abcrules.compute_rule(
         rule, profile, committeesize)) == 6
-    assert len(rules_approval.compute_rule(
+    assert len(abcrules.compute_rule(
         rule, profile, committeesize, resolute=True)) == 1
 
 
@@ -265,8 +265,8 @@ def test_monroe_indivisible(ilp):
     profile.add_preferences([[0], [0], [0], [1, 2], [1, 2], [1], [3]])
     committeesize = 3
 
-    assert (rules_approval.compute_monroe(profile, committeesize,
-                                          ilp=ilp, resolute=False)
+    assert (abcrules.compute_monroe(profile, committeesize,
+                                    ilp=ilp, resolute=False)
             == [[0, 1, 2], [0, 1, 3], [0, 2, 3]])
 
 
@@ -278,34 +278,34 @@ def test_optphrag_notiebreaking():
                              [2, 4], [2, 5], [2, 5]])
     committeesize = 3
 
-    assert len(rules_approval.compute_rule(
+    assert len(abcrules.compute_rule(
         "optphrag", profile, committeesize, resolute=False)) == 12
 
 
 @pytest.mark.parametrize(
-    "rule", rules_approval.MWRULES
+    "rule", abcrules.MWRULES
 )
 @pytest.mark.parametrize(
     "instance", testinsts.instances
 )
 def test_abcrules_correct(rule, instance):
     profile, exp_results, committeesize = instance
-    output = rules_approval.compute_rule(rule, profile,
-                                         committeesize,
-                                         resolute=False)
+    output = abcrules.compute_rule(rule, profile,
+                                   committeesize,
+                                   resolute=False)
     assert output == exp_results[rule]
 
 
 @pytest.mark.parametrize(
-    "rule", rules_approval.MWRULES
+    "rule", abcrules.MWRULES
 )
 @pytest.mark.parametrize(
     "instance", testinsts.instances
 )
 def test_abcrules_correct_resolute(rule, instance):
     profile, exp_results, committeesize = instance
-    output = rules_approval.compute_rule(rule, profile,
-                                         committeesize,
-                                         resolute=True)
+    output = abcrules.compute_rule(rule, profile,
+                                   committeesize,
+                                   resolute=True)
     assert len(output) == 1
     assert output[0] in exp_results[rule]

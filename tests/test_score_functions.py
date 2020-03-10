@@ -5,8 +5,8 @@ Unit tests for scoring_functions.py
 import pytest
 
 from abcvoting.preferences import Profile
-from abcvoting.score_functions import monroescore_flowbased
-from abcvoting.score_functions import monroescore_matching
+from abcvoting.scores import monroescore_flowbased
+from abcvoting.scores import monroescore_matching
 
 
 @pytest.mark.parametrize(
