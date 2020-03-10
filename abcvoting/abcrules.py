@@ -37,7 +37,7 @@ MWRULES = {
     "slav-noilp": "Sainte-Lague Approval Voting (SLAV) via branch-and-bound",
     "seqslav": "Sequential Sainte-Lague Approval Voting (seq-SLAV)",
     "phrag": "Phragmen's sequential rule (seq-Phragmen)",
-    "optphrag": "Phragmen's optimization rule (opt-Phragmen)",
+    "optphrag-ilp": "Phragmen's optimization rule (opt-Phragmen)",
     "monroe-ilp": "Monroe's rule via ILP",
     "monroe-noilp": "Monroe's rule via flow algorithm",
     "greedy-monroe": "Greedy Monroe rule",
@@ -107,7 +107,7 @@ def compute_rule(name, profile, committeesize, resolute=False):
     elif name == "minimaxav-ilp":
         return compute_minimaxav(profile, committeesize,
                                  ilp=True, resolute=resolute)
-    elif name == "optphrag":
+    elif name == "optphrag-ilp":
         return compute_optphragmen_ilp(profile, committeesize,
                                        resolute=resolute)
     elif name == "rule-x":

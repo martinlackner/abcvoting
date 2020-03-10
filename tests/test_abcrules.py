@@ -14,11 +14,13 @@ class CollectRules():
     """
     def __init__(self):
         self.rules = abcrules.MWRULES
+        self.ilp = [True, False]
         try:
             import gurobipy
         except ImportError:
             self.rules = [rule for rule in self.rules
                           if rule[-4:] != "-ilp"]
+            self.ilp = [False]
             print("Warning: Gurobi not found, "
                   + "ILP-based unittests are ignored.")
 
@@ -61,7 +63,7 @@ class CollectInstances():
                                    [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
             "phrag": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
                       [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "optphrag": [[0, 1, 2, 3]],
+            "optphrag-ilp": [[0, 1, 2, 3]],
             "cc-ilp": [[0, 1, 2, 3]],
             "cc-noilp": [[0, 1, 2, 3]],
             "seqcc": [[0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5],
@@ -125,7 +127,7 @@ class CollectInstances():
             "minimaxav-ilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
             "lexminimaxav-noilp": [[0, 1, 3]],
             "phrag": [[0, 1, 3]],
-            "optphrag": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
+            "optphrag-ilp": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
             "cc-ilp": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
                        [1, 2, 3], [1, 3, 4]],
             "cc-noilp": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
@@ -168,7 +170,7 @@ class CollectInstances():
                               [0, 2, 4, 5]],
             "lexminimaxav-noilp": [[0, 1, 2, 4]],
             "phrag": [[0, 1, 2, 4]],
-            "optphrag": [[0, 1, 2, 3], [0, 1, 2, 4],
+            "optphrag-ilp": [[0, 1, 2, 3], [0, 1, 2, 4],
                          [0, 1, 2, 5], [0, 2, 3, 4],
                          [0, 2, 3, 5], [0, 2, 4, 5],
                          [1, 2, 3, 4], [1, 2, 3, 5],
@@ -275,7 +277,7 @@ def test_abcrules_correct_simple(rule):
 
 
 @pytest.mark.parametrize(
-    "ilp", [True, False]
+    "ilp", testrules.ilp
 )
 def test_monroe_indivisible(ilp):
     profile = Profile(4)
@@ -290,13 +292,16 @@ def test_monroe_indivisible(ilp):
 def test_optphrag_notiebreaking():
     # this test shows that tiebreaking is not (yet)
     # implemented for opt-Phragmen
+
+    # requires Gurobi
+    pytest.importorskip("gurobipy")
     profile = Profile(6)
     profile.add_preferences([[0], [0], [1, 3], [1, 3], [1, 4],
                              [2, 4], [2, 5], [2, 5]])
     committeesize = 3
 
     assert len(abcrules.compute_rule(
-        "optphrag", profile, committeesize, resolute=False)) == 12
+        "optphrag-ilp", profile, committeesize, resolute=False)) == 12
 
 
 @pytest.mark.parametrize(
