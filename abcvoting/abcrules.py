@@ -1,22 +1,26 @@
-# Implementations of approval-based multi-winner voting rules
+"""
+Implementations of approval-based committee (ABC) voting rules
+"""
 
 
 from __future__ import print_function
 import sys
 from itertools import combinations
-
 try:
     from gmpy2 import mpq as Fraction
 except ImportError:
-    print("Warning: gmpy2 not found, resorting to Python's fractions")
+    print("Warning: gmpy2.mpq not found, "
+          + "resorting to Python's fractions.Fraction")
     from fractions import Fraction
-from rules_approval_ilp import compute_monroe_ilp, compute_thiele_methods_ilp,\
-                               compute_optphragmen_ilp, compute_minimaxav_ilp
-from committees import sort_committees,\
-                       enough_approved_candidates,\
-                       print_committees,\
-                       hamming
-import score_functions as sf
+from abcvoting.abcrules_ilp import compute_monroe_ilp
+from abcvoting.abcrules_ilp import compute_thiele_methods_ilp
+from abcvoting.abcrules_ilp import compute_optphragmen_ilp
+from abcvoting.abcrules_ilp import compute_minimaxav_ilp
+from abcvoting.committees import sort_committees
+from abcvoting.committees import print_committees
+from abcvoting.committees import hamming
+from abcvoting.committees import enough_approved_candidates
+import abcvoting.scores as sf
 
 
 ########################################################################
@@ -273,7 +277,7 @@ def compute_seq_thiele_methods(profile, committeesize, scorefct_str):
         for committee, score in comm_scores.items():
             # marginal utility gained by adding candidate to the committee
             additional_score_cand = sf.additional_thiele_scores(
-                                        profile, committee, scorefct)
+                profile, committee, scorefct)
 
             for c in range(profile.num_cand):
                 if additional_score_cand[c] >= max(additional_score_cand):
@@ -299,7 +303,7 @@ def compute_seq_thiele_resolute(profile, committeesize, scorefct_str):
     # build committees starting with the empty set
     for _ in range(0, committeesize):
         additional_score_cand = sf.additional_thiele_scores(
-                                    profile, committee, scorefct)
+            profile, committee, scorefct)
         next_cand = additional_score_cand.index(max(additional_score_cand))
         committee.append(next_cand)
     return [sorted(committee)]
@@ -649,7 +653,7 @@ def compute_rule_x(profile, committeesize, resolute=False):
                 rich = set(approved_by)
                 q = 0.0
                 while already_available < price and q == 0.0 and len(rich) > 0:
-                    fair_split = Fraction(price-already_available, len(rich))
+                    fair_split = Fraction(price - already_available, len(rich))
                     still_rich = set()
                     for v in rich:
                         if budget[v] <= fair_split:
@@ -814,9 +818,6 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
     committees = [comm for b, comm in committees]
     committees = sort_committees(committees)
     if resolute:
-        if len(committees) > 0:
-            return [committees[0]]
-        else:
-            return []
+        return [committees[0]]
     else:
         return committees

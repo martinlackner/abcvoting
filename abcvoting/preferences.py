@@ -1,7 +1,8 @@
-# Dichotomous (approval) preferences and profiles
-
-
-from functools import reduce
+"""
+Dichotomous (approval) preferences and profiles
+Voters are indexed by 0, ..., len(profile)
+Candidates are indexed by 0, ..., profile.num_cand
+"""
 
 
 class Profile(object):
@@ -39,11 +40,11 @@ class Profile(object):
             pref.is_valid(self.num_cand)
             self.preferences.append(pref)
         else:
-            raise ValueError("Object of type " + str(type(p)) +
-                             " not suitable as preferences")
+            raise TypeError("Object of type " + str(type(pref)) +
+                            " not suitable as preferences")
 
     def totalweight(self):
-        return reduce(lambda acc, prof: acc + prof.weight, self.preferences, 0)
+        return sum(pref.weight for pref in self.preferences)
 
     def has_unit_weights(self):
         for p in self.preferences:

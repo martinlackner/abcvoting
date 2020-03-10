@@ -6,7 +6,7 @@ from __future__ import print_function
 import sys
 sys.path.insert(0, '..')
 from abcvoting.preferences import Profile
-from abcvoting import rules_approval
+from abcvoting import abcrules
 from abcvoting import committees
 
 
@@ -32,7 +32,7 @@ print("Computing a committee of size", committeesize, end=' ')
 print("with the Proportional Approval Voting (PAV) rule")
 print("given a", profile)
 print("Output:")
-output = rules_approval.compute_pav(profile, committeesize, ilp=ilp)
+output = abcrules.compute_pav(profile, committeesize, ilp=ilp)
 committees.print_committees(output)
 
 print("****************************************")
@@ -45,4 +45,4 @@ profile.add_preferences([[0, 4, 5], [0], [1, 4, 5], [1],
                          [2, 4, 5], [2], [3, 4, 5], [3]])
 committeesize = 4
 
-rules_approval.allrules(profile, committeesize, ilp=ilp)
+abcrules.allrules(profile, committeesize, ilp=ilp)

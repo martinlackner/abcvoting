@@ -6,7 +6,7 @@ sys.path.insert(0, '..')
 
 import genprofiles
 from preferences import Profile
-from abcvoting import rules_approval
+from abcvoting import abcrules
 import committees
 
 # See whether the Gurobi ILP solver is available
@@ -47,7 +47,7 @@ def compute(appr_sets, cand_count, gen_profile_name):
           gen_profile_name)
     print(profile)
     print("Output:")
-    output = rules_approval.compute_pav(profile, committeesize, ilp=ilp)
+    output = abcrules.compute_pav(profile, committeesize, ilp=ilp)
     committees.print_committees(output)
 
     print("****************************************")

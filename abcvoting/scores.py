@@ -1,4 +1,6 @@
-# Calculating scores
+"""
+Calculating all kinds of scores
+"""
 
 
 try:

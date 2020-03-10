@@ -1,5 +1,9 @@
+"""
+Basic functions for committees (i.e., subsets of candidates)
+"""
+
+
 from __future__ import print_function
-# Basic functions for committees (i.e., subsets of candidates)
 
 
 # sorts a list of committees,

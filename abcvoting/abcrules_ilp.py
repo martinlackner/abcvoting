@@ -1,11 +1,11 @@
 """
-Approval-based multiwinner rules implemented as a integer linear
+Approval-based committee (ABC) rules implemented as a integer linear
 programs (ILPs) with Gurobi (https://www.gurobi.com/)
 """
 
 from __future__ import print_function
-from committees import enough_approved_candidates, sort_committees
-import score_functions as sf
+from abcvoting.committees import enough_approved_candidates, sort_committees
+import abcvoting.scores as sf
 try:
     import gurobipy as gb
 except ImportError:

@@ -1,4 +1,6 @@
-# random generation of approval profiles
+"""
+Random generation of approval profiles
+"""
 
 
 import random

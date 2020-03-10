@@ -1,4 +1,6 @@
-# load preflib files (SOI or TOI)
+"""
+Read preflib files (SOI or TOI)
+"""
 
 
 from __future__ import print_function
@@ -37,14 +39,15 @@ def load_election_files_from_dir(dir_name, max_approval_percent=1.0,
                 dict from normalized candidate ids to candidate names
             profile: list of lists
                 list of approval set lists for each voter one
-            used_candidate_count: int
+            num_cand: int
                 number of candidates that are within the profile
         """
     file_dir, files = get_file_names(dir_name)
 
     profiles = []
     if file_dir is not None:
-        files = sorted(files)  # sorts from oldest to newest if name is sortable by date (YYYYMMDD)
+        # sorts from oldest to newest if name is sortable by date (YYYYMMDD)
+        files = sorted(files)
         for f in files:
             if f.endswith('.soi') or f.endswith('.toi'):
                 ''' # can be added if not all soi from a directory are needed.
@@ -55,9 +58,10 @@ def load_election_files_from_dir(dir_name, max_approval_percent=1.0,
                     if to_date is not None and date > to_date:
                         break
                 '''
-                candidate_map, profile, used_candidate_count = read_election_file(
-                    f, max_approval_percent, setsize=setsize, file_dir=file_dir)
-                profiles.append((candidate_map, profile, used_candidate_count))
+                candidate_map, profile, num_cand = read_election_file(
+                    f, max_approval_percent,
+                    setsize=setsize, file_dir=file_dir)
+                profiles.append((candidate_map, profile, num_cand))
 
     return profiles
 
@@ -175,7 +179,7 @@ def read_election_file(filename, max_approval_percent=1.0,
         unique_orders = int(parts[2].strip())
         unique_candidates = set()
         profile = []
-        for i in range(unique_orders):
+        for _ in range(unique_orders):
             line = f.readline().strip()
             parts = line.split(",")
             count = int(parts[0])
@@ -184,7 +188,7 @@ def read_election_file(filename, max_approval_percent=1.0,
             if setsize:
                 take_cands = min(setsize, len(ranking))
             else:
-                take_cands = max(1, int(len(ranking)*max_approval_percent))
+                take_cands = max(1, int(len(ranking) * max_approval_percent))
             if take_cands > 0:
                 vote = get_vote(take_cands, ranking)
                 for cand in vote:
@@ -197,9 +201,9 @@ def read_election_file(filename, max_approval_percent=1.0,
         normalized_profile = []
         normalize_map = {}
         j = 0
-        for i in unique_candidates:
-            normalize_map[i] = j
-            used_candidate_map[j] = candidate_map[i]
+        for c in unique_candidates:
+            normalize_map[c] = j
+            used_candidate_map[j] = candidate_map[c]
             j += 1
         for vote in profile:
             normalized_vote = []

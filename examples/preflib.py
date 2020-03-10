@@ -5,7 +5,7 @@ sys.path.insert(0, '..')
 
 import file_reader
 from preferences import Profile
-from abcvoting import rules_approval
+from abcvoting import abcrules
 import committees
 
 # See whether the Gurobi ILP solver is available
@@ -30,7 +30,7 @@ def compute(appr_sets, cand_count):
     print("with the Proportional Approval Voting (PAV) rule")
     print("given a", profile)
     print("Output:")
-    output = rules_approval.compute_pav(profile, committeesize, ilp=ilp)
+    output = abcrules.compute_pav(profile, committeesize, ilp=ilp)
     committees.print_committees(output)
 
     print("****************************************")
