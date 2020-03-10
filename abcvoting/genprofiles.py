@@ -4,7 +4,7 @@ Random generation of approval profiles
 
 
 import random
-from scipy.spatial.distance import euclidean
+from math import abs, sqrt
 
 
 def random_urn_profile(num_cand, num_voters, setsize, replace):
@@ -179,7 +179,7 @@ def compute_mallows_insert_distributions(num_cand, dispersion):
         # + ... dispersion^(i-1)
         denominator += pow(dispersion, i)
         dist = []
-        for j in range(i+1):  # 0..i
+        for j in range(i + 1):  # 0..i
             dist.append(pow(dispersion, i - j) / denominator)
         distributions.append(dist)
 
@@ -264,6 +264,10 @@ def generate_2d_points(agents, mode, sigma):
         print("mode", mode, "not known")
         quit()
     return points
+
+
+def euclidean(p1, p2):
+    return sqrt(abs(p1[0] - p2[0])**2 + abs(p1[1] - p2[1])**2)
 
 
 def get_profile_from_points(voters, cands, voter_points,
