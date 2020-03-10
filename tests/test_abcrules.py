@@ -7,6 +7,22 @@ from abcvoting.preferences import Profile, DichotomousPreferences
 from abcvoting import abcrules
 
 
+class CollectRules():
+    """
+    Collect all ABC rules that are available for unittesting.
+    Exclude ILP-based rules if Gurobi is not available
+    """
+    def __init__(self):
+        self.rules = abcrules.MWRULES
+        try:
+            import gurobipy
+        except ImportError:
+            self.rules = [rule for rule in self.rules
+                          if rule[-4:] != "-ilp"]
+            print("Warning: Gurobi not found, "
+                  + "ILP-based unittests are ignored.")
+
+
 class CollectInstances():
     def __init__(self):
         self.instances = []
@@ -197,13 +213,14 @@ class CollectInstances():
 
 
 testinsts = CollectInstances()
+testrules = CollectRules()
 
 
 @pytest.mark.parametrize(
     "resolute", [True, False]
 )
 @pytest.mark.parametrize(
-    "rule", abcrules.MWRULES
+    "rule", testrules.rules
 )
 def test_abcrules__toofewcandidates(rule, resolute):
 
@@ -217,7 +234,7 @@ def test_abcrules__toofewcandidates(rule, resolute):
 
 
 @pytest.mark.parametrize(
-    "rule", abcrules.MWRULES
+    "rule", testrules.rules
 )
 def test_abcrules_weightsconsidered(rule):
     profile = Profile(3)
@@ -241,7 +258,7 @@ def test_abcrules_weightsconsidered(rule):
 
 
 @pytest.mark.parametrize(
-    "rule", abcrules.MWRULES
+    "rule", testrules.rules
 )
 def test_abcrules_correct_simple(rule):
     profile = Profile(4)
@@ -283,7 +300,7 @@ def test_optphrag_notiebreaking():
 
 
 @pytest.mark.parametrize(
-    "rule", abcrules.MWRULES
+    "rule", testrules.rules
 )
 @pytest.mark.parametrize(
     "instance", testinsts.instances
@@ -297,7 +314,7 @@ def test_abcrules_correct(rule, instance):
 
 
 @pytest.mark.parametrize(
-    "rule", abcrules.MWRULES
+    "rule", testrules.rules
 )
 @pytest.mark.parametrize(
     "instance", testinsts.instances

@@ -50,6 +50,7 @@ def test_unitweights(num_cand):
 
     assert profile.totalweight() == 6.4
 
+
 @pytest.mark.parametrize(
     "num_cand", [6, 7, 8]
 )
@@ -59,4 +60,4 @@ def test_iterate(num_cand):
     profile.add_preferences([0, 4, 5])
     assert len(profile) == 2
     for p in profile:
-        assert type(p) is DichotomousPreferences
+        assert isinstance(p, DichotomousPreferences)
