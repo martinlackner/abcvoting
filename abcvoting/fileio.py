@@ -168,7 +168,7 @@ def read_election_file(filename, max_approval_percent=1.0,
         line = f.readline()
         candidate_count = int(line.strip())
         candidate_map = {}
-        for i in range(candidate_count):
+        for _ in range(candidate_count):
             parts = f.readline().strip().split(",")
             candidate_map[int(parts[0].strip())] = \
                 ",".join(parts[1:]).strip()

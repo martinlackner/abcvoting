@@ -1,12 +1,12 @@
 from __future__ import print_function
 
 import sys
+import os
 sys.path.insert(0, '..')
-
-import file_reader
-from preferences import Profile
+from abcvoting import fileio
+from abcvoting.preferences import Profile
 from abcvoting import abcrules
-import committees
+from abcvoting import committees
 
 # See whether the Gurobi ILP solver is available
 
@@ -22,6 +22,9 @@ print("****************************************")
 
 committeesize = 2
 
+# directory of preflib.py
+currdir = os.path.dirname(os.path.abspath(__file__))
+
 
 def compute(appr_sets, cand_count):
     profile = Profile(cand_count)
@@ -36,25 +39,23 @@ def compute(appr_sets, cand_count):
     print("****************************************")
 
 
-profiles = file_reader.load_election_files_from_dir("./examples/toi_examples/",
-                                                    max_approval_percent=0.7)
+profiles = fileio.load_election_files_from_dir(currdir + "/toi_examples/",
+                                               max_approval_percent=0.7)
 
 for candidate_map, appr_sets, cand_count in profiles:
     compute(appr_sets, cand_count)
 
-
 # Example to read a single file
 candidate_map, appr_sets, cand_count = \
-    file_reader.read_election_file("./examples/toi_examples/ex_2010.toi",
-                                   max_approval_percent=0.5)
+    fileio.read_election_file(currdir + "/toi_examples/ex_2010.toi",
+                              max_approval_percent=0.5)
 
 compute(appr_sets, cand_count)
 
 
 # Example with setsize
 _, appr_sets, cand_count = \
-    file_reader.read_election_file("./examples/toi_examples/ex_2010.toi",
-                                   setsize=1)
-
+    fileio.read_election_file(currdir + "/toi_examples/ex_2010.toi",
+                              setsize=1)
 
 compute(appr_sets, cand_count)

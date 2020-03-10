@@ -4,10 +4,10 @@ import sys
 import random
 sys.path.insert(0, '..')
 
-import genprofiles
-from preferences import Profile
+from abcvoting import genprofiles
+from abcvoting.preferences import Profile
 from abcvoting import abcrules
-import committees
+from abcvoting import committees
 
 # See whether the Gurobi ILP solver is available
 ilp = True
