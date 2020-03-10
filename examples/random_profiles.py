@@ -9,17 +9,6 @@ from abcvoting.preferences import Profile
 from abcvoting import abcrules
 from abcvoting import committees
 
-# See whether the Gurobi ILP solver is available
-ilp = True
-try:
-    import gurobipy  # pylint: disable=unused-import
-except ImportError:
-    ilp = False
-    print("ILP solver Gurobi not available (import gurobipy failed).")
-    print()
-
-print("****************************************")
-
 
 random.seed(31415)
 
@@ -47,7 +36,7 @@ def compute(appr_sets, cand_count, gen_profile_name):
           gen_profile_name)
     print(profile)
     print("Output:")
-    output = abcrules.compute_pav(profile, committeesize, ilp=ilp)
+    output = abcrules.compute_pav(profile, committeesize, ilp=False)
     committees.print_committees(output)
 
     print("****************************************")
