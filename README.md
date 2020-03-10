@@ -1,3 +1,5 @@
+![Unittests badge](https://github.com/lumbric/abcvoting/workflows/Unittests/badge.svg)
+
 # abcvoting
 
 ## Python implementations of approval-based committee (multi-winner) rules
