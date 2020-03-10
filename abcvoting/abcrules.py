@@ -466,7 +466,7 @@ def compute_lexminimaxav(profile, committeesize, ilp=False, resolute=False):
        according to Lexicographic Minimax AV"""
 
     if ilp:
-        raise NotImplemented
+        raise NotImplementedError
 
     enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
