@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [2.7, 3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v2
@@ -24,11 +24,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      # TODO requirements.txt needs to be fixed, for now let's just install networkx directly
-      run: pip3 install networkx==2.4
-      #run: |
-      #  python -m pip install --upgrade pip
-      #  pip install -r requirements.txt
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
     - name: Lint with flake8
       run: |
         pip install flake8
@@ -40,7 +38,5 @@ jobs:
       # The other tests require Gurobi, let's whitelist at least the other tests for now:
       run: |
         pip install pytest
-        PYTHONPATH=$PYTHONPATH:$PWD python3 -m pytest -ra \
-          unittests.py::TestApprovalMultiwinner::test_createprofiles \
-          unittests.py::TestApprovalMultiwinner::test_monroescore \
-          unittests.py::TestApprovalMultiwinner::test_mwrules__toofewcandidates
+        PYTHONPATH=$PYTHONPATH:$PWD python -m pytest -ra tests/
+
