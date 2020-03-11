@@ -16,7 +16,7 @@ class CollectRules():
         self.rules = abcrules.MWRULES
         self.ilp = [True, False]
         try:
-            import gurobipy
+            import gurobipy  # pylint: disable=unused-import
         except ImportError:
             self.rules = [rule for rule in self.rules
                           if rule[-4:] != "-ilp"]

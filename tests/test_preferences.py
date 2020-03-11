@@ -13,14 +13,17 @@ def test_invalidpreferences():
 
 
 @pytest.mark.parametrize(
-    "num_cand", [6, 7, 8]
+    "num_cand", [6, 8]
 )
 def test_invalidprofiles(num_cand):
     with pytest.raises(ValueError):
         Profile(0)
     with pytest.raises(ValueError):
         Profile(-8)
-    profile = Profile(num_cand)
+    with pytest.raises(ValueError):
+        Profile(4, ["a", "b", "c"])
+    Profile(4, ["a", 3, "b", "c"])
+    profile = Profile(num_cand, "abcdefgh")
     pref = DichotomousPreferences([num_cand])
     with pytest.raises(ValueError):
         profile.add_preferences(pref)
@@ -33,7 +36,7 @@ def test_invalidprofiles(num_cand):
 
 
 @pytest.mark.parametrize(
-    "num_cand", [6, 7, 8]
+    "num_cand", [6, 7]
 )
 def test_unitweights(num_cand):
     profile = Profile(num_cand)
@@ -52,7 +55,7 @@ def test_unitweights(num_cand):
 
 
 @pytest.mark.parametrize(
-    "num_cand", [6, 7, 8]
+    "num_cand", [6, 7]
 )
 def test_iterate(num_cand):
     profile = Profile(num_cand)
@@ -61,3 +64,22 @@ def test_iterate(num_cand):
     assert len(profile) == 2
     for p in profile:
         assert isinstance(p, DichotomousPreferences)
+
+
+@pytest.mark.parametrize(
+    "add_pref",
+    [[3], [1, 5], [0], [2], [2, 6, 7], [0, 1, 2, 3, 4, 5, 6, 7]]
+)
+@pytest.mark.parametrize(
+    "num_cand", [8, 9]
+)
+def test_party_list(num_cand, add_pref):
+    profile = Profile(num_cand)
+    profile.add_preferences(DichotomousPreferences([1, 3, 5], 3))
+    profile.add_preferences([0, 4, 6])
+    profile.add_preferences([0, 4, 6])
+    profile.add_preferences([2, 7])
+    profile.add_preferences(DichotomousPreferences([1, 3, 5], 3))
+    assert profile.party_list()
+    profile.add_preferences(add_pref)
+    assert not profile.party_list()
