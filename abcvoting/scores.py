@@ -41,11 +41,11 @@ def get_scorefct(scorefct_str, committeesize):
 def thiele_score(profile, committee, scorefct_str="pav"):
     scorefct = get_scorefct(scorefct_str, len(committee))
     score = 0
-    for pref in profile.preferences:
+    for vote in profile:
         cand_in_com = 0
-        for _ in set(committee) & pref.approved:
+        for _ in set(committee) & vote.approved:
             cand_in_com += 1
-            score += pref.weight * scorefct(cand_in_com)
+            score += vote.weight * scorefct(cand_in_com)
     return score
 
 
@@ -117,13 +117,13 @@ def cumulative_score_fct(scorefct, cand_in_com):
 #  gained by adding candidate i
 def additional_thiele_scores(profile, committee, scorefct):
     marg = [0] * profile.num_cand
-    for pref in profile.preferences:
-        for c in pref.approved:
-            if pref.approved & set(committee):
-                marg[c] += pref.weight * scorefct(len(pref.approved &
+    for vote in profile:
+        for c in vote:
+            if vote.approved & set(committee):
+                marg[c] += vote.weight * scorefct(len(vote.approved &
                                                       set(committee)) + 1)
             else:
-                marg[c] += pref.weight * scorefct(1)
+                marg[c] += vote.weight * scorefct(1)
     for c in committee:
         marg[c] = -1
     return marg
@@ -140,7 +140,7 @@ def monroescore_matching(profile, committee):
     for cand in committee:
         interestedvoters = []
         for i in range(len(profile)):
-            if cand in profile.preferences[i].approved:
+            if cand in profile[i]:
                 interestedvoters.append(i)
         for j in range(sizeofdistricts):
             graph[str(cand) + "/" + str(j)] = interestedvoters
@@ -153,27 +153,26 @@ def monroescore_flowbased(profile, committee):
     Uses a flow-based algorithm that works even if
     committeesize does not divide the number of voters"""
     G = nx.DiGraph()
-    voters = profile.preferences
     committeesize = len(committee)
     # the lower bound of the size of districts
     lower_bound = len(profile) // committeesize
     # number of voters that will be contribute to the excess
     # of the lower bounds of districts
-    overflow = len(voters) - committeesize * lower_bound
+    overflow = len(profile) - committeesize * lower_bound
     # add a sink node for the overflow
     G.add_node('sink', demand=overflow)
     for i in committee:
         G.add_node(i, demand=lower_bound)
         G.add_edge(i, 'sink', weight=0, capacity=1)
-    for i in range(len(voters)):
+    for i, vote in enumerate(profile):
         voter_name = 'v' + str(i)
         G.add_node(voter_name, demand=-1)
         for cand in committee:
-            if cand in voters[i].approved:
+            if cand in vote:
                 G.add_edge(voter_name, cand, weight=0, capacity=1)
             else:
                 G.add_edge(voter_name, cand, weight=1, capacity=1)
     # compute the minimal cost assignment of voters to candidates,
     # i.e. the unrepresented voters, and subtract it from the total number
     # of voters
-    return len(voters) - nx.capacity_scaling(G)[0]
+    return len(profile) - nx.capacity_scaling(G)[0]

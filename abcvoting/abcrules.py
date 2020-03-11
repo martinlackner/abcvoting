@@ -29,26 +29,26 @@ import abcvoting.scores as sf
 MWRULES = {
     "av": "Approval Voting",
     "sav": "Satisfaction Approval Voting",
-    "pav-ilp": "Proportional Approval Voting (PAV) via ILP",
-    "pav-noilp": "Proportional Approval Voting (PAV) via branch-and-bound",
+    "pav-ilp": "Proportional Approval Voting (PAV) [ILP]",
+    "pav-noilp": "Proportional Approval Voting (PAV) [branch-and-bound]",
     "seqpav": "Sequential Proportional Approval Voting (seq-PAV)",
     "revseqpav": "Reverse Sequential Prop. Approval Voting (revseq-PAV)",
-    "slav-ilp": "Sainte-Lague Approval Voting (SLAV) via ILP",
-    "slav-noilp": "Sainte-Lague Approval Voting (SLAV) via branch-and-bound",
+    "slav-ilp": "Sainte-Lague Approval Voting (SLAV) [ILP]",
+    "slav-noilp": "Sainte-Lague Approval Voting (SLAV) [branch-and-bound]",
     "seqslav": "Sequential Sainte-Lague Approval Voting (seq-SLAV)",
     "phrag": "Phragmen's sequential rule (seq-Phragmen)",
-    "optphrag-ilp": "Phragmen's optimization rule (opt-Phragmen)",
-    "monroe-ilp": "Monroe's rule via ILP",
-    "monroe-noilp": "Monroe's rule via flow algorithm",
+    "optphrag-ilp": "Phragmen's optimization rule (opt-Phragmen) [ILP]",
+    "monroe-ilp": "Monroe's rule [ILP]",
+    "monroe-noilp": "Monroe's rule [matching or flow algorithm]",
     "greedy-monroe": "Greedy Monroe rule",
-    "cc-ilp": "Chamberlin-Courant (CC) via ILP",
-    "cc-noilp": "Chamberlin-Courant (CC) via branch-and-bound",
+    "cc-ilp": "Chamberlin-Courant (CC) [ILP]",
+    "cc-noilp": "Chamberlin-Courant (CC) [branch-and-bound]",
     "seqcc": "Sequential Chamberlin-Courant (seq-CC)",
     "revseqcc": "Reverse Sequential Chamberlin-Courant (revseq-CC)",
-    "minimaxav-noilp": "Minimax Approval Voting via brute-force",
-    "minimaxav-ilp": "Minimax Approval Voting via ILP",
+    "minimaxav-noilp": "Minimax Approval Voting [brute-force]",
+    "minimaxav-ilp": "Minimax Approval Voting [ILP]",
     "lexminimaxav-noilp":
-        "Lexicographic Minimax Approval Voting via brute-force",
+        "Lexicographic Minimax Approval Voting [brute-force]",
     "rule-x": "Rule X",
     "phragmen-enestroem": "Phragmen's first method / Enestroeom's method",
 }
@@ -126,13 +126,14 @@ def allrules(profile, committeesize, ilp=True, include_resolute=False):
         if not ilp and "-ilp" in rule:
             continue
         print(MWRULES[rule] + ":")
-        com = compute_rule(rule, profile, committeesize)
-        print_committees(com)
+        committees = compute_rule(rule, profile, committeesize)
+        print_committees(committees)
 
         if include_resolute:
             print(MWRULES[rule] + " (with tie-breaking):")
-            com = compute_rule(rule, profile, committeesize, resolute=True)
-            print_committees(com)
+            committees = compute_rule(rule, profile,
+                                      committeesize, resolute=True)
+            print_committees(committees)
 
 
 ########################################################################
@@ -239,11 +240,11 @@ def compute_av(profile, committeesize, resolute=False, sav=False):
     enough_approved_candidates(profile, committeesize)
 
     appr_scores = [0] * profile.num_cand
-    for pref in profile.preferences:
-        for cand in pref.approved:
+    for pref in profile:
+        for cand in pref:
             if sav:
                 # Satisfaction Approval Voting
-                appr_scores[cand] += Fraction(pref.weight, len(pref.approved))
+                appr_scores[cand] += Fraction(pref.weight, len(pref))
             else:
                 # (Classic) Approval Voting
                 appr_scores[cand] += pref.weight
@@ -287,9 +288,9 @@ def compute_seq_thiele_methods(profile, committeesize, scorefct_str):
         # remove suboptimal committees
         comm_scores = {}
         cutoff = max(comm_scores_next.values())
-        for com, score in comm_scores_next.items():
+        for comm, score in comm_scores_next.items():
             if score >= cutoff:
-                comm_scores[com] = score
+                comm_scores[comm] = score
     return sort_committees(list(comm_scores.keys()))
 
 
@@ -314,8 +315,8 @@ def __least_relevant_cands(profile, comm, utilityfct):
     # marginal utility gained by adding candidate to the committee
     marg_util_cand = [0] * profile.num_cand
 
-    for pref in profile.preferences:
-        for c in pref.approved:
+    for pref in profile:
+        for c in pref:
             satisfaction = len(pref.approved.intersection(comm))
             marg_util_cand[c] += pref.weight * utilityfct(satisfaction)
     for c in range(profile.num_cand):
@@ -348,9 +349,9 @@ def compute_revseq_thiele_methods(profile, committeesize, scorefct_str):
         # remove suboptimal committees
         comm_scores = {}
         cutoff = max(comm_scores_next.values())
-        for com, score in comm_scores_next.items():
+        for comm, score in comm_scores_next.items():
             if score >= cutoff:
-                comm_scores[com] = score
+                comm_scores[comm] = score
     return sort_committees(list(comm_scores.keys()))
 
 
@@ -375,14 +376,14 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
     according to sequential Phragmen"""
     enough_approved_candidates(profile, committeesize)
 
-    load = {v: 0 for v in profile.preferences}
+    load = {pref: 0 for pref in profile}
     comm_loads = {(): load}
 
     approvers_weight = {}
     for c in range(profile.num_cand):
-        approvers_weight[c] = sum(v.weight
-                                  for v in profile.preferences
-                                  if c in v.approved)
+        approvers_weight[c] = sum(pref.weight
+                                  for pref in profile
+                                  if c in pref)
 
     # build committees starting with the empty set
     for _ in range(0, committeesize):
@@ -390,9 +391,9 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
         for committee, load in comm_loads.items():
             approvers_load = {}
             for c in range(profile.num_cand):
-                approvers_load[c] = sum(v.weight * load[v]
-                                        for v in profile.preferences
-                                        if c in v.approved)
+                approvers_load[c] = sum(pref.weight * load[pref]
+                                        for pref in profile
+                                        if c in pref)
             new_maxload = [Fraction(approvers_load[c] + 1, approvers_weight[c])
                            if approvers_weight[c] > 0 else committeesize + 1
                            for c in range(profile.num_cand)]
@@ -402,18 +403,18 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
             for c in range(profile.num_cand):
                 if new_maxload[c] <= min(new_maxload):
                     new_load = {}
-                    for v in profile.preferences:
-                        if c in v.approved:
-                            new_load[v] = new_maxload[c]
+                    for pref in profile:
+                        if c in pref:
+                            new_load[pref] = new_maxload[c]
                         else:
-                            new_load[v] = load[v]
+                            new_load[pref] = load[pref]
                     comm_loads_next[tuple(sorted(committee + (c,)))] = new_load
         # remove suboptimal committees
         comm_loads = {}
         cutoff = min([max(load.values()) for load in comm_loads_next.values()])
-        for com, load in comm_loads_next.items():
+        for comm, load in comm_loads_next.items():
             if max(load.values()) <= cutoff:
-                comm_loads[com] = load
+                comm_loads[comm] = load
         if resolute:
             committees = sort_committees(list(comm_loads.keys()))
             comm = tuple(committees[0])
@@ -435,8 +436,8 @@ def compute_minimaxav(profile, committeesize, ilp=True, resolute=False):
 
     def mavscore(committee, profile):
         score = 0
-        for vote in profile.preferences:
-            hamdistance = hamming(vote.approved, committee)
+        for pref in profile:
+            hamdistance = hamming(pref, committee)
             if hamdistance > score:
                 score = hamdistance
         return score
@@ -476,8 +477,8 @@ def compute_lexminimaxav(profile, committeesize, ilp=False, resolute=False):
     opt_committees = []
     opt_distances = [profile.num_cand + 1] * len(profile)
     for comm in combinations(list(range(profile.num_cand)), committeesize):
-        distances = sorted([hamming(vote.approved, comm)
-                            for vote in profile.preferences],
+        distances = sorted([hamming(pref, comm)
+                            for pref in profile],
                            reverse=True)
         for i in range(len(distances)):
             if opt_distances[i] < distances[i]:
@@ -590,13 +591,13 @@ def compute_greedy_monroe(profile, committeesize):
         selected = None
         for c in remaining_cands:
             approvals = len([i for i in remaining_voters
-                             if c in profile.preferences[i].approved])
+                             if c in profile[i]])
             if approvals > maxapprovals:
                 maxapprovals = approvals
                 selected = c
         print(selected, maxapprovals,
               [i for i in remaining_voters
-               if selected in profile.preferences[i].approved])
+               if selected in profile[i]])
 
         # determine how many voters are removed (at most)
         if t < num_voters - committeesize * (num_voters // committeesize):
@@ -607,7 +608,7 @@ def compute_greedy_monroe(profile, committeesize):
         # only voters that approve the chosen candidate
         # are removed
         to_remove = [i for i in remaining_voters
-                     if selected in profile.preferences[i].approved]
+                     if selected in profile[i]]
         if len(to_remove) > num_remove:
             to_remove = to_remove[:num_remove]
         remaining_voters = [i for i in remaining_voters
@@ -645,9 +646,9 @@ def compute_rule_x(profile, committeesize, resolute=False):
             curr_cands = set(cands) - committee[1]
             for c in curr_cands:
                 approved_by = set()
-                for v, vote in enumerate(profile.preferences):
-                    if c in vote.approved and budget[v] > 0.0:
-                        approved_by.add(v)
+                for i, pref in enumerate(profile):
+                    if c in pref and budget[i] > 0.0:
+                        approved_by.add(i)
                 too_poor = set()
                 already_available = Fraction(0)
                 rich = set(approved_by)
@@ -677,9 +678,9 @@ def compute_rule_x(profile, committeesize, resolute=False):
 
                 for c in cheapest_split:
                     b = dict(committee[0])
-                    for v, vote in enumerate(profile.preferences):
-                        if c in vote.approved:
-                            b[v] -= min(budget[v], min_q)
+                    for i, pref in enumerate(profile):
+                        if c in pref:
+                            b[i] -= min(budget[i], min_q)
                     comm = set(committee[1])
                     comm.add(c)
                     next_committees.append((b, comm))
@@ -732,9 +733,9 @@ def fill_remaining_committee(committee, curr_cands, committee_size,
             budget_support = {}
             for cand in remaining_cands:
                 budget_support[cand] = 0
-                for v, vote in enumerate(profile.preferences):
-                    if cand in vote.approved:
-                        budget_support[cand] += budget[v]
+                for i, pref in enumerate(profile):
+                    if cand in pref:
+                        budget_support[cand] += budget[i]
 
             max_support = max(budget_support.values())
             winners = [c for c in remaining_cands
@@ -742,7 +743,7 @@ def fill_remaining_committee(committee, curr_cands, committee_size,
             for c in winners:
                 budget_c = {}
                 for voter, value in budget.items():
-                    if c in profile.preferences[voter].approved:
+                    if c in profile[voter]:
                         budget_c[voter] = 0
                     else:
                         budget_c[voter] = value
@@ -765,8 +766,8 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
     enough_approved_candidates(profile, committeesize)
     num_voters = len(profile)
 
-    start_budget = {v: Fraction(profile.preferences[v].weight)
-                    for v in range(num_voters)}
+    start_budget = {i: Fraction(profile[i].weight)
+                    for i in range(num_voters)}
     price = Fraction(sum(start_budget.values()), committeesize)
 
     cands = range(profile.num_cand)
@@ -782,11 +783,11 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
             budget, comm = committee
             curr_cands = set(cands) - comm
             support = {c: 0 for c in curr_cands}
-            for nr, pref in enumerate(profile.preferences):
+            for nr, pref in enumerate(profile):
                 voting_power = budget[nr]
                 if voting_power <= 0:
                     continue
-                for cand in pref.approved:
+                for cand in pref:
                     if cand in curr_cands:
                         support[cand] += voting_power
             max_support = max(support.values())
@@ -800,8 +801,8 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
                                           max_support)
                 else:  # set supporters to 0
                     multiplier = 0
-                for nr, pref in enumerate(profile.preferences):
-                    if cand in pref.approved:
+                for nr, pref in enumerate(profile):
+                    if cand in pref:
                         b[nr] *= multiplier
                 c = comm.union([cand])  # new committee with candidate
                 next_committees.append((b, c))

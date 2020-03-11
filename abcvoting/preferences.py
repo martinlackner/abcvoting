@@ -1,17 +1,26 @@
 """
-Dichotomous (approval) preferences and profiles
+Dichotomous (approval) preferences and preference profiles
 Voters are indexed by 0, ..., len(profile)
 Candidates are indexed by 0, ..., profile.num_cand
 """
 
 
 class Profile(object):
-    def __init__(self, num_cand):
+    """
+    Preference profiles
+    """
+    def __init__(self, num_cand, names=None):
         if num_cand <= 0:
             raise ValueError(str(num_cand) +
                              " is not a valid number of candidates")
         self.num_cand = num_cand
         self.preferences = []
+        if names:
+            if len(names) < num_cand:
+                raise ValueError("names " + str(names) + " has length "
+                                 + str(len(names)) + " < num_cand ("
+                                 + str(num_cand) + ")")
+            self.names = [str(names[i]) for i in range(num_cand)]
 
     def __len__(self):
         return len(self.preferences)
@@ -55,6 +64,9 @@ class Profile(object):
     def __iter__(self):
         return iter(self.preferences)
 
+    def __getitem__(self, i):
+        return self.preferences[i]
+
     def __str__(self):
         if self.has_unit_weights():
             return ("profile with %d votes and %d candidates:\n "
@@ -68,6 +80,19 @@ class Profile(object):
             output = output[:-2]
             return output
 
+    def party_list(self):
+        """
+        Is this party a party-list profile?
+        In a party-list profile all approval sets are either
+        disjoint or equal (see https://arxiv.org/abs/1704.02453).
+        """
+        for pref1 in self.preferences:
+            for pref2 in self.preferences:
+                if ((len(pref1.approved & pref2.approved)
+                     not in [0, len(pref1.approved)])):
+                    return False
+        return True
+
 
 class DichotomousPreferences():
     def __init__(self, approved, weight=1):
@@ -79,10 +104,15 @@ class DichotomousPreferences():
     def __str__(self):
         return str(list(self.approved))
 
+    def __len__(self):
+        return len(self.approved)
+
+    def __iter__(self):
+        return iter(self.approved)
+
     def is_valid(self, num_cand):
         for c in self.approved:
             if c < 0 or c >= num_cand:
                 raise ValueError(str(self) + " not valid for num_cand = " +
                                  str(num_cand))
-
         return True

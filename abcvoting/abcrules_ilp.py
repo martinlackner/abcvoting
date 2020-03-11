@@ -29,24 +29,25 @@ def compute_thiele_methods_ilp(profile, committeesize,
     # a (intended binary) variable indicating
     # whether v approves at least l candidates in the committee
     utility = {}
-    for v in profile.preferences:
+    for pref in profile:
         for l in range(1, committeesize + 1):
-            utility[(v, l)] = m.addVar(ub=1.0)
+            utility[(pref, l)] = m.addVar(ub=1.0)
 
     # constraint: the committee has the required size
     m.addConstr(gb.quicksum(in_committee[c] for c in cands) == committeesize)
 
     # constraint: utilities are consistent with actual committee
-    for v in profile.preferences:
-        m.addConstr(gb.quicksum(utility[v, l]
+    for pref in profile:
+        m.addConstr(gb.quicksum(utility[pref, l]
                                 for l in range(1, committeesize + 1)) ==
-                    gb.quicksum(in_committee[c] for c in v.approved))
+                    gb.quicksum(in_committee[c] for c in pref))
 
     # objective: the PAV score of the committee
-    m.setObjective(gb.quicksum(float(scorefct(l)) * v.weight * utility[(v, l)]
-                               for v in profile.preferences
-                               for l in range(1, committeesize + 1)),
-                   gb.GRB.MAXIMIZE)
+    m.setObjective(
+        gb.quicksum(float(scorefct(l)) * pref.weight * utility[(pref, l)]
+                    for pref in profile
+                    for l in range(1, committeesize + 1)),
+        gb.GRB.MAXIMIZE)
 
     m.setParam('OutputFlag', False)
 
@@ -96,7 +97,7 @@ def compute_monroe_ilp(profile, committeesize, resolute):
     # prof2 = Profile(profile.num_cand)
     # for v in profile:
     #    for _ in range(v.weight):
-    #        prof2.add_preference(DichotomousPreference(v.approved,
+    #        prof2.add_preference(DichotomousPreference(v,
     #                                                   profile.num_cand))
     # total_weight = profile.voters_num()
 
@@ -116,35 +117,35 @@ def compute_monroe_ilp(profile, committeesize, resolute):
                           vtype=gb.GRB.INTEGER, lb=0, name="partition")
     for i in range(len(profile)):
         # every voter has to be part of a voter partition set
-        m.addConstr(gb.quicksum(partition[(j, i)]
-                                for j in cands)
-                    == profile.preferences[i].weight)
-    for i in cands:
+        m.addConstr(gb.quicksum(partition[(c, i)]
+                                for c in cands)
+                    == profile[i].weight)
+    for c in cands:
         # every voter set in the partition has to contain
         # at least (num_voters // committeesize) candidates
-        m.addConstr(gb.quicksum(partition[(i, j)]
+        m.addConstr(gb.quicksum(partition[(c, j)]
                                 for j in range(len(profile)))
                     >= (num_voters // committeesize
-                        - num_voters * (1 - in_committee[i])))
+                        - num_voters * (1 - in_committee[c])))
         # every voter set in the partition has to contain
         # at most ceil(num_voters/committeesize) candidates
-        m.addConstr(gb.quicksum(partition[(i, j)]
+        m.addConstr(gb.quicksum(partition[(c, j)]
                                 for j in range(len(profile)))
                     <= (num_voters // committeesize
                         + bool(num_voters % committeesize)
-                        + num_voters * (1 - in_committee[i])))
+                        + num_voters * (1 - in_committee[c])))
         # if in_committee[i] = 0 then partition[(i,j) = 0
-        m.addConstr(gb.quicksum(partition[(i, j)]
+        m.addConstr(gb.quicksum(partition[(c, j)]
                                 for j in range(len(profile)))
-                    <= num_voters * in_committee[i])
+                    <= num_voters * in_committee[c])
 
     m.update()
 
     # constraint for objective variable "satisfaction"
-    m.addConstr(gb.quicksum(partition[(i, j)] *
-                            (i in profile.preferences[j].approved)
+    m.addConstr(gb.quicksum(partition[(c, j)] *
+                            (c in profile[j])
                             for j in range(len(profile))
-                            for i in cands)
+                            for c in cands)
                 >= satisfaction)
 
     # optimization objective
@@ -206,27 +207,27 @@ def compute_optphragmen_ilp(profile, committeesize,
 
     load = {}
     for c in cands:
-        for v in profile.preferences:
-            load[(v, c)] = m.addVar(ub=1.0, lb=0.0)
+        for pref in profile:
+            load[(pref, c)] = m.addVar(ub=1.0, lb=0.0)
 
     # constraint: the committee has the required size
     m.addConstr(gb.quicksum(in_committee[c] for c in cands) == committeesize)
 
     for c in cands:
-        for v in profile.preferences:
-            if c not in v.approved:
-                m.addConstr(load[(v, c)] == 0)
+        for pref in profile:
+            if c not in pref:
+                m.addConstr(load[(pref, c)] == 0)
 
     # a candidate's load is distributed among his approvers
     for c in cands:
-        m.addConstr(gb.quicksum(v.weight * load[(v, c)]
-                                for v in profile.preferences if c in cands)
+        m.addConstr(gb.quicksum(pref.weight * load[(pref, c)]
+                                for pref in profile if c in cands)
                     == in_committee[c])
 
     loadbound = m.addVar(name="loadbound")
-    for v in profile.preferences:
-        m.addConstr(gb.quicksum(load[(v, c)]
-                                for c in v.approved)
+    for pref in profile:
+        m.addConstr(gb.quicksum(load[(pref, c)]
+                                for c in pref)
                     <= loadbound)
     m.setObjective(loadbound, gb.GRB.MINIMIZE)
 
@@ -266,8 +267,7 @@ def compute_optphragmen_ilp(profile, committeesize,
 def compute_minimaxav_ilp(profile, committeesize, resolute=False):
     enough_approved_candidates(profile, committeesize)
 
-    voters = profile.preferences
-    num_voters = len(voters)
+    num_voters = len(profile)
     cands = list(range(profile.num_cand))
 
     m = gb.Model()
@@ -287,7 +287,7 @@ def compute_minimaxav_ilp(profile, committeesize, resolute=False):
 
     for i in cands:
         for j in range(num_voters):
-            if i in voters[j].approved:
+            if i in profile[j]:
                 # constraint for the case that the candidate is approved
                 m.addConstr(difference[i, j] == 1 - in_committee[i])
             else:

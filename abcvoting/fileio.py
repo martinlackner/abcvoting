@@ -1,215 +1,195 @@
 """
-Read preflib files (SOI or TOI)
+Read preflib files (soi, toi, soc or toc)
 """
 
 
 from __future__ import print_function
 import os
-from copy import copy
+from abcvoting.preferences import Profile
+from math import ceil
 
-script_dir = os.path.dirname(__file__)
+
+class PreflibException(Exception):
+    pass
 
 
-def load_election_files_from_dir(dir_name, max_approval_percent=1.0,
-                                 setsize=None):
-    """Loads all election files (toi, soi) from the given dir.
+def load_preflib_files_from_dir(dir_name, setsize=1, appr_percent=None):
+    """Loads all election files (soi, toi, soc or toc) from the given dir.
 
     Parameters:
         dir_name: str
-            relative path to the root of this project.
-
-        max_approval_percent: float (0, 1]
-            how many of the candidates within a ranking  should be
-            used for the approval set.
-            E.g. if a ranking has 10 candidates, max_approval_percent is
-            0.5 then 5 candidates are considered.
-            In case of toi files this can be more if the last candidate
-            that would normally be taken is tied with other candidates.
-            E.g. 1, 2, 3, 4, {5, 6}, 7,8, 9, 10: with 0.5 it would end
-            with 5 but 6 is also included. apprset=[1, 2, 3, 4, 5, 6]
+            path of directory to be searched for preflib files.
 
         setsize: int
-            If set max_approval_percent is ignored and this number is
-            taken to decide how many alternatives are taken per voter.
-            If the candidate on the position setsize is tied, those
-            tied candidates are also taken.
+            Number of top-ranked candidates that voters approve.
+            In case of ties, more than setsize candidates are approved.
+
+            setsize is ignored if appr_percent is used.
+
+        appr_percent: float in (0, 1]
+            Indicates which percentage of candidates of the ranking
+            are approved (rounded up). In case of ties, more
+            candidates are approved.
+            E.g., if a voter has 10 candidates and this value is 0.75,
+            then the approval set contains the top 8 candidates.
 
         Returns:
-            candidate_map: dict
-                dict from normalized candidate ids to candidate names
-            profile: list of lists
-                list of approval set lists for each voter one
-            num_cand: int
-                number of candidates that are within the profile
+            profiles: list
+                a list of profiles (type Profile)
         """
     file_dir, files = get_file_names(dir_name)
+    files = [file_dir + f for f in files]
 
     profiles = []
     if file_dir is not None:
-        # sorts from oldest to newest if name is sortable by date (YYYYMMDD)
         files = sorted(files)
         for f in files:
-            if f.endswith('.soi') or f.endswith('.toi'):
-                ''' # can be added if not all soi from a directory are needed.
-                if from_date is not None or to_date is not None:
-                    date = f.split("_")[-1].split(".")[-1]
-                    if from_date is not None and date < from_date:
-                        continue
-                    if to_date is not None and date > to_date:
-                        break
-                '''
-                candidate_map, profile, num_cand = read_election_file(
-                    f, max_approval_percent,
-                    setsize=setsize, file_dir=file_dir)
-                profiles.append((candidate_map, profile, num_cand))
+            if ((f.endswith('.soi') or f.endswith('.toi')
+                 or f.endswith('.soc') or f.endswith('.toc'))):
+                profile = read_preflib_file(
+                    f, setsize=setsize, appr_percent=appr_percent)
+                profiles.append(profile)
 
     return profiles
 
 
 def get_file_names(dir_name):
-    input_path = os.path.join(script_dir, dir_name)
     files = []
-    file_dir = None
-    for (dir_path, _, filenames) in os.walk(input_path):
+    for (dir_path, _, filenames) in os.walk(dir_name):
         file_dir = dir_path
         files = filenames
-        break
+        break  # do not consider subdirs
     if len(files) == 0:
-        raise Exception("No files found in", input_path)
+        raise PreflibException("No files found in", dir_name)
     return file_dir, files
 
 
-def get_vote(threshold, ranking):
-    appr_set = []
+def get_appr_set(num_appr, ranking, candidate_map):
+    appr_set = set()
     tied = False
-    curr_voters = ""
     for i in range(len(ranking)):
-        if threshold > 0:
-            voter = ranking[i].strip()
+        rank = ranking[i].strip()
+        if rank.startswith("{"):
             if not tied:
-                if voter.startswith("{"):
-                    tied = True
-                    # count = 1
-                    curr_voters = voter
-                    if "}" in voter:
-                        raise Exception("Single voter in {} is invalid")
-                else:
-                    add_candidate(voter, appr_set)
-                    threshold -= 1
+                tied = True
+                rank = rank[1:]
             else:
-                curr_voters += "," + voter
-                if "}" in voter:
-                    count = add_candidate(curr_voters, appr_set)
-                    curr_voters = ""
-                    threshold -= count  # or -= 1
-
-                else:
-                    continue
-        else:
+                raise PreflibException(
+                    "Invalid format for tied candidates: " + str(ranking))
+        if rank.endswith("}"):
+            if tied:
+                tied = False
+                rank = rank[:-1]
+            else:
+                raise PreflibException(
+                    "Invalid format for tied candidates: " + str(ranking))
+        rank = rank.strip()
+        if len(rank) > 0:
+            try:
+                c = int(rank)
+            except ValueError:
+                raise PreflibException(
+                    "Expected candidate number but encountered " + str(c) + "")
+            appr_set.add(c)
+        if len(appr_set) >= num_appr and not tied:
             break
+    if tied:
+        raise PreflibException(
+            "Invalid format for tied candidates: " + str(ranking))
+    if len(appr_set) < num_appr:
+        # all candidates approved
+        appr_set = set(candidate_map.keys())
     return appr_set
 
 
-def add_candidate(rank, appr_set):
-    """Adds the candidates in the string rank to appr_set.
-    Returns the number of candidates added."""
-    candidate = rank.strip()
-    if candidate.find("{") != -1:
-        if candidate[0] != "{" or candidate[-1] != "}":
-            raise Exception("Invalid format for tied candidates.",
-                            rank)
-        candidates = candidate[1:-1].split(",")
-        for c in candidates:
-            appr_set.append(int(c.strip()))
-        return len(candidate)
-    else:
-        appr_set.append(int(candidate))
-        return 1
-
-
-def read_election_file(filename, max_approval_percent=1.0,
-                       setsize=None, file_dir=None):
-    """Reads a single election file (soi or toi).
+def read_preflib_file(filename, setsize=1, appr_percent=None):
+    """Reads a single preflib file (soi, toi, soc or toc).
 
     Parameters:
 
         filename: str
-            Name of the file.
-
-        max_approval_percent: float
-            Indicates how many candidates of the ranking are approved.
-            If a voter has 10 candidates and this value is 0.8,
-            then 8 candidates are taken as approval set.
+            Name of the preflib file.
 
         setsize: int
-            If not None max_approval_percent is ignored and this decides
-            the number of candidates per approval set
+            Number of top-ranked candidates that voters approve.
+            In case of ties, more than setsize candidates are approved.
 
-        file_dir: str
-            Absolute path to the directory that contains the file.
-            If None a relative path to this file is chosen.
+            setsize is ignored if appr_percent is used.
+
+        appr_percent: float in (0, 1]
+            Indicates which percentage of candidates of the ranking
+            are approved (rounded up). In case of ties, more
+            candidates are approved.
+            E.g., if a voter has 10 candidates and this value is 0.75,
+            then the approval set contains the top 8 candidates.
 
     Returns:
-        used_candidate_map: dict
-            dictionary with normalized candidate ids to names.
-
-        normalized_profile:  list
-            list of lists that represent approval sets.
-
-        used_candidate_count: int
-            Number of candidates within the profile.
+        profile: Profile
+            Preference profile extracted from preflib file,
+            including names of candidates
 
         """
-    if file_dir is None:
-        filename = os.path.join(script_dir, filename)
-    else:
-        filename = os.path.join(file_dir, filename)
+    if setsize <= 0:
+        raise ValueError("Parameter setsize <= 0")
+    if appr_percent and (appr_percent <= 0. or appr_percent > 1.):
+        raise ValueError(
+            "Parameter appr_percent not in interval (0, 1]")
     with open(filename, "r") as f:
         line = f.readline()
-        candidate_count = int(line.strip())
+        num_cand = int(line.strip())
         candidate_map = {}
-        for _ in range(candidate_count):
+        for _ in range(num_cand):
             parts = f.readline().strip().split(",")
             candidate_map[int(parts[0].strip())] = \
                 ",".join(parts[1:]).strip()
 
         parts = f.readline().split(",")
-        voter_count = int(parts[0].strip())
-        # voter_sum = int(parts[1].strip())
-        unique_orders = int(parts[2].strip())
-        unique_candidates = set()
-        profile = []
-        for _ in range(unique_orders):
-            line = f.readline().strip()
+        try:
+            voter_count, _, unique_orders = [int(p.strip()) for p in parts]
+        except Exception:
+            raise PreflibException("Number of voters ill specified, "
+                                   + str(parts)
+                                   + " should be triple of integers")
+        appr_sets = []
+        lines = [line.strip() for line in f.readlines() if line.strip()]
+        if len(lines) != unique_orders:
+            raise PreflibException("Number of unique orders should be "
+                                   + str(unique_orders) + " but is " +
+                                   str(len(lines)))
+        for line in lines:
             parts = line.split(",")
-            count = int(parts[0])
+            if len(parts) < 1:
+                continue
+            try:
+                count = int(parts[0])
+            except ValueError:
+                raise PreflibException("Each ranking must start with count ("
+                                       + str(line) + ")")
             ranking = parts[1:]  # ranking starts after count
-            vote = []
-            if setsize:
-                take_cands = min(setsize, len(ranking))
+            if len(ranking) == 0:
+                raise PreflibException("Empty ranking: " + str(line))
+            if appr_percent:
+                num_appr = int(ceil(len(ranking) * appr_percent))
             else:
-                take_cands = max(1, int(len(ranking) * max_approval_percent))
-            if take_cands > 0:
-                vote = get_vote(take_cands, ranking)
-                for cand in vote:
-                    unique_candidates.add(cand)
+                num_appr = setsize
+            appr_set = get_appr_set(num_appr, ranking, candidate_map)
             for _ in range(count):
-                profile.append(copy(vote))
+                appr_sets.append(appr_set)
 
-        used_candidate_count = len(unique_candidates)
-        used_candidate_map = {}
-        normalized_profile = []
+        # normalize candidates to 0, 1, 2, ...
+        names = []
         normalize_map = {}
-        j = 0
-        for c in unique_candidates:
-            normalize_map[c] = j
-            used_candidate_map[j] = candidate_map[c]
-            j += 1
-        for vote in profile:
-            normalized_vote = []
-            for c in vote:
-                normalized_vote.append(normalize_map[c])
-            normalized_profile.append(normalized_vote)
-        if len(normalized_profile) != voter_count:
-            raise Exception("Missing voters.")
-        return used_candidate_map, normalized_profile, used_candidate_count
+        for c in candidate_map.keys():
+            names.append(candidate_map[c])
+            normalize_map[c] = len(names) - 1
+
+        profile = Profile(num_cand, names)
+
+        for appr_set in appr_sets:
+            norm_appr_set = []
+            for c in appr_set:
+                norm_appr_set.append(normalize_map[c])
+            profile.add_preferences(norm_appr_set)
+        if len(profile) != voter_count:
+            raise PreflibException("Missing voters.")
+        return profile

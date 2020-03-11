@@ -15,8 +15,8 @@ def sort_committees(committees):
 # verifies whether a sufficient number of approved candidates exists
 def enough_approved_candidates(profile, committeesize):
     appr = set()
-    for pref in profile.preferences:
-        appr.update(pref.approved)
+    for pref in profile:
+        appr.update(pref)
     if len(appr) < committeesize:
         raise ValueError("committeesize = " + str(committeesize)
                          + " is larger than number of approved candidates")
@@ -36,11 +36,11 @@ def print_committees(committees, print_max=10, names=None):
         else:
             print(" ", len(committees), "committees:")
     if names is None:
-        for com in sorted(map(tuple, committees[:print_max])):
-            print("    {" + ", ".join(map(str, com)) + "}")
+        for comm in sorted(map(tuple, committees[:print_max])):
+            print("    {" + ", ".join(map(str, comm)) + "}")
     else:
-        for com in sorted(map(tuple, committees[:print_max])):
-            namedcom = [names[c] for c in com]
+        for comm in sorted(map(tuple, committees[:print_max])):
+            namedcom = [names[c] for c in comm]
             print("    {" + ", ".join(map(str, namedcom)) + "}")
     print()
 
