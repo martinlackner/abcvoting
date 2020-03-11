@@ -8,7 +8,7 @@ try:
 except ImportError:
     from fractions import Fraction
 import functools
-from bipartite_matching import matching
+from abcvoting.bipartite_matching import matching
 import networkx as nx
 
 
