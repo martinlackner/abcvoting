@@ -247,16 +247,19 @@ def test_abcrules_weightsconsidered(rule):
     committeesize = 1
 
     if (("monroe" in rule
-         or "lexminimaxav" in rule
+         or rule.startswith("lexminimaxav")
          or rule in ["rule-x", "phragmen-enestroem"])):
-        # Some rules only work with unit weights:
-        return
-    if "minimaxav" in rule:
+        with pytest.raises(ValueError):
+            abcrules.compute_rule(rule, profile, committeesize)
+    elif rule.startswith("minimaxav"):
         # Minimax AV ignores weights by definition
-        return
-    result = abcrules.compute_rule(rule, profile, committeesize)
-    assert len(result) == 1
-    assert result[0] == [1]
+        result = abcrules.compute_rule(rule, profile, committeesize)
+        assert len(result) == 3
+        assert result == [[0], [1], [2]]
+    else:
+        result = abcrules.compute_rule(rule, profile, committeesize)
+        assert len(result) == 1
+        assert result[0] == [1]
 
 
 @pytest.mark.parametrize(

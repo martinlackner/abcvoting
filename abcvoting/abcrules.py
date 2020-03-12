@@ -12,10 +12,7 @@ except ImportError:
     print("Warning: gmpy2.mpq not found, "
           + "resorting to Python's fractions.Fraction")
     from fractions import Fraction
-from abcvoting.abcrules_ilp import compute_monroe_ilp
-from abcvoting.abcrules_ilp import compute_thiele_methods_ilp
-from abcvoting.abcrules_ilp import compute_optphragmen_ilp
-from abcvoting.abcrules_ilp import compute_minimaxav_ilp
+from abcvoting import abcrules_ilp
 from abcvoting.committees import sort_committees
 from abcvoting.committees import print_committees
 from abcvoting.committees import hamming
@@ -182,6 +179,18 @@ def compute_thiele_methods_branchandbound(profile, committeesize,
         return [committees[0]]
     else:
         return committees
+
+
+def compute_thiele_methods_ilp(profile, committeesize,
+                               scorefct_str, resolute=False):
+
+    enough_approved_candidates(profile, committeesize)
+    scorefct = sf.get_scorefct(scorefct_str, committeesize)
+
+    committees = abcrules_ilp.__gurobi_thiele_methods(
+        profile, committeesize, scorefct, resolute)
+
+    return sort_committees(committees)
 
 
 # Sequential PAV
@@ -461,6 +470,14 @@ def compute_minimaxav(profile, committeesize, ilp=True, resolute=False):
         return sort_committees(opt_committees)
 
 
+def compute_minimaxav_ilp(profile, committeesize, resolute=False):
+    enough_approved_candidates(profile, committeesize)
+
+    committees = abcrules_ilp.__gurobi_minimaxav(profile, committeesize, resolute)
+
+    return sort_committees(committees)
+
+
 # Lexicographic Minimax Approval Voting
 def compute_lexminimaxav(profile, committeesize, ilp=False, resolute=False):
     """Returns the list of winning committees
@@ -471,8 +488,8 @@ def compute_lexminimaxav(profile, committeesize, ilp=False, resolute=False):
 
     enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
-        raise Exception("Lexicographic Minimax Approval Voting\
-                         is only defined for unit weights (weight=1)")
+        raise ValueError(MWRULES["lexminimaxav-noilp"] +
+                         " is only defined for unit weights (weight=1)")
 
     opt_committees = []
     opt_distances = [profile.num_cand + 1] * len(profile)
@@ -540,6 +557,19 @@ def compute_monroe(profile, committeesize, ilp=True, resolute=False):
         return compute_monroe_bruteforce(profile, committeesize, resolute)
 
 
+def compute_monroe_ilp(profile, committeesize, resolute):
+    enough_approved_candidates(profile, committeesize)
+
+    # Monroe is only defined for unit weights
+    if not profile.has_unit_weights():
+        raise ValueError(MWRULES["monroe-ilp"] +
+                         " is only defined for unit weights (weight=1)")
+
+    committees = abcrules_ilp.__gurobi_monroe(profile, committeesize, resolute)
+
+    return sort_committees(committees)
+
+
 # Monroe's rule, computed via (brute-force) matching
 def compute_monroe_bruteforce(profile, committeesize,
                               resolute=False, flowbased=True):
@@ -547,7 +577,8 @@ def compute_monroe_bruteforce(profile, committeesize,
     enough_approved_candidates(profile, committeesize)
 
     if not profile.has_unit_weights():
-        raise Exception("Monroe is only defined for unit weights (weight=1)")
+        raise ValueError(MWRULES["monroe-noilp"] +
+                         " is only defined for unit weights (weight=1)")
 
     if profile.totalweight() % committeesize != 0 or flowbased:
         monroescore = sf.monroescore_flowbased
@@ -576,8 +607,8 @@ def compute_greedy_monroe(profile, committeesize):
     """
     enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
-        raise Exception("Greedy Monroe is only defined for unit weights"
-                        + " (weight=1)")
+        raise ValueError(MWRULES["greedy-monroe"] +
+                         " is only defined for unit weights (weight=1)")
 
     num_voters = len(profile)
     committee = []
@@ -628,8 +659,9 @@ def compute_rule_x(profile, committeesize, resolute=False):
     https://arxiv.org/pdf/1911.11747.pdf (Page 7)"""
     enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
-        raise Exception("Rule X is only defined \
-                            for unit weights (weight=1)")
+        raise ValueError(MWRULES["rule-x"] +
+                         " is only defined for unit weights (weight=1)")
+        
     num_voters = len(profile)
     price = Fraction(num_voters, committeesize)
 
@@ -754,6 +786,14 @@ def fill_remaining_committee(committee, curr_cands, committee_size,
     return committees
 
 
+def compute_optphragmen_ilp(profile, committeesize, resolute=False):
+    enough_approved_candidates(profile, committeesize)
+
+    committees = abcrules_ilp.__gurobi_optphragmen(profile, committeesize, resolute)
+
+    return sort_committees(committees)
+
+
 def compute_phragmen_enestroem(profile, committeesize, resolute=False):
     """"Returns the winning committees with
     Phragmen's first method (Enestroem's method).
@@ -764,6 +804,10 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
     https://arxiv.org/pdf/1611.08826.pdf (18.5, Page 59)
     """
     enough_approved_candidates(profile, committeesize)
+    if not profile.has_unit_weights():
+        raise ValueError(MWRULES["phragmen-enestroem"] +
+                         " is only defined for unit weights (weight=1)")
+    
     num_voters = len(profile)
 
     start_budget = {i: Fraction(profile[i].weight)

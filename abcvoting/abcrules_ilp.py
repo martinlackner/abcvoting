@@ -4,19 +4,14 @@ programs (ILPs) with Gurobi (https://www.gurobi.com/)
 """
 
 from __future__ import print_function
-from abcvoting.committees import enough_approved_candidates, sort_committees
-import abcvoting.scores as sf
 try:
     import gurobipy as gb
 except ImportError:
     None    # Gurobi not available
 
 
-def compute_thiele_methods_ilp(profile, committeesize,
-                               scorefct_str, resolute=False):
-
-    enough_approved_candidates(profile, committeesize)
-    scorefct = sf.get_scorefct(scorefct_str, committeesize)
+def __gurobi_thiele_methods(profile, committeesize,
+                            scorefct, resolute=False):
 
     m = gb.Model()
     cands = list(range(profile.num_cand))
@@ -64,8 +59,8 @@ def compute_thiele_methods_ilp(profile, committeesize,
     m.optimize()
 
     if m.Status != 2:
-        print("Warning (" + scorefct_str + "):", end=' ')
-        print("solutions may be incomplete or not optimal.")
+        print("Warning (__gurobi_thiele_methods):"+
+              " solutions may be incomplete or not optimal.")
         print("(Gurobi return code", m.Status, ")")
 
     # extract committees from model
@@ -77,19 +72,11 @@ def compute_thiele_methods_ilp(profile, committeesize,
             m.setParam('SolutionNumber', sol)
             committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
 
-    committees = sort_committees(committees)
-
     return committees
 
 
-def compute_monroe_ilp(profile, committeesize, resolute):
-    enough_approved_candidates(profile, committeesize)
-
-    # Monroe is only defined for unit weights
-    if not profile.has_unit_weights():
-        raise NotImplementedError("Monroe is only defined for" +
-                                  " unit weights (weight=1)")
-
+def __gurobi_monroe(profile, committeesize, resolute):
+    
     num_voters = len(profile)
     cands = list(range(profile.num_cand))
 
@@ -178,8 +165,6 @@ def compute_monroe_ilp(profile, committeesize, resolute):
             m.setParam('SolutionNumber', sol)
             committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
 
-    committees = sort_committees(committees)
-
     return committees
 
 
@@ -191,10 +176,7 @@ def compute_monroe_ilp(profile, committeesize, resolute):
 # http://martin.lackner.xyz/publications/phragmen.pdf
 #
 # Instead: minimizes the maximum load
-def compute_optphragmen_ilp(profile, committeesize,
-                            resolute=False):
-
-    enough_approved_candidates(profile, committeesize)
+def __gurobi_optphragmen(profile, committeesize, resolute=False):
 
     cands = list(range(profile.num_cand))
 
@@ -259,13 +241,10 @@ def compute_optphragmen_ilp(profile, committeesize,
             m.setParam('SolutionNumber', sol)
             committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
 
-    committees = sort_committees(committees)
-
     return committees
 
 
-def compute_minimaxav_ilp(profile, committeesize, resolute=False):
-    enough_approved_candidates(profile, committeesize)
+def __gurobi_minimaxav(profile, committeesize, resolute=False):
 
     num_voters = len(profile)
     cands = list(range(profile.num_cand))
@@ -333,7 +312,5 @@ def compute_minimaxav_ilp(profile, committeesize, resolute=False):
         for sol in range(m.SolCount):
             m.setParam('SolutionNumber', sol)
             committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
-
-    committees = sort_committees(committees)
 
     return committees
