@@ -9,12 +9,11 @@ from itertools import combinations
 try:
     from gmpy2 import mpq as Fraction
 except ImportError:
-    print("Warning: gmpy2.mpq not found, "
+    print("Warning: module gmpy2 not found, "
           + "resorting to Python's fractions.Fraction")
     from fractions import Fraction
 from abcvoting import abcrules_ilp
 from abcvoting.committees import sort_committees
-from abcvoting.committees import print_committees
 from abcvoting.committees import hamming
 from abcvoting.committees import enough_approved_candidates
 import abcvoting.scores as sf
@@ -117,22 +116,6 @@ def compute_rule(name, profile, committeesize, resolute=False):
                                   + " not known")
 
 
-def allrules(profile, committeesize, ilp=True, include_resolute=False):
-    """Prints the winning committees for all implemented rules"""
-    for rule in list(MWRULES.keys()):
-        if not ilp and "-ilp" in rule:
-            continue
-        print(MWRULES[rule] + ":")
-        committees = compute_rule(rule, profile, committeesize)
-        print_committees(committees)
-
-        if include_resolute:
-            print(MWRULES[rule] + " (with tie-breaking):")
-            committees = compute_rule(rule, profile,
-                                      committeesize, resolute=True)
-            print_committees(committees)
-
-
 ########################################################################
 
 
@@ -213,11 +196,8 @@ def compute_seqslav(profile, committeesize, resolute=False):
 
 # Reverse Sequential PAV
 def compute_revseqpav(profile, committeesize, resolute=False):
-    if resolute:
-        return compute_revseq_thiele_methods_resolute(profile,
-                                                      committeesize, 'pav')
-    else:
-        return compute_revseq_thiele_methods(profile, committeesize, 'pav')
+    return compute_revseq_thiele_methods(
+        profile, committeesize, resolute, 'pav')
 
 
 # Sequential Chamberlin-Courant
@@ -231,11 +211,8 @@ def compute_seqcc(profile, committeesize, resolute=False):
 
 # Reverse Sequential Chamberlin-Courant
 def compute_revseqcc(profile, committeesize, resolute=False):
-    if resolute:
-        return compute_revseq_thiele_methods_resolute(profile, committeesize,
-                                                      'cc')
-    else:
-        return compute_revseq_thiele_methods(profile, committeesize, 'cc')
+    return compute_revseq_thiele_methods(profile, committeesize,
+                                         resolute, 'cc')
 
 
 # Satisfaction Approval Voting (SAV)
@@ -319,29 +296,38 @@ def compute_seq_thiele_resolute(profile, committeesize, scorefct_str):
     return [sorted(committee)]
 
 
-# required for computing Reverse Sequential Thiele methods
-def __least_relevant_cands(profile, comm, utilityfct):
-    # marginal utility gained by adding candidate to the committee
-    marg_util_cand = [0] * profile.num_cand
+def compute_revseq_thiele_methods(profile, committeesize,
+                                  resolute, scorefct_str):
+    """
+    Reverse Sequential Thiele methods
+    """
+    def __least_relevant_cands(profile, comm, utilityfct):
+        # determines candidates to remove
+        marg_util_cand = [0] * profile.num_cand
+        #  marginal utility gained by adding candidate to the committee
+        for pref in profile:
+            for c in pref:
+                satisfaction = len(pref.approved.intersection(comm))
+                marg_util_cand[c] += pref.weight * utilityfct(satisfaction)
+        for c in range(profile.num_cand):
+            if c not in comm:
+                # do not choose candidates that already have been removed
+                marg_util_cand[c] = max(marg_util_cand) + 1
+        # find smallest elements in marg_util_cand and return indices
+        return ([cand for cand in range(profile.num_cand)
+                 if marg_util_cand[cand] == min(marg_util_cand)],
+                min(marg_util_cand))
 
-    for pref in profile:
-        for c in pref:
-            satisfaction = len(pref.approved.intersection(comm))
-            marg_util_cand[c] += pref.weight * utilityfct(satisfaction)
-    for c in range(profile.num_cand):
-        if c not in comm:
-            # do not choose candidates that already have been removed
-            marg_util_cand[c] = max(marg_util_cand) + 1
-    # find smallest elements in marg_util_cand and return indices
-    return ([cand for cand in range(profile.num_cand)
-             if marg_util_cand[cand] == min(marg_util_cand)],
-            min(marg_util_cand))
-
-
-# Reverse Sequential Thiele methods without resolute
-def compute_revseq_thiele_methods(profile, committeesize, scorefct_str):
     enough_approved_candidates(profile, committeesize)
     scorefct = sf.get_scorefct(scorefct_str, committeesize)
+
+    if resolute:
+        committee = set(range(profile.num_cand))
+        for _ in range(0, profile.num_cand - committeesize):
+            cands_to_remove, _ = __least_relevant_cands(profile, committee,
+                                                        scorefct)
+            committee.remove(cands_to_remove[0])
+        return [sorted(list(committee))]
 
     allcandcomm = tuple(range(profile.num_cand))
     comm_scores = {allcandcomm: sf.thiele_score(profile, allcandcomm,
@@ -362,21 +348,6 @@ def compute_revseq_thiele_methods(profile, committeesize, scorefct_str):
             if score >= cutoff:
                 comm_scores[comm] = score
     return sort_committees(list(comm_scores.keys()))
-
-
-# Reverse Sequential Thiele methods with resolute
-def compute_revseq_thiele_methods_resolute(profile, committeesize,
-                                           scorefct_str):
-    enough_approved_candidates(profile, committeesize)
-    scorefct = sf.get_scorefct(scorefct_str, committeesize)
-
-    committee = set(range(profile.num_cand))
-
-    for _ in range(0, profile.num_cand - committeesize):
-        cands_to_remove, _ = __least_relevant_cands(profile, committee,
-                                                    scorefct)
-        committee.remove(cands_to_remove[0])
-    return [sorted(list(committee))]
 
 
 # Phragmen's Sequential Rule
@@ -421,6 +392,7 @@ def compute_seqphragmen(profile, committeesize, resolute=False):
         # remove suboptimal committees
         comm_loads = {}
         cutoff = min([max(load.values()) for load in comm_loads_next.values()])
+        print(cutoff)
         for comm, load in comm_loads_next.items():
             if max(load.values()) <= cutoff:
                 comm_loads[comm] = load
@@ -473,7 +445,8 @@ def compute_minimaxav(profile, committeesize, ilp=True, resolute=False):
 def compute_minimaxav_ilp(profile, committeesize, resolute=False):
     enough_approved_candidates(profile, committeesize)
 
-    committees = abcrules_ilp.__gurobi_minimaxav(profile, committeesize, resolute)
+    committees = abcrules_ilp.__gurobi_minimaxav(profile, committeesize,
+                                                 resolute)
 
     return sort_committees(committees)
 
@@ -661,7 +634,7 @@ def compute_rule_x(profile, committeesize, resolute=False):
     if not profile.has_unit_weights():
         raise ValueError(MWRULES["rule-x"] +
                          " is only defined for unit weights (weight=1)")
-        
+
     num_voters = len(profile)
     price = Fraction(num_voters, committeesize)
 
@@ -718,8 +691,8 @@ def compute_rule_x(profile, committeesize, resolute=False):
                     next_committees.append((b, comm))
 
             else:  # no affordable candidate remains
-                comms = fill_remaining_committee(committee, curr_cands,
-                                                 committeesize, profile)
+                comms = __rule_x_fill_remaining_committee(
+                    committee, curr_cands, committeesize, profile)
                 # after filling the remaining spots these committees
                 # have size committeesize
                 for b, comm in comms:
@@ -738,16 +711,13 @@ def compute_rule_x(profile, committeesize, resolute=False):
 
     committees = sort_committees(final_committees)
     if resolute:
-        if len(committees) > 0:
-            return [committees[0]]
-        else:
-            return []
+        return [committees[0]]
     else:
         return committees
 
 
-def fill_remaining_committee(committee, curr_cands, committee_size,
-                             profile):
+def __rule_x_fill_remaining_committee(
+        committee, curr_cands, committee_size, profile):
     """
     Rule X has no definition of how to fill remaining committee spots.
     This function takes the candidates with the most remaining budget
@@ -789,7 +759,8 @@ def fill_remaining_committee(committee, curr_cands, committee_size,
 def compute_optphragmen_ilp(profile, committeesize, resolute=False):
     enough_approved_candidates(profile, committeesize)
 
-    committees = abcrules_ilp.__gurobi_optphragmen(profile, committeesize, resolute)
+    committees = abcrules_ilp.__gurobi_optphragmen(profile, committeesize,
+                                                   resolute)
 
     return sort_committees(committees)
 
@@ -807,7 +778,7 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
     if not profile.has_unit_weights():
         raise ValueError(MWRULES["phragmen-enestroem"] +
                          " is only defined for unit weights (weight=1)")
-    
+
     num_voters = len(profile)
 
     start_budget = {i: Fraction(profile[i].weight)
@@ -851,13 +822,8 @@ def compute_phragmen_enestroem(profile, committeesize, resolute=False):
                 c = comm.union([cand])  # new committee with candidate
                 next_committees.append((b, c))
 
-        if resolute:  # only one is requested
-            if len(next_committees) > 0:
-                committees = [next_committees[0]]
-            else:  # should not happen
-                committees = []
-                raise Exception("Phragmen-Enestroem failed to find "
-                                + "next candidate for", committees)
+        if resolute:
+            committees = [next_committees[0]]
         else:
             committees = next_committees
     committees = [comm for b, comm in committees]
