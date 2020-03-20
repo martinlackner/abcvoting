@@ -9,6 +9,10 @@ def test_simple_py():
     import examples.simple
 
 
+def test_allrules_py():
+    import examples.allrules
+
+
 def test_preflib_py():
     import examples.handling_preflib_files
 
