@@ -213,6 +213,40 @@ class CollectInstances():
         committeesize = 4
         self.instances.append((profile, tests, committeesize))
 
+        # and a fourth profile
+        profile = Profile(4)
+        committeesize = 2
+        preflist = [[0, 1, 3], [0, 1], [0, 1], [0, 3], [2, 3]]
+        profile.add_preferences(preflist)
+
+        tests = {
+            "seqpav": [[0, 3]],
+            "av": [[0, 1], [0, 3]],
+            "sav": [[0, 1], [0, 3]],
+            "pav-ilp": [[0, 3]],
+            "pav-noilp": [[0, 3]],
+            "revseqpav": [[0, 3]],
+            "minimaxav-noilp": [[0, 3], [1, 3]],
+            "minimaxav-ilp": [[0, 3], [1, 3]],
+            "lexminimaxav-noilp": [[0, 3]],
+            "phrag": [[0, 3]],
+            "optphrag-ilp": [[0, 3], [1, 3]],
+            "cc-ilp": [[0, 2], [0, 3], [1, 3]],
+            "cc-noilp": [[0, 2], [0, 3], [1, 3]],
+            "seqcc": [[0, 2], [0, 3]],
+            "revseqcc": [[0, 2], [0, 3], [1, 3]],
+            "monroe-ilp": [[0, 3], [1, 3]],
+            "monroe-noilp": [[0, 3], [1, 3]],
+            "greedy-monroe": [[0, 3]],
+            "seqslav": [[0, 3]],
+            "slav-ilp": [[0, 3]],
+            "slav-noilp": [[0, 3]],
+            "rule-x": [[0, 3]],
+            "phragmen-enestroem": [[0, 3]],
+        }
+        committeesize = 2
+        self.instances.append((profile, tests, committeesize))
+
 
 testinsts = CollectInstances()
 testrules = CollectRules()

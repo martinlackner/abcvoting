@@ -545,7 +545,7 @@ def compute_monroe_ilp(profile, committeesize, resolute):
 
 # Monroe's rule, computed via (brute-force) matching
 def compute_monroe_bruteforce(profile, committeesize,
-                              resolute=False, flowbased=True):
+                              resolute=False, forceflowbased=False):
     """Returns the list of winning committees via brute-force Monroe's rule"""
     enough_approved_candidates(profile, committeesize)
 
@@ -553,7 +553,7 @@ def compute_monroe_bruteforce(profile, committeesize,
         raise ValueError(MWRULES["monroe-noilp"] +
                          " is only defined for unit weights (weight=1)")
 
-    if profile.totalweight() % committeesize != 0 or flowbased:
+    if profile.totalweight() % committeesize != 0 or forceflowbased:
         monroescore = sf.monroescore_flowbased
     else:
         monroescore = sf.monroescore_matching
