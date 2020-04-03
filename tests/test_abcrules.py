@@ -16,9 +16,9 @@ class CollectRules():
         try:
             import gurobipy
             gurobipy.Model()
-            gurobi_supported = True
+            self.gurobi_supported = True
         except ImportError:
-            gurobi_supported = False
+            self.gurobi_supported = False
             print("Warning: Gurobi not found, "
                   + "Gurobi-based unittests are ignored.")
 
@@ -27,7 +27,7 @@ class CollectRules():
         self.irres_instances = []
         for rule in abcrules.rules.values():
             for alg in rule.algorithms:
-                if alg == "gurobi_supported" and not gurobi_supported:
+                if alg == "gurobi" and not self.gurobi_supported:
                     continue
                 for resolute in rule.resolute:
                     instance = (rule.rule_id, alg, resolute)
@@ -318,6 +318,8 @@ def test_abcrules_correct_simple(rule_instance, verbose):
     "algorithm", abcrules.rules["monroe"].algorithms
 )
 def test_monroe_indivisible(algorithm):
+    if algorithm == "gurobi":
+        pytest.importorskip("gurobipy")
     profile = Profile(4)
     profile.add_preferences([[0], [0], [0], [1, 2], [1, 2], [1], [3]])
     committeesize = 3
@@ -392,16 +394,20 @@ def test_seqpav_irresolute():
     assert committees == [[0, 2]]
 
 
-@pytest.mark.parametrize(
-    "rule_instance", testrules.irres_instances
-)
-def test_jansonexamples(rule_instance):
-    # example from Janson's survey (https://arxiv.org/pdf/1611.08826.pdf),
-    # Example 3.7, 18.1
-    rule_id, algorithm = rule_instance
+testrules_jansonex = []
+for rule_id, algorithm in testrules.irres_instances:
     if rule_id not in ["phragm-enestr", "seqphrag", "pav",
                        "seqpav", "revseqpav"]:
-        return
+        continue
+    testrules_jansonex.append((rule_id, algorithm))
+
+
+@pytest.mark.parametrize(
+    "rule_id, algorithm", testrules_jansonex
+)
+def test_jansonexamples(rule_id, algorithm):
+    # example from Janson's survey (https://arxiv.org/pdf/1611.08826.pdf),
+    # Example 3.7, 18.1
     profile = Profile(6)
     A = 0
     B = 1
@@ -457,20 +463,22 @@ def test_unspecified_algorithms(rule, verbose, resolute):
             resolute=resolute, verbose=verbose)
 
 
+testrules_fastest = []
+for rule in abcrules.rules.values():
+    for resolute in rule.resolute:
+        testrules_fastest.append((rule, resolute))
+
+
 @pytest.mark.parametrize(
-    "rule", abcrules.rules.values()
-)
-@pytest.mark.parametrize(
-    "resolute", [True, False]
+    "rule, resolute", testrules_fastest
 )
 def test_fastest_algorithms(rule, resolute):
-    if resolute not in rule.resolute:
-        return
-
     profile = Profile(4)
     profile.add_preferences([[0, 1], [1, 2], [0, 2, 3]])
     committeesize = 2
     algo = rule.fastest_algo()
+    if algo is None:
+        pytest.skip("no supported algorithms for " + rule.shortname)
     rule.compute(
         profile, committeesize, algorithm=algo, resolute=resolute)
 

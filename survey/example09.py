@@ -12,7 +12,7 @@ from survey import example01 as ex1
 from abcvoting import misc
 
 
-print(misc.header("Example 8", "*"))
+print(misc.header("Example 9", "*"))
 
 print("As of now, lexmin-Phragmen is not implemented.")
 print("Using opt-Phragmen instead (without lexicographic order).\n")

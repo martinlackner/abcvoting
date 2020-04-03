@@ -2,6 +2,9 @@
 Test if examples in directory examples/ work
 """
 
+import pytest
+from sys import modules
+
 
 def test_example01_py():
     from survey import example01
@@ -36,6 +39,7 @@ def test_example08_py():
 
 
 def test_example09_py():
+    pytest.importorskip("gurobipy")
     from survey import example09
 
 
@@ -64,5 +68,5 @@ def test_remark03_py():
 
 
 def test_proposition02_py():
+    pytest.importorskip("gurobipy")
     from survey import proposition02
-    

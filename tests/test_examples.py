@@ -2,12 +2,15 @@
 Test if examples in directory examples/ work
 """
 
+import pytest
+
 
 def test_simple_py():
     from examples import simple
 
 
 def test_allrules_py():
+    pytest.importorskip("gurobipy")
     from examples import allrules
 
 
