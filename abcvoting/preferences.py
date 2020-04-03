@@ -5,6 +5,10 @@ Candidates are indexed by 0, ..., profile.num_cand
 """
 
 
+from abcvoting.misc import str_candset
+from collections import OrderedDict
+
+
 class Profile(object):
     """
     Preference profiles
@@ -15,6 +19,7 @@ class Profile(object):
                              " is not a valid number of candidates")
         self.num_cand = num_cand
         self.preferences = []
+        self.names = [str(c) for c in range(num_cand)]
         if names:
             if len(names) < num_cand:
                 raise ValueError("names " + str(names) + " has length "
@@ -69,16 +74,17 @@ class Profile(object):
 
     def __str__(self):
         if self.has_unit_weights():
-            return ("profile with %d votes and %d candidates:\n "
-                    % (len(self.preferences), self.num_cand)
-                    + ",\n ".join(map(str, self.preferences)))
+            output = ("profile with %d votes and %d candidates:\n"
+                      % (len(self.preferences), self.num_cand))
+            for p in self.preferences:
+                output += " " + str_candset(p.approved, self.names) + ",\n"
         else:
             output = ("weighted profile with %d votes and %d candidates:\n"
                       % (len(self.preferences), self.num_cand))
             for p in self.preferences:
-                output += " " + str(p.weight) + " * " + str(p) + ",\n"
-            output = output[:-2]
-            return output
+                output += (" " + str(p.weight) + " * "
+                           + str_candset(p.approved, self.names) + ",\n")
+        return output[:-2]
 
     def party_list(self):
         """
@@ -92,6 +98,29 @@ class Profile(object):
                      not in [0, len(pref1.approved)])):
                     return False
         return True
+
+    def str_compact(self):
+        compact = OrderedDict()
+        for p in self.preferences:
+            if tuple(p.approved) in compact:
+                compact[tuple(p.approved)] += p.weight
+            else:
+                compact[tuple(p.approved)] = p.weight
+        if self.has_unit_weights():
+            output = ""
+        else:
+            output = "weighted "
+        output += ("profile with %d votes and %d candidates:\n"
+                   % (len(self.preferences), self.num_cand))
+        for apprset in compact:
+            output += (" " + str(compact[apprset]) + " x "
+                       + str_candset(apprset, self.names) + ",\n")
+        output = output[:-2]
+        if not self.has_unit_weights():
+            output += "\ntotal weight: " + str(self.totalweight())
+        output += "\n"
+
+        return output
 
 
 class DichotomousPreferences():

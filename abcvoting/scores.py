@@ -10,6 +10,7 @@ except ImportError:
 import functools
 from abcvoting.bipartite_matching import matching
 import networkx as nx
+from abcvoting.misc import hamming
 
 
 # returns score function given its name
@@ -25,20 +26,14 @@ def get_scorefct(scorefct_str, committeesize):
     elif scorefct_str[:4] == 'geom':
         base = Fraction(scorefct_str[4:])
         return functools.partial(__geom_score_fct, base=base)
-    elif scorefct_str.startswith('generalizedcc'):
-        param = Fraction(scorefct_str[13:])
-        return functools.partial(__generalizedcc_score_fct, ell=param,
-                                 committeesize=committeesize)
-    elif scorefct_str.startswith('lp-av'):
-        param = Fraction(scorefct_str[5:])
-        return functools.partial(__lp_av_score_fct, ell=param)
     else:
-        raise Exception("Scoring function", scorefct_str, "does not exist.")
+        raise Exception("Score function", scorefct_str, "does not exist.")
 
 
-# computes the Thiele score of a committee subject to
-# a given score function (scorefct_str)
-def thiele_score(profile, committee, scorefct_str="pav"):
+def thiele_score(scorefct_str, profile, committee):
+    """ computes the Thiele score of a committee subject to
+    a given score function (scorefct_str)
+    """
     scorefct = get_scorefct(scorefct_str, len(committee))
     score = 0
     for vote in profile:
@@ -49,35 +44,11 @@ def thiele_score(profile, committee, scorefct_str="pav"):
     return score
 
 
-def __generalizedcc_score_fct(i, ell, committeesize):
-    # corresponds to (1,1,1,..,1,0,..0) of length *committeesize*
-    #  with *ell* zeros
-    # e.g.:
-    # ell = committeesize - 1 ... Chamberlin-Courant
-    # ell = 0 ... Approval Voting
-    if i > committeesize - ell:
-        return 0
-    if i > 0:
-        return 1
-    else:
-        return 0
-
-
-def __lp_av_score_fct(i, ell):
-    # l-th root of i
-    # l=1 ... Approval Voting
-    # l=\infty ... Chamberlin-Courant
-    if i == 1:
-        return 1
-    else:
-        return i ** Fraction(1, ell) - (i - 1) ** Fraction(1, ell)
-
-
 def __geom_score_fct(i, base):
     if i == 0:
         return 0
     else:
-        return Fraction(1, base**i)
+        return Fraction(1, base ** (i - 1))
 
 
 def __pav_score_fct(i):
@@ -91,7 +62,7 @@ def __slav_score_fct(i):
     if i == 0:
         return 0
     else:
-        return Fraction(1, 2*i - 1)
+        return Fraction(1, 2 * i - 1)
 
 
 def __av_score_fct(i):
@@ -115,18 +86,40 @@ def cumulative_score_fct(scorefct, cand_in_com):
 # returns a list of length num_cand
 # the i-th entry contains the marginal score increase
 #  gained by adding candidate i
-def additional_thiele_scores(profile, committee, scorefct):
+def marginal_thiele_scores_add(scorefct, profile, committee):
     marg = [0] * profile.num_cand
-    for vote in profile:
-        for c in vote:
-            if vote.approved & set(committee):
-                marg[c] += vote.weight * scorefct(len(vote.approved &
+    for pref in profile:
+        for c in pref:
+            if pref.approved & set(committee):
+                marg[c] += pref.weight * scorefct(len(pref.approved &
                                                       set(committee)) + 1)
             else:
-                marg[c] += vote.weight * scorefct(1)
+                marg[c] += pref.weight * scorefct(1)
     for c in committee:
         marg[c] = -1
     return marg
+
+
+def marginal_thiele_scores_remove(scorefct, profile, committee):
+    marg_util_cand = [0] * profile.num_cand
+    #  marginal utility gained by adding candidate to the committee
+    for pref in profile:
+        for c in pref:
+            satisfaction = len(pref.approved.intersection(committee))
+            marg_util_cand[c] += pref.weight * scorefct(satisfaction)
+    for c in range(profile.num_cand):
+        if c not in committee:
+            # do not choose candidates that already have been removed
+            marg_util_cand[c] = max(marg_util_cand) + 1
+    return marg_util_cand
+
+
+def monroescore(profile, committee):
+    if len(profile) % len(committee) == 0:
+        # faster
+        return monroescore_matching(profile, committee)
+    else:
+        return monroescore_flowbased(profile, committee)
 
 
 def monroescore_matching(profile, committee):
@@ -176,3 +169,12 @@ def monroescore_flowbased(profile, committee):
     # i.e. the unrepresented voters, and subtract it from the total number
     # of voters
     return len(profile) - nx.capacity_scaling(G)[0]
+
+
+def mavscore(profile, committee):
+    score = 0
+    for pref in profile:
+        hamdistance = hamming(pref, committee)
+        if hamdistance > score:
+            score = hamdistance
+    return score

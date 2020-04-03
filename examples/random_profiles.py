@@ -3,10 +3,8 @@ from __future__ import print_function
 import sys
 import random
 sys.path.insert(0, '..')
-
 from abcvoting import genprofiles
-from abcvoting import abcrules
-from abcvoting import committees
+from abcvoting.misc import enough_approved_candidates
 
 
 random.seed(31415)
@@ -15,58 +13,54 @@ committeesize = 3
 num_cand = 10
 
 
-def compute(profile, gen_profile_name):
-    print("Computing Proportional Approval Voting (PAV)")
-    print("for a randomly generated profile via " +
+def output(profile, gen_profile_name):
+    print("Randomly generated profile via " +
           gen_profile_name + ":")
     print(str(profile))
-    print("Output:")
-    output = abcrules.compute_pav(profile, committeesize, ilp=False)
-    committees.print_committees(output)
     print("****************************************")
 
 
 """
-For some methods, it might happen that fewer candidates
-than committeesize are approved (in total by all voters).
+For some methods, it might happen that fewer than
+committeesize many candidates are approved (in total by all voters).
 We thus recommended to verify this before computing the rule.
 """
 
 while True:
     profile = genprofiles.random_urn_profile(num_cand, 5, 2, 0.4)
     try:
-        committees.enough_approved_candidates(profile, committeesize)
+        enough_approved_candidates(profile, committeesize)
         break
     except ValueError:
         pass
-compute(profile, "random_urn")
+output(profile, "random_urn")
 
 while True:
     profile = genprofiles.random_urn_party_list_profile(
         num_cand, 3, 2, 0.4, uniform=False)
     try:
-        committees.enough_approved_candidates(profile, committeesize)
+        enough_approved_candidates(profile, committeesize)
         break
     except ValueError:
         pass
-compute(profile, "random_urn_party_list")
+output(profile, "random_urn_party_list")
 
 profile = genprofiles.random_IC_profile(num_cand, 5, 4)
-compute(profile, "random_IC")
+output(profile, "random_IC")
 
 profile = genprofiles.random_IC_party_list_profile(
     num_cand, 5, 2, uniform=True)
-compute(profile, "random_IC_party_list")
+output(profile, "random_IC_party_list")
 
 profile = genprofiles.random_mallows_profile(num_cand, 4, 4, 0.7)
-compute(profile, "random_mallows")
+output(profile, "random_mallows")
 
 while True:
     profile = genprofiles.random_2d_points_profile(
         num_cand, 4, "twogroups", "uniform_square", 0.5, 1.9)
     try:
-        committees.enough_approved_candidates(profile, committeesize)
+        enough_approved_candidates(profile, committeesize)
         break
     except ValueError:
         pass
-compute(profile, "random_2d_points")
+output(profile, "random_2d_points")

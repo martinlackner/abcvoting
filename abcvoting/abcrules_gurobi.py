@@ -6,12 +6,13 @@ programs (ILPs) with Gurobi (https://www.gurobi.com/)
 from __future__ import print_function
 try:
     import gurobipy as gb
+    available = True
 except ImportError:
-    None    # Gurobi not available
+    available = False
 
 
 def __gurobi_thiele_methods(profile, committeesize,
-                            scorefct, resolute=False):
+                            scorefct, resolute):
 
     m = gb.Model()
     cands = list(range(profile.num_cand))
@@ -45,6 +46,7 @@ def __gurobi_thiele_methods(profile, committeesize,
         gb.GRB.MAXIMIZE)
 
     m.setParam('OutputFlag', False)
+    m.setParam('FeasibilityTol', 1e-9)
 
     if resolute:
         m.setParam('PoolSearchMode', 0)
@@ -54,12 +56,12 @@ def __gurobi_thiele_methods(profile, committeesize,
         # abort after (roughly) 100 optimal solutions
         m.setParam('PoolSolutions', 100)
         # ignore suboptimal committees
-        m.setParam('PoolGap', 0)
+        m.setParam('PoolGap', 1e-9)
 
     m.optimize()
 
     if m.Status != 2:
-        print("Warning (__gurobi_thiele_methods):"+
+        print("Warning (__gurobi_thiele_methods):" +
               " solutions may be incomplete or not optimal.")
         print("(Gurobi return code", m.Status, ")")
 
@@ -76,7 +78,6 @@ def __gurobi_thiele_methods(profile, committeesize,
 
 
 def __gurobi_monroe(profile, committeesize, resolute):
-    
     num_voters = len(profile)
     cands = list(range(profile.num_cand))
 
@@ -139,6 +140,7 @@ def __gurobi_monroe(profile, committeesize, resolute):
     m.setObjective(satisfaction, gb.GRB.MAXIMIZE)
 
     m.setParam('OutputFlag', False)
+    m.setParam('FeasibilityTol', 1e-9)
 
     if resolute:
         m.setParam('PoolSearchMode', 0)
@@ -148,7 +150,7 @@ def __gurobi_monroe(profile, committeesize, resolute):
         # abort after (roughly) 100 optimal solutions
         m.setParam('PoolSolutions', 100)
         # ignore suboptimal committees
-        m.setParam('PoolGap', 0)
+        m.setParam('PoolGap', 1e-9)
 
     m.optimize()
 
@@ -168,16 +170,16 @@ def __gurobi_monroe(profile, committeesize, resolute):
     return committees
 
 
-# opt-Phragmen
-#
-# Warning: does not include the tie-breaking mechanism as specified
-# in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
-# Phragmen's Voting Methods and Justified Representation.
-# http://martin.lackner.xyz/publications/phragmen.pdf
-#
-# Instead: minimizes the maximum load
-def __gurobi_optphragmen(profile, committeesize, resolute=False):
+def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
+    """opt-Phragmen
 
+    Warning: does not include the tie-breaking mechanism as specified
+    in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
+    Phragmen's Voting Methods and Justified Representation.
+    http://martin.lackner.xyz/publications/phragmen.pdf
+
+    Instead: minimizes the maximum load
+    """
     cands = list(range(profile.num_cand))
 
     m = gb.Model()
@@ -214,6 +216,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute=False):
     m.setObjective(loadbound, gb.GRB.MINIMIZE)
 
     m.setParam('OutputFlag', False)
+    m.setParam('FeasibilityTol', 1e-9)
 
     if resolute:
         m.setParam('PoolSearchMode', 0)
@@ -223,7 +226,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute=False):
         # abort after (roughly) 100 optimal solutions
         m.setParam('PoolSolutions', 100)
         # ignore suboptimal committees
-        m.setParam('PoolGap', 0)
+        m.setParam('PoolGap', 1e-9)
 
     m.optimize()
 
@@ -241,10 +244,16 @@ def __gurobi_optphragmen(profile, committeesize, resolute=False):
             m.setParam('SolutionNumber', sol)
             committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
 
+    # optional output
+    if verbose:
+        print("optimal load bound: " + str(loadbound.Xn))
+        print("(i.e., all loads are <= " + str(loadbound.Xn) + ")")
+    # end of optional output
+
     return committees
 
 
-def __gurobi_minimaxav(profile, committeesize, resolute=False):
+def __gurobi_minimaxav(profile, committeesize, resolute):
 
     num_voters = len(profile)
     cands = list(range(profile.num_cand))
@@ -286,6 +295,7 @@ def __gurobi_minimaxav(profile, committeesize, resolute=False):
     # m.setParam('OutputFlag', False)
 
     m.setParam('OutputFlag', False)
+    m.setParam('FeasibilityTol', 1e-9)
 
     if resolute:
         m.setParam('PoolSearchMode', 0)
@@ -295,7 +305,7 @@ def __gurobi_minimaxav(profile, committeesize, resolute=False):
         # abort after (roughly) 100 optimal solutions
         m.setParam('PoolSolutions', 1000)
         # ignore suboptimal committees
-        m.setParam('PoolGap', 0)
+        m.setParam('PoolGap', 1e-9)
 
     m.optimize()
 

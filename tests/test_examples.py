@@ -1,21 +1,19 @@
 """
-Test if examples in examples/ work
+Test if examples in directory examples/ work
 """
-
-import unittest
 
 
 def test_simple_py():
-    import examples.simple
+    from examples import simple
 
 
 def test_allrules_py():
-    import examples.allrules
+    from examples import allrules
 
 
 def test_preflib_py():
-    import examples.handling_preflib_files
+    from examples import handling_preflib_files
 
 
 def test_random_profiles_py():
-    import examples.random_profiles
+    from examples import random_profiles
