@@ -6,14 +6,18 @@ Miscellaneous functions for committees (i.e., subsets of candidates)
 from __future__ import print_function
 
 
-# sorts a list of committees,
-# converts them to lists, and removes duplicates
 def sort_committees(committees):
+    """
+    sorts a list of committees,
+    converts them to lists, and removes duplicates
+    """
     return [sorted(list(c)) for c in sorted(set(map(tuple, committees)))]
 
 
-# verifies whether a sufficient number of approved candidates exists
 def enough_approved_candidates(profile, committeesize):
+    """
+    verifies whether a sufficient number of approved candidates exists
+    """
     appr = set()
     for pref in profile:
         appr.update(pref)
@@ -23,6 +27,9 @@ def enough_approved_candidates(profile, committeesize):
 
 
 def str_candset(candset, names=None):
+    """
+    nicely format a single committee
+    """
     if names is None:
         namedset = [str(c) for c in candset]
     else:
@@ -42,7 +49,7 @@ def str_candsets(committees, names=None):
 
 def str_committees_header(committees, winning=False):
     """
-    nicely format a heaer for a list of committees,
+    nicely format a header for a list of committees,
     stating how many committees there are
 
     winning: write "winning committee" instead of "committee"
