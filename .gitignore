@@ -1,0 +1,51 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.pytest_cache
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+
+# Jupyter NB Checkpoints
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Spyder
+.spyproject/
+
+# Mac OS-specific storage files
+.DS_Store
+
+# VIM
+*.swp
+*.swo
+
+# Pycharm
+.idea
+
+gurobi.log
+
+# LaTex
+*.log
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.toc
+*.snm
+*.nav
+*.run.xml
