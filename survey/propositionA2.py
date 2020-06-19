@@ -1,4 +1,4 @@
-"""Proposition 2
+"""Proposition A.2
 from the survey: "Approval-Based Multi-Winner Voting:
 Axioms, Algorithms, and Applications"
 by Martin Lackner and Piotr Skowron
@@ -12,7 +12,7 @@ from abcvoting.preferences import Profile
 from abcvoting import misc
 
 
-print(misc.header("Proposition 2", "*"))
+print(misc.header("Proposition A.2", "*"))
 
 num_cand = 3
 a, b, c = (0, 1, 2)

@@ -67,6 +67,16 @@ def test_remark03_py():
     from survey import remark03
 
 
-def test_proposition02_py():
+def test_propositionA2_py():
     pytest.importorskip("gurobipy")
-    from survey import proposition02
+    from survey import propositionA2
+
+
+def test_propositionA3_py():
+    pytest.importorskip("gurobipy")
+    from survey import propositionA3
+
+
+def test_propositionA4_py():
+    pytest.importorskip("gurobipy")
+    from survey import propositionA4
