@@ -31,7 +31,7 @@ class Profile(object):
         return len(self.preferences)
 
     def add_preferences(self, pref):
-        if type(pref) is list:
+        if type(pref) in [list, tuple]:
             if len(pref) == 0:
                 return
             if type(pref[0]) is int:
@@ -40,7 +40,7 @@ class Profile(object):
             else:
                 # list of integer-lists or DichotomousPreferences
                 for p in pref:
-                    if type(p) is list:
+                    if type(p) in [list, tuple]:
                         newpref = DichotomousPreferences(p)
                         newpref.is_valid(self.num_cand)
                         self.preferences.append(newpref)
@@ -121,6 +121,9 @@ class Profile(object):
         output += "\n"
 
         return output
+
+    def aslist(self):
+        return [list(pref.approved) for pref in self.preferences]
 
 
 class DichotomousPreferences():

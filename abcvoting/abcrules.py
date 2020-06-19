@@ -62,12 +62,16 @@ class ABCRule():
 
 
 def compute(rule_id, profile, committeesize, **kwargs):
-    return rules[rule_id].compute(profile, committeesize, **kwargs)
+    try:
+        return rules[rule_id].compute(profile, committeesize, **kwargs)
+    except KeyError:
+        raise NotImplementedError("ABC rule " + str(rule_id) + " not known.")
 
 
 # computes arbitrary Thiele methods via branch-and-bound
 def compute_thiele_method(scorefct_str, profile, committeesize,
-                          algorithm="gurobi", resolute=False, verbose=0):
+                          algorithm="branch-and-bound",
+                          resolute=False, verbose=0):
     """Thiele methods
 
     Compute winning committees of the Thiele method specified
