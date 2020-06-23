@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/192713860.svg)](https://zenodo.org/badge/latestdoi/192713860)
 [![MIT License](https://img.shields.io/github/license/martinlackner/abcvoting.svg)](https://choosealicense.com/licenses/mit/)
 [![Unittests badge](https://github.com/martinlackner/abcvoting/workflows/Unittests/badge.svg)](https://github.com/martinlackner/abcvoting/actions)
 
