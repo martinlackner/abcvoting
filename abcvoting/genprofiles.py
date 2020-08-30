@@ -157,7 +157,7 @@ def random_mallows_profile(num_cand, num_voters, setsize, dispersion):
     """Generates a Mallows Profile after the definition for
     repeated insertion  mode (RIM) in
     https://icml.cc/2011/papers/135_icmlpaper.pdf"""
-    if not (0 < dispersion < 1):
+    if not (0 < dispersion <= 1):
         raise Exception("Invalid dispersion, needs to be in (0, 1].")
     reference_ranking = list(range(num_cand))
     random.shuffle(reference_ranking)
