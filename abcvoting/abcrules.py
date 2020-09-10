@@ -1030,10 +1030,14 @@ def __rule_x_get_min_q(profile, budget, cand):
 
 
 def compute_rule_x(profile, committeesize, algorithm="standard",
-                   resolute=True, verbose=0):
+                   resolute=True, verbose=0, skip_phragmen_phase=False):
     """Rule X
 
     See https://arxiv.org/pdf/1911.11747.pdf, page 7
+    
+    skip_phragmen_phase : bool, optional
+        omit the second phase (that uses seq-Phragmen)
+        may result in a committee that is too small
     """
     enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
@@ -1118,6 +1122,9 @@ def compute_rule_x(profile, committeesize, algorithm="standard",
                         break
 
             else:  # no affordable candidates remain
+              if skip_phragmen_phase:
+                  final_committees.add(tuple(committee))
+              else:
                 # fill committee via seq-Phragmen
 
                 # optional output
