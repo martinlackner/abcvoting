@@ -1034,6 +1034,10 @@ def compute_rule_x(profile, committeesize, algorithm="standard",
     """Rule X
 
     See https://arxiv.org/pdf/1911.11747.pdf, page 7
+    
+    skip_phragmen_phase : bool, optional
+        omit the second phase (that uses seq-Phragmen)
+        may result in a committee that is too small
     """
     enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
