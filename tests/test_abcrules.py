@@ -7,7 +7,7 @@ from abcvoting.preferences import Profile, DichotomousPreferences
 from abcvoting import abcrules
 
 
-class CollectRules():
+class CollectRules:
     """
     Collect all ABC rules that are available for unittesting.
     Exclude Gurobi-based rules if Gurobi is not available
@@ -38,7 +38,7 @@ class CollectRules():
                         self.irres_instances.append(instance[:2])
 
 
-class CollectInstances():
+class CollectInstances:
     def __init__(self):
         self.instances = []
 
@@ -252,6 +252,12 @@ def test_abcrules__toofewcandidates(rule_instance, verbose):
         abcrules.compute(
             rule_id, profile, committeesize, algorithm=algorithm,
             resolute=resolute, verbose=verbose)
+
+
+def test_abcrules_wrong_rule_id():
+    profile = Profile(3)
+    with pytest.raises(abcrules.UnknownRuleIDError):
+        abcrules.compute("a_rule_that_does_not_exist", profile, 3)
 
 
 @pytest.mark.parametrize(

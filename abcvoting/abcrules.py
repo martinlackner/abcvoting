@@ -28,15 +28,15 @@ from abcvoting import scores
 class UnknownRuleIDError(ValueError):
     """Exception raised if unknown rule id is used"""
 
-    def __init__(self, expression, message):
-        self.expression = expression
-        self.message = "Rule ID \"" + str(message) + "\" is not known."
+    def __init__(self, rule_id):
+        message = "Rule ID \"" + str(rule_id) + "\" is not known."
+        super(ValueError, self).__init__(message)
 
 
-class ABCRule():
+class ABCRule:
     """Class for ABC rules containing basic information and function call"""
     def __init__(self, rule_id, shortname, longname, fct,
-                 algorithms=["standard"], resolute=[True, False]):
+                 algorithms=("standard"), resolute=(True, False)):
         self.rule_id = rule_id
         self.shortname = shortname
         self.longname = longname
@@ -65,7 +65,7 @@ def compute(rule_id, profile, committeesize, **kwargs):
     try:
         return rules[rule_id].compute(profile, committeesize, **kwargs)
     except KeyError:
-        raise NotImplementedError("ABC rule " + str(rule_id) + " not known.")
+        raise UnknownRuleIDError(rule_id)
 
 
 # computes arbitrary Thiele methods via branch-and-bound
@@ -434,7 +434,7 @@ def __revseq_thiele_irresolute(profile, committeesize, scorefct_str):
             cands_to_remove = [cand for cand in range(profile.num_cand)
                                if marg_util_cand[cand] == min(marg_util_cand)]
             for c in cands_to_remove:
-                next_comm = tuple(set(committee) - set([c]))
+                next_comm = tuple(set(committee) - {c})
                 comm_scores_next[next_comm] = score - score_reduction
             comm_scores = comm_scores_next
     return sort_committees(list(comm_scores.keys()))
@@ -1293,44 +1293,44 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="standard",
 
 __RULESINFO = [
     ("av", "AV", "Approval Voting (AV)", compute_av,
-     ["standard"], [True, False]),
+     ("standard",), (True, False)),
     ("sav", "SAV", "Satisfaction Approval Voting (SAV)", compute_sav,
-     ["standard"], [True, False]),
+     ("standard",), (True, False)),
     ("pav", "PAV", "Proportional Approval Voting (PAV)", compute_pav,
-     ["gurobi", "branch-and-bound"], [True, False]),
+     ("gurobi", "branch-and-bound"), (True, False)),
     ("slav", "SLAV", "Sainte-Laguë Approval Voting (SLAV)", compute_slav,
-     ["gurobi", "branch-and-bound"], [True, False]),
+     ("gurobi", "branch-and-bound"), (True, False)),
     ("cc", "CC", "Approval Chamberlin-Courant (CC)", compute_cc,
-     ["gurobi", "branch-and-bound"], [True, False]),
+     ("gurobi", "branch-and-bound"), (True, False)),
     ("geom2", "2-Geometric", "2-Geometric Rule",
      functools.partial(compute_thiele_method, "geom2"),
-     ["gurobi", "branch-and-bound"], [True, False]),
+     ("gurobi", "branch-and-bound",), (True, False)),
     ("seqpav", "seq-PAV", "Sequential Proportional Approval Voting (seq-PAV)",
-     compute_seqpav, ["standard"], [True, False]),
+     compute_seqpav, ("standard",), (True, False)),
     ("revseqpav", "revseq-PAV",
      "Reverse Sequential Proportional Approval Voting (revseq-PAV)",
-     compute_revseqpav, ["standard"], [True, False]),
+     compute_revseqpav, ("standard",), (True, False)),
     ("seqslav", "seq-SLAV",
      "Sequential Sainte-Laguë Approval Voting (seq-SLAV)",
-     compute_seqslav, ["standard"], [True, False]),
+     compute_seqslav, ("standard",), (True, False)),
     ("seqcc", "seq-CC", "Sequential Approval Chamberlin-Courant (seq-CC)",
-     compute_seqcc, ["standard"], [True, False]),
+     compute_seqcc, ("standard",), (True, False)),
     ("seqphrag", "seq-Phragmén", "Phragmén's Sequential Rule (seq-Phragmén)",
-     compute_seqphragmen, ["standard"], [True, False]),
+     compute_seqphragmen, ("standard",), (True, False)),
     ("optphrag", "opt-Phragmén", "Phragmén's Optimization Rule (opt-Phragmén)",
-     compute_optphragmen, ["gurobi"], [True, False]),
+     compute_optphragmen, ("gurobi",), (True, False)),
     ("monroe", "Monroe", "Monroe's Approval Rule (Monroe)",
-     compute_monroe, ["gurobi", "brute-force"], [True, False]),
+     compute_monroe, ("gurobi", "brute-force"), (True, False)),
     ("greedy-monroe", "Greedy Monroe", "Greedy Monroe",
-     compute_greedy_monroe, ["standard"], [True]),
+     compute_greedy_monroe, ("standard",), (True,)),
     ("mav", "MAV", "Minimax Approval Voting (MAV)",
-     compute_mav, ["gurobi", "brute-force"], [True, False]),
+     compute_mav, ("gurobi", "brute-force"), (True, False)),
     ("lexmav", "lex-MAV", "Lexicographic Minimax Approval Voting (lex-MAV)",
-     compute_lexmav, ["brute-force"], [True, False]),
+     compute_lexmav, ("brute-force",), (True, False)),
     ("rule-x", "Rule X", "Rule X",
-     compute_rule_x, ["standard"], [True, False]),
+     compute_rule_x, ("standard",), (True, False)),
     ("phrag-enestr", "Phragmén-Eneström", "Method of Phragmén-Eneström",
-     compute_phragmen_enestroem, ["standard"], [True, False])]
+     compute_phragmen_enestroem, ("standard",), (True, False))]
 rules = {}
 for ruleinfo in __RULESINFO:
     rules[ruleinfo[0]] = ABCRule(*ruleinfo)

@@ -91,5 +91,5 @@ for manip in manipulations:
         for commafter in commsafter:
             for c in set(commfirst) & set(truepref):
                 assert c in commafter
-    assert (set(commfirst) & set(truepref) <
-            set(commafter) & set(truepref))
+            assert (set(commfirst) & set(truepref) <
+                    set(commafter) & set(truepref))

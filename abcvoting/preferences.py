@@ -126,7 +126,7 @@ class Profile(object):
         return [list(pref.approved) for pref in self.preferences]
 
 
-class DichotomousPreferences():
+class DichotomousPreferences:
     def __init__(self, approved, weight=1):
         self.approved = set(approved)
         if approved:  # empty approval sets are fine

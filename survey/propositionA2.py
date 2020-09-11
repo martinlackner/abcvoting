@@ -76,8 +76,8 @@ print(" " + abcrules.rules[rule_id].shortname + ": "
       + " vs " + misc.str_candset(comm2, names))
 
 print("\n\nDetailed calculations:")
-abcrules.compute("rule-x", profile, 2, resolute=True, verbose=2)[0]
-abcrules.compute("rule-x", profile, 3, resolute=True, verbose=2)[0]
+abcrules.compute("rule-x", profile, 2, resolute=True, verbose=2)
+abcrules.compute("rule-x", profile, 3, resolute=True, verbose=2)
 
 num_cand = 5
 a, b, c, d, e = 0, 1, 2, 3, 4

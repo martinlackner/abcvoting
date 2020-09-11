@@ -29,6 +29,6 @@ profile.add_preferences(apprsets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees = abcrules.compute_revseqpav(profile, 1, resolute=False, verbose=1)
+abcrules.compute_revseqpav(profile, 1, resolute=False, verbose=1)
 
-committees = abcrules.compute_av(profile, 1, verbose=1)
+abcrules.compute_av(profile, 1, verbose=1)

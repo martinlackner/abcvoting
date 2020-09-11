@@ -150,46 +150,48 @@ def read_preflib_file(filename, setsize=1, appr_percent=None):
             raise PreflibException("Number of voters ill specified, "
                                    + str(parts)
                                    + " should be triple of integers")
+
         appr_sets = []
         lines = [line.strip() for line in f.readlines() if line.strip()]
         if len(lines) != unique_orders:
             raise PreflibException("Number of unique orders should be "
                                    + str(unique_orders) + " but is " +
                                    str(len(lines)))
-        for line in lines:
-            parts = line.split(",")
-            if len(parts) < 1:
-                continue
-            try:
-                count = int(parts[0])
-            except ValueError:
-                raise PreflibException("Each ranking must start with count ("
-                                       + str(line) + ")")
-            ranking = parts[1:]  # ranking starts after count
-            if len(ranking) == 0:
-                raise PreflibException("Empty ranking: " + str(line))
-            if appr_percent:
-                num_appr = int(ceil(len(ranking) * appr_percent))
-            else:
-                num_appr = setsize
-            appr_set = get_appr_set(num_appr, ranking, candidate_map)
-            for _ in range(count):
-                appr_sets.append(appr_set)
 
-        # normalize candidates to 0, 1, 2, ...
-        names = []
-        normalize_map = {}
-        for c in candidate_map.keys():
-            names.append(candidate_map[c])
-            normalize_map[c] = len(names) - 1
+    for line in lines:
+        parts = line.split(",")
+        if len(parts) < 1:
+            continue
+        try:
+            count = int(parts[0])
+        except ValueError:
+            raise PreflibException("Each ranking must start with count ("
+                                   + str(line) + ")")
+        ranking = parts[1:]  # ranking starts after count
+        if len(ranking) == 0:
+            raise PreflibException("Empty ranking: " + str(line))
+        if appr_percent:
+            num_appr = int(ceil(len(ranking) * appr_percent))
+        else:
+            num_appr = setsize
+        appr_set = get_appr_set(num_appr, ranking, candidate_map)
+        for _ in range(count):
+            appr_sets.append(appr_set)
 
-        profile = Profile(num_cand, names)
+    # normalize candidates to 0, 1, 2, ...
+    names = []
+    normalize_map = {}
+    for c in candidate_map.keys():
+        names.append(candidate_map[c])
+        normalize_map[c] = len(names) - 1
 
-        for appr_set in appr_sets:
-            norm_appr_set = []
-            for c in appr_set:
-                norm_appr_set.append(normalize_map[c])
-            profile.add_preferences(norm_appr_set)
-        if len(profile) != voter_count:
-            raise PreflibException("Missing voters.")
-        return profile
+    profile = Profile(num_cand, names)
+
+    for appr_set in appr_sets:
+        norm_appr_set = []
+        for c in appr_set:
+            norm_appr_set.append(normalize_map[c])
+        profile.add_preferences(norm_appr_set)
+    if len(profile) != voter_count:
+        raise PreflibException("Missing voters.")
+    return profile

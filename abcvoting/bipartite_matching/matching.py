@@ -54,7 +54,7 @@ def bipartiteMatch(graph):
 				for v in graph[u]:
 					if v not in preds:
 						unlayered[v] = None
-			return (matching,list(pred),list(unlayered))
+			return matching, list(pred), list(unlayered)
 
 		# recursively search backward through layers to find alternating paths
 		# recursion returns true if found path, false otherwise
