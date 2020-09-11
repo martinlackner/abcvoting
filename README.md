@@ -9,7 +9,8 @@
 Approval-based committee rules (ABC rules) are voting methods for selecting a committee, i.e., a fixed-size subset of candidates.
 ABC rules are also known as approval-based multi-winner rules.
 The input of such rules are [approval ballots](https://en.wikipedia.org/wiki/Approval_voting#/media/File:Approval_ballot.svg).
-We recommend the survey by Faliszewski et al. [1] as an introduction to this topic and for further reference.
+A detailed introduction to ABC rules and related research directions, [''Approval-Based Committee Voting: Axioms, Algorithms, and Applications''](https://arxiv.org/abs/2007.01795) was written by Lackner and Skowron [8].
+A more general introduction to committee voting (not limited to approval ballots) is the survey by Faliszewski et al. [1].
 The following ABC rules are implemented:
 
 * Approval Voting (AV)
@@ -55,13 +56,13 @@ from abcvoting import abcrules
 profile = Profile(5)
 profile.add_preferences([[0,1,2], [0,1], [0,1], [1,2], [3,4], [3,4]])
 committeesize = 3
-print(abcrules.compute_pav(profile, committeesize, ilp=False))
+print(abcrules.compute_pav(profile, committeesize))
 ```
 The output is 
 ```
 [[0, 1, 3], [0, 1, 4]]
 ```
-which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples can be found in the directory [examples/](examples/).
+which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples can be found in the directories [examples/](examples) and [survey/](survey) (which contains all examples from the survey on ABC rules [8]). 
 
 ## Comments
 
@@ -108,3 +109,5 @@ Proportionality and the Limits of Welfarism. arXiv preprint arXiv:1911.11747. 20
 
 [7] Janson, Svante.
 Phragmén's and Thiele's election methods. arXiv preprint arXiv:1611.08826. 2016. https://arxiv.org/pdf/1611.08826.pdf
+
+[8] Lackner, Martin, and Piotr Skowron. "Approval-Based Committee Voting: Axioms, Algorithms, and Applications." arXiv preprint arXiv:2007.01795. 2020. https://arxiv.org/abs/2007.01795
