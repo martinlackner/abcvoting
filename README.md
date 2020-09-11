@@ -82,6 +82,7 @@ The following people have contributed code to this package or provided help with
 [Andrzej Kaczmarczyk](http://www.user.tu-berlin.de/droores/),
 [Benjamin Krenn](https://github.com/benjaminkrenn),
 [Martin Lackner](http://martin.lackner.xyz/),
+[Pawel Batko](https://github.com/pbatko),
 [Dominik Peters](http://dominik-peters.de/),
 Peter Regner, 
 [Piotr Skowron](https://www.mimuw.edu.pl/~ps219737/).
