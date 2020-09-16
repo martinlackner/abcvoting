@@ -44,6 +44,7 @@ class CollectInstances:
 
         # first profile
         profile = Profile(6)
+        committeesize = 4
         preflist = [[0, 4, 5], [0], [1, 4, 5], [1],
                     [2, 4, 5], [2], [3, 4, 5], [3]]
         profile.add_preferences(preflist)
@@ -98,8 +99,11 @@ class CollectInstances:
             "phrag-enestr": [[0, 1, 4, 5], [0, 2, 4, 5],
                              [0, 3, 4, 5], [1, 2, 4, 5],
                              [1, 3, 4, 5], [2, 3, 4, 5]],
+            "consensus": [[0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4],
+                          [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
+                          [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5],
+                          [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
         }
-        committeesize = 4
         self.instances.append((profile, tests, committeesize))
 
         # first profile now with reversed preflist
@@ -145,6 +149,7 @@ class CollectInstances:
             "slav": [[0, 1, 3]],
             "rule-x": [[0, 1, 3]],
             "phrag-enestr": [[0, 1, 3]],
+            "consensus": [[0, 1, 3]],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -195,6 +200,7 @@ class CollectInstances:
             "slav": [[0, 1, 2, 4]],
             "rule-x": [[0, 1, 2, 4]],
             "phrag-enestr": [[0, 1, 2, 4]],
+            "consensus": [[0, 1, 2, 4]],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -224,6 +230,7 @@ class CollectInstances:
             "slav": [[0, 3]],
             "rule-x": [[0, 3]],
             "phrag-enestr": [[0, 3]],
+            "consensus": [[0, 3]],
         }
         self.instances.append((profile, tests, committeesize))
 

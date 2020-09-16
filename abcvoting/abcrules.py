@@ -1289,6 +1289,71 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="standard",
     return committees
 
 
+def compute_consensus_rule(profile, committeesize, algorithm="standard",
+                           resolute=True, verbose=0):
+    """"Consensus rule,
+    based on Perpetual Consensus from
+    Martin Lackner Perpetual Voting: Fairness in Long-Term Decision Making
+    In Proceedings of the 34th AAAI Conference on Artificial Intelligence (AAAI 2020)
+    """
+    enough_approved_candidates(profile, committeesize)
+
+    if algorithm != "standard":
+        raise NotImplementedError(
+            "Algorithm " + str(algorithm)
+            + " not specified for compute_consensus_rule")
+
+    num_voters = len(profile)
+    cands = range(profile.num_cand)
+
+    start_budget = {i: 0 for i in range(num_voters)}
+
+    committees = [(start_budget, set())]
+    for _ in range(committeesize):
+        next_committees = []
+        for budget, comm in committees:
+            for i in range(num_voters):
+                budget[i] += profile[i].weight  # weight is 1 by default
+            curr_cands = set(cands) - comm
+            support = {c: 0 for c in curr_cands}
+            supporters = {c: [] for c in curr_cands}
+            for i, appr in enumerate(profile):
+                if budget[i] <= 0:
+                    continue
+                for cand in appr:
+                    if cand in curr_cands:
+                        support[cand] += budget[i]
+                        supporters[cand].append(i)
+            max_support = max(support.values())
+            winners = [c for c, s in support.items()
+                       if s == max_support]
+            for cand in winners:
+                b = dict(budget)  # copy of budget
+                for i in supporters[cand]:
+                    b[i] -= Fraction(num_voters, len(supporters[cand]))
+                c = comm.union([cand])  # new committee with candidate
+                next_committees.append((b, c))
+
+        if resolute:
+            committees = [next_committees[0]]
+        else:
+            committees = next_committees
+    committees = [comm for b, comm in committees]
+    committees = sort_committees(committees)
+    if resolute:
+        committees = [committees[0]]
+
+    # optional output
+    if verbose:
+        print(header(rules["consensus"].longname))
+
+        print(str_committees_header(committees, winning=True))
+        print(str_candsets(committees, names=profile.names))
+    # end of optional output
+
+    return committees
+
+
 __RULESINFO = [
     ("av", "AV", "Approval Voting (AV)", compute_av,
      ("standard",), (True, False)),
@@ -1328,7 +1393,9 @@ __RULESINFO = [
     ("rule-x", "Rule X", "Rule X",
      compute_rule_x, ("standard",), (True, False)),
     ("phrag-enestr", "Phragmén-Eneström", "Method of Phragmén-Eneström",
-     compute_phragmen_enestroem, ("standard",), (True, False))]
+     compute_phragmen_enestroem, ("standard",), (True, False)),
+    ("consensus", "Consensus", "Consensus Rule",
+     compute_consensus_rule, ("standard",), (True, False))]
 rules = {}
 for ruleinfo in __RULESINFO:
     rules[ruleinfo[0]] = ABCRule(*ruleinfo)
