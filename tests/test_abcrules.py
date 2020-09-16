@@ -146,7 +146,6 @@ class CollectInstances:
             "rule-x": [[0, 1, 3]],
             "phrag-enestr": [[0, 1, 3]],
         }
-        committeesize = 3
         self.instances.append((profile, tests, committeesize))
 
         # and a third profile
@@ -197,7 +196,6 @@ class CollectInstances:
             "rule-x": [[0, 1, 2, 4]],
             "phrag-enestr": [[0, 1, 2, 4]],
         }
-        committeesize = 4
         self.instances.append((profile, tests, committeesize))
 
         # and a fourth profile
@@ -227,7 +225,6 @@ class CollectInstances:
             "rule-x": [[0, 3]],
             "phrag-enestr": [[0, 3]],
         }
-        committeesize = 2
         self.instances.append((profile, tests, committeesize))
 
 

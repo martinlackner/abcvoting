@@ -145,7 +145,7 @@ def monroescore_flowbased(profile, committee):
     """Returns Monroe score of a given committee.
     Uses a flow-based algorithm that works even if
     committeesize does not divide the number of voters"""
-    G = nx.DiGraph()
+    graph = nx.DiGraph()
     committeesize = len(committee)
     # the lower bound of the size of districts
     lower_bound = len(profile) // committeesize
@@ -153,22 +153,22 @@ def monroescore_flowbased(profile, committee):
     # of the lower bounds of districts
     overflow = len(profile) - committeesize * lower_bound
     # add a sink node for the overflow
-    G.add_node('sink', demand=overflow)
+    graph.add_node('sink', demand=overflow)
     for i in committee:
-        G.add_node(i, demand=lower_bound)
-        G.add_edge(i, 'sink', weight=0, capacity=1)
+        graph.add_node(i, demand=lower_bound)
+        graph.add_edge(i, 'sink', weight=0, capacity=1)
     for i, vote in enumerate(profile):
         voter_name = 'v' + str(i)
-        G.add_node(voter_name, demand=-1)
+        graph.add_node(voter_name, demand=-1)
         for cand in committee:
             if cand in vote:
-                G.add_edge(voter_name, cand, weight=0, capacity=1)
+                graph.add_edge(voter_name, cand, weight=0, capacity=1)
             else:
-                G.add_edge(voter_name, cand, weight=1, capacity=1)
+                graph.add_edge(voter_name, cand, weight=1, capacity=1)
     # compute the minimal cost assignment of voters to candidates,
     # i.e. the unrepresented voters, and subtract it from the total number
     # of voters
-    return len(profile) - nx.capacity_scaling(G)[0]
+    return len(profile) - nx.capacity_scaling(graph)[0]
 
 
 def mavscore(profile, committee):

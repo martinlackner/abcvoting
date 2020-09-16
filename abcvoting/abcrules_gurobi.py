@@ -185,7 +185,6 @@ def __gurobi_monroe(profile, committeesize, resolute):
         if resolute:
             break
 
-
     return committees
 
 
@@ -258,7 +257,6 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
             if len(committees) == 0:
                 raise RuntimeError("Gurobi found no solution in opt-Phragmen ILP.")
             break
-
 
         if minmaxload is None:
             minmaxload = loadbound.Xn

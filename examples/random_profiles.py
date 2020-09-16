@@ -13,10 +13,10 @@ committeesize = 3
 num_cand = 10
 
 
-def output(profile, gen_profile_name):
+def output(prof, gen_profile_name):
     print("Randomly generated profile via " +
           gen_profile_name + ":")
-    print(str(profile))
+    print(str(prof))
     print("****************************************")
 
 

@@ -36,7 +36,7 @@ class UnknownRuleIDError(ValueError):
 class ABCRule:
     """Class for ABC rules containing basic information and function call"""
     def __init__(self, rule_id, shortname, longname, fct,
-                 algorithms=("standard"), resolute=(True, False)):
+                 algorithms=("standard",), resolute=(True, False)):
         self.rule_id = rule_id
         self.shortname = shortname
         self.longname = longname
@@ -205,9 +205,7 @@ def compute_sav(profile, committeesize, algorithm="standard",
     if algorithm == "standard":
         return __separable("sav", profile, committeesize, resolute, verbose)
     else:
-            raise NotImplementedError(
-                "Algorithm " + str(algorithm)
-                + " not specified for compute_sav")
+        raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for compute_sav")
 
 
 # Approval Voting (AV)
@@ -1122,44 +1120,44 @@ def compute_rule_x(profile, committeesize, algorithm="standard",
                         break
 
             else:  # no affordable candidates remain
-              if skip_phragmen_phase:
-                  final_committees.add(tuple(committee))
-              else:
-                # fill committee via seq-Phragmen
-
-                # optional output
-                if resolute and verbose >= 2:
-                    print("Phase 2 (seq-Phragmén):\n")
-                # end of optional output
-
-                start_load = {}
-                # translate budget to loads
-                for v in range(len(profile)):
-                    start_load[v] = (Fraction(committeesize, len(profile))
-                                     - budget[v])
-
-                # optional output
-                if resolute and verbose >= 2:
-                    print("starting loads (= budget spent):")
-                    output = "  ("
-                    for v, _ in enumerate(profile):
-                        output += str(start_load[v]) + ", "
-                    print(output[:-2] + ")\n")
-                # end of optional output
-
-                if resolute:
-                    committees, _ = __seqphragmen_resolute(
-                        profile, committeesize, verbose=verbose,
-                        partial_committee=list(committee),
-                        start_load=start_load)
+                if skip_phragmen_phase:
+                    final_committees.add(tuple(committee))
                 else:
-                    committees, _ = __seqphragmen_irresolute(
-                        profile, committeesize,
-                        partial_committee=list(committee),
-                        start_load=start_load)
-                final_committees.update([tuple(comm) for comm in committees])
-                # after filling the remaining spots these committees
-                # have size committeesize
+                    # fill committee via seq-Phragmen
+
+                    # optional output
+                    if resolute and verbose >= 2:
+                        print("Phase 2 (seq-Phragmén):\n")
+                    # end of optional output
+
+                    start_load = {}
+                    # translate budget to loads
+                    for v in range(len(profile)):
+                        start_load[v] = (Fraction(committeesize, len(profile))
+                                         - budget[v])
+
+                    # optional output
+                    if resolute and verbose >= 2:
+                        print("starting loads (= budget spent):")
+                        output = "  ("
+                        for v, _ in enumerate(profile):
+                            output += str(start_load[v]) + ", "
+                        print(output[:-2] + ")\n")
+                    # end of optional output
+
+                    if resolute:
+                        committees, _ = __seqphragmen_resolute(
+                            profile, committeesize, verbose=verbose,
+                            partial_committee=list(committee),
+                            start_load=start_load)
+                    else:
+                        committees, _ = __seqphragmen_irresolute(
+                            profile, committeesize,
+                            partial_committee=list(committee),
+                            start_load=start_load)
+                    final_committees.update([tuple(comm) for comm in committees])
+                    # after filling the remaining spots these committees
+                    # have size committeesize
 
             commbugdets = next_commbudgets
 
