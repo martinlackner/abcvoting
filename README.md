@@ -9,8 +9,8 @@
 Approval-based committee rules (ABC rules) are voting methods for selecting a committee, i.e., a fixed-size subset of candidates.
 ABC rules are also known as approval-based multi-winner rules.
 The input of such rules are [approval ballots](https://en.wikipedia.org/wiki/Approval_voting#/media/File:Approval_ballot.svg).
-We recommend [''Approval-Based Committee Voting: Axioms, Algorithms, and Applications''](https://arxiv.org/abs/2007.01795) as a detailed introduction to ABC rules and related research directions [8].
-In addition, the survey by Faliszewski et al. [1] is useful as a more general introduction to committee voting (not limited to approval ballots).
+We recommend [''Approval-Based Committee Voting: Axioms, Algorithms, and Applications''](https://arxiv.org/abs/2007.01795) by Lackner and Skowron as a detailed introduction to ABC rules and related research directions [8].
+In addition, the [survey by Faliszewski et al.](http://research.illc.uva.nl/COST-IC1205/BookDocs/Chapters/TrendsCOMSOC-02.pdf) [1] is useful as a more general introduction to committee voting (not limited to approval ballots).
 
 The following ABC rules are implemented:
 
@@ -68,11 +68,10 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 ## Comments
 
 * This module requires Python 2.7 or 3.6+.
-* The used modules can be found in [requirements.txt](requirements.txt).
+* The required modules can be found in [requirements.txt](requirements.txt).
 * Most computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). The corresponding functions require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
 * Some functions use fractions (e.g., `compute_seqphragmen`). These compute significantly faster if the module [gmpy2](https://gmpy2.readthedocs.io/) is available. If gmpy2 is not available, the much slower Python module [fractions](https://docs.python.org/2/library/fractions.html) is used.
 * All voting methods have a parameter `resolute`. If it is set to true, only one winning committee is computed. In most cases,  `resolute=True` speeds up the computation. 
-* For ILP implementations via Gurobi it is not guaranteed that all winning committees are computed even if `resolute = False`.
 
 
 ## Acknowledgements
@@ -85,7 +84,7 @@ The following people have contributed code to this package or provided help with
 [Martin Lackner](http://martin.lackner.xyz/),
 [Pawel Batko](https://github.com/pbatko),
 [Dominik Peters](http://dominik-peters.de/),
-Peter Regner, 
+[Peter Regner](https://github.com/lumbric), 
 [Piotr Skowron](https://www.mimuw.edu.pl/~ps219737/).
 
 
