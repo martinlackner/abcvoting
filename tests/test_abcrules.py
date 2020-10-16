@@ -22,20 +22,20 @@ class CollectRules:
             print("Warning: Gurobi not found, "
                   + "Gurobi-based unittests are ignored.")
 
-        self.instances = []
-        self.res_instances = []
-        self.irres_instances = []
+        self.rule_alg_resolute = []
+        self.rule_alg_onlyresolute = []
+        self.rule_alg_onlyirresolute = []
         for rule in abcrules.rules.values():
             for alg in rule.algorithms:
                 if alg == "gurobi" and not self.gurobi_supported:
                     continue
                 for resolute in rule.resolute:
                     instance = (rule.rule_id, alg, resolute)
-                    self.instances.append(instance)
+                    self.rule_alg_resolute.append(instance)
                     if resolute:
-                        self.res_instances.append(instance[:2])
+                        self.rule_alg_onlyresolute.append(instance[:2])
                     else:
-                        self.irres_instances.append(instance[:2])
+                        self.rule_alg_onlyirresolute.append(instance[:2])
 
 
 class CollectInstances:
@@ -239,8 +239,39 @@ testinsts = CollectInstances()
 testrules = CollectRules()
 
 
+def idfn(val):
+    if isinstance(val, abcrules.ABCRule):
+        return val.rule_id
+    if isinstance(val, tuple):
+        return "/".join(map(str, val))
+    return str(val)
+
+
 @pytest.mark.parametrize(
-    "rule_instance", testrules.instances
+    "rule", abcrules.rules.values(), ids=idfn
+)
+def test_resolute_parameter(rule):
+    for alg in rule.algorithms:
+        if alg == "gurobi" and not testrules.gurobi_supported:
+            continue
+        assert len(rule.resolute) in [1, 2]
+        # resolute=True should be default
+        if len(rule.resolute) == 2:
+            assert rule.resolute[0]
+        # raise NotImplementedError if value for resolute is not implemented
+        for resolute in [False, True]:
+            if resolute not in rule.resolute:
+                profile = Profile(5)
+                committeesize = 1
+                preflist = [[0, 1, 2], [1], [1, 2], [0]]
+                profile.add_preferences(preflist)
+
+                with pytest.raises(NotImplementedError):
+                    rule.compute(profile, committeesize, algorithm=alg, resolute=resolute)
+
+
+@pytest.mark.parametrize(
+    "rule_instance", testrules.rule_alg_resolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2]
@@ -265,7 +296,7 @@ def test_abcrules_wrong_rule_id():
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.instances
+    "rule_instance", testrules.rule_alg_resolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2, 3]
@@ -303,7 +334,7 @@ def test_abcrules_weightsconsidered(rule_instance, verbose):
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.instances
+    "rule_instance", testrules.rule_alg_resolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2, 3]
@@ -355,7 +386,7 @@ def test_optphrag_notiebreaking():
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.instances
+    "rule_instance", testrules.rule_alg_resolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2, 3]
@@ -404,8 +435,22 @@ def test_seqpav_irresolute():
     assert committees == [[0, 2]]
 
 
+def test_consensus_fails_lower_quota():
+    profile = Profile(31)
+    profile.add_preferences([[0]] + [[1, 2]] * 3 + [[3, 4, 5]] * 5 + [[6, 7, 8, 9, 10, 11, 12, 13, 14, 15]] * 18
+                            + [[16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 29, 30]] * 27)
+    committeesize = 30
+
+    committees = abcrules.rules["consensus"].compute(
+        profile, committeesize, resolute=True)
+    for comm in committees:
+        assert not all(cand in comm for cand in [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30])
+    # .. and thus the Consensus rule fails lower quota (and PJR and EJR): the quota of the 27 voters is 15,
+    # but not all of their 15 approved candidates are contained in a winning committee.
+
+
 testrules_jansonex = []
-for rule_id, algorithm in testrules.irres_instances:
+for rule_id, algorithm in testrules.rule_alg_onlyirresolute:
     if rule_id not in ["phragm-enestr", "seqphrag", "pav",
                        "seqpav", "revseqpav"]:
         continue
@@ -435,7 +480,7 @@ def test_jansonexamples(rule_id, algorithm):
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.res_instances
+    "rule_instance", testrules.rule_alg_onlyresolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2, 3]
@@ -453,7 +498,7 @@ def test_tiebreaking_order(rule_instance, verbose):
 
 
 @pytest.mark.parametrize(
-    "rule", abcrules.rules.values()
+    "rule", abcrules.rules.values(), ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2, 3]
@@ -473,28 +518,23 @@ def test_unspecified_algorithms(rule, verbose, resolute):
             resolute=resolute, verbose=verbose)
 
 
-testrules_fastest = []
-for rule in abcrules.rules.values():
-    for resolute in rule.resolute:
-        testrules_fastest.append((rule, resolute))
-
-
 @pytest.mark.parametrize(
-    "rule, resolute", testrules_fastest
+    "rule", abcrules.rules.values(), ids=idfn
 )
-def test_fastest_algorithms(rule, resolute):
+def test_fastest_algorithms(rule):
     profile = Profile(4)
     profile.add_preferences([[0, 1], [1, 2], [0, 2, 3]])
     committeesize = 2
     algo = rule.fastest_algo()
     if algo is None:
         pytest.skip("no supported algorithms for " + rule.shortname)
-    rule.compute(
-        profile, committeesize, algorithm=algo, resolute=resolute)
+    for resolute in rule.resolute:
+        rule.compute(
+            profile, committeesize, algorithm=algo, resolute=resolute)
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.instances
+    "rule_instance", testrules.rule_alg_resolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2, 3]
