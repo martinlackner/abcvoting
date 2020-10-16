@@ -96,6 +96,7 @@ class CollectInstances:
             "rule-x": [[0, 1, 4, 5], [0, 2, 4, 5],
                        [0, 3, 4, 5], [1, 2, 4, 5],
                        [1, 3, 4, 5], [2, 3, 4, 5]],
+            "rule-x-without-2nd-phase": [[4, 5]],
             "phrag-enestr": [[0, 1, 4, 5], [0, 2, 4, 5],
                              [0, 3, 4, 5], [1, 2, 4, 5],
                              [1, 3, 4, 5], [2, 3, 4, 5]],
@@ -148,6 +149,7 @@ class CollectInstances:
             "seqslav": [[0, 1, 3]],
             "slav": [[0, 1, 3]],
             "rule-x": [[0, 1, 3]],
+            "rule-x-without-2nd-phase": [[0, 1, 3]],
             "phrag-enestr": [[0, 1, 3]],
             "consensus": [[0, 1, 3]],
         }
@@ -199,6 +201,7 @@ class CollectInstances:
             "seqslav": [[0, 1, 2, 4]],
             "slav": [[0, 1, 2, 4]],
             "rule-x": [[0, 1, 2, 4]],
+            "rule-x-without-2nd-phase": [[0, 2]],
             "phrag-enestr": [[0, 1, 2, 4]],
             "consensus": [[0, 1, 2, 4]],
         }
@@ -229,6 +232,7 @@ class CollectInstances:
             "seqslav": [[0, 3]],
             "slav": [[0, 3]],
             "rule-x": [[0, 3]],
+            "rule-x-without-2nd-phase": [[0]],
             "phrag-enestr": [[0, 3]],
             "consensus": [[0, 3]],
         }
@@ -312,23 +316,23 @@ def test_abcrules_weightsconsidered(rule_instance, verbose):
     committeesize = 1
 
     if (("monroe" in rule_id
-         or rule_id in ["lexmav", "rule-x", "phrag-enestr"])):
+         or rule_id in ["lexmav", "rule-x", "rule-x-without-2nd-phase", "phrag-enestr"])):
         with pytest.raises(ValueError):
             abcrules.compute(rule_id, profile, committeesize,
                              algorithm=algorithm, verbose=verbose)
-    elif rule_id == "mav":
+        return
+
+    result = abcrules.compute(
+        rule_id, profile, committeesize,
+        algorithm=algorithm, resolute=resolute, verbose=verbose)
+
+    if rule_id == "mav":
         # Minimax AV ignores weights by definition
-        result = abcrules.compute(
-            rule_id, profile, committeesize,
-            algorithm=algorithm, resolute=resolute, verbose=verbose)
         if resolute:
             assert result == [[0]]
         else:
             assert result == [[0], [1], [2]]
     else:
-        result = abcrules.compute(
-            rule_id, profile, committeesize, algorithm=algorithm,
-            resolute=resolute, verbose=verbose)
         assert len(result) == 1
         assert result[0] == [1]
 
@@ -348,6 +352,10 @@ def test_abcrules_correct_simple(rule_instance, verbose):
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm,
         resolute=resolute, verbose=verbose)
+
+    if rule_id == "rule-x-without-2nd-phase":
+        assert committees == [[]]
+        return
 
     if resolute:
         assert len(committees) == 1
@@ -494,7 +502,10 @@ def test_tiebreaking_order(rule_instance, verbose):
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm,
         resolute=True, verbose=verbose)
-    assert committees == [[0]]
+    if rule_id == "rule-x-without-2nd-phase":
+        assert committees == [[]]
+    else:
+        assert committees == [[0]]
 
 
 @pytest.mark.parametrize(

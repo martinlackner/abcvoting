@@ -1176,6 +1176,14 @@ def compute_rule_x(profile, committeesize, algorithm="standard",
     return committees
 
 
+def compute_rule_x_without_2nd_phase(
+        profile, committeesize, algorithm="standard", resolute=True, verbose=0):
+    """Rule X with skip_phragmen_phase=True
+    """
+    return compute_rule_x(
+        profile, committeesize, algorithm, resolute=resolute, verbose=verbose, skip_phragmen_phase=True)
+
+
 def compute_optphragmen(profile, committeesize,
                         algorithm="gurobi", resolute=False, verbose=0):
     enough_approved_candidates(profile, committeesize)
@@ -1392,6 +1400,8 @@ __RULESINFO = [
      compute_lexmav, ("brute-force",), (True, False)),
     ("rule-x", "Rule X", "Rule X",
      compute_rule_x, ("standard",), (True, False)),
+    ("rule-x-without-2nd-phase", "Rule X (without 2nd phase)", "Rule X without the second (Phragmén) phase",
+     compute_rule_x_without_2nd_phase, ("standard",), (True, False)),
     ("phrag-enestr", "Phragmén-Eneström", "Method of Phragmén-Eneström",
      compute_phragmen_enestroem, ("standard",), (True, False)),
     ("consensus", "Consensus", "Consensus Rule",
