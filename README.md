@@ -54,7 +54,7 @@ The following code computes the Proportional Approval Voting (PAV) rule for a pr
 from abcvoting.preferences import Profile
 from abcvoting import abcrules
 
-profile = Profile(5)
+profile = Profile(5)  # a preference profile with 5 candidates
 profile.add_preferences([[0,1,2], [0,1], [0,1], [1,2], [3,4], [3,4]])
 committeesize = 3
 print(abcrules.compute_pav(profile, committeesize))
@@ -67,11 +67,10 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 
 ## Comments
 
-* This module requires Python 2.7 or 3.6+.
-* The required modules can be found in [requirements.txt](requirements.txt).
+* This module requires Python 2.7 or 3.6+. Required modules are listed in [requirements.txt](requirements.txt).
 * Most computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). The corresponding functions require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
 * Some functions use fractions (e.g., `compute_seqphragmen`). These compute significantly faster if the module [gmpy2](https://gmpy2.readthedocs.io/) is available. If gmpy2 is not available, the much slower Python module [fractions](https://docs.python.org/2/library/fractions.html) is used.
-* All voting methods have a parameter `resolute`. If it is set to true, only one winning committee is computed. In most cases,  `resolute=True` speeds up the computation. 
+* All voting methods have a parameter `resolute`. If it is set to true, only one winning committee is computed. In most cases, `resolute=True` speeds up the computation. 
 
 
 ## Acknowledgements
@@ -87,6 +86,7 @@ The following people have contributed code to this package or provided help with
 [Peter Regner](https://github.com/lumbric), 
 [Piotr Skowron](https://www.mimuw.edu.pl/~ps219737/).
 
+The development of this module has been supported by the Austrian Science Fund FWF, grant P31890.
 
 ## References
 
