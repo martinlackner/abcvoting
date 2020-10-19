@@ -472,19 +472,19 @@ def test_jansonexamples(rule_id, algorithm):
     # example from Janson's survey (https://arxiv.org/pdf/1611.08826.pdf),
     # Example 3.7, 18.1
     profile = Profile(6)
-    A = 0
-    B = 1
-    C = 2
-    P = 3
-    Q = 4
-    R = 5
-    profile.add_preferences([[A, B, C]] * 1034 + [[P, Q, R]] * 519 +
-                            [[A, B, Q]] * 90 + [[A, P, Q]] * 90)
+    a = 0
+    b = 1
+    c = 2
+    p = 3
+    q = 4
+    r = 5
+    profile.add_preferences([[a, b, c]] * 1034 + [[p, q, r]] * 519 +
+                            [[a, b, q]] * 90 + [[a, p, q]] * 90)
     committeesize = 3
 
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm, resolute=False)
-    assert committees == [[A, B, Q]]
+    assert committees == [[a, b, q]]
 
 
 @pytest.mark.parametrize(
