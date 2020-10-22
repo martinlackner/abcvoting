@@ -35,8 +35,8 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
-      # The other tests require Gurobi, let's whitelist at least the other tests for now:
       run: |
         pip install pytest
+        # note that some tests are skipped because Gurobi is not available on Github
         PYTHONPATH=$PYTHONPATH:$PWD python -m pytest -ra tests/
 
