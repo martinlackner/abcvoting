@@ -38,5 +38,6 @@ jobs:
       run: |
         pip install pytest
         # note that some tests are skipped because Gurobi is not available on Github
-        PYTHONPATH=$PYTHONPATH:$PWD python -m pytest -ra tests/
-
+        PYTHONPATH=$PYTHONPATH:$PWD python -m pytest -ra --cov-report xml --cov=abcvoting --cov=examples--cov=survey tests/
+    - name: Upload coverage metrics to codecov
+      uses: codecov/codecov-action@v1
