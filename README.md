@@ -1,6 +1,7 @@
 [![DOI](https://zenodo.org/badge/192713860.svg)](https://zenodo.org/badge/latestdoi/192713860)
-[![MIT License](https://img.shields.io/github/license/martinlackner/abcvoting.svg)](https://choosealicense.com/licenses/mit/)
+![MIT License](https://badgen.net/github/license/martinlackner/abcvoting)](https://choosealicense.com/licenses/mit/)
 [![Unittests badge](https://github.com/martinlackner/abcvoting/workflows/Unittests/badge.svg)](https://github.com/martinlackner/abcvoting/actions)
+[![codecov](https://codecov.io/gh/martinlackner/abcvoting/branch/master/graph/badge.svg)](https://codecov.io/gh/martinlackner/abcvoting)
 
 # abcvoting
 
