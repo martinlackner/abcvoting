@@ -28,6 +28,10 @@ def test_example04_py():
 
 # noinspection PyUnresolvedReferences
 def test_example05_py():
+    from survey import example05
+
+# noinspection PyUnresolvedReferences
+def test_example05_py():
     from survey import example06
 
 
