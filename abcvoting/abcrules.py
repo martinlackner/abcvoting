@@ -117,9 +117,10 @@ def __init_rules():
 
 def compute(rule_id, profile, committeesize, **kwargs):
     try:
-        return rules[rule_id].compute(profile, committeesize, **kwargs)
+        rule = rules[rule_id]
     except KeyError:
         raise UnknownRuleIDError(rule_id)
+    return rule.compute(profile, committeesize, **kwargs)
 
 
 # computes arbitrary Thiele methods via branch-and-bound
