@@ -10,6 +10,8 @@ try:
 except ImportError:
     available = False
 
+GUROBI_ACCURACY = 1e-9
+
 
 def __gurobi_thiele_methods(profile, committeesize,
                             scorefct, resolute):
@@ -55,7 +57,7 @@ def __gurobi_thiele_methods(profile, committeesize,
             gb.GRB.MAXIMIZE)
 
         m.setParam('OutputFlag', False)
-        m.setParam('FeasibilityTol', 1e-9)
+        m.setParam('FeasibilityTol', GUROBI_ACCURACY)
         m.setParam('PoolSearchMode', 0)
 
         m.optimize()
@@ -75,11 +77,13 @@ def __gurobi_thiele_methods(profile, committeesize,
         if maxscore is None:
             maxscore = m.objVal
 
-        if abs(m.objVal - maxscore) > 1e-8:
+        if abs(m.objVal - maxscore) > GUROBI_ACCURACY:
             # no longer optimal
             break
 
-        committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
+        committee = [c for c in cands if in_committee[c].Xn >= 1-GUROBI_ACCURACY]
+        assert len(committee) == committeesize
+        committees.append(committee)
 
         if resolute:
             break
@@ -156,7 +160,7 @@ def __gurobi_monroe(profile, committeesize, resolute):
         m.setObjective(satisfaction, gb.GRB.MAXIMIZE)
 
         m.setParam('OutputFlag', False)
-        m.setParam('FeasibilityTol', 1e-9)
+        m.setParam('FeasibilityTol', GUROBI_ACCURACY)
         m.setParam('PoolSearchMode', 0)
 
         m.optimize()
@@ -176,11 +180,13 @@ def __gurobi_monroe(profile, committeesize, resolute):
         if maxscore is None:
             maxscore = m.objVal
 
-        if abs(m.objVal - maxscore) > 1e-8:
+        if abs(m.objVal - maxscore) > GUROBI_ACCURACY:
             # no longer optimal
             break
 
-        committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
+        committee = [c for c in cands if in_committee[c].Xn >= 1 - GUROBI_ACCURACY]
+        assert len(committee) == committeesize
+        committees.append(committee)
 
         if resolute:
             break
@@ -241,7 +247,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
         m.setObjective(loadbound, gb.GRB.MINIMIZE)
 
         m.setParam('OutputFlag', False)
-        m.setParam('FeasibilityTol', 1e-9)
+        m.setParam('FeasibilityTol', GUROBI_ACCURACY)
         m.setParam('PoolSearchMode', 0)
 
         m.optimize()
@@ -261,11 +267,13 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
         if minmaxload is None:
             minmaxload = loadbound.Xn
 
-        if abs(loadbound.Xn - minmaxload) > 1e-8:
-            # no longer optimal
-            break
+        if abs(loadbound.Xn - minmaxload) > GUROBI_ACCURACY:
+                # no longer optimal
+                break
 
-        committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
+        committee = [c for c in cands if in_committee[c].Xn >= 1 - GUROBI_ACCURACY]
+        assert len(committee) == committeesize
+        committees.append(committee)
 
         if resolute:
             break
@@ -327,7 +335,7 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
         m.setObjective(max_hamdistance, gb.GRB.MINIMIZE)
 
         m.setParam('OutputFlag', False)
-        m.setParam('FeasibilityTol', 1e-9)
+        m.setParam('FeasibilityTol', GUROBI_ACCURACY)
         m.setParam('PoolSearchMode', 0)
 
         m.optimize()
@@ -347,11 +355,13 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
         if minmaxdistance is None:
             minmaxdistance = m.objVal
 
-        if abs(m.objVal - minmaxdistance) > 1e-8:
+        if abs(m.objVal - minmaxdistance) > GUROBI_ACCURACY:
             # no longer optimal
             break
 
-        committees.append([c for c in cands if in_committee[c].Xn >= 0.99])
+        committee = [c for c in cands if in_committee[c].Xn >= 1 - GUROBI_ACCURACY]
+        assert len(committee) == committeesize
+        committees.append(committee)
 
         if resolute:
             break
