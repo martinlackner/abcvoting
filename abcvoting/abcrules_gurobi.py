@@ -35,7 +35,7 @@ def __gurobi_thiele_methods(profile, committeesize,
                 utility[(pref, num_appr)] = m.addVar(ub=1.0)
 
         # constraint: the committee has the required size
-        m.addConstr(gb.quicksum(in_committee[c] for c in cands) == committeesize)
+        m.addConstr(gb.quicksum(in_committee) == committeesize)
 
         # constraint: utilities are consistent with actual committee
         for pref in profile:
