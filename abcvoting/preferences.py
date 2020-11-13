@@ -42,16 +42,16 @@ class Profile(object):
                 for p in pref:
                     if type(p) in [list, tuple]:
                         newpref = DichotomousPreferences(p)
-                        newpref.is_valid(self.num_cand)
+                        newpref.check_valid(self.num_cand)
                         self.preferences.append(newpref)
                     elif isinstance(p, DichotomousPreferences):
-                        p.is_valid(self.num_cand)
+                        p.check_valid(self.num_cand)
                         self.preferences.append(p)
                     else:
                         raise TypeError("Object of type " + str(type(p)) +
                                         " not suitable as preferences")
         elif isinstance(pref, DichotomousPreferences):
-            pref.is_valid(self.num_cand)
+            pref.check_valid(self.num_cand)
             self.preferences.append(pref)
         else:
             raise TypeError("Object of type " + str(type(pref)) +
@@ -130,7 +130,7 @@ class DichotomousPreferences:
     def __init__(self, approved, weight=1):
         self.approved = set(approved)
         if approved:  # empty approval sets are fine
-            self.is_valid(max(approved) + 1)
+            self.check_valid(max(approved) + 1)
         self.weight = weight
 
     def __str__(self):
@@ -142,9 +142,8 @@ class DichotomousPreferences:
     def __iter__(self):
         return iter(self.approved)
 
-    def is_valid(self, num_cand):
+    def check_valid(self, num_cand):
         for c in self.approved:
             if c < 0 or c >= num_cand:
                 raise ValueError(str(self) + " not valid for num_cand = " +
                                  str(num_cand))
-        return True
