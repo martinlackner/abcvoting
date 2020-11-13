@@ -146,7 +146,7 @@ def read_preflib_file(filename, setsize=1, appr_percent=None):
         parts = f.readline().split(",")
         try:
             voter_count, _, unique_orders = [int(p.strip()) for p in parts]
-        except Exception:
+        except ValueError:
             raise PreflibException("Number of voters ill specified, "
                                    + str(parts)
                                    + " should be triple of integers")
