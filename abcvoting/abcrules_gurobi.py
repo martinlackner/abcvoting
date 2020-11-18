@@ -20,8 +20,9 @@ def __gurobi_thiele_methods(profile, committeesize,
     maxscore = None
     committees = []
 
+    # TODO add a max iterations parameter with fancy default value which works in almost all
+    #  cases to avoid endless hanging computations, e.g. when CI runs the tests
     while True:
-
         m = gb.Model()
 
         # a binary variable indicating whether c is in the committee
@@ -29,11 +30,13 @@ def __gurobi_thiele_methods(profile, committeesize,
                                  vtype=gb.GRB.BINARY,
                                  name="in_comm")
 
-        # a (intended binary) variable indicating
-        # whether v approves at least num_appr candidates in the committee
+        # utility[(pref, num_appr)] contains (intended binary) variables indicating
+        # whether pref approves at least num_appr candidates in the committee
+
         utility = {}
         for pref in profile:
             for num_appr in range(1, committeesize + 1):
+                # TODO Should we use vtype=gb.GRB.BINARY? Does it make it faster to use ub=1.0?
                 utility[(pref, num_appr)] = m.addVar(ub=1.0)
 
         # constraint: the committee has the required size
@@ -45,7 +48,8 @@ def __gurobi_thiele_methods(profile, committeesize,
                                     for num_appr in range(1, committeesize + 1)) ==
                         gb.quicksum(in_committee[c] for c in pref))
 
-        # find a new committee that has not been found before
+        # find a new committee that has not been found before, by making previously found
+        # committees invalid
         for comm in committees:
             m.addConstr(gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
 
