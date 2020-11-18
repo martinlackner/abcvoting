@@ -70,12 +70,12 @@ def __gurobi_thiele_methods(profile, committeesize,
             # m.Status == 2 implies solution found
             # m.Status in [3, 4] implies infeasible --> no more solutions
             # otherwise ...
-            print("Warning (opt-Phragmen): solutions may be "
+            print("Warning (__gurobi_thiele_methods): solutions may be "
                   + "incomplete or not optimal.")
             print("(Gurobi return code", m.Status, ")")
         if m.Status != 2:
             if len(committees) == 0:
-                raise RuntimeError("Gurobi found no solution in opt-Phragmen ILP.")
+                raise RuntimeError("Gurobi found no solution in __gurobi_thiele_methods.")
             break
 
         if maxscore is None:
