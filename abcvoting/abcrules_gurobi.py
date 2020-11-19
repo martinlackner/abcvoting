@@ -28,7 +28,7 @@ def __gurobi_thiele_methods(profile, committeesize,
         # a binary variable indicating whether c is in the committee
         in_committee = m.addVars(profile.num_cand,
                                  vtype=gb.GRB.BINARY,
-                                 name="in_comm")
+                                 name="in_committee")
 
         # utility[(pref, num_appr)] contains (intended binary) variables indicating
         # whether pref approves at least num_appr candidates in the committee
@@ -118,7 +118,7 @@ def __gurobi_monroe(profile, committeesize, resolute):
 
         # a list of committee members
         in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY,
-                                 name="in_comm")
+                                 name="in_committee")
         m.addConstr(gb.quicksum(in_committee[c] for c in cands)
                     == committeesize)
 
@@ -218,7 +218,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
 
         # a binary variable indicating whether c is in the committee
         in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY,
-                                 name="in_comm")
+                                 name="in_committee")
 
         load = {}
         for c in cands:
@@ -307,7 +307,7 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
 
         # a list of committee members
         in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY,
-                                 name="in_comm")
+                                 name="in_committee")
         m.addConstr(gb.quicksum(in_committee[c] for c in cands)
                     == committeesize)
 
