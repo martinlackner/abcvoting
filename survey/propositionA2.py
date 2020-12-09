@@ -14,6 +14,8 @@ from abcvoting import misc
 
 print(misc.header("Proposition A.2", "*"))
 
+###
+
 num_cand = 3
 a, b, c = (0, 1, 2)
 apprsets = [[a]] * 2 + [[a, c]] * 3 + [[b, c]] * 3 + [[b]] * 2
@@ -32,7 +34,9 @@ for rule_id in ["pav", "cc", "monroe", "optphrag", "mav"]:
     print(" " + abcrules.rules[rule_id].shortname + ": "
           + misc.str_candset(comm1, names)
           + " vs " + misc.str_candset(comm2, names))
+    assert not all(cand in comm1 for cand in comm2)
 
+###
 
 num_cand = 4
 a, b, c, d = 0, 1, 2, 3
@@ -46,7 +50,6 @@ print()
 print(misc.header("2nd profile:"))
 print(profile.str_compact())
 
-
 print("winning committees for k=2 and k=3:")
 for rule_id in ["greedy-monroe"]:
     comm1 = abcrules.compute(rule_id, profile, 2, resolute=True)[0]
@@ -54,12 +57,14 @@ for rule_id in ["greedy-monroe"]:
     print(" " + abcrules.rules[rule_id].shortname + ": "
           + misc.str_candset(comm1, names)
           + " vs " + misc.str_candset(comm2, names))
+    assert not all(cand in comm1 for cand in comm2)
 
+###
 
-num_cand = 4
-a, b, c, d = 0, 1, 2, 3
-apprsets = [[a, c]] * 4 + [[a, d]] * 2 + [[b, d]] * 3 + [[b]]
-names = "abcde"
+num_cand = 6
+a, b, c, d, e, f = list(range(num_cand))
+apprsets = [[a, d, e], [a, c], [b, e], [c, d, f]]
+names = "abcdef"
 profile = Profile(num_cand, names=names)
 profile.add_preferences(apprsets)
 
@@ -67,30 +72,14 @@ print()
 print(misc.header("3rd profile:"))
 print(profile.str_compact())
 
-
-print("winning committees for k=2 and k=3:")
-comm1 = abcrules.compute("rule-x", profile, 2, resolute=True)[0]
-comm2 = abcrules.compute("rule-x", profile, 3, resolute=True)[0]
-print(" " + abcrules.rules[rule_id].shortname + ": "
+print("winning committees for k=3 and k=4:")
+comm1 = abcrules.compute("rule-x", profile, 3, resolute=True)[0]
+comm2 = abcrules.compute("rule-x", profile, 4, resolute=True)[0]
+print(" " + abcrules.rules["rule-x"].shortname + ": "
       + misc.str_candset(comm1, names)
       + " vs " + misc.str_candset(comm2, names))
+assert not all(cand in comm1 for cand in comm2)
 
 print("\n\nDetailed calculations:")
-abcrules.compute("rule-x", profile, 2, resolute=True, verbose=2)
 abcrules.compute("rule-x", profile, 3, resolute=True, verbose=2)
-
-num_cand = 5
-a, b, c, d, e = 0, 1, 2, 3, 4
-apprsets = [[a, c]] * 1 + [[a, b]] * 1 + [[d, e]]
-names = "abcde"
-profile = Profile(num_cand, names=names)
-profile.add_preferences(apprsets)
-
-print()
-print(misc.header("3rd profile:"))
-print(profile.str_compact())
-
-
-print("winning committees for k=2 and k=3:")
-comm1 = abcrules.compute("mav", profile, 1, resolute=False, verbose=2)
-print(comm1)
+abcrules.compute("rule-x", profile, 4, resolute=True, verbose=2)
