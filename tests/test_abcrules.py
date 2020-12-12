@@ -27,7 +27,7 @@ class CollectRules:
         self.rule_alg_onlyirresolute = []
         for rule in abcrules.rules.values():
             for alg in rule.algorithms:
-                if alg == "gurobi" and not self.gurobi_supported:
+                if "gurobi" in alg and not self.gurobi_supported:
                     continue
                 for resolute in rule.resolute:
                     instance = (rule.rule_id, alg, resolute)
@@ -256,7 +256,7 @@ def idfn(val):
 )
 def test_resolute_parameter(rule):
     for alg in rule.algorithms:
-        if alg == "gurobi" and not testrules.gurobi_supported:
+        if "gurobi" in alg and not testrules.gurobi_supported:
             continue
         assert len(rule.resolute) in [1, 2]
         # resolute=True should be default
@@ -413,7 +413,8 @@ def test_abcrules_correct(rule_instance, verbose, instance):
         assert len(committees) == 1
         assert committees[0] in exp_results[rule_id]
     else:
-        assert committees == exp_results[rule_id]
+        # different solvers won't find solutions in the same order
+        assert sorted(committees) == sorted(exp_results[rule_id])
 
 
 def test_seqphragmen_irresolute():

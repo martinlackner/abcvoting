@@ -6,6 +6,7 @@ from __future__ import print_function
 import sys
 import functools
 from itertools import combinations
+
 try:
     from gmpy2 import mpq as Fraction
 except ImportError:
@@ -13,6 +14,7 @@ except ImportError:
           + "resorting to Python's fractions.Fraction")
     from fractions import Fraction
 from abcvoting import abcrules_gurobi
+from abcvoting import abcrules_cvxpy
 from abcvoting.misc import sort_committees
 from abcvoting.misc import hamming
 from abcvoting.misc import enough_approved_candidates
@@ -65,7 +67,7 @@ def __init_rules():
         ("sav", "SAV", "Satisfaction Approval Voting (SAV)", compute_sav,
          ("standard",), (True, False)),
         ("pav", "PAV", "Proportional Approval Voting (PAV)", compute_pav,
-         ("gurobi", "branch-and-bound"), (True, False)),
+         ("gurobi", "branch-and-bound", "glpk_mi", "cbc", "scip", "cvxpy_gurobi"), (True, False)),
         ("slav", "SLAV", "Sainte-Laguë Approval Voting (SLAV)", compute_slav,
          ("gurobi", "branch-and-bound"), (True, False)),
         ("cc", "CC", "Approval Chamberlin-Courant (CC)", compute_cc,
@@ -155,6 +157,12 @@ def compute_thiele_method(scorefct_str, profile, committeesize,
     elif algorithm == "branch-and-bound":
         committees = __thiele_methods_branchandbound(
             profile, committeesize, scorefct_str, resolute)
+    elif algorithm in ['glpk_mi', 'cbc', 'scip', 'cvxpy_gurobi']:
+        committees = abcrules_cvxpy.cvxpy_thiele_methods(profile=profile,
+                                                         committeesize=committeesize,
+                                                         scorefct_str=scorefct_str,
+                                                         resolute=resolute,
+                                                         algorithm=algorithm)
     else:
         raise NotImplementedError(
             "Algorithm " + str(algorithm)
