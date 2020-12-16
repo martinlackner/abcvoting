@@ -62,7 +62,7 @@ for rule_id in ["greedy-monroe"]:
 ###
 
 num_cand = 6
-a, b, c, d, e, f = list(range(num_cand))
+a, b, c, d, e, f = range(num_cand)
 apprsets = [[a, d, e], [a, c], [b, e], [c, d, f]]
 names = "abcdef"
 profile = Profile(num_cand, names=names)

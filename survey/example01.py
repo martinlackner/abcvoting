@@ -12,7 +12,7 @@ from abcvoting import misc
 
 
 num_cand = 8
-a, b, c, d, e, f, g = list(range(7))  # a = 0, b = 1, c = 2, ...
+a, b, c, d, e, f, g = range(7)  # a = 0, b = 1, c = 2, ...
 apprsets = [[a, b], [a, b], [a, b], [a, c], [a, c], [a, c],
             [a, d], [a, d], [b, c, f], [e], [f], [g]]
 names = "abcdefgh"

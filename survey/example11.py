@@ -16,7 +16,7 @@ print(misc.header("Example 11", "*"))
 
 # Approval profile
 num_cand = 5
-a, b, c, d, e = list(range(5))
+a, b, c, d, e = range(5)
 # apprsets = [[a, b, c]] * 5 + [[a, b, c, d, e]] * 5 + [[a, b, d, e]] * 2 + [[d, e]] * 3
 # apprsets = [[a, b]] + [[a, b, c]] * 3 + [[a, b, c, d, e]] * 5 + [[d, e]] * 2 + [[d]]
 apprsets = [[a, b, c]] * 6 + [[a, b, c, d, e]] * 4 + [[a, b, d, e]] * 2 + [[d, e]] * 3
