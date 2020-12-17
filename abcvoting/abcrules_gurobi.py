@@ -48,8 +48,7 @@ def __gurobi_thiele_methods(profile, committeesize,
                                     for num_appr in range(1, committeesize + 1)) ==
                         gb.quicksum(in_committee[c] for c in pref))
 
-        # find a new committee that has not been found before, by making previously found
-        # committees invalid
+        # find a new committee that has not been found yet by excluding previously found committees
         for comm in committees:
             m.addConstr(gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
 
