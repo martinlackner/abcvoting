@@ -20,20 +20,23 @@ def __gurobi_thiele_methods(profile, committeesize,
     maxscore = None
     committees = []
 
+    # TODO add a max iterations parameter with fancy default value which works in almost all
+    #  cases to avoid endless hanging computations, e.g. when CI runs the tests
     while True:
-
         m = gb.Model()
 
         # a binary variable indicating whether c is in the committee
         in_committee = m.addVars(profile.num_cand,
                                  vtype=gb.GRB.BINARY,
-                                 name="in_comm")
+                                 name="in_committee")
 
-        # a (intended binary) variable indicating
-        # whether v approves at least num_appr candidates in the committee
+        # utility[(pref, num_appr)] contains (intended binary) variables indicating
+        # whether pref approves at least num_appr candidates in the committee
+
         utility = {}
         for pref in profile:
             for num_appr in range(1, committeesize + 1):
+                # TODO Should we use vtype=gb.GRB.BINARY? Does it make it faster to use ub=1.0?
                 utility[(pref, num_appr)] = m.addVar(ub=1.0)
 
         # constraint: the committee has the required size
@@ -45,7 +48,7 @@ def __gurobi_thiele_methods(profile, committeesize,
                                     for num_appr in range(1, committeesize + 1)) ==
                         gb.quicksum(in_committee[c] for c in pref))
 
-        # find a new committee that has not been found before
+        # find a new committee that has not been found yet by excluding previously found committees
         for comm in committees:
             m.addConstr(gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
 
@@ -66,12 +69,12 @@ def __gurobi_thiele_methods(profile, committeesize,
             # m.Status == 2 implies solution found
             # m.Status in [3, 4] implies infeasible --> no more solutions
             # otherwise ...
-            print("Warning (opt-Phragmen): solutions may be "
+            print("Warning (__gurobi_thiele_methods): solutions may be "
                   + "incomplete or not optimal.")
             print("(Gurobi return code", m.Status, ")")
         if m.Status != 2:
             if len(committees) == 0:
-                raise RuntimeError("Gurobi found no solution in opt-Phragmen ILP.")
+                raise RuntimeError("Gurobi found no solution in __gurobi_thiele_methods.")
             break
 
         if maxscore is None:
@@ -114,7 +117,7 @@ def __gurobi_monroe(profile, committeesize, resolute):
 
         # a list of committee members
         in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY,
-                                 name="in_comm")
+                                 name="in_committee")
         m.addConstr(gb.quicksum(in_committee[c] for c in cands)
                     == committeesize)
 
@@ -214,7 +217,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
 
         # a binary variable indicating whether c is in the committee
         in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY,
-                                 name="in_comm")
+                                 name="in_committee")
 
         load = {}
         for c in cands:
@@ -303,7 +306,7 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
 
         # a list of committee members
         in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY,
-                                 name="in_comm")
+                                 name="in_committee")
         m.addConstr(gb.quicksum(in_committee[c] for c in cands)
                     == committeesize)
 
