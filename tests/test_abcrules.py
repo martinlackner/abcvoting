@@ -547,6 +547,18 @@ def test_fastest_algorithms(rule):
 def test_output(capfd, rule_instance, verbose):
     rule_id, algorithm, resolute = rule_instance
 
+    if algorithm == 'glpk_mi' and verbose == 0:
+        # TODO unfortunately GLPK_MI prints "Long-step dual simplex will be used" to stderr and it
+        #  would be very complicated to capture this on all platforms reliably, changing
+        #  sys.stderr doesn't help.
+        #  This seems to be fixed in GLPK 5.0 but not in GLPK 4.65. For some weird reason this
+        #  test succeeds and does not need to be skipped when using conda-forge, although the
+        #  version from conda-forge is given as glpk 4.65 he80fd80_1002.
+        #  This could help to introduce a workaround: https://github.com/xolox/python-capturer
+        #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
+        pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
+        ...
+
     profile = Profile(2)
     profile.add_preferences([[0]])
     committeesize = 1
