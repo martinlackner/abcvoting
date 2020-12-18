@@ -5,8 +5,17 @@ programs (ILPs) with CVXPY.
 
 from __future__ import print_function
 
-import cvxpy as cp
-import numpy as np
+try:
+    import cvxpy as cp
+    cvxpy_available = True
+except ImportError:
+    cvxpy_available = False
+
+try:
+    import numpy as np
+    numpy_available = True
+except ImportError:
+    numpy_available = False
 
 
 def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorithm):

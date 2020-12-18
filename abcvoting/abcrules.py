@@ -35,6 +35,28 @@ class UnknownRuleIDError(ValueError):
         super(ValueError, self).__init__(message)
 
 
+def is_algorithm_supported(algo):
+    if algo == "gurobi" and not abcrules_gurobi.available:
+        return False
+
+    if algo in ("glpk_mi", "cbc", "scip", "cvxpy_gurobi"):
+        if not abcrules_cvxpy.cvxpy_available or not abcrules_cvxpy.numpy_available:
+            return False
+
+        import cvxpy as cp
+
+        if algo == "glpk_mi" and not cp.GLPK_MI not in cp.installed_solvers():
+            return False
+        elif algo == "cbc" and cp.CBC not in cp.installed_solvers():
+            return False
+        elif algo == "scip" and cp.SCIP not in cp.installed_solvers():
+            return False
+        elif algo == "cvxpy_gurobi" and not abcrules_gurobi.available:
+            return False
+
+    return True
+
+
 class ABCRule:
     """Class for ABC rules containing basic information and function call"""
     def __init__(self, rule_id, shortname, longname, fct,
@@ -55,7 +77,7 @@ class ABCRule:
 
     def fastest_algo(self):
         for algo in self.algorithms:
-            if algo == "gurobi" and not abcrules_gurobi.available:
+            if not is_algorithm_supported(algo):
                 continue
             return algo
 
@@ -67,6 +89,7 @@ def __init_rules():
         ("sav", "SAV", "Satisfaction Approval Voting (SAV)", compute_sav,
          ("standard",), (True, False)),
         ("pav", "PAV", "Proportional Approval Voting (PAV)", compute_pav,
+         # TODO sort by speed, requires testing I guess...
          ("gurobi", "branch-and-bound", "glpk_mi", "cbc", "scip", "cvxpy_gurobi"), (True, False)),
         ("slav", "SLAV", "Sainte-Laguë Approval Voting (SLAV)", compute_slav,
          ("gurobi", "branch-and-bound"), (True, False)),

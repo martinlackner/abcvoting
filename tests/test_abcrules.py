@@ -3,8 +3,10 @@ Unit tests for abcrules.py and abcrules_gurobi.py
 """
 
 import pytest
+
+from abcvoting.abcrules import is_algorithm_supported
 from abcvoting.preferences import Profile, DichotomousPreferences
-from abcvoting import abcrules
+from abcvoting import abcrules, abcrules_gurobi
 
 
 class CollectRules:
@@ -13,21 +15,12 @@ class CollectRules:
     Exclude Gurobi-based rules if Gurobi is not available
     """
     def __init__(self):
-        try:
-            import gurobipy
-            gurobipy.Model()
-            self.gurobi_supported = True
-        except ImportError:
-            self.gurobi_supported = False
-            print("Warning: Gurobi not found, "
-                  + "Gurobi-based unittests are ignored.")
-
         self.rule_alg_resolute = []
         self.rule_alg_onlyresolute = []
         self.rule_alg_onlyirresolute = []
         for rule in abcrules.rules.values():
             for alg in rule.algorithms:
-                if "gurobi" in alg and not self.gurobi_supported:
+                if not is_algorithm_supported(alg):
                     continue
                 for resolute in rule.resolute:
                     instance = (rule.rule_id, alg, resolute)
@@ -256,7 +249,7 @@ def idfn(val):
 )
 def test_resolute_parameter(rule):
     for alg in rule.algorithms:
-        if "gurobi" in alg and not testrules.gurobi_supported:
+        if "gurobi" in alg and not abcrules_gurobi.available:
             continue
         assert len(rule.resolute) in [1, 2]
         # resolute=True should be default
