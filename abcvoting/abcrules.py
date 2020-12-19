@@ -45,7 +45,7 @@ def is_algorithm_supported(algo):
 
         import cvxpy as cp
 
-        if algo == "glpk_mi" and not cp.GLPK_MI not in cp.installed_solvers():
+        if algo == "glpk_mi" and cp.GLPK_MI not in cp.installed_solvers():
             return False
         elif algo == "cbc" and cp.CBC not in cp.installed_solvers():
             return False
