@@ -60,7 +60,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
             (len(profile), 1)
         )
     else:
-        raise NotImplemented(f"invalid scorefct_str: {scorefct_str}")
+        raise NotImplementedError(f"invalid scorefct_str: {scorefct_str}")
 
     # TODO does this make things slower in case of weights == 1 to multiply weights? We could
     #  skip it then of course...

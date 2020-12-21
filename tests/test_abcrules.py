@@ -5,6 +5,7 @@ Unit tests for abcrules.py and abcrules_gurobi.py
 import pytest
 
 from abcvoting.abcrules import is_algorithm_supported
+from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.preferences import Profile, DichotomousPreferences
 from abcvoting import abcrules, abcrules_gurobi
 
@@ -536,7 +537,6 @@ def test_output(capfd, rule_instance, verbose):
         #  This could help to introduce a workaround: https://github.com/xolox/python-capturer
         #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
         pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
-        ...
 
     profile = Profile(2)
     profile.add_preferences([[0]])
@@ -550,3 +550,15 @@ def test_output(capfd, rule_instance, verbose):
         assert out == ""
     else:
         assert len(out) > 0
+
+
+def test_cvxpy_wrong_score_fct():
+    profile = Profile(4)
+    profile.add_preferences([[0, 1], [2, 3]])
+    committeesize = 1
+    with pytest.raises(NotImplementedError):
+        cvxpy_thiele_methods(profile=profile,
+                             committeesize=committeesize,
+                             scorefct_str='non_existing',
+                             resolute=False,
+                             algorithm='glpk_mi')
