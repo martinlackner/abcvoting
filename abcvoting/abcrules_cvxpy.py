@@ -22,7 +22,9 @@ CVXPY_ACCURACY = 1e-7
 
 
 def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorithm):
-    """
+    """Compute thiele method using CVXPY. This is similar to `__gurobi_thiele_methods()`,
+    where `gurobipy` is used as interface to Gurobi. This method supports Gurobi too, but also
+    other solvers.
 
     Parameters
     ----------
@@ -43,8 +45,8 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
     Returns
     -------
     committees : list of lists
-        FIXME what should this actually return? is range(0) ok for candidates or does profile
-        include names for the candidates?
+        a list of chosen committees, each of them represented as list with candidates named from
+        `0` to `num_cand`, profile.names is ignored
 
     """
     if algorithm in ['glpk_mi', 'cbc', 'scip']:
@@ -57,6 +59,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
     committees = []
     maxscore = None
 
+    # TODO should we use functions for abcvoting.scores? Does it make it slower?
     if scorefct_str == 'pav':
         scorefct_value = np.tile(
             1 / np.arange(1, committeesize + 1),
@@ -96,8 +99,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
                            lhs <= rhs,
                            lhs >= rhs]
 
-        # find a new committee that has not been found before, by making previously found
-        # committees invalid
+        # find a new committee that has not been found yet by excluding previously found committees
         for committee in committees:
             constraints.append(cp.sum(in_committee[committee]) <= committeesize - 1)
 
@@ -120,12 +122,16 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
                 raise RuntimeError("no solutions found")
             break
         elif problem.status != cp.OPTIMAL:
-            # TODO how to deal with OPTIMAL_INACCURATE, INFEASIBLE_INACCURATE, UNBOUNDED_INACCURATE?
-            raise RuntimeError("something bad happened")
+            raise RuntimeError(f"Solver returned status {problem.status}. At the moment abcvoting "
+                               "can't handle this error.")
 
         if maxscore is None:
             maxscore = problem.value
 
+        # TODO is there a way to find accuracy for all solvers?
+        # 1e-7 is based on CVXOPT's default value:
+        # https://www.cvxpy.org/tutorial/advanced/index.html
+        # We might miss committees if the value is too high or get wrong solutions if it's too low.
         if maxscore - problem.value > CVXPY_ACCURACY:
             # no longer optimal
             break
