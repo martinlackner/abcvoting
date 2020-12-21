@@ -482,27 +482,6 @@ def test_jansonexamples(rule_id, algorithm):
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.rule_alg_onlyresolute, ids=idfn
-)
-@pytest.mark.parametrize(
-    "verbose", [0, 1, 2, 3]
-)
-def test_tiebreaking_order(rule_instance, verbose):
-    rule_id, algorithm = rule_instance
-    profile = Profile(4)
-    profile.add_preferences([[1]] * 2 + [[0]] * 2 + [[2]] * 2)
-    committeesize = 1
-
-    committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm,
-        resolute=True, verbose=verbose)
-    if rule_id == "rule-x-without-2nd-phase":
-        assert committees == [[]]
-    else:
-        assert committees == [[0]]
-
-
-@pytest.mark.parametrize(
     "rule", abcrules.rules.values(), ids=idfn
 )
 @pytest.mark.parametrize(

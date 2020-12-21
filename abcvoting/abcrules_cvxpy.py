@@ -131,12 +131,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
 
         committees.append(committee.tolist())
 
-        # TODO this is the right way if we don't want to compute all solutions, but see below...
-        # if resolute:
-        #    break
-
-    # TODO this fixes test.abcrules.test_tiebreaking_order, is there a better solution?
-    if resolute:
-        return [sorted(committees)[0]]
+        if resolute:
+           break
 
     return committees
