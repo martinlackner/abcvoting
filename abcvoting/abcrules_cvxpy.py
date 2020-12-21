@@ -18,6 +18,9 @@ except ImportError:
     numpy_available = False
 
 
+CVXPY_ACCURACY = 1e-7
+
+
 def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorithm):
     """
 
@@ -123,7 +126,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
         if maxscore is None:
             maxscore = problem.value
 
-        if maxscore - problem.value > 1e-13:   # TODO replace with a reasonable value for accuracy!
+        if maxscore - problem.value > CVXPY_ACCURACY:
             # no longer optimal
             break
 
