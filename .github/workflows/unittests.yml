@@ -31,6 +31,10 @@ jobs:
         pip install cvxpy
         pip install cvxopt
 
+    - name: Test if solver GLPK_MI is installed
+      # this is just a paranoia check, because unit tests won't fail, they would be silently skipped
+      run: python -c "import cvxpy as cp; assert cp.GLPK_MI in cp.installed_solvers(), 'GLPKI_MI not installed'"
+
     - name: Lint with flake8
       run: |
         pip install flake8
