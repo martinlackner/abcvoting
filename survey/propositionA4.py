@@ -19,31 +19,35 @@ a, b, c, d, e, f = list(range(6))  # a = 0, b = 1, c = 2, ...
 names = "abcdef"
 
 manipulations = [
-    ("sav", 1, [[a, b, c], [d, e]], [a], [[d], [e]], [[a]]),
-    ("revseqpav", 2, [[a, b, c], [b, d], [c, b], [a, d, e], [b, e]],
+    ("cc", True, 2, [[a, b]] + [[a]] * 3 + [[c]], [b], [[a, c]], [[a, b]]),
+    ("sav", False, 1, [[a, b, c], [d, e]], [a], [[d], [e]], [[a]]),
+    ("revseqpav", False, 2, [[a, b, c], [b, d], [c, b], [a, d, e], [b, e]],
      [a], [[b, d], [b, e]], [[a, b]]),
-    ("seqphrag", 2, [[0, 1, 2], [0, 1], [1, 5], [2, 4], [1, 4, 5], [1, 3, 5]],
+    ("seqphrag", False, 2, [[0, 1, 2], [0, 1], [1, 5], [2, 4], [1, 4, 5], [1, 3, 5]],
      [2], [[1, 5]], [[1, 2]]),
-    ("seqpav", 3, [[0, 1], [1, 3], [2, 5], [0, 1, 5], [1, 5], [1, 2]],
+    ("seqpav", False, 3, [[0, 1], [1, 3], [2, 5], [0, 1, 5], [1, 5], [1, 2]],
      [0], [[1, 2, 5]], [[0, 1, 5]]),
-    ("mav", 3, [[0, 1, 2], [1, 3], [0, 1, 4], [0, 1, 3], [0, 1, 4], [0, 1]],
+    ("mav", False, 3, [[0, 1, 2], [1, 3], [0, 1, 4], [0, 1, 3], [0, 1, 4], [0, 1]],
      [2], [[0, 1, 3]], [[0, 1, 2]]),
-    ("pav", 3, [[2, 3, 4], [0, 1], [1, 5], [0, 2, 3], [1, 2, 5], [2, 4, 5]],
+    ("pav", False, 3, [[2, 3, 4], [0, 1], [1, 5], [0, 2, 3], [1, 2, 5], [2, 4, 5]],
      [4], [[1, 2, 5]], [[1, 2, 4]]),
-    ("rule-x", 3, [[1, 2, 3], [0, 1], [1, 3], [2, 3], [3, 4], [3, 4]],
+    ("rule-x", False, 3, [[1, 2, 3], [0, 1], [1, 3], [2, 3], [3, 4], [3, 4]],
      [2], [[1, 3, 4]], [[1, 2, 3]]),
-    ("greedy-monroe", 2, [[0, 1], [0, 2, 5], [0, 2, 3], [4, 5]],
+    ("greedy-monroe", True, 2, [[0, 1], [0, 2, 5], [0, 2, 3], [4, 5]],
      [1], [[0, 2]], [[0, 1]]),
-    ("monroe", 3, [[1, 3], [0, 1, 2], [1, 4], [3, 4], [4, 5], [1, 2, 4],
-                   [2, 3, 4], [1, 2], [0, 5], [1, 2, 3], [0, 5], [0, 3]],
+    ("monroe", False, 3, [[1, 3], [0, 1, 2], [1, 4], [3, 4], [4, 5], [1, 2, 4],
+     [2, 3, 4], [1, 2], [0, 5], [1, 2, 3], [0, 5], [0, 3]],
      [5], [[0, 1, 4]], [[1, 3, 5]]),
-    ("seqcc", 3, [[1, 4, 5], [0, 1], [3, 4, 5], [3, 4], [1, 5], [2, 3],
-                  [0, 1, 2], [0, 2], [2, 3], [0, 1, 4], [0, 4, 5], [1, 2, 3]],
-     [2], [[0, 1, 3]], [[1, 2, 4]])
+    ("seqcc", False, 3, [[1, 4, 5], [0, 1], [3, 4, 5], [3, 4], [1, 5], [2, 3],
+     [0, 1, 2], [0, 2], [2, 3], [0, 1, 4], [0, 4, 5], [1, 2, 3]],
+     [2], [[0, 1, 3]], [[1, 2, 4]]),
+    # ("optphrag", True, 3, [[a, b]] + [[b, c, d]] * 3, [a], [[b, c, d]], [[a, b, c]]),
+    # this does not work because optphrag does not support a specified tiebreaking
+    # ([a, b, c] should be prefered to [b, c, d])
 ]
 
 for manip in manipulations:
-    rule_id, committeesize, apprsets, modvote, commsfirst, commsafter = manip
+    rule_id, resolute, committeesize, apprsets, modvote, commsfirst, commsafter = manip
 
     print(misc.header(abcrules.rules[rule_id].longname, "-"))
 
@@ -51,12 +55,6 @@ for manip in manipulations:
     profile.add_preferences(apprsets)
     truepref = profile.preferences[0].approved
     print(profile.str_compact())
-
-    # irresolute if possible
-    if False in abcrules.rules[rule_id].resolute:
-        resolute = False
-    else:
-        resolute = True
 
     committees = abcrules.compute(
         rule_id, profile, committeesize, resolute=resolute)
