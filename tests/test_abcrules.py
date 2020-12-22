@@ -358,6 +358,36 @@ def test_abcrules_correct_simple(rule_instance, verbose):
 
 
 @pytest.mark.parametrize(
+    "rule_instance", testrules.rule_alg_resolute, ids=idfn
+)
+@pytest.mark.parametrize(
+    "verbose", [0, 1, 2, 3]
+)
+def test_abcrules_handling_empty_ballots(rule_instance, verbose):
+    rule_id, algorithm, resolute = rule_instance
+    profile = Profile(4)
+    profile.add_preferences([[0], [1], [2]])
+    committeesize = 3
+
+    committees = abcrules.compute(
+        rule_id, profile, committeesize, algorithm=algorithm,
+        resolute=resolute, verbose=verbose)
+
+    assert committees == [[0, 1, 2]]
+
+    profile.add_preferences([[]])
+
+    committees = abcrules.compute(
+        rule_id, profile, committeesize, algorithm=algorithm,
+        resolute=resolute, verbose=verbose)
+
+    if rule_id == "rule-x-without-2nd-phase":
+        assert committees == [[]]
+    else:
+        assert committees == [[0, 1, 2]]
+
+
+@pytest.mark.parametrize(
     "algorithm", abcrules.rules["monroe"].algorithms
 )
 def test_monroe_indivisible(algorithm):
