@@ -129,8 +129,7 @@ class Profile(object):
 class DichotomousPreferences:
     def __init__(self, approved, weight=1):
         self.approved = set(approved)
-        if approved:  # empty approval sets are fine
-            self.check_valid(max(approved) + 1)
+        self.check_valid(max(approved) + 1)
         self.weight = weight
 
     def __str__(self):
@@ -143,6 +142,7 @@ class DichotomousPreferences:
         return iter(self.approved)
 
     def check_valid(self, num_cand):
+        # empty approval sets are fine
         for c in self.approved:
             if c < 0 or c >= num_cand:
                 raise ValueError(str(self) + " not valid for num_cand = " +

@@ -15,7 +15,7 @@ from abcvoting import misc
 print(misc.header("Proposition A.4", "*"))
 
 num_cand = 6
-a, b, c, d, e, f = list(range(6))  # a = 0, b = 1, c = 2, ...
+a, b, c, d, e, f = range(6)  # a = 0, b = 1, c = 2, ...
 names = "abcdef"
 
 manipulations = [

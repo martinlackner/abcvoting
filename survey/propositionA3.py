@@ -15,7 +15,7 @@ from abcvoting import misc
 print(misc.header("Proposition A.3", "*"))
 
 num_cand = 8
-a, b, c, d, e, f, g, h = list(range(num_cand))  # a = 0, b = 1, c = 2, ...
+a, b, c, d, e, f, g, h = range(num_cand)  # a = 0, b = 1, c = 2, ...
 names = "abcdefgh"
 
 monotonicity_instances = [

@@ -16,7 +16,7 @@ print("Remark 2:\n*********\n")
 
 # Approval profile
 num_cand = 3
-a, b, c = list(range(3))  # a = 0, b = 1, c = 2
+a, b, c = range(3)  # a = 0, b = 1, c = 2
 apprsets = [[a]] * 99 + [[a, b, c]]
 names = "abc"
 

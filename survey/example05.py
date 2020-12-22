@@ -16,7 +16,7 @@ print(misc.header("Example 5", "*"))
 
 # Approval profile
 num_cand = 4
-a, b, c, d = list(range(4))  # a = 0, b = 1, c = 2, ...
+a, b, c, d = range(4)  # a = 0, b = 1, c = 2, ...
 names = "abcd"
 
 apprsets = [[a, b]] * 3 + [[a, d]] * 6 + [[b]] * 4 + [[c]] * 5 + [[c, d]] * 5
@@ -44,7 +44,7 @@ print(misc.header(
 
 # Approval profile
 num_cand = 4
-a, b, c, d = list(range(4))  # a = 0, b = 1, c = 2, ...
+a, b, c, d = range(4)  # a = 0, b = 1, c = 2, ...
 names = "abcd"
 
 profile = Profile(num_cand, names=names)
