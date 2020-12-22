@@ -3,8 +3,11 @@ Unit tests for abcrules.py and abcrules_gurobi.py
 """
 
 import pytest
+
+from abcvoting.abcrules import is_algorithm_supported
+from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.preferences import Profile, DichotomousPreferences
-from abcvoting import abcrules
+from abcvoting import abcrules, abcrules_gurobi
 
 
 class CollectRules:
@@ -13,21 +16,12 @@ class CollectRules:
     Exclude Gurobi-based rules if Gurobi is not available
     """
     def __init__(self):
-        try:
-            import gurobipy
-            gurobipy.Model()
-            self.gurobi_supported = True
-        except ImportError:
-            self.gurobi_supported = False
-            print("Warning: Gurobi not found, "
-                  + "Gurobi-based unittests are ignored.")
-
         self.rule_alg_resolute = []
         self.rule_alg_onlyresolute = []
         self.rule_alg_onlyirresolute = []
         for rule in abcrules.rules.values():
             for alg in rule.algorithms:
-                if alg == "gurobi" and not self.gurobi_supported:
+                if not is_algorithm_supported(alg):
                     continue
                 for resolute in rule.resolute:
                     instance = (rule.rule_id, alg, resolute)
@@ -256,7 +250,7 @@ def idfn(val):
 )
 def test_resolute_parameter(rule):
     for alg in rule.algorithms:
-        if alg == "gurobi" and not testrules.gurobi_supported:
+        if "gurobi" in alg and not abcrules_gurobi.available:
             continue
         assert len(rule.resolute) in [1, 2]
         # resolute=True should be default
@@ -419,7 +413,8 @@ def test_abcrules_correct(rule_instance, verbose, instance):
         assert len(committees) == 1
         assert committees[0] in exp_results[rule_id]
     else:
-        assert committees == exp_results[rule_id]
+        # different solvers won't find solutions in the same order
+        assert sorted(committees) == sorted(exp_results[rule_id])
 
 
 def test_seqphragmen_irresolute():
@@ -494,27 +489,6 @@ def test_jansonexamples(rule_id, algorithm):
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.rule_alg_onlyresolute, ids=idfn
-)
-@pytest.mark.parametrize(
-    "verbose", [0, 1, 2, 3]
-)
-def test_tiebreaking_order(rule_instance, verbose):
-    rule_id, algorithm = rule_instance
-    profile = Profile(4)
-    profile.add_preferences([[1]] * 2 + [[0]] * 2 + [[2]] * 2)
-    committeesize = 1
-
-    committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm,
-        resolute=True, verbose=verbose)
-    if rule_id == "rule-x-without-2nd-phase":
-        assert committees == [[]]
-    else:
-        assert committees == [[0]]
-
-
-@pytest.mark.parametrize(
     "rule", abcrules.rules.values(), ids=idfn
 )
 @pytest.mark.parametrize(
@@ -559,6 +533,17 @@ def test_fastest_algorithms(rule):
 def test_output(capfd, rule_instance, verbose):
     rule_id, algorithm, resolute = rule_instance
 
+    if algorithm == 'glpk_mi' and verbose == 0:
+        # TODO unfortunately GLPK_MI prints "Long-step dual simplex will be used" to stderr and it
+        #  would be very complicated to capture this on all platforms reliably, changing
+        #  sys.stderr doesn't help.
+        #  This seems to be fixed in GLPK 5.0 but not in GLPK 4.65. For some weird reason this
+        #  test succeeds and does not need to be skipped when using conda-forge, although the
+        #  version from conda-forge is given as glpk 4.65 he80fd80_1002.
+        #  This could help to introduce a workaround: https://github.com/xolox/python-capturer
+        #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
+        pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
+
     profile = Profile(2)
     profile.add_preferences([[0]])
     committeesize = 1
@@ -571,3 +556,15 @@ def test_output(capfd, rule_instance, verbose):
         assert out == ""
     else:
         assert len(out) > 0
+
+
+def test_cvxpy_wrong_score_fct():
+    profile = Profile(4)
+    profile.add_preferences([[0, 1], [2, 3]])
+    committeesize = 1
+    with pytest.raises(NotImplementedError):
+        cvxpy_thiele_methods(profile=profile,
+                             committeesize=committeesize,
+                             scorefct_str='non_existing',
+                             resolute=False,
+                             algorithm='glpk_mi')

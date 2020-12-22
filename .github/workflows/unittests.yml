@@ -3,11 +3,7 @@
 
 name: Unittests
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -15,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7, 3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v2
@@ -29,6 +25,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
+        # these are optional requirements, but we want GLPK_MI to be installed to run more unitests
+        pip install numpy
+        pip install cvxpy
+        pip install cvxopt
+
+    - name: Test if solver GLPK_MI is installed
+      # this is just a paranoia check, because unit tests won't fail, they would be silently skipped
+      run: python -c "import cvxpy as cp; assert cp.GLPK_MI in cp.installed_solvers(), 'GLPKI_MI not installed'"
 
     - name: Lint with flake8
       run: |

@@ -30,10 +30,6 @@ def test_example04_py():
 def test_example05_py():
     from survey import example05
 
-# noinspection PyUnresolvedReferences
-def test_example05_py():
-    from survey import example06
-
 
 # noinspection PyUnresolvedReferences
 def test_example06_py():
@@ -100,5 +96,4 @@ def test_propositionA3_py():
 
 # noinspection PyUnresolvedReferences
 def test_propositionA4_py():
-    pytest.importorskip("gurobipy")
     from survey import propositionA4
