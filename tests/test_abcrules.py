@@ -303,10 +303,10 @@ def test_abcrules_weightsconsidered(rule_instance, verbose):
     rule_id, algorithm, resolute = rule_instance
 
     profile = Profile(3)
-    profile.add_preferences(DichotomousPreferences([0]))
-    profile.add_preferences(DichotomousPreferences([0]))
-    profile.add_preferences(DichotomousPreferences([1], 5))
-    profile.add_preferences(DichotomousPreferences([0]))
+    profile.add_preference(DichotomousPreferences([0]))
+    profile.add_preference(DichotomousPreferences([0]))
+    profile.add_preference(DichotomousPreferences([1], 5))
+    profile.add_preference(DichotomousPreferences([0]))
     committeesize = 1
 
     if (("monroe" in rule_id
