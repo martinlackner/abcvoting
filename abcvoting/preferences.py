@@ -30,32 +30,33 @@ class Profile(object):
     def __len__(self):
         return len(self.preferences)
 
-    def add_preferences(self, pref):
-        if type(pref) in [list, tuple]:
-            if len(pref) == 0:
-                return
-            if type(pref[0]) is int:
-                # list of integers
-                self.preferences.append(DichotomousPreferences(pref))
-            else:
-                # list of integer-lists or DichotomousPreferences
-                for p in pref:
-                    if type(p) in [list, tuple]:
-                        newpref = DichotomousPreferences(p)
-                        newpref.check_valid(self.num_cand)
-                        self.preferences.append(newpref)
-                    elif isinstance(p, DichotomousPreferences):
-                        p.check_valid(self.num_cand)
-                        self.preferences.append(p)
-                    else:
-                        raise TypeError("Object of type " + str(type(p)) +
-                                        " not suitable as preferences")
-        elif isinstance(pref, DichotomousPreferences):
-            pref.check_valid(self.num_cand)
-            self.preferences.append(pref)
+    def add_preference(self, preference):
+        """Adds a set of approved candidates of one voter to the preference profile.
+
+        Parameters
+        ----------
+        preference : DichotomousPreferences or iterable of int
+
+        """
+        if isinstance(preference, DichotomousPreferences):
+            dichotomous_pref = preference
         else:
-            raise TypeError("Object of type " + str(type(pref)) +
-                            " not suitable as preferences")
+            dichotomous_pref = DichotomousPreferences(preference)
+
+        # this check is a bit redundant, but needed to check for consistency with self.num_cand
+        dichotomous_pref.check_valid(self.num_cand)
+        self.preferences.append(dichotomous_pref)
+
+    def add_preferences(self, preferences):
+        """Add sets of approved candidates for many voters to the preference profile.
+
+        Parameters
+        ----------
+        preferences : iterable of DichotomousPreferences or iterable of iterables of int
+
+        """
+        for p in preferences:
+            self.add_preference(p)
 
     def totalweight(self):
         return sum(pref.weight for pref in self.preferences)
@@ -129,8 +130,10 @@ class Profile(object):
 class DichotomousPreferences:
     def __init__(self, approved, weight=1):
         self.approved = set(approved)
-        self.check_valid(max(approved) + 1)
         self.weight = weight
+
+        # does not check for num_cand, because not known here
+        self.check_valid(approved_raw=approved)
 
     def __str__(self):
         return str(list(self.approved))
@@ -141,9 +144,17 @@ class DichotomousPreferences:
     def __iter__(self):
         return iter(self.approved)
 
-    def check_valid(self, num_cand):
-        # empty approval sets are fine
-        for c in self.approved:
-            if c < 0 or c >= num_cand:
-                raise ValueError(str(self) + " not valid for num_cand = " +
-                                 str(num_cand))
+    def check_valid(self, num_cand=float('inf'), approved_raw=None):
+        """Check if approved candidates are given as non-negative integers. If `num_cand` is known,
+        also check if they are too large. Double entries are check if approved_raw is given as
+        list or tuple (or similar)."""
+        if approved_raw is not None and len(self.approved) < len(approved_raw):
+            raise ValueError(f"double entries found in list of approved candidates: {approved_raw}")
+
+        # note: empty approval sets are fine
+        for candidate in self.approved:
+            if not isinstance(candidate, int):
+                raise TypeError("Object of type " + str(type(candidate)) +
+                                " not suitable as preferences")
+            if candidate < 0 or candidate >= num_cand:
+                raise ValueError(str(self) + " not valid for num_cand = " + str(num_cand))

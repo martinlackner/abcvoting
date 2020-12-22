@@ -191,7 +191,7 @@ def read_preflib_file(filename, setsize=1, appr_percent=None):
         norm_appr_set = []
         for c in appr_set:
             norm_appr_set.append(normalize_map[c])
-        profile.add_preferences(norm_appr_set)
+        profile.add_preference(norm_appr_set)
     if len(profile) != voter_count:
         raise PreflibException("Missing voters.")
     return profile
