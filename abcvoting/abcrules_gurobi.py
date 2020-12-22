@@ -200,12 +200,13 @@ def __gurobi_monroe(profile, committeesize, resolute):
 def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
     """opt-Phragmen
 
-    Warning: does not include the tie-breaking mechanism as specified
+    Warning: does not include the lexicographic optimization as specified
     in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
     Phragmen's Voting Methods and Justified Representation.
     http://martin.lackner.xyz/publications/phragmen.pdf
 
-    Instead: minimizes the maximum load
+    Instead: minimizes the maximum load (without consideration of the
+             second-, third-, ...-largest load
     """
     cands = list(range(profile.num_cand))
     minmaxload = None

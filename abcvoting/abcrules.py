@@ -1241,6 +1241,16 @@ def compute_rule_x_without_2nd_phase(
 
 def compute_optphragmen(profile, committeesize,
                         algorithm="gurobi", resolute=False, verbose=0):
+    """opt-Phragmen
+
+    Warning: does not include the lexicographic optimization as specified
+    in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
+    Phragmen's Voting Methods and Justified Representation.
+    http://martin.lackner.xyz/publications/phragmen.pdf
+
+    Instead: minimizes the maximum load (without consideration of the
+             second-, third-, ...-largest load
+    """
     enough_approved_candidates(profile, committeesize)
 
     # optional output

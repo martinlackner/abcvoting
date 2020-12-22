@@ -378,9 +378,13 @@ def test_monroe_indivisible(algorithm):
             == [[0, 1, 2], [0, 1, 3], [0, 2, 3]])
 
 
-def test_optphrag_notiebreaking():
-    # this test shows that tiebreaking is not (yet)
-    # implemented for opt-Phragmen
+@pytest.mark.parametrize(
+    "algorithm", abcrules.rules["optphrag"].algorithms
+)
+def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
+    # this test shows that lexicographic optimization is not (yet)
+    # implemented for opt-Phragmen (as it is described in
+    # http://martin.lackner.xyz/publications/phragmen.pdf)
 
     # requires Gurobi
     pytest.importorskip("gurobipy")
@@ -389,8 +393,10 @@ def test_optphrag_notiebreaking():
                              [2, 4], [2, 5], [2, 5]])
     committeesize = 3
 
+    # without lexicographic optimization, this profile has 12 winning committees
+    # (with lexicographic optimization only [0, 1, 2] is winning)
     assert len(abcrules.rules["optphrag"].compute(
-        profile, committeesize, algorithm="gurobi", resolute=False)) == 12
+        profile, committeesize, algorithm=algorithm, resolute=False)) == 12
 
 
 @pytest.mark.parametrize(
