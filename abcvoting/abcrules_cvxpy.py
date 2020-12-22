@@ -141,6 +141,6 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
         committees.append(committee.tolist())
 
         if resolute:
-           break
+            break
 
     return committees
