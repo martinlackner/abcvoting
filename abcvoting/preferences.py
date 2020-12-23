@@ -31,7 +31,7 @@ class Profile(object):
             raise ValueError(str(num_cand) +
                              " is not a valid number of candidates")
         self.num_cand = num_cand
-        self.approval_sets = []  # entries correspond to voters
+        self._approval_sets = []  # entries correspond to voters
         self.cand_names = [str(c) for c in range(num_cand)]
         if cand_names:
             if len(cand_names) < num_cand:
@@ -42,6 +42,10 @@ class Profile(object):
 
     def __len__(self):
         return len(self.approval_sets)
+
+    @property
+    def approval_sets(self):
+        return self._approval_sets
 
     def add_voter(self, pref):
         """
@@ -59,7 +63,7 @@ class Profile(object):
 
         # this check is a bit redundant, but needed to check for consistency with self.num_cand
         appr_set.check_valid(self.num_cand)
-        self.approval_sets.append(appr_set)
+        self._approval_sets.append(appr_set)
 
     def add_voters(self, prefs):
         """
