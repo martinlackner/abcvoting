@@ -21,9 +21,9 @@ b = 1
 c = 2
 d = 3
 apprsets = [[a, b], [a, b, d], [a, b, c], [a, c, d], [a, c, d], [b], [c], [d]]
-names = "abcd"
+cand_names = "abcd"
 
-profile = Profile(num_cand, names=names)
+profile = Profile(num_cand, cand_names=cand_names)
 profile.add_voters(apprsets)
 
 print(misc.header("Input:"))

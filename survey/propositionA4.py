@@ -16,7 +16,7 @@ print(misc.header("Proposition A.4", "*"))
 
 num_cand = 6
 a, b, c, d, e, f = range(6)  # a = 0, b = 1, c = 2, ...
-names = "abcdef"
+cand_names = "abcdef"
 
 manipulations = [
     ("cc", True, 2, [[a, b]] + [[a]] * 3 + [[c]], [b], [[a, c]], [[a, b]]),
@@ -51,7 +51,7 @@ for manip in manipulations:
 
     print(misc.header(abcrules.rules[rule_id].longname, "-"))
 
-    profile = Profile(num_cand, names=names)
+    profile = Profile(num_cand, cand_names=cand_names)
     profile.add_voters(apprsets)
     truepref = profile.approval_sets[0].approved
     print(profile.str_compact())
@@ -59,26 +59,26 @@ for manip in manipulations:
     committees = abcrules.compute(
         rule_id, profile, committeesize, resolute=resolute)
     print("original winning committees:\n"
-          + misc.str_candsets(committees, names))
+          + misc.str_candsets(committees, cand_names))
 
     # verify correctness
     assert committees == commsfirst
 
     print("Manipulation by voter 0: "
-          + misc.str_candset(apprsets[0], names)
+          + misc.str_candset(apprsets[0], cand_names)
           + " --> "
-          + misc.str_candset(modvote, names))
+          + misc.str_candset(modvote, cand_names))
     if not all(c in truepref for c in modvote):
         print(" (not a subset!)")
 
     apprsets[0] = modvote
-    profile = Profile(num_cand, names=names)
+    profile = Profile(num_cand, cand_names=cand_names)
     profile.add_voters(apprsets)
 
     committees = abcrules.compute(
         rule_id, profile, committeesize, resolute=resolute)
     print("\nwinning committees after manipulation:\n"
-          + misc.str_candsets(committees, names))
+          + misc.str_candsets(committees, cand_names))
 
     # verify correctness
     assert committees == commsafter

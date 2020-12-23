@@ -17,10 +17,10 @@ print(misc.header("Example 5", "*"))
 # Approval profile
 num_cand = 4
 a, b, c, d = range(4)  # a = 0, b = 1, c = 2, ...
-names = "abcd"
+cand_names = "abcd"
 
 apprsets = [[a, b]] * 3 + [[a, d]] * 6 + [[b]] * 4 + [[c]] * 5 + [[c, d]] * 5
-profile = Profile(num_cand, names=names)
+profile = Profile(num_cand, cand_names=cand_names)
 profile.add_voters(apprsets)
 
 print(misc.header("Input:"))
@@ -45,9 +45,9 @@ print(misc.header(
 # Approval profile
 num_cand = 4
 a, b, c, d = range(4)  # a = 0, b = 1, c = 2, ...
-names = "abcd"
+cand_names = "abcd"
 
-profile = Profile(num_cand, names=names)
+profile = Profile(num_cand, cand_names=cand_names)
 profile.add_voter(ApprovalSet([a, c, d], 960))
 profile.add_voter(ApprovalSet([b, c, d], 3000))
 profile.add_voter(ApprovalSet([b, c], 520))

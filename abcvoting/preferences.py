@@ -19,25 +19,25 @@ class Profile(object):
     ----------
     num_cand : int
         number of candidates or alternatives, denoted with m in the survey paper
-    names : iterable of str
+    cand_names : iterable of str
         symbolic names for the candidates, defaults to '1', '2', ..., str(num_cand)
     preferences : list of DichotomousPreferences
         approved candidates for each voter, use `Profile.add_preferences()` to add  preferences
 
     """
-    def __init__(self, num_cand, names=None):
+    def __init__(self, num_cand, cand_names=None):
         if num_cand <= 0:
             raise ValueError(str(num_cand) +
                              " is not a valid number of candidates")
         self.num_cand = num_cand
         self.approval_sets = []  # entries correspond to voters
         self.cand_names = [str(c) for c in range(num_cand)]
-        if names:
-            if len(names) < num_cand:
-                raise ValueError("names " + str(names) + " has length "
-                                 + str(len(names)) + " < num_cand ("
+        if cand_names:
+            if len(cand_names) < num_cand:
+                raise ValueError("cand_names " + str(cand_names) + " has length "
+                                 + str(len(cand_names)) + " < num_cand ("
                                  + str(num_cand) + ")")
-            self.cand_names = [str(names[i]) for i in range(num_cand)]
+            self.cand_names = [str(cand_names[i]) for i in range(num_cand)]
 
     def __len__(self):
         return len(self.approval_sets)

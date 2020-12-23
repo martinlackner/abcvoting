@@ -16,7 +16,7 @@ print(misc.header("Proposition A.3", "*"))
 
 num_cand = 8
 a, b, c, d, e, f, g, h = range(num_cand)  # a = 0, b = 1, c = 2, ...
-names = "abcdefgh"
+cand_names = "abcdefgh"
 
 monotonicity_instances = [
     ("seqphrag", 3,  # from Xavier Mora, Maria Oliver (2015)
@@ -90,7 +90,7 @@ for inst in monotonicity_instances:
 
     print(misc.header(abcrules.rules[rule_id].longname, "-"))
 
-    profile = Profile(num_cand, names=names)
+    profile = Profile(num_cand, cand_names=cand_names)
     profile.add_voters(apprsets)
     origvote = set(apprsets[0])
     print(profile.str_compact())
@@ -104,7 +104,7 @@ for inst in monotonicity_instances:
     committees = abcrules.compute(
         rule_id, profile, committeesize, resolute=resolute)
     print("original winning committees:\n"
-          + misc.str_candsets(committees, names))
+          + misc.str_candsets(committees, cand_names))
     # verify correctness
     assert committees == commsfirst
     some_variant = any(all(c in comm for c in extravote) for comm in commsfirst)
@@ -116,22 +116,22 @@ for inst in monotonicity_instances:
         assert not any(all(c in comm for c in extravote) for comm in commsafter)
 
     if addvoter:
-        print("additional voter: " + misc.str_candset(extravote, names))
+        print("additional voter: " + misc.str_candset(extravote, cand_names))
         apprsets.append(extravote)
     else:
         apprsets[0] = list(set(extravote) | set(apprsets[0]))
         print("change of voter 0: "
-              + misc.str_candset(list(origvote), names)
+              + misc.str_candset(list(origvote), cand_names)
               + " --> "
-              + misc.str_candset(apprsets[0], names))
+              + misc.str_candset(apprsets[0], cand_names))
 
-    profile = Profile(num_cand, names=names)
+    profile = Profile(num_cand, cand_names=cand_names)
     profile.add_voters(apprsets)
 
     committees = abcrules.compute(
         rule_id, profile, committeesize, resolute=resolute)
     print("\nwinning committees after the modification:\n"
-          + misc.str_candsets(committees, names))
+          + misc.str_candsets(committees, cand_names))
 
     # verify correctness
     assert committees == commsafter

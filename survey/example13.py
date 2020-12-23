@@ -18,9 +18,9 @@ print(misc.header("Example 13", "*"))
 num_cand = 5
 a, b, c, d, e = range(5)  # a = 0, b = 1, c = 2, ...
 apprsets = [[a]] + [[b, c, d, e]] * 3
-names = "abcde"
+cand_names = "abcde"
 
-profile = Profile(num_cand, names=names)
+profile = Profile(num_cand, cand_names=cand_names)
 profile.add_voters(apprsets)
 
 print(misc.header("Input:"))

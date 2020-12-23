@@ -198,7 +198,7 @@ def compute_thiele_method(scorefct_str, profile, committeesize,
         print()
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -375,7 +375,7 @@ def __separable(rule_id, profile, committeesize, resolute, verbose):
                   + " in every winning committee.)\n")
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -482,7 +482,7 @@ def compute_seq_thiele_method(profile, committeesize, scorefct_str,
     # optional output
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
         if resolute or len(committees) == 1:
             print(scorefct_str.upper() + "-score of winning committee:",
                   end="")
@@ -600,7 +600,7 @@ def compute_revseq_thiele_method(profile, committeesize,
     # optional output
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
     if verbose >= 2:
         if resolute or len(committees) == 1:
             print("PAV-score of winning committee:", end="")
@@ -668,7 +668,7 @@ def compute_mav(profile, committeesize, algorithm="brute-force",
         print("Minimum maximal distance: " + str(opt_mavscore))
 
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
 
         print("Corresponding distances to voters:")
         for comm in committees:
@@ -723,7 +723,7 @@ def compute_lexmav(profile, committeesize, algorithm="brute-force",
         print("Minimum maximal distance: " + str(max(opt_distances)))
 
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
 
         print("Corresponding distances to voters:")
         for comm in committees:
@@ -800,7 +800,7 @@ def compute_monroe(profile, committeesize, algorithm="brute-force",
               + str(scores.monroescore(profile, committees[0])) + "\n")
 
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -927,7 +927,7 @@ def compute_greedy_monroe(profile, committeesize,
 
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1079,7 +1079,7 @@ def compute_seqphragmen(profile, committeesize, algorithm="standard",
     # optional output
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
     if verbose >= 2:
         if resolute or len(committees) == 1:
             print("corresponding load distribution:")
@@ -1256,7 +1256,7 @@ def compute_rule_x(profile, committeesize, algorithm="standard",
     # optional output
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1305,7 +1305,7 @@ def compute_optphragmen(profile, committeesize,
     # optional output
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1387,7 +1387,7 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="standard",
         print(header(rules["phrag-enestr"].longname))
 
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1452,7 +1452,7 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard",
         print(header(rules["consensus"].longname))
 
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, names=profile.cand_names))
+        print(str_candsets(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees

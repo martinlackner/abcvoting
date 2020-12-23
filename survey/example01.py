@@ -15,10 +15,10 @@ num_cand = 8
 a, b, c, d, e, f, g = range(7)  # a = 0, b = 1, c = 2, ...
 apprsets = [[a, b], [a, b], [a, b], [a, c], [a, c], [a, c],
             [a, d], [a, d], [b, c, f], [e], [f], [g]]
-names = "abcdefgh"
+cand_names = "abcdefgh"
 committeesize = 4
 
-profile = Profile(num_cand, names=names)
+profile = Profile(num_cand, cand_names=cand_names)
 profile.add_voters(apprsets)
 
 

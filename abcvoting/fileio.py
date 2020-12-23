@@ -179,13 +179,13 @@ def read_preflib_file(filename, setsize=1, appr_percent=None):
             appr_sets.append(appr_set)
 
     # normalize candidates to 0, 1, 2, ...
-    names = []
+    cand_names = []
     normalize_map = {}
     for c in candidate_map.keys():
-        names.append(candidate_map[c])
-        normalize_map[c] = len(names) - 1
+        cand_names.append(candidate_map[c])
+        normalize_map[c] = len(cand_names) - 1
 
-    profile = Profile(num_cand, names)
+    profile = Profile(num_cand, cand_names=cand_names)
 
     for appr_set in appr_sets:
         norm_appr_set = []
