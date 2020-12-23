@@ -10,9 +10,9 @@ def test_simple_py():
     from examples import simple
 
 
+@pytest.mark.gurobi
 # noinspection PyUnresolvedReferences
 def test_allrules_py():
-    pytest.importorskip("gurobipy")
     from examples import allrules
 
 

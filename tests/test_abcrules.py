@@ -6,7 +6,7 @@ import pytest
 
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.preferences import Profile, ApprovalSet
-from abcvoting import abcrules, abcrules_gurobi, abcrules_cvxpy
+from abcvoting import abcrules
 
 
 class CollectRules:
@@ -261,8 +261,6 @@ def idfn(val):
 )
 def test_resolute_parameter(rule):
     for alg in rule.algorithms:
-        if "gurobi" in alg and not abcrules_gurobi.available:
-            continue
         assert len(rule.resolute) in [1, 2]
         # resolute=True should be default
         if len(rule.resolute) == 2:
@@ -397,8 +395,6 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
     "algorithm", abcrules.rules["monroe"].algorithms
 )
 def test_monroe_indivisible(algorithm):
-    if algorithm == "gurobi":
-        pytest.importorskip("gurobipy")
     profile = Profile(4)
     profile.add_voters([[0], [0], [0], [1, 2], [1, 2], [1], [3]])
     committeesize = 3
@@ -408,6 +404,7 @@ def test_monroe_indivisible(algorithm):
             == [[0, 1, 2], [0, 1, 3], [0, 2, 3]])
 
 
+@pytest.mark.gurobi
 @pytest.mark.parametrize(
     "algorithm", abcrules.rules["optphrag"].algorithms
 )
@@ -416,8 +413,6 @@ def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
     # implemented for opt-Phragmen (as it is described in
     # http://martin.lackner.xyz/publications/phragmen.pdf)
 
-    # requires Gurobi
-    pytest.importorskip("gurobipy")
     profile = Profile(6)
     profile.add_voters([[0], [0], [1, 3], [1, 3], [1, 4],
                         [2, 4], [2, 5], [2, 5]])
@@ -550,8 +545,7 @@ def test_fastest_algorithms(rule):
     if algo is None:
         pytest.skip("no supported algorithms for " + rule.shortname)
     for resolute in rule.resolute:
-        rule.compute(
-            profile, committeesize, algorithm=algo, resolute=resolute)
+        rule.compute(profile, committeesize, algorithm=algo, resolute=resolute)
 
 
 @pytest.mark.parametrize(
@@ -586,14 +580,14 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
         assert len(out) > 0
 
 
+@pytest.mark.cvxpy
 def test_cvxpy_wrong_score_fct():
     profile = Profile(4)
     profile.add_voters([[0, 1], [2, 3]])
     committeesize = 1
-    if abcrules_cvxpy.cvxpy_available:
-        with pytest.raises(NotImplementedError):
-            cvxpy_thiele_methods(profile=profile,
-                                 committeesize=committeesize,
-                                 scorefct_str='non_existing',
-                                 resolute=False,
-                                 algorithm='glpk_mi')
+    with pytest.raises(NotImplementedError):
+        cvxpy_thiele_methods(profile=profile,
+                             committeesize=committeesize,
+                             scorefct_str='non_existing',
+                             resolute=False,
+                             algorithm='glpk_mi')

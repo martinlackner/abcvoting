@@ -3,7 +3,6 @@ Test if examples in directory examples/ work
 """
 
 import pytest
-from sys import modules
 
 
 # noinspection PyUnresolvedReferences
@@ -47,8 +46,8 @@ def test_example08_py():
 
 
 # noinspection PyUnresolvedReferences
+@pytest.mark.gurobi
 def test_example09_py():
-    pytest.importorskip("gurobipy")
     from survey import example09
 
 
@@ -83,14 +82,14 @@ def test_remark03_py():
 
 
 # noinspection PyUnresolvedReferences
+@pytest.mark.gurobi
 def test_propositionA2_py():
-    pytest.importorskip("gurobipy")
     from survey import propositionA2
 
 
 # noinspection PyUnresolvedReferences
+@pytest.mark.gurobi
 def test_propositionA3_py():
-    pytest.importorskip("gurobipy")
     from survey import propositionA3
 
 
