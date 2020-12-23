@@ -21,7 +21,7 @@ a, b, c = (0, 1, 2)
 apprsets = [[a]] * 2 + [[a, c]] * 3 + [[b, c]] * 3 + [[b]] * 2
 names = "abcde"
 profile = Profile(num_cand, names=names)
-profile.add_preferences(apprsets)
+profile.add_voters(apprsets)
 
 print(misc.header("1st profile:"))
 print(profile.str_compact())
@@ -44,7 +44,7 @@ apprsets = ([[a]] * 6 + [[a, c]] * 4 + [[a, b, c]] * 2 + [[a]] * 2
             + [[a, d]] * 1 + [[b, d]] * 3)
 names = "abcde"
 profile = Profile(num_cand, names=names)
-profile.add_preferences(apprsets)
+profile.add_voters(apprsets)
 
 print()
 print(misc.header("2nd profile:"))
@@ -66,7 +66,7 @@ a, b, c, d, e, f = range(num_cand)
 apprsets = [[a, d, e], [a, c], [b, e], [c, d, f]]
 names = "abcdef"
 profile = Profile(num_cand, names=names)
-profile.add_preferences(apprsets)
+profile.add_voters(apprsets)
 
 print()
 print(misc.header("3rd profile:"))

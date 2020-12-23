@@ -8,7 +8,7 @@ from __future__ import print_function
 import sys
 sys.path.insert(0, '..')
 from abcvoting import abcrules
-from abcvoting.preferences import Profile, DichotomousPreferences
+from abcvoting.preferences import Profile, ApprovalSet
 from abcvoting import misc
 
 
@@ -21,7 +21,7 @@ names = "abcd"
 
 apprsets = [[a, b]] * 3 + [[a, d]] * 6 + [[b]] * 4 + [[c]] * 5 + [[c, d]] * 5
 profile = Profile(num_cand, names=names)
-profile.add_preferences(apprsets)
+profile.add_voters(apprsets)
 
 print(misc.header("Input:"))
 print(profile.str_compact())
@@ -48,16 +48,16 @@ a, b, c, d = range(4)  # a = 0, b = 1, c = 2, ...
 names = "abcd"
 
 profile = Profile(num_cand, names=names)
-profile.add_preference(DichotomousPreferences([a, c, d], 960))
-profile.add_preference(DichotomousPreferences([b, c, d], 3000))
-profile.add_preference(DichotomousPreferences([b, c], 520))
-profile.add_preference(DichotomousPreferences([a, b], 1620))
-profile.add_preference(DichotomousPreferences([a, d], 1081))
-profile.add_preference(DichotomousPreferences([a, c], 1240))
-profile.add_preference(DichotomousPreferences([b, d], 360))
-profile.add_preference(DichotomousPreferences([d], 360))
-profile.add_preference(DichotomousPreferences([c], 120))
-profile.add_preference(DichotomousPreferences([b], 60))
+profile.add_voter(ApprovalSet([a, c, d], 960))
+profile.add_voter(ApprovalSet([b, c, d], 3000))
+profile.add_voter(ApprovalSet([b, c], 520))
+profile.add_voter(ApprovalSet([a, b], 1620))
+profile.add_voter(ApprovalSet([a, d], 1081))
+profile.add_voter(ApprovalSet([a, c], 1240))
+profile.add_voter(ApprovalSet([b, d], 360))
+profile.add_voter(ApprovalSet([d], 360))
+profile.add_voter(ApprovalSet([c], 120))
+profile.add_voter(ApprovalSet([b], 60))
 
 print(misc.header("Input:"))
 print(profile.str_compact())

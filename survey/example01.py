@@ -19,7 +19,7 @@ names = "abcdefgh"
 committeesize = 4
 
 profile = Profile(num_cand, names=names)
-profile.add_preferences(apprsets)
+profile.add_voters(apprsets)
 
 
 if __name__ == "__main__":

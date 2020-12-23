@@ -98,14 +98,6 @@ def __gurobi_monroe(profile, committeesize, resolute):
     num_voters = len(profile)
     cands = list(range(profile.num_cand))
 
-    # Alternative: split voters -> generate new profile with all weights = 1
-    # prof2 = Profile(profile.num_cand)
-    # for v in profile:
-    #    for _ in range(v.weight):
-    #        prof2.add_preference(DichotomousPreference(v,
-    #                                                   profile.num_cand))
-    # total_weight = profile.voters_num()
-
     maxscore = None
     committees = []
 

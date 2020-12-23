@@ -46,7 +46,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
     -------
     committees : list of lists
         a list of chosen committees, each of them represented as list with candidates named from
-        `0` to `num_cand`, profile.names is ignored
+        `0` to `num_cand`, profile.cand_names is ignored
 
     """
     if algorithm in ['glpk_mi', 'cbc', 'scip']:

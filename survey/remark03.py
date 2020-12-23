@@ -24,7 +24,7 @@ apprsets = [[a, b], [a, b, d], [a, b, c], [a, c, d], [a, c, d], [b], [c], [d]]
 names = "abcd"
 
 profile = Profile(num_cand, names=names)
-profile.add_preferences(apprsets)
+profile.add_voters(apprsets)
 
 print(misc.header("Input:"))
 print(profile.str_compact())

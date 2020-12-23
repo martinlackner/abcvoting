@@ -37,7 +37,7 @@ def random_urn_profile(num_cand, num_voters, setsize, replace):
                 else:
                     r -= count
     profile = Profile(num_cand)
-    profile.add_preferences(apprsets)
+    profile.add_voters(apprsets)
     return profile
 
 
@@ -74,7 +74,7 @@ def random_urn_party_list_profile(num_cand, num_voters, num_parties,
                 else:
                     r -= count
     profile = Profile(num_cand)
-    profile.add_preferences(apprsets)
+    profile.add_voters(apprsets)
     return profile
 
 
@@ -86,7 +86,7 @@ def random_IC_profile(num_cand, num_voters, setsize):
         randset = random.sample(range(num_cand), setsize)
         apprsets.append(randset)
     profile = Profile(num_cand)
-    profile.add_preferences(apprsets)
+    profile.add_voters(apprsets)
     return profile
 
 
@@ -103,7 +103,7 @@ def random_IC_party_list_profile(num_cand, num_voters, num_parties,
     for _ in range(num_voters):
         apprsets.append(party_cands[random.choice(parties)])
     profile = Profile(num_cand)
-    profile.add_preferences(apprsets)
+    profile.add_voters(apprsets)
     return profile
 
 
@@ -121,7 +121,7 @@ def random_2d_points_profile(num_cand, num_voters, candpointmode,
     apprsets = __get_profile_from_points(voters, cands, voter_points,
                                          cand_points, approval_threshold)
     profile = Profile(num_cand)
-    profile.add_preferences(apprsets)
+    profile.add_voters(apprsets)
     return profile
 
 
@@ -149,7 +149,7 @@ def random_2d_points_party_list_profile(num_cand, num_voters,
     for p in party_sets:
         apprsets.append(party_cands[p[0]])
     profile = Profile(num_cand)
-    profile.add_preferences(apprsets)
+    profile.add_voters(apprsets)
     return profile
 
 
@@ -172,7 +172,7 @@ def random_mallows_profile(num_cand, num_voters, setsize, dispersion):
 
         apprsets.append(vote[:setsize])
     profile = Profile(num_cand)
-    profile.add_preferences(apprsets)
+    profile.add_voters(apprsets)
     return profile
 
 

@@ -52,8 +52,8 @@ for manip in manipulations:
     print(misc.header(abcrules.rules[rule_id].longname, "-"))
 
     profile = Profile(num_cand, names=names)
-    profile.add_preferences(apprsets)
-    truepref = profile.preferences[0].approved
+    profile.add_voters(apprsets)
+    truepref = profile.approval_sets[0].approved
     print(profile.str_compact())
 
     committees = abcrules.compute(
@@ -73,7 +73,7 @@ for manip in manipulations:
 
     apprsets[0] = modvote
     profile = Profile(num_cand, names=names)
-    profile.add_preferences(apprsets)
+    profile.add_voters(apprsets)
 
     committees = abcrules.compute(
         rule_id, profile, committeesize, resolute=resolute)

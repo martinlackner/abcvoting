@@ -6,8 +6,8 @@ import pytest
 
 from abcvoting.abcrules import is_algorithm_supported
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
-from abcvoting.preferences import Profile, DichotomousPreferences
-from abcvoting import abcrules, abcrules_gurobi
+from abcvoting.preferences import Profile, ApprovalSet
+from abcvoting import abcrules, abcrules_gurobi, abcrules_cvxpy
 
 
 class CollectRules:
@@ -41,7 +41,7 @@ class CollectInstances:
         committeesize = 4
         preflist = [[0, 4, 5], [0], [1, 4, 5], [1],
                     [2, 4, 5], [2], [3, 4, 5], [3]]
-        profile.add_preferences(preflist)
+        profile.add_voters(preflist)
         tests = {
             "seqpav": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
                        [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
@@ -106,7 +106,7 @@ class CollectInstances:
         for p in preflist:
             p.reverse()
         profile = Profile(6)
-        profile.add_preferences(preflist)
+        profile.add_voters(preflist)
         # Greedy Monroe yields a different result
         # for a different voter ordering
         tests = dict(tests)
@@ -119,7 +119,7 @@ class CollectInstances:
         committeesize = 3
         preflist = [[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2],
                     [0, 1, 2], [0, 1], [3, 4], [3, 4], [3]]
-        profile.add_preferences(preflist)
+        profile.add_voters(preflist)
 
         tests = {
             "seqpav": [[0, 1, 3]],
@@ -154,7 +154,7 @@ class CollectInstances:
         committeesize = 4
         preflist = [[0, 3, 4, 5], [1, 2], [0, 2, 5], [2],
                     [0, 1, 2, 3, 4], [0, 3, 4], [0, 2, 4], [0, 1]]
-        profile.add_preferences(preflist)
+        profile.add_voters(preflist)
 
         tests = {
             "seqpav": [[0, 1, 2, 4]],
@@ -205,7 +205,7 @@ class CollectInstances:
         profile = Profile(4)
         committeesize = 2
         preflist = [[0, 1, 3], [0, 1], [0, 1], [0, 3], [2, 3]]
-        profile.add_preferences(preflist)
+        profile.add_voters(preflist)
 
         tests = {
             "seqpav": [[0, 3]],
@@ -262,7 +262,7 @@ def test_resolute_parameter(rule):
                 profile = Profile(5)
                 committeesize = 1
                 preflist = [[0, 1, 2], [1], [1, 2], [0]]
-                profile.add_preferences(preflist)
+                profile.add_voters(preflist)
 
                 with pytest.raises(NotImplementedError):
                     rule.compute(profile, committeesize, algorithm=alg, resolute=resolute)
@@ -279,7 +279,7 @@ def test_abcrules__toofewcandidates(rule_instance, verbose):
     profile = Profile(5)
     committeesize = 4
     preflist = [[0, 1, 2], [1], [1, 2], [0]]
-    profile.add_preferences(preflist)
+    profile.add_voters(preflist)
 
     with pytest.raises(ValueError):
         abcrules.compute(
@@ -303,10 +303,10 @@ def test_abcrules_weightsconsidered(rule_instance, verbose):
     rule_id, algorithm, resolute = rule_instance
 
     profile = Profile(3)
-    profile.add_preference(DichotomousPreferences([0]))
-    profile.add_preference(DichotomousPreferences([0]))
-    profile.add_preference(DichotomousPreferences([1], 5))
-    profile.add_preference(DichotomousPreferences([0]))
+    profile.add_voter(ApprovalSet([0]))
+    profile.add_voter(ApprovalSet([0]))
+    profile.add_voter(ApprovalSet([1], 5))
+    profile.add_voter(ApprovalSet([0]))
     committeesize = 1
 
     if (("monroe" in rule_id
@@ -340,7 +340,7 @@ def test_abcrules_weightsconsidered(rule_instance, verbose):
 def test_abcrules_correct_simple(rule_instance, verbose):
     rule_id, algorithm, resolute = rule_instance
     profile = Profile(4)
-    profile.add_preferences([[0], [1], [2], [3]])
+    profile.add_voters([[0], [1], [2], [3]])
     committeesize = 2
 
     committees = abcrules.compute(
@@ -366,7 +366,7 @@ def test_abcrules_correct_simple(rule_instance, verbose):
 def test_abcrules_handling_empty_ballots(rule_instance, verbose):
     rule_id, algorithm, resolute = rule_instance
     profile = Profile(4)
-    profile.add_preferences([[0], [1], [2]])
+    profile.add_voters([[0], [1], [2]])
     committeesize = 3
 
     committees = abcrules.compute(
@@ -375,7 +375,7 @@ def test_abcrules_handling_empty_ballots(rule_instance, verbose):
 
     assert committees == [[0, 1, 2]]
 
-    profile.add_preferences([[]])
+    profile.add_voters([[]])
 
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm,
@@ -394,7 +394,7 @@ def test_monroe_indivisible(algorithm):
     if algorithm == "gurobi":
         pytest.importorskip("gurobipy")
     profile = Profile(4)
-    profile.add_preferences([[0], [0], [0], [1, 2], [1, 2], [1], [3]])
+    profile.add_voters([[0], [0], [0], [1, 2], [1, 2], [1], [3]])
     committeesize = 3
 
     assert (abcrules.compute_monroe(profile, committeesize,
@@ -413,8 +413,8 @@ def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
     # requires Gurobi
     pytest.importorskip("gurobipy")
     profile = Profile(6)
-    profile.add_preferences([[0], [0], [1, 3], [1, 3], [1, 4],
-                             [2, 4], [2, 5], [2, 5]])
+    profile.add_voters([[0], [0], [1, 3], [1, 3], [1, 4],
+                        [2, 4], [2, 5], [2, 5]])
     committeesize = 3
 
     # without lexicographic optimization, this profile has 12 winning committees
@@ -449,7 +449,7 @@ def test_abcrules_correct(rule_instance, verbose, instance):
 
 def test_seqphragmen_irresolute():
     profile = Profile(3)
-    profile.add_preferences([[0, 1], [0, 1], [0], [1, 2], [2]])
+    profile.add_voters([[0, 1], [0, 1], [0], [1, 2], [2]])
     committeesize = 2
     committees = abcrules.rules["seqphrag"].compute(
         profile, committeesize, resolute=False)
@@ -462,7 +462,7 @@ def test_seqphragmen_irresolute():
 
 def test_seqpav_irresolute():
     profile = Profile(3)
-    profile.add_preferences([[0, 1]] * 3 + [[0], [1, 2], [2], [2]])
+    profile.add_voters([[0, 1]] * 3 + [[0], [1, 2], [2], [2]])
     committeesize = 2
 
     committees = abcrules.rules["seqpav"].compute(
@@ -476,8 +476,8 @@ def test_seqpav_irresolute():
 
 def test_consensus_fails_lower_quota():
     profile = Profile(31)
-    profile.add_preferences([[0]] + [[1, 2]] * 3 + [[3, 4, 5]] * 5 + [[6, 7, 8, 9, 10, 11, 12, 13, 14, 15]] * 18
-                            + [[16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 29, 30]] * 27)
+    profile.add_voters([[0]] + [[1, 2]] * 3 + [[3, 4, 5]] * 5 + [[6, 7, 8, 9, 10, 11, 12, 13, 14, 15]] * 18
+                       + [[16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 29, 30]] * 27)
     committeesize = 30
 
     committees = abcrules.rules["consensus"].compute(
@@ -509,8 +509,8 @@ def test_jansonexamples(rule_id, algorithm):
     p = 3
     q = 4
     r = 5
-    profile.add_preferences([[a, b, c]] * 1034 + [[p, q, r]] * 519 +
-                            [[a, b, q]] * 90 + [[a, p, q]] * 90)
+    profile.add_voters([[a, b, c]] * 1034 + [[p, q, r]] * 519 +
+                       [[a, b, q]] * 90 + [[a, p, q]] * 90)
     committeesize = 3
 
     committees = abcrules.compute(
@@ -531,7 +531,7 @@ def test_unspecified_algorithms(rule, verbose, resolute):
     if resolute not in rule.resolute:
         return
     profile = Profile(3)
-    profile.add_preferences([[0, 1], [1, 2]])
+    profile.add_voters([[0, 1], [1, 2]])
     committeesize = 2
     with pytest.raises(NotImplementedError):
         rule.compute(
@@ -544,7 +544,7 @@ def test_unspecified_algorithms(rule, verbose, resolute):
 )
 def test_fastest_algorithms(rule):
     profile = Profile(4)
-    profile.add_preferences([[0, 1], [1, 2], [0, 2, 3]])
+    profile.add_voters([[0, 1], [1, 2], [0, 2, 3]])
     committeesize = 2
     algo = rule.fastest_algo()
     if algo is None:
@@ -575,7 +575,7 @@ def test_output(capfd, rule_instance, verbose):
         pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
 
     profile = Profile(2)
-    profile.add_preferences([[0]])
+    profile.add_voters([[0]])
     committeesize = 1
     abcrules.compute(
         rule_id, profile, committeesize,
@@ -590,11 +590,12 @@ def test_output(capfd, rule_instance, verbose):
 
 def test_cvxpy_wrong_score_fct():
     profile = Profile(4)
-    profile.add_preferences([[0, 1], [2, 3]])
+    profile.add_voters([[0, 1], [2, 3]])
     committeesize = 1
-    with pytest.raises(NotImplementedError):
-        cvxpy_thiele_methods(profile=profile,
-                             committeesize=committeesize,
-                             scorefct_str='non_existing',
-                             resolute=False,
-                             algorithm='glpk_mi')
+    if abcrules_cvxpy.cvxpy_available:
+        with pytest.raises(NotImplementedError):
+            cvxpy_thiele_methods(profile=profile,
+                                 committeesize=committeesize,
+                                 scorefct_str='non_existing',
+                                 resolute=False,
+                                 algorithm='glpk_mi')

@@ -21,7 +21,7 @@ apprsets = [[a]] + [[b, c, d, e]] * 3
 names = "abcde"
 
 profile = Profile(num_cand, names=names)
-profile.add_preferences(apprsets)
+profile.add_voters(apprsets)
 
 print(misc.header("Input:"))
 print(profile.str_compact())

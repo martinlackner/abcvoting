@@ -91,7 +91,7 @@ for inst in monotonicity_instances:
     print(misc.header(abcrules.rules[rule_id].longname, "-"))
 
     profile = Profile(num_cand, names=names)
-    profile.add_preferences(apprsets)
+    profile.add_voters(apprsets)
     origvote = set(apprsets[0])
     print(profile.str_compact())
 
@@ -126,7 +126,7 @@ for inst in monotonicity_instances:
               + misc.str_candset(apprsets[0], names))
 
     profile = Profile(num_cand, names=names)
-    profile.add_preferences(apprsets)
+    profile.add_voters(apprsets)
 
     committees = abcrules.compute(
         rule_id, profile, committeesize, resolute=resolute)

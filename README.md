@@ -10,7 +10,7 @@
 Approval-based committee rules (ABC rules) are voting methods for selecting a committee, i.e., a fixed-size subset of candidates.
 ABC rules are also known as approval-based multi-winner rules.
 The input of such rules are [approval ballots](https://en.wikipedia.org/wiki/Approval_voting#/media/File:Approval_ballot.svg).
-We recommend [''Approval-Based Committee Voting: Axioms, Algorithms, and Applications''](https://arxiv.org/abs/2007.01795) by Lackner and Skowron as a detailed introduction to ABC rules and related research directions [8].
+We recommend [''Approval-Based Committee Voting''](https://arxiv.org/abs/2007.01795) by Lackner and Skowron as a detailed introduction to ABC rules and related research directions [8].
 In addition, the [survey by Faliszewski et al.](http://research.illc.uva.nl/COST-IC1205/BookDocs/Chapters/TrendsCOMSOC-02.pdf) [1] is useful as a more general introduction to committee voting (not limited to approval ballots).
 
 The following ABC rules are implemented:
@@ -56,7 +56,7 @@ from abcvoting.preferences import Profile
 from abcvoting import abcrules
 
 profile = Profile(5)  # a preference profile with 5 candidates
-profile.add_preferences([[0,1,2], [0,1], [0,1], [1,2], [3,4], [3,4]])
+profile.add_voters([[0,1,2], [0,1], [0,1], [1,2], [3,4], [3,4]])
 committeesize = 3
 print(abcrules.compute_pav(profile, committeesize))
 ```
