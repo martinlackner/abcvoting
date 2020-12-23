@@ -21,8 +21,9 @@ class Profile(object):
         number of candidates or alternatives, denoted with m in the survey paper
     cand_names : iterable of str
         symbolic names for the candidates, defaults to '1', '2', ..., str(num_cand)
-    preferences : list of DichotomousPreferences
-        approved candidates for each voter, use `Profile.add_preferences()` to add  preferences
+    approval_sets : list of ApprovalSet
+        approved candidates for each voter, use `Profile.add_voter()` or `Profile.add_voters()`
+        to add approval sets
 
     """
     def __init__(self, num_cand, cand_names=None):
@@ -30,7 +31,7 @@ class Profile(object):
             raise ValueError(str(num_cand) +
                              " is not a valid number of candidates")
         self.num_cand = num_cand
-        self.approval_sets = []  # entries correspond to voters
+        self._approval_sets = []  # entries correspond to voters
         self.cand_names = [str(c) for c in range(num_cand)]
         if cand_names:
             if len(cand_names) < num_cand:
@@ -41,6 +42,10 @@ class Profile(object):
 
     def __len__(self):
         return len(self.approval_sets)
+
+    @property
+    def approval_sets(self):
+        return self._approval_sets
 
     def add_voter(self, pref):
         """
@@ -58,7 +63,7 @@ class Profile(object):
 
         # this check is a bit redundant, but needed to check for consistency with self.num_cand
         appr_set.check_valid(self.num_cand)
-        self.approval_sets.append(appr_set)
+        self._approval_sets.append(appr_set)
 
     def add_voters(self, prefs):
         """
@@ -176,6 +181,6 @@ class ApprovalSet:
         for candidate in self.approved:
             if not isinstance(candidate, int):
                 raise TypeError("Object of type " + str(type(candidate)) +
-                                " not suitable as preferences")
+                                " not suitable as candidate")
             if candidate < 0 or candidate >= num_cand:
                 raise ValueError(str(self) + " not valid for num_cand = " + str(num_cand))

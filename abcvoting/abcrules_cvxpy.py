@@ -29,7 +29,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
     Parameters
     ----------
     profile : abcvoting.preferences.Profile
-        preferences of voters
+        approval sets of voters
     committeesize : int
         number of chosen alternatives
     scorefct_str : str
