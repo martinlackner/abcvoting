@@ -1,10 +1,9 @@
 """
-Unit tests for abcrules.py and abcrules_gurobi.py
+Unit tests for abcrules.py and abcrules_gurobi.py and abcrules_cvxpy.py
 """
 
 import pytest
 
-from abcvoting.abcrules import is_algorithm_supported
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.preferences import Profile, ApprovalSet
 from abcvoting import abcrules, abcrules_gurobi, abcrules_cvxpy
@@ -16,20 +15,32 @@ class CollectRules:
     Exclude Gurobi-based rules if Gurobi is not available
     """
     def __init__(self):
-        self.rule_alg_resolute = []
-        self.rule_alg_onlyresolute = []
-        self.rule_alg_onlyirresolute = []
+        marks = {
+            "gurobi": pytest.mark.gurobi,
+            "scip": [pytest.mark.cvxpy, pytest.mark.scip],
+            "glpk_mi": [pytest.mark.cvxpy, pytest.mark.glpk_mi],
+            "cbc": [pytest.mark.cvxpy, pytest.mark.cbc],
+            "cvxpy_gurobi": [pytest.mark.cvxpy, pytest.mark.gurobi],
+        }
+
+        self.rule_algorithm_resolute = []
+        self.rule_algorithm_onlyresolute = []
+        self.rule_algorithm_onlyirresolute = []
         for rule in abcrules.rules.values():
             for alg in rule.algorithms:
-                if not is_algorithm_supported(alg):
-                    continue
                 for resolute in rule.resolute:
-                    instance = (rule.rule_id, alg, resolute)
-                    self.rule_alg_resolute.append(instance)
-                    if resolute:
-                        self.rule_alg_onlyresolute.append(instance[:2])
+                    if alg in marks:
+                        instance = pytest.param(rule.rule_id, alg, resolute, marks=marks[alg])
+                        instance_no_resolute_param = pytest.param(rule.rule_id, alg, marks=marks[alg])
                     else:
-                        self.rule_alg_onlyirresolute.append(instance[:2])
+                        instance = pytest.param(rule.rule_id, alg, resolute)
+                        instance_no_resolute_param = pytest.param(rule.rule_id, alg)
+
+                    self.rule_algorithm_resolute.append(instance)
+                    if resolute:
+                        self.rule_algorithm_onlyresolute.append(instance_no_resolute_param)
+                    else:
+                        self.rule_algorithm_onlyirresolute.append(instance_no_resolute_param)
 
 
 class CollectInstances:
@@ -269,13 +280,12 @@ def test_resolute_parameter(rule):
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.rule_alg_resolute, ids=idfn
+    "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2]
 )
-def test_abcrules__toofewcandidates(rule_instance, verbose):
-    rule_id, algorithm, resolute = rule_instance
+def test_abcrules__toofewcandidates(rule_id, algorithm, resolute, verbose):
     profile = Profile(5)
     committeesize = 4
     preflist = [[0, 1, 2], [1], [1, 2], [0]]
@@ -294,14 +304,12 @@ def test_abcrules_wrong_rule_id():
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.rule_alg_resolute, ids=idfn
+    "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2, 3]
 )
-def test_abcrules_weightsconsidered(rule_instance, verbose):
-    rule_id, algorithm, resolute = rule_instance
-
+def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
     profile = Profile(3)
     profile.add_voter(ApprovalSet([0]))
     profile.add_voter(ApprovalSet([0]))
@@ -332,13 +340,12 @@ def test_abcrules_weightsconsidered(rule_instance, verbose):
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.rule_alg_resolute, ids=idfn
+    "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2, 3]
 )
-def test_abcrules_correct_simple(rule_instance, verbose):
-    rule_id, algorithm, resolute = rule_instance
+def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
     profile = Profile(4)
     profile.add_voters([[0], [1], [2], [3]])
     committeesize = 2
@@ -358,13 +365,12 @@ def test_abcrules_correct_simple(rule_instance, verbose):
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.rule_alg_resolute, ids=idfn
+    "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2, 3]
 )
-def test_abcrules_handling_empty_ballots(rule_instance, verbose):
-    rule_id, algorithm, resolute = rule_instance
+def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
     profile = Profile(4)
     profile.add_voters([[0], [1], [2]])
     committeesize = 3
@@ -424,17 +430,15 @@ def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.rule_alg_resolute, ids=idfn
+    "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2, 3]
 )
 @pytest.mark.parametrize(
-    "instance", testinsts.instances
+    "profile, exp_results, committeesize", testinsts.instances
 )
-def test_abcrules_correct(rule_instance, verbose, instance):
-    rule_id, algorithm, resolute = rule_instance
-    profile, exp_results, committeesize = instance
+def test_abcrules_correct(rule_id, algorithm, resolute, verbose, profile, exp_results, committeesize):
     print(profile)
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm,
@@ -488,20 +492,16 @@ def test_consensus_fails_lower_quota():
     # but not all of their 15 approved candidates are contained in a winning committee.
 
 
-testrules_jansonex = []
-for rule_id, algorithm in testrules.rule_alg_onlyirresolute:
-    if rule_id not in ["phragm-enestr", "seqphrag", "pav",
-                       "seqpav", "revseqpav"]:
-        continue
-    testrules_jansonex.append((rule_id, algorithm))
-
-
 @pytest.mark.parametrize(
-    "rule_id, algorithm", testrules_jansonex
+    "rule_id, algorithm", testrules.rule_algorithm_onlyirresolute, ids=idfn
 )
 def test_jansonexamples(rule_id, algorithm):
     # example from Janson's survey (https://arxiv.org/pdf/1611.08826.pdf),
     # Example 3.7, 18.1
+
+    if rule_id not in ["phragm-enestr", "seqphrag", "pav", "seqpav", "revseqpav"]:
+        return
+
     profile = Profile(6)
     a = 0
     b = 1
@@ -555,14 +555,12 @@ def test_fastest_algorithms(rule):
 
 
 @pytest.mark.parametrize(
-    "rule_instance", testrules.rule_alg_resolute, ids=idfn
+    "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
 @pytest.mark.parametrize(
     "verbose", [0, 1, 2, 3]
 )
-def test_output(capfd, rule_instance, verbose):
-    rule_id, algorithm, resolute = rule_instance
-
+def test_output(capfd, rule_id, algorithm, resolute, verbose):
     if algorithm == 'glpk_mi' and verbose == 0:
         # TODO unfortunately GLPK_MI prints "Long-step dual simplex will be used" to stderr and it
         #  would be very complicated to capture this on all platforms reliably, changing
