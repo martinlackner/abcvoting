@@ -26,24 +26,24 @@ def enough_approved_candidates(profile, committeesize):
                          + " is larger than number of approved candidates")
 
 
-def str_candset(candset, names=None):
+def str_candset(candset, cand_names=None):
     """
     nicely format a single committee
     """
-    if names is None:
+    if cand_names is None:
         namedset = [str(c) for c in candset]
     else:
-        namedset = [names[c] for c in candset]
+        namedset = [cand_names[c] for c in candset]
     return "{" + ", ".join(map(str, namedset)) + "}"
 
 
-def str_candsets(committees, names=None):
+def str_candsets(committees, cand_names=None):
     """
     nicely format a list of committees
     """
     output = ""
     for comm in sorted(map(tuple, committees)):
-        output += " " + str_candset(comm, names) + "\n"
+        output += " " + str_candset(comm, cand_names) + "\n"
     return output
 
 
