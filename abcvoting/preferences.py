@@ -13,7 +13,17 @@ from collections import OrderedDict
 
 class Profile(object):
     """
-    Preference profiles consisting of approval sets
+    Preference profiles consisting of approval sets.
+
+    Properties
+    ----------
+    num_cand : int
+        number of candidates or alternatives, denoted with m in the survey paper
+    names : iterable of str
+        symbolic names for the candidates, defaults to '1', '2', ..., str(num_cand)
+    preferences : list of DichotomousPreferences
+        approved candidates for each voter, use `Profile.add_preferences()` to add  preferences
+
     """
     def __init__(self, num_cand, names=None):
         if num_cand <= 0:
@@ -33,7 +43,8 @@ class Profile(object):
         return len(self.approval_sets)
 
     def add_voter(self, pref):
-        """Adds a set of approved candidates of one voter to the preference profile.
+        """
+        Adds a set of approved candidates of one voter to the preference profile.
 
         Parameters
         ----------
@@ -50,7 +61,8 @@ class Profile(object):
         self.approval_sets.append(appr_set)
 
     def add_voters(self, prefs):
-        """Adds several voters to the preference profile.
+        """
+        Adds several voters to the preference profile.
         Each voter is specified by a set (or list) of approved candidates
         or by an object of type ApprovalSet.
 
@@ -132,6 +144,9 @@ class Profile(object):
 
 
 class ApprovalSet:
+    """
+    A set of approved candidates by one voter.
+    """
     def __init__(self, approved, weight=1):
         self.approved = set(approved)
         self.weight = weight
@@ -149,9 +164,11 @@ class ApprovalSet:
         return iter(self.approved)
 
     def check_valid(self, num_cand=float('inf'), approved_raw=None):
-        """Check if approved candidates are given as non-negative integers. If `num_cand` is known,
+        """
+        Check if approved candidates are given as non-negative integers. If `num_cand` is known,
         also check if they are too large. Double entries are check if approved_raw is given as
-        list or tuple (or similar)."""
+        list or tuple (or similar).
+        """
         if approved_raw is not None and len(self.approved) < len(approved_raw):
             raise ValueError(f"double entries found in list of approved candidates: {approved_raw}")
 
