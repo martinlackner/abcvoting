@@ -21,8 +21,9 @@ class Profile(object):
         number of candidates or alternatives, denoted with m in the survey paper
     cand_names : iterable of str
         symbolic names for the candidates, defaults to '1', '2', ..., str(num_cand)
-    preferences : list of DichotomousPreferences
-        approved candidates for each voter, use `Profile.add_preferences()` to add  preferences
+    approval_sets : list of ApprovalSet
+        approved candidates for each voter, use `Profile.add_voter()` or `Profile.add_voters()`
+        to add approval sets
 
     """
     def __init__(self, num_cand, cand_names=None):
@@ -176,6 +177,6 @@ class ApprovalSet:
         for candidate in self.approved:
             if not isinstance(candidate, int):
                 raise TypeError("Object of type " + str(type(candidate)) +
-                                " not suitable as preferences")
+                                " not suitable as candidate")
             if candidate < 0 or candidate >= num_cand:
                 raise ValueError(str(self) + " not valid for num_cand = " + str(num_cand))
