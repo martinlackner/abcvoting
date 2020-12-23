@@ -50,6 +50,19 @@ def test_invalidprofiles(num_cand):
 @pytest.mark.parametrize(
     "num_cand", [6, 7]
 )
+def test_empty_approval(num_cand):
+    profile = Profile(num_cand)
+    profile.add_voter([])
+    profile.add_voters([[]])
+    profile.add_voters([[], [0, 3], []])
+
+    profile = Profile(num_cand)
+    profile.add_voters([[]])
+
+
+@pytest.mark.parametrize(
+    "num_cand", [6, 7]
+)
 def test_unitweights(num_cand):
     profile = Profile(num_cand)
     profile.add_voters([])
