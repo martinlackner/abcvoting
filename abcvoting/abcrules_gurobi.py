@@ -73,8 +73,11 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct,
 
         if maxscore is None:
             maxscore = m.objVal
-
-        if abs(m.objVal - maxscore) > GUROBI_ACCURACY:
+        elif m.objVal > maxscore + GUROBI_ACCURACY:
+            raise RuntimeError("Gurobi found a solution better than a previous optimum. This "
+                               f"should not happen (previous optimal score: {maxscore}, "
+                               f"new optimal score: {m.objVal}).")
+        elif m.objVal < maxscore - GUROBI_ACCURACY:
             # no longer optimal
             break
 
@@ -226,7 +229,9 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
             m.addConstr(gb.quicksum(load[(pref, c)]
                                     for c in pref)
                         <= loadbound)
-        m.setObjective(loadbound, gb.GRB.MINIMIZE)
+
+        # maximizing the negative distance makes code more similar to the other methods here
+        m.setObjective(-loadbound, gb.GRB.MAXIMIZE)
 
     return _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct=None,
                                  resolute=resolute, verbose=verbose)
@@ -267,8 +272,8 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
             m.addConstr(
                 gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
 
-        # optimization objective
-        m.setObjective(max_hamdistance, gb.GRB.MINIMIZE)
+        # maximizing the negative distance makes code more similar to the other methods here
+        m.setObjective(-max_hamdistance, gb.GRB.MAXIMIZE)
 
     return _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct=None,
                                  resolute=resolute)
