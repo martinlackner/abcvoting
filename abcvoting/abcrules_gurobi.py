@@ -101,9 +101,10 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct,
 def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
     def set_opt_model_func(m, profile, in_committee, committeesize, committees, cands, scorefct):
         # utility[(pref, num_appr)] contains (intended binary) variables indicating
-        # whether pref approves at least num_appr candidates in the committee
-
+        # whether pref approves at least num_appr candidates in the committee (except when
+        # scorefct(num_appr) == 0 for num_appr >= 1, then order does not matter)
         utility = {}
+
         for pref in profile:
             for num_appr in range(1, committeesize + 1):
                 # TODO Should we use vtype=gb.GRB.BINARY? Does it make it faster to use ub=1.0?
@@ -129,6 +130,12 @@ def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
                         for pref in profile
                         for num_appr in range(1, committeesize + 1)),
             gb.GRB.MAXIMIZE)
+
+    score_values = [scorefct(num_appr) for num_appr in range(1, committeesize + 1)]
+    if not all(first > second or first == second == 0
+               for first, second in zip(score_values, score_values[1:])):
+        raise ValueError("scorefct must be monotonic decreasing")
+
     return _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct, resolute)
 
 

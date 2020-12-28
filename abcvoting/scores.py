@@ -66,6 +66,8 @@ def __slav_score_fct(i):
 
 
 def __av_score_fct(i):
+    # note: this is used only for unit tests atm, because AV is separable anyway and therefore not
+    # implemented as optimization problem
     if i >= 1:
         return 1
     else:

@@ -5,8 +5,9 @@ Unit tests for abcrules.py and abcrules_gurobi.py and abcrules_cvxpy.py
 import pytest
 
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
+from abcvoting.abcrules_gurobi import __gurobi_thiele_methods
 from abcvoting.preferences import Profile, ApprovalSet
-from abcvoting import abcrules
+from abcvoting import abcrules, scores
 
 
 class CollectRules:
@@ -471,6 +472,27 @@ def test_seqpav_irresolute():
     committees = abcrules.rules["seqpav"].compute(
         profile, committeesize, resolute=True)
     assert committees == [[0, 2]]
+
+
+def test_gurobi_cant_compute_av():
+    profile = Profile(4)
+    profile.add_voters([[0, 1], [1, 2]])
+    committeesize = 2
+
+    scorefct = scores.get_scorefct('av', committeesize)
+
+    with pytest.raises(ValueError):
+        __gurobi_thiele_methods(profile, committeesize, scorefct, resolute=False)
+
+
+@pytest.mark.cvxpy
+def test_cvxpy_cant_compute_av():
+    profile = Profile(4)
+    profile.add_voters([[0, 1], [1, 2]])
+    committeesize = 2
+
+    with pytest.raises(ValueError):
+        cvxpy_thiele_methods(profile, committeesize, 'av', resolute=False, algorithm='glpk_mi')
 
 
 def test_consensus_fails_lower_quota():
