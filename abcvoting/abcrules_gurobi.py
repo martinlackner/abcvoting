@@ -263,7 +263,8 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
         if minmaxload is None:
             minmaxload = loadbound.Xn
 
-        if abs(loadbound.Xn - minmaxload) > GUROBI_ACCURACY:
+        assert m.objVal == loadbound.Xn
+        if abs(m.objVal - minmaxload) > GUROBI_ACCURACY:
                 # no longer optimal
                 break
 
