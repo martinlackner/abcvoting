@@ -13,8 +13,30 @@ except ImportError:
 GUROBI_ACCURACY = 1e-9
 
 
-def __gurobi_thiele_methods(profile, committeesize,
-                            scorefct, resolute):
+def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct,
+                          resolute, verbose=False):
+    """Compute rules, which are given in the form of an optimization problem, using Gurobi.
+
+    Parameters
+    ----------
+    set_opt_model_func : callable
+        sets constraints and objective and adds additional variables, see examples below for its
+        signature
+    profile : abcvoting.preferences.Profile
+        approval sets of voters
+    committeesize : int
+        number of chosen alternatives
+    scorefct : callable
+    resolute : bool
+    verbose : bool
+
+    Returns
+    -------
+    committees : list of lists
+        a list of chosen committees, each of them represented as list with candidates named from
+        `0` to `num_cand`, profile.cand_names is ignored
+
+    """
 
     cands = list(range(profile.num_cand))
     maxscore = None
@@ -30,6 +52,50 @@ def __gurobi_thiele_methods(profile, committeesize,
                                  vtype=gb.GRB.BINARY,
                                  name="in_committee")
 
+        set_opt_model_func(m, profile, in_committee, committeesize, committees, cands, scorefct)
+
+        m.setParam('OutputFlag', False)
+        m.setParam('FeasibilityTol', GUROBI_ACCURACY)
+        m.setParam('PoolSearchMode', 0)
+
+        m.optimize()
+
+        if m.Status not in [2, 3, 4]:
+            # m.Status == 2 implies solution found
+            # m.Status in [3, 4] implies infeasible --> no more solutions
+            # otherwise ...
+            print("Warning (_optimize_rule_gurobi): solutions may be incomplete or not optimal.")
+            print("(Gurobi return code", m.Status, ")")
+        if m.Status != 2:
+            if len(committees) == 0:
+                raise RuntimeError("Gurobi found no solution")
+            break
+
+        if maxscore is None:
+            maxscore = m.objVal
+
+        if abs(m.objVal - maxscore) > GUROBI_ACCURACY:
+            # no longer optimal
+            break
+
+        committee = [c for c in cands if in_committee[c].Xn >= 1-GUROBI_ACCURACY]
+        assert len(committee) == committeesize
+        committees.append(committee)
+
+        if resolute:
+            break
+
+    # optional output
+    if verbose:
+        print("optimal score: " + str(maxscore))
+        print("(i.e., all scores are <= " + str(maxscore) + ")")
+    # end of optional output
+
+    return committees
+
+
+def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
+    def set_opt_model_func(m, profile, in_committee, committeesize, committees, cands, scorefct):
         # utility[(pref, num_appr)] contains (intended binary) variables indicating
         # whether pref approves at least num_appr candidates in the committee
 
@@ -50,7 +116,8 @@ def __gurobi_thiele_methods(profile, committeesize,
 
         # find a new committee that has not been found yet by excluding previously found committees
         for comm in committees:
-            m.addConstr(gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
+            m.addConstr(
+                gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
 
         # objective: the PAV score of the committee
         m.setObjective(
@@ -58,58 +125,17 @@ def __gurobi_thiele_methods(profile, committeesize,
                         for pref in profile
                         for num_appr in range(1, committeesize + 1)),
             gb.GRB.MAXIMIZE)
-
-        m.setParam('OutputFlag', False)
-        m.setParam('FeasibilityTol', GUROBI_ACCURACY)
-        m.setParam('PoolSearchMode', 0)
-
-        m.optimize()
-
-        if m.Status not in [2, 3, 4]:
-            # m.Status == 2 implies solution found
-            # m.Status in [3, 4] implies infeasible --> no more solutions
-            # otherwise ...
-            print("Warning (__gurobi_thiele_methods): solutions may be "
-                  + "incomplete or not optimal.")
-            print("(Gurobi return code", m.Status, ")")
-        if m.Status != 2:
-            if len(committees) == 0:
-                raise RuntimeError("Gurobi found no solution in __gurobi_thiele_methods.")
-            break
-
-        if maxscore is None:
-            maxscore = m.objVal
-
-        if abs(m.objVal - maxscore) > GUROBI_ACCURACY:
-            # no longer optimal
-            break
-
-        committee = [c for c in cands if in_committee[c].Xn >= 1-GUROBI_ACCURACY]
-        assert len(committee) == committeesize
-        committees.append(committee)
-
-        if resolute:
-            break
-
-    return committees
+    return _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct, resolute)
 
 
 def __gurobi_monroe(profile, committeesize, resolute):
-    num_voters = len(profile)
-    cands = list(range(profile.num_cand))
-
-    maxscore = None
-    committees = []
-
-    while True:
-        m = gb.Model()
+    def set_opt_model_func(
+            m, profile, in_committee, committeesize, committees, cands, scorefct):
+        num_voters = len(profile)
 
         # optimization goal: variable "satisfaction"
         satisfaction = m.addVar(vtype=gb.GRB.INTEGER, name="satisfaction")
 
-        # a list of committee members
-        in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY,
-                                 name="in_committee")
         m.addConstr(gb.quicksum(in_committee[c] for c in cands)
                     == committeesize)
 
@@ -149,44 +175,13 @@ def __gurobi_monroe(profile, committeesize, resolute):
 
         # find a new committee that has not been found before
         for comm in committees:
-            m.addConstr(gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
+            m.addConstr(
+                gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
 
         # optimization objective
         m.setObjective(satisfaction, gb.GRB.MAXIMIZE)
-
-        m.setParam('OutputFlag', False)
-        m.setParam('FeasibilityTol', GUROBI_ACCURACY)
-        m.setParam('PoolSearchMode', 0)
-
-        m.optimize()
-
-        if m.Status not in [2, 3, 4]:
-            # m.Status == 2 implies solution found
-            # m.Status in [3, 4] implies infeasible --> no more solutions
-            # otherwise ...
-            print("Warning (opt-Phragmen): solutions may be "
-                  + "incomplete or not optimal.")
-            print("(Gurobi return code", m.Status, ")")
-        if m.Status != 2:
-            if len(committees) == 0:
-                raise RuntimeError("Gurobi found no solution in opt-Phragmen ILP.")
-            break
-
-        if maxscore is None:
-            maxscore = m.objVal
-
-        if abs(m.objVal - maxscore) > GUROBI_ACCURACY:
-            # no longer optimal
-            break
-
-        committee = [c for c in cands if in_committee[c].Xn >= 1 - GUROBI_ACCURACY]
-        assert len(committee) == committeesize
-        committees.append(committee)
-
-        if resolute:
-            break
-
-    return committees
+    return _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct=None,
+                                 resolute=resolute)
 
 
 def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
@@ -200,18 +195,8 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
     Instead: minimizes the maximum load (without consideration of the
              second-, third-, ...-largest load
     """
-    cands = list(range(profile.num_cand))
-    minmaxload = None
-    committees = []
-
-    while True:
-        m = gb.Model()
-        m.setParam('OutputFlag', False)
-
-        # a binary variable indicating whether c is in the committee
-        in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY,
-                                 name="in_committee")
-
+    def set_opt_model_func(
+            m, profile, in_committee, committeesize, committees, cands, scorefct):
         load = {}
         for c in cands:
             for pref in profile:
@@ -233,7 +218,8 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
 
         # find a new committee that has not been found before
         for comm in committees:
-            m.addConstr(gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
+            m.addConstr(
+                gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
 
         loadbound = m.addVar(name="loadbound")
         for pref in profile:
@@ -242,65 +228,17 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
                         <= loadbound)
         m.setObjective(loadbound, gb.GRB.MINIMIZE)
 
-        m.setParam('OutputFlag', False)
-        m.setParam('FeasibilityTol', GUROBI_ACCURACY)
-        m.setParam('PoolSearchMode', 0)
-
-        m.optimize()
-
-        if m.Status not in [2, 3, 4]:
-            # m.Status == 2 implies solution found
-            # m.Status in [3, 4] implies infeasible --> no more solutions
-            # otherwise ...
-            print("Warning (opt-Phragmen): solutions may be "
-                  + "incomplete or not optimal.")
-            print("(Gurobi return code", m.Status, ")")
-        if m.Status != 2:
-            if len(committees) == 0:
-                raise RuntimeError("Gurobi found no solution in opt-Phragmen ILP.")
-            break
-
-        if minmaxload is None:
-            minmaxload = loadbound.Xn
-
-        assert m.objVal == loadbound.Xn
-        if abs(m.objVal - minmaxload) > GUROBI_ACCURACY:
-                # no longer optimal
-                break
-
-        committee = [c for c in cands if in_committee[c].Xn >= 1 - GUROBI_ACCURACY]
-        assert len(committee) == committeesize
-        committees.append(committee)
-
-        if resolute:
-            break
-
-    # optional output
-    if verbose:
-        print("optimal load bound: " + str(minmaxload))
-        print("(i.e., all loads are <= " + str(minmaxload) + ")")
-    # end of optional output
-
-    return committees
+    return _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct=None,
+                                 resolute=resolute, verbose=verbose)
 
 
 def __gurobi_minimaxav(profile, committeesize, resolute):
-
-    num_voters = len(profile)
-    cands = list(range(profile.num_cand))
-
-    minmaxdistance = None
-    committees = []
-
-    while True:
-        m = gb.Model()
-
+    def set_opt_model_func(
+            m, profile, in_committee, committeesize, committees, cands, scorefct):
+        num_voters = len(profile)
         # optimization goal: variable "sum_difference"
         max_hamdistance = m.addVar(vtype=gb.GRB.INTEGER, name="max_hamdistance")
 
-        # a list of committee members
-        in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY,
-                                 name="in_committee")
         m.addConstr(gb.quicksum(in_committee[c] for c in cands)
                     == committeesize)
 
@@ -326,41 +264,11 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
 
         # find a new committee that has not been found before
         for comm in committees:
-            m.addConstr(gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
+            m.addConstr(
+                gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
 
         # optimization objective
         m.setObjective(max_hamdistance, gb.GRB.MINIMIZE)
 
-        m.setParam('OutputFlag', False)
-        m.setParam('FeasibilityTol', GUROBI_ACCURACY)
-        m.setParam('PoolSearchMode', 0)
-
-        m.optimize()
-
-        if m.Status not in [2, 3, 4]:
-            # m.Status == 2 implies solution found
-            # m.Status in [3, 4] implies infeasible --> no more solutions
-            # otherwise ...
-            print("Warning (opt-Phragmen): solutions may be "
-                  + "incomplete or not optimal.")
-            print("(Gurobi return code", m.Status, ")")
-        if m.Status != 2:
-            if len(committees) == 0:
-                raise RuntimeError("Gurobi found no solution in opt-Phragmen ILP.")
-            break
-
-        if minmaxdistance is None:
-            minmaxdistance = m.objVal
-
-        if abs(m.objVal - minmaxdistance) > GUROBI_ACCURACY:
-            # no longer optimal
-            break
-
-        committee = [c for c in cands if in_committee[c].Xn >= 1 - GUROBI_ACCURACY]
-        assert len(committee) == committeesize
-        committees.append(committee)
-
-        if resolute:
-            break
-
-    return committees
+    return _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct=None,
+                                 resolute=resolute)
