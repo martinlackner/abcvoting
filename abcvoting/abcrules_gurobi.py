@@ -100,23 +100,30 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct,
 
 def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
     def set_opt_model_func(m, profile, in_committee, committeesize, committees, cands, scorefct):
-        # utility[(pref, num_appr)] contains (intended binary) variables indicating
-        # whether pref approves at least num_appr candidates in the committee (except when
-        # scorefct(num_appr) == 0 for num_appr >= 1, then order does not matter)
+        # utility[(pref, l)] contains (intended binary) variables counting the number of approved
+        # candidates in the selected committee by pref. This utility[(pref, l)] is true for
+        # exactly the number of candidates in the committee approved by pref for all
+        # l = 1...committeesize.
+        #
+        # If scorefct(l) > 0 for l >= 1, we assume that scorefct is monotonic decreasing and
+        # therefore in combination with the objective function the following interpreation is
+        # valid:
+        # utility[(pref, l)] indicates whether pref approves at least l candidates in the
+        # committee (this is the case for scorefct "pav", "slav" or "geom").
         utility = {}
 
         for pref in profile:
-            for num_appr in range(1, committeesize + 1):
+            for l in range(1, committeesize + 1):
                 # TODO Should we use vtype=gb.GRB.BINARY? Does it make it faster to use ub=1.0?
-                utility[(pref, num_appr)] = m.addVar(ub=1.0)
+                utility[(pref, l)] = m.addVar(ub=1.0)
 
         # constraint: the committee has the required size
         m.addConstr(gb.quicksum(in_committee) == committeesize)
 
         # constraint: utilities are consistent with actual committee
         for pref in profile:
-            m.addConstr(gb.quicksum(utility[pref, num_appr]
-                                    for num_appr in range(1, committeesize + 1)) ==
+            m.addConstr(gb.quicksum(utility[pref, l]
+                                    for l in range(1, committeesize + 1)) ==
                         gb.quicksum(in_committee[c] for c in pref))
 
         # find a new committee that has not been found yet by excluding previously found committees
@@ -126,12 +133,12 @@ def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
 
         # objective: the PAV score of the committee
         m.setObjective(
-            gb.quicksum(float(scorefct(num_appr)) * pref.weight * utility[(pref, num_appr)]
+            gb.quicksum(float(scorefct(l)) * pref.weight * utility[(pref, l)]
                         for pref in profile
-                        for num_appr in range(1, committeesize + 1)),
+                        for l in range(1, committeesize + 1)),
             gb.GRB.MAXIMIZE)
 
-    score_values = [scorefct(num_appr) for num_appr in range(1, committeesize + 1)]
+    score_values = [scorefct(l) for l in range(1, committeesize + 1)]
     if not all(first > second or first == second == 0
                for first, second in zip(score_values, score_values[1:])):
         raise ValueError("scorefct must be monotonic decreasing")
