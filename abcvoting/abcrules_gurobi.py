@@ -64,10 +64,11 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct,
             # m.Status == 2 implies solution found
             # m.Status in [3, 4] implies infeasible --> no more solutions
             # otherwise ...
-            print("Warning (_optimize_rule_gurobi): solutions may be incomplete or not optimal.")
-            print("(Gurobi return code", m.Status, ")")
-        if m.Status != 2:
+            raise RuntimeError(f"Gurobi returned an unexpected status code: {m.Status}"
+                               "Warning: solutions may be incomplete or not optimal.")
+        elif m.Status != 2:
             if len(committees) == 0:
+                # we are in the first round of searching committees and Gurobi doesn't find anything
                 raise RuntimeError("Gurobi found no solution")
             break
 
