@@ -17,7 +17,7 @@ from abcvoting import abcrules_gurobi
 from abcvoting import abcrules_cvxpy
 from abcvoting.misc import sort_committees
 from abcvoting.misc import hamming
-from abcvoting.misc import enough_approved_candidates
+from abcvoting.misc import check_enough_approved_candidates
 from abcvoting.misc import str_committees_header
 from abcvoting.misc import str_candset, str_candsets
 from abcvoting.misc import header
@@ -157,7 +157,7 @@ def compute_thiele_method(scorefct_str, profile, committeesize,
     Compute winning committees of the Thiele method specified
     by the score function (scorefct_str)
     """
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
 
     # optional output
@@ -209,7 +209,7 @@ def __thiele_methods_branchandbound(profile, committeesize,
                                     scorefct_str, resolute):
     """Branch-and-bound algorithm to compute winning committees
     for Thiele methods"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
 
     best_committees = []
@@ -307,7 +307,7 @@ def compute_av(profile, committeesize, algorithm="standard",
 
 
 def __separable(rule_id, profile, committeesize, resolute, verbose):
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     appr_scores = [0] * profile.num_cand
     for pref in profile:
@@ -458,7 +458,7 @@ def compute_seq_thiele_method(profile, committeesize, scorefct_str,
                               algorithm="standard", resolute=True, verbose=0):
     """Sequential Thiele methods"""
 
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     if algorithm != "standard":
         raise NotImplementedError(
@@ -576,7 +576,7 @@ def compute_revseq_thiele_method(profile, committeesize,
                                  scorefct_str, algorithm="standard",
                                  resolute=True, verbose=0):
     """Reverse sequential Thiele methods"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     if algorithm != "standard":
         raise NotImplementedError(
@@ -635,7 +635,7 @@ def __minimaxav_bruteforce(profile, committeesize):
 def compute_mav(profile, committeesize, algorithm="brute-force",
                 resolute=False, verbose=0):
     """Minimax AV (MAV)"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     # optional output
     if verbose:
@@ -683,7 +683,7 @@ def compute_mav(profile, committeesize, algorithm="brute-force",
 def compute_lexmav(profile, committeesize, algorithm="brute-force",
                    resolute=False, verbose=0):
     """Lexicographic Minimax AV"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     if not profile.has_unit_weights():
         raise ValueError(rules["lexmav"].shortname +
@@ -764,7 +764,7 @@ def compute_cc(profile, committeesize, algorithm="branch-and-bound",
 def compute_monroe(profile, committeesize, algorithm="brute-force",
                    resolute=False, verbose=0):
     """Monroe's rule"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     # optional output
     if verbose:
@@ -829,7 +829,7 @@ def __monroe_bruteforce(profile, committeesize, resolute):
 def compute_greedy_monroe(profile, committeesize,
                           algorithm="standard", resolute=True, verbose=0):
     """"Greedy Monroe"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise ValueError(rules["greedy-monroe"].shortname +
                          " is only defined for unit weights (weight=1)")
@@ -1055,7 +1055,7 @@ def __seqphragmen_irresolute(profile, committeesize,
 def compute_seqphragmen(profile, committeesize, algorithm="standard",
                         resolute=True, verbose=False):
     """Phragmen's sequential rule (seq-Phragmen)"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     if algorithm != "standard":
         raise NotImplementedError(
@@ -1123,7 +1123,7 @@ def compute_rule_x(profile, committeesize, algorithm="standard",
         omit the second phase (that uses seq-Phragmen)
         may result in a committee that is too small
     """
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise ValueError(rules["rule-x"].shortname +
                          " is only defined for unit weights (weight=1)")
@@ -1282,7 +1282,7 @@ def compute_optphragmen(profile, committeesize,
     Instead: minimizes the maximum load (without consideration of the
              second-, third-, ...-largest load
     """
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     # optional output
     if verbose:
@@ -1320,7 +1320,7 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="standard",
     Method described in:
     https://arxiv.org/pdf/1611.08826.pdf (Section 18.5, Page 59)
     """
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise ValueError(rules["phrag-enestr"].shortname +
                          " is only defined for unit weights (weight=1)")
@@ -1400,7 +1400,7 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard",
     Martin Lackner Perpetual Voting: Fairness in Long-Term Decision Making
     In Proceedings of the 34th AAAI Conference on Artificial Intelligence (AAAI 2020)
     """
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     if algorithm != "standard":
         raise NotImplementedError(

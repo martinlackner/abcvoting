@@ -14,7 +14,7 @@ def sort_committees(committees):
     return [sorted(list(c)) for c in sorted(set(map(tuple, committees)))]
 
 
-def enough_approved_candidates(profile, committeesize):
+def check_enough_approved_candidates(profile, committeesize):
     """
     verifies whether a sufficient number of approved candidates exists
     """
