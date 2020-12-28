@@ -56,6 +56,9 @@ class Profile(object):
         pref : ApprovalSet or iterable of int
 
         """
+        # note that we trust that each set in self._approval_sets is a unique object even if pref
+        # might not be unique, because it is used as dict key (see e.g. the variable utility in
+        # abcrules_gurobi or propositionA3.py)
         if isinstance(pref, ApprovalSet):
             appr_set = pref
         else:

@@ -72,7 +72,7 @@ def str_committees_header(committees, winning=False):
 
 
 def hamming(a, b):
-    """Hamming distance"""
+    """Hamming distance for sets `a` and `b`."""
     diffs = ([x for x in a if x not in b] +
              [x for x in b if x not in a])
     return len(diffs)
