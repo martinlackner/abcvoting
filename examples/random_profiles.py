@@ -4,7 +4,7 @@ import sys
 import random
 sys.path.insert(0, '..')
 from abcvoting import genprofiles
-from abcvoting.misc import enough_approved_candidates
+from abcvoting.misc import check_enough_approved_candidates
 
 
 random.seed(31415)
@@ -29,7 +29,7 @@ We thus recommended to verify this before computing the rule.
 while True:
     profile = genprofiles.random_urn_profile(num_cand, 5, 2, 0.4)
     try:
-        enough_approved_candidates(profile, committeesize)
+        check_enough_approved_candidates(profile, committeesize)
         break
     except ValueError:
         pass
@@ -39,7 +39,7 @@ while True:
     profile = genprofiles.random_urn_party_list_profile(
         num_cand, 3, 2, 0.4, uniform=False)
     try:
-        enough_approved_candidates(profile, committeesize)
+        check_enough_approved_candidates(profile, committeesize)
         break
     except ValueError:
         pass
@@ -59,7 +59,7 @@ while True:
     profile = genprofiles.random_2d_points_profile(
         num_cand, 4, "twogroups", "uniform_square", 0.5, 1.9)
     try:
-        enough_approved_candidates(profile, committeesize)
+        check_enough_approved_candidates(profile, committeesize)
         break
     except ValueError:
         pass

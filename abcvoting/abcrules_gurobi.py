@@ -37,6 +37,8 @@ def __gurobi_thiele_methods(profile, committeesize,
         for pref in profile:
             for num_appr in range(1, committeesize + 1):
                 # TODO Should we use vtype=gb.GRB.BINARY? Does it make it faster to use ub=1.0?
+                # note: when using pref as dict key, id(pref) is used, so we rely on
+                # preferences.Profile.add_voter() that unique objects are created.
                 utility[(pref, num_appr)] = m.addVar(ub=1.0)
 
         # constraint: the committee has the required size
