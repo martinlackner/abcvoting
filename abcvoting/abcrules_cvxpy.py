@@ -65,6 +65,8 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
             1 / np.arange(1, committeesize + 1),
             (len(profile), 1)
         )
+    elif scorefct_str == 'av':
+        raise ValueError("scorefct must be monotonic decreasing")
     else:
         raise NotImplementedError(f"invalid scorefct_str: {scorefct_str}")
 
