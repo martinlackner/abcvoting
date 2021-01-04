@@ -17,7 +17,7 @@ from abcvoting import abcrules_gurobi
 from abcvoting import abcrules_cvxpy
 from abcvoting.misc import sort_committees
 from abcvoting.misc import hamming
-from abcvoting.misc import enough_approved_candidates
+from abcvoting.misc import check_enough_approved_candidates
 from abcvoting.misc import str_committees_header
 from abcvoting.misc import str_candset, str_candsets
 from abcvoting.misc import header
@@ -109,7 +109,7 @@ def __init_rules():
         ("seqcc", "seq-CC", "Sequential Approval Chamberlin-Courant (seq-CC)",
          compute_seqcc, ("standard",), (True, False)),
         ("seqphrag", "seq-Phragmén", "Phragmén's Sequential Rule (seq-Phragmén)",
-         compute_seqphragmen, ("standard",), (True, False)),
+         compute_seqphragmen, ("standard", "exact-fractions"), (True, False)),
         ("optphrag", "opt-Phragmén", "Phragmén's Optimization Rule (opt-Phragmén)",
          compute_optphragmen, ("gurobi",), (True, False)),
         ("monroe", "Monroe", "Monroe's Approval Rule (Monroe)",
@@ -121,11 +121,11 @@ def __init_rules():
         ("lexmav", "lex-MAV", "Lexicographic Minimax Approval Voting (lex-MAV)",
          compute_lexmav, ("brute-force",), (True, False)),
         ("rule-x", "Rule X", "Rule X",
-         compute_rule_x, ("standard",), (True, False)),
+         compute_rule_x, ("standard", "exact-fractions"), (True, False)),
         ("rule-x-without-2nd-phase", "Rule X (without 2nd phase)", "Rule X without the second (Phragmén) phase",
          compute_rule_x_without_2nd_phase, ("standard",), (True, False)),
         ("phrag-enestr", "Phragmén-Eneström", "Method of Phragmén-Eneström",
-         compute_phragmen_enestroem, ("standard",), (True, False)),
+         compute_phragmen_enestroem, ("standard", "exact-fractions"), (True, False)),
         ("consensus", "Consensus", "Consensus Rule",
          compute_consensus_rule, ("standard",), (True, False))]
     # TODO: add other thiele methods
@@ -157,7 +157,7 @@ def compute_thiele_method(scorefct_str, profile, committeesize,
     Compute winning committees of the Thiele method specified
     by the score function (scorefct_str)
     """
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
 
     # optional output
@@ -209,7 +209,7 @@ def __thiele_methods_branchandbound(profile, committeesize,
                                     scorefct_str, resolute):
     """Branch-and-bound algorithm to compute winning committees
     for Thiele methods"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
 
     best_committees = []
@@ -307,14 +307,14 @@ def compute_av(profile, committeesize, algorithm="standard",
 
 
 def __separable(rule_id, profile, committeesize, resolute, verbose):
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     appr_scores = [0] * profile.num_cand
     for pref in profile:
         for cand in pref:
             if rule_id == "sav":
                 # Satisfaction Approval Voting
-                appr_scores[cand] += Fraction(pref.weight, len(pref))
+                appr_scores[cand] += pref.weight / len(pref)
             elif rule_id == "av":
                 # (Classic) Approval Voting
                 appr_scores[cand] += pref.weight
@@ -458,7 +458,7 @@ def compute_seq_thiele_method(profile, committeesize, scorefct_str,
                               algorithm="standard", resolute=True, verbose=0):
     """Sequential Thiele methods"""
 
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     if algorithm != "standard":
         raise NotImplementedError(
@@ -576,7 +576,7 @@ def compute_revseq_thiele_method(profile, committeesize,
                                  scorefct_str, algorithm="standard",
                                  resolute=True, verbose=0):
     """Reverse sequential Thiele methods"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     if algorithm != "standard":
         raise NotImplementedError(
@@ -635,7 +635,7 @@ def __minimaxav_bruteforce(profile, committeesize):
 def compute_mav(profile, committeesize, algorithm="brute-force",
                 resolute=False, verbose=0):
     """Minimax AV (MAV)"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     # optional output
     if verbose:
@@ -683,7 +683,7 @@ def compute_mav(profile, committeesize, algorithm="brute-force",
 def compute_lexmav(profile, committeesize, algorithm="brute-force",
                    resolute=False, verbose=0):
     """Lexicographic Minimax AV"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     if not profile.has_unit_weights():
         raise ValueError(rules["lexmav"].shortname +
@@ -764,7 +764,7 @@ def compute_cc(profile, committeesize, algorithm="branch-and-bound",
 def compute_monroe(profile, committeesize, algorithm="brute-force",
                    resolute=False, verbose=0):
     """Monroe's rule"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     # optional output
     if verbose:
@@ -829,7 +829,7 @@ def __monroe_bruteforce(profile, committeesize, resolute):
 def compute_greedy_monroe(profile, committeesize,
                           algorithm="standard", resolute=True, verbose=0):
     """"Greedy Monroe"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise ValueError(rules["greedy-monroe"].shortname +
                          " is only defined for unit weights (weight=1)")
@@ -933,9 +933,9 @@ def compute_greedy_monroe(profile, committeesize,
     return committees
 
 
-def __seqphragmen_resolute(profile, committeesize, verbose,
-                           start_load=None, partial_committee=None):
+def __seqphragmen_resolute(profile, committeesize, division, verbose=0, start_load=None, partial_committee=None):
     """Algorithm for computing resolute seq-Phragmen  (1 winning committee)"""
+
     approvers_weight = {}
     for c in range(profile.num_cand):
         approvers_weight[c] = sum(pref.weight for pref in profile if c in pref)
@@ -954,7 +954,7 @@ def __seqphragmen_resolute(profile, committeesize, verbose,
             approvers_load[c] = sum(pref.weight * load[v]
                                     for v, pref in enumerate(profile)
                                     if c in pref)
-        new_maxload = [Fraction(approvers_load[c] + 1, approvers_weight[c])
+        new_maxload = [division(approvers_load[c] + 1, approvers_weight[c])
                        if approvers_weight[c] > 0 else committeesize + 1
                        for c in range(profile.num_cand)]
         # exclude committees already in the committee
@@ -1003,7 +1003,7 @@ def __seqphragmen_resolute(profile, committeesize, verbose,
 
 
 def __seqphragmen_irresolute(profile, committeesize,
-                             start_load=None, partial_committee=None):
+                             division, start_load=None, partial_committee=None):
     """Algorithm for computing irresolute seq-Phragmen (>=1 winning committees)
     """
     approvers_weight = {}
@@ -1027,7 +1027,7 @@ def __seqphragmen_irresolute(profile, committeesize,
                                         for v, pref in enumerate(profile)
                                         if c in pref)
             new_maxload = [
-                Fraction(approvers_load[c] + 1, approvers_weight[c])
+                division(approvers_load[c] + 1, approvers_weight[c])
                 if approvers_weight[c] > 0 else committeesize + 1
                 for c in range(profile.num_cand)]
             # exclude committees already in the committee
@@ -1055,12 +1055,14 @@ def __seqphragmen_irresolute(profile, committeesize,
 def compute_seqphragmen(profile, committeesize, algorithm="standard",
                         resolute=True, verbose=False):
     """Phragmen's sequential rule (seq-Phragmen)"""
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
-    if algorithm != "standard":
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm)
-            + " not specified for compute_seqphragmen")
+    if algorithm == "standard":
+        division = lambda x, y: x / y  # standard float division
+    elif algorithm == "exact-fractions":
+        division = Fraction  # using exact fractions
+    else:
+        raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for compute_seqphragmen")
 
     # optional output
     if verbose:
@@ -1070,11 +1072,9 @@ def compute_seqphragmen(profile, committeesize, algorithm="standard",
     # end of optional output
 
     if resolute:
-        committees, comm_loads = __seqphragmen_resolute(
-            profile, committeesize, verbose)
+        committees, comm_loads = __seqphragmen_resolute(profile, committeesize, division, verbose=verbose)
     else:
-        committees, comm_loads = __seqphragmen_irresolute(
-            profile, committeesize)
+        committees, comm_loads = __seqphragmen_irresolute(profile, committeesize, division)
 
     # optional output
     if verbose:
@@ -1095,14 +1095,14 @@ def compute_seqphragmen(profile, committeesize, algorithm="standard",
     return committees
 
 
-def __rule_x_get_min_q(profile, budget, cand):
+def __rule_x_get_min_q(profile, budget, cand, division):
     rich = set([v for v, pref in enumerate(profile)
                 if cand in pref])
     poor = set()
 
     while len(rich) > 0:
         poor_budget = sum(budget[v] for v in poor)
-        q = Fraction(1 - poor_budget, len(rich))
+        q = division(1 - poor_budget, len(rich))
         new_poor = set([v for v in rich
                         if budget[v] < q])
         if len(new_poor) == 0:
@@ -1123,15 +1123,17 @@ def compute_rule_x(profile, committeesize, algorithm="standard",
         omit the second phase (that uses seq-Phragmen)
         may result in a committee that is too small
     """
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise ValueError(rules["rule-x"].shortname +
                          " is only defined for unit weights (weight=1)")
 
-    if algorithm != "standard":
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm)
-            + " not specified for compute_rule_x")
+    if algorithm == "standard":
+        division = lambda x, y: x / y  # standard float division
+    elif algorithm == "exact-fractions":
+        division = Fraction  # using exact fractions
+    else:
+        raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for compute_rule_x")
 
     # optional output
     if verbose:
@@ -1140,7 +1142,7 @@ def compute_rule_x(profile, committeesize, algorithm="standard",
             print("Computing only one winning committee (resolute=True)\n")
     # end of optional output
 
-    start_budget = {v: Fraction(committeesize, len(profile))
+    start_budget = {v: division(committeesize, len(profile))
                     for v, _ in enumerate(profile)}
     cands = range(profile.num_cand)
     commbugdets = [(set(), start_budget)]
@@ -1163,7 +1165,7 @@ def compute_rule_x(profile, committeesize, algorithm="standard",
             curr_cands = set(cands) - committee
             min_q = {}
             for c in curr_cands:
-                q = __rule_x_get_min_q(profile, budget, c)
+                q = __rule_x_get_min_q(profile, budget, c, division)
                 if q is not None:
                     min_q[c] = q
 
@@ -1219,7 +1221,7 @@ def compute_rule_x(profile, committeesize, algorithm="standard",
                     start_load = {}
                     # translate budget to loads
                     for v in range(len(profile)):
-                        start_load[v] = (Fraction(committeesize, len(profile))
+                        start_load[v] = (division(committeesize, len(profile))
                                          - budget[v])
 
                     # optional output
@@ -1233,12 +1235,12 @@ def compute_rule_x(profile, committeesize, algorithm="standard",
 
                     if resolute:
                         committees, _ = __seqphragmen_resolute(
-                            profile, committeesize, verbose=verbose,
+                            profile, committeesize, division, verbose=verbose,
                             partial_committee=list(committee),
                             start_load=start_load)
                     else:
                         committees, _ = __seqphragmen_irresolute(
-                            profile, committeesize,
+                            profile, committeesize, division,
                             partial_committee=list(committee),
                             start_load=start_load)
                     final_committees.update([tuple(comm) for comm in committees])
@@ -1282,7 +1284,7 @@ def compute_optphragmen(profile, committeesize,
     Instead: minimizes the maximum load (without consideration of the
              second-, third-, ...-largest load
     """
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
     # optional output
     if verbose:
@@ -1320,21 +1322,22 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="standard",
     Method described in:
     https://arxiv.org/pdf/1611.08826.pdf (Section 18.5, Page 59)
     """
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise ValueError(rules["phrag-enestr"].shortname +
                          " is only defined for unit weights (weight=1)")
 
-    if algorithm != "standard":
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm)
-            + " not specified for compute_phragmen_enestroem")
+    if algorithm == "standard":
+        division = lambda x, y: x / y  # standard float division
+    elif algorithm == "exact-fractions":
+        division = Fraction  # using exact fractions
+    else:
+        raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for compute_phragmen_enestroem")
 
     num_voters = len(profile)
 
-    start_budget = {i: Fraction(profile[i].weight)
-                    for i in range(num_voters)}
-    price = Fraction(sum(start_budget.values()), committeesize)
+    start_budget = {i: profile[i].weight for i in range(num_voters)}
+    price = division(sum(start_budget.values()), committeesize)
 
     cands = range(profile.num_cand)
 
@@ -1363,8 +1366,7 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="standard",
                 b = dict(budget)  # copy of budget
                 if max_support > price:  # supporters can afford it
                     # (voting_power - price) / voting_power
-                    multiplier = Fraction(max_support - price,
-                                          max_support)
+                    multiplier = division(max_support - price, max_support)
                 else:  # set supporters to 0
                     multiplier = 0
                 for nr, pref in enumerate(profile):
@@ -1400,12 +1402,15 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard",
     Martin Lackner Perpetual Voting: Fairness in Long-Term Decision Making
     In Proceedings of the 34th AAAI Conference on Artificial Intelligence (AAAI 2020)
     """
-    enough_approved_candidates(profile, committeesize)
+    check_enough_approved_candidates(profile, committeesize)
 
-    if algorithm != "standard":
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm)
-            + " not specified for compute_consensus_rule")
+    if algorithm == "standard":
+        division = lambda x, y: x / y  # standard float division
+    elif algorithm == "exact-fractions":
+        division = Fraction  # using exact fractions
+    else:
+        raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for compute_consensus_rule")
+
 
     num_voters = len(profile)
     cands = range(profile.num_cand)
@@ -1434,7 +1439,7 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard",
             for cand in winners:
                 b = dict(budget)  # copy of budget
                 for i in supporters[cand]:
-                    b[i] -= Fraction(num_voters, len(supporters[cand]))
+                    b[i] -= division(num_voters, len(supporters[cand]))
                 c = comm.union([cand])  # new committee with candidate
                 next_committees.append((b, c))
 

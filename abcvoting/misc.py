@@ -14,7 +14,7 @@ def sort_committees(committees):
     return [sorted(list(c)) for c in sorted(set(map(tuple, committees)))]
 
 
-def enough_approved_candidates(profile, committeesize):
+def check_enough_approved_candidates(profile, committeesize):
     """
     verifies whether a sufficient number of approved candidates exists
     """
@@ -72,7 +72,15 @@ def str_committees_header(committees, winning=False):
 
 
 def hamming(a, b):
-    """Hamming distance"""
+    """Hamming distance between sets `a` and `b`.
+
+    The Hamming distance for sets is the size of their symmetric difference,
+    or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings.
+
+    Parameters
+    ----------
+    a, b : iterable of int
+        The two sets, for which the Hamming distance is computed."""
     diffs = ([x for x in a if x not in b] +
              [x for x in b if x not in a])
     return len(diffs)
