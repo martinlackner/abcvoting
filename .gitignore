@@ -60,3 +60,4 @@ excluded
 *.cache
 venv
 venv-p2.7
+/coverage.sh
