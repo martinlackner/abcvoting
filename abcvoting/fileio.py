@@ -5,7 +5,7 @@ Read preflib files (soi, toi, soc or toc)
 
 from __future__ import print_function
 import os
-from abcvoting.preferences import Profile
+from abcvoting.preferences import Profile, ApprovalSet
 from math import ceil
 
 
@@ -65,6 +65,11 @@ def get_file_names(dir_name):
 
 
 def get_appr_set(num_appr, ranking, candidate_map):
+    # if num_appr = 1 and the ranking starts with empty set, interpret as empty ballot and return set()
+    if num_appr == 1 and ranking[0].strip()[0] == "{"  and ranking[0].strip()[-1] == "}"\
+            and ranking[0].strip().replace("}","").replace("{","").strip() == "":
+        return set()
+
     appr_set = set()
     tied = False
     for i in range(len(ranking)):
@@ -102,7 +107,7 @@ def get_appr_set(num_appr, ranking, candidate_map):
     return appr_set
 
 
-def read_preflib_file(filename, setsize=1, appr_percent=None):
+def read_preflib_file(filename, setsize=1, appr_percent=None, use_weights=False):
     """Reads a single preflib file (soi, toi, soc or toc).
 
     Parameters:
@@ -120,17 +125,21 @@ def read_preflib_file(filename, setsize=1, appr_percent=None):
             Indicates which percentage of candidates of the ranking
             are approved (rounded up). In case of ties, more
             candidates are approved.
-            E.g., if a voter has 10 candidates and this value is 0.75,
+            E.g., if a voter has 10 approved candidates and appr_percent is 0.75,
             then the approval set contains the top 8 candidates.
+
+        use_weights: bool
+            If False, treat vote count in preflib file as the number of duplicate ballots,
+            i.e., the number of voters that have this approval set.
+            If True, treat vote count as weight and use this weight in ApprovalSet.
 
     Returns:
         profile: Profile
             Preference profile extracted from preflib file,
             including names of candidates
-
-        """
+    """
     if setsize <= 0:
-        raise ValueError("Parameter setsize <= 0")
+        raise ValueError("Parameter setsize must be > 0")
     if appr_percent and (appr_percent <= 0. or appr_percent > 1.):
         raise ValueError(
             "Parameter appr_percent not in interval (0, 1]")
@@ -147,16 +156,12 @@ def read_preflib_file(filename, setsize=1, appr_percent=None):
         try:
             voter_count, _, unique_orders = [int(p.strip()) for p in parts]
         except ValueError:
-            raise PreflibException("Number of voters ill specified, "
-                                   + str(parts)
-                                   + " should be triple of integers")
+            raise PreflibException(f"Number of voters ill specified ({str(parts)}), should be triple of integers")
 
         appr_sets = []
         lines = [line.strip() for line in f.readlines() if line.strip()]
         if len(lines) != unique_orders:
-            raise PreflibException("Number of unique orders should be "
-                                   + str(unique_orders) + " but is " +
-                                   str(len(lines)))
+            raise PreflibException(f"Expected {unique_orders} lines that specify voters in the input, encountered {len(lines)}")
 
     for line in lines:
         parts = line.split(",")
@@ -165,8 +170,7 @@ def read_preflib_file(filename, setsize=1, appr_percent=None):
         try:
             count = int(parts[0])
         except ValueError:
-            raise PreflibException("Each ranking must start with count ("
-                                   + str(line) + ")")
+            raise PreflibException(f"Each ranking must start with count/weight ({line})")
         ranking = parts[1:]  # ranking starts after count
         if len(ranking) == 0:
             raise PreflibException("Empty ranking: " + str(line))
@@ -175,8 +179,7 @@ def read_preflib_file(filename, setsize=1, appr_percent=None):
         else:
             num_appr = setsize
         appr_set = get_appr_set(num_appr, ranking, candidate_map)
-        for _ in range(count):
-            appr_sets.append(appr_set)
+        appr_sets.append((count, appr_set))
 
     # normalize candidates to 0, 1, 2, ...
     cand_names = []
@@ -187,11 +190,47 @@ def read_preflib_file(filename, setsize=1, appr_percent=None):
 
     profile = Profile(num_cand, cand_names=cand_names)
 
-    for appr_set in appr_sets:
+    for count, appr_set in appr_sets:
         norm_appr_set = []
         for c in appr_set:
             norm_appr_set.append(normalize_map[c])
-        profile.add_voter(norm_appr_set)
-    if len(profile) != voter_count:
-        raise PreflibException("Missing voters.")
+        if use_weights:
+            profile.add_voter(ApprovalSet(norm_appr_set, weight=count))
+        else:
+            profile.add_voters([norm_appr_set] * count)
+    if use_weights:
+        if len(profile) != unique_orders:
+            raise PreflibException("Number of voters wrongly specified in preflib file.")
+    else:
+        if len(profile) != voter_count:
+            raise PreflibException("Number of voters wrongly specified in preflib file.")
     return profile
+
+
+def write_profile_to_preflib_toi_file(profile, filename):
+    """ Writes profile in a preflib toi file
+
+    Parameters:
+
+        profile: Profile
+            Profile to be written in preflib file.
+
+        filename: str
+            File name of the preflib file to be written.
+
+    Returns:
+        None
+    """
+    with open(filename, 'w') as f:
+        # write: number of candidates
+        f.write(str(profile.num_cand) + "\n")
+        # write: names of candidates
+        for i in range(profile.num_cand):
+            f.write(f"{i + 1}, {profile.cand_names[i]}\n")
+        # write: info about number of voters and total weight
+        total_weight = sum(appr_set.weight for appr_set in profile)
+        f.write(f"{total_weight}, {total_weight}, {len(profile)}\n")
+        # write: approval sets and weights
+        for appr_set in profile:
+            appr_set_string = ", ".join(str(cand + 1) for cand in appr_set)
+            f.write(f"{appr_set.weight}, {{{appr_set_string}}}\n")
