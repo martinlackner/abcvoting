@@ -6,7 +6,8 @@ by Martin Lackner and Piotr Skowron
 
 from __future__ import print_function
 import sys
-sys.path.insert(0, '..')
+
+sys.path.insert(0, "..")
 from abcvoting import abcrules
 from abcvoting.preferences import Profile
 from abcvoting import misc
@@ -29,11 +30,11 @@ profile.add_voters(apprsets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees_rule_x = abcrules.compute_rule_x(
-    profile, 4, resolute=False, verbose=2)
+committees_rule_x = abcrules.compute_rule_x(profile, 4, resolute=False, verbose=2)
 
 committees_seqphragmen = abcrules.compute_seqphragmen(
-    profile, 4, resolute=False, verbose=1)
+    profile, 4, resolute=False, verbose=1
+)
 
 # verify correctness
 assert committees_rule_x == [[a, b, c, d], [a, b, c, e]]

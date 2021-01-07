@@ -8,22 +8,17 @@ import os
 from abcvoting.preferences import Profile
 
 
-@pytest.mark.parametrize(
-    "filename", ["test1.toi", "test2.soi", "test3.toc"]
-)
+@pytest.mark.parametrize("filename", ["test1.toi", "test2.soi", "test3.toc"])
 def test_readfile(filename):
     currdir = os.path.dirname(os.path.abspath(__file__))
-    profile = fileio.read_preflib_file(
-        currdir + "/data/" + filename, appr_percent=0.5)
+    profile = fileio.read_preflib_file(currdir + "/data/" + filename, appr_percent=0.5)
     assert len(profile) == 5
     assert profile.has_unit_weights()
 
 
 def test_readfromdir():
     currdir = os.path.dirname(os.path.abspath(__file__))
-    profiles = \
-        fileio.load_preflib_files_from_dir(currdir + "/data/",
-                                           setsize=2)
+    profiles = fileio.load_preflib_files_from_dir(currdir + "/data/", setsize=2)
     assert len(profiles) == 5
     for profile in profiles:
         for pref in profile:
@@ -31,57 +26,57 @@ def test_readfromdir():
         assert profile.has_unit_weights()
 
 
-@pytest.mark.parametrize(
-    "filename", ["test2.soi", "test3.toc"]
-)
+@pytest.mark.parametrize("filename", ["test2.soi", "test3.toc"])
 def test_readfile_setsize(filename):
     currdir = os.path.dirname(os.path.abspath(__file__))
-    profile = \
-        fileio.read_preflib_file(currdir + "/data/" + filename,
-                                 setsize=2)
+    profile = fileio.read_preflib_file(currdir + "/data/" + filename, setsize=2)
     for pref in profile:
         assert len(pref) == 2
 
 
 @pytest.mark.parametrize(
-    "filename,setsize,expected", 
-    [("test1.toi", 1, [1, 1, 1, 2, 1]),
-     ("test1.toi", 2, [2, 3, 3, 2, 2]),
-     ("test1.toi", 3, [3, 3, 3, 3, 3]),
-     ("test1.toi", 4, [6, 6, 6, 6, 4]),
-     ("test1.toi", 5, [6, 6, 6, 6, 6]),
-     ("test4.toi", 1, [1, 1, 1, 3, 1]),
-     ("test4.toi", 2, [2, 6, 6, 3, 2]),
-     ("test4.toi", 3, [3, 6, 6, 3, 3]),
-     ("test4.toi", 4, [6, 6, 6, 6, 6])]
+    "filename,setsize,expected",
+    [
+        ("test1.toi", 1, [1, 1, 1, 2, 1]),
+        ("test1.toi", 2, [2, 3, 3, 2, 2]),
+        ("test1.toi", 3, [3, 3, 3, 3, 3]),
+        ("test1.toi", 4, [6, 6, 6, 6, 4]),
+        ("test1.toi", 5, [6, 6, 6, 6, 6]),
+        ("test4.toi", 1, [1, 1, 1, 3, 1]),
+        ("test4.toi", 2, [2, 6, 6, 3, 2]),
+        ("test4.toi", 3, [3, 6, 6, 3, 3]),
+        ("test4.toi", 4, [6, 6, 6, 6, 6]),
+    ],
 )
 def test_readfile_setsize_with_ties(filename, setsize, expected):
     currdir = os.path.dirname(os.path.abspath(__file__))
-    profile = fileio.read_preflib_file(currdir + "/data/" + filename,
-                                       setsize=setsize)
+    profile = fileio.read_preflib_file(currdir + "/data/" + filename, setsize=setsize)
     assert [len(pref) for pref in profile] == expected
     for pref in profile:
         assert pref.weight == 1
 
 
 @pytest.mark.parametrize(
-    "filename", ["test1.toi", "test2.soi", "test3.toc",
-                 "test6.soi", "test7.toi", "test8.soi"]
+    "filename",
+    ["test1.toi", "test2.soi", "test3.toc", "test6.soi", "test7.toi", "test8.soi"],
 )
 def test_readfile_corrupt(filename):
     currdir = os.path.dirname(os.path.abspath(__file__))
     with pytest.raises(fileio.PreflibException):
         profile = fileio.read_preflib_file(
-            currdir + "/data-fail/" + filename, setsize=2)
+            currdir + "/data-fail/" + filename, setsize=2
+        )
         print(str(profile))
 
 
 @pytest.mark.parametrize(
     "filename,total_weight,num_voters",
-    [("test1.toi", 5, 4),
-     ("test2.soi", 5, 3),
-     ("test3.toc", 5, 5),
-     ("test4.toi", 5, 4)]
+    [
+        ("test1.toi", 5, 4),
+        ("test2.soi", 5, 3),
+        ("test3.toc", 5, 5),
+        ("test4.toi", 5, 4),
+    ],
 )
 def test_readfile_and_weights(filename, total_weight, num_voters):
     currdir = os.path.dirname(os.path.abspath(__file__))
@@ -100,7 +95,9 @@ def test_read_and_write_preflib_file():
     profile.add_voters([[3], [4, 1, 5], [0, 2], [], [0, 1, 2, 3, 4, 5], [5], [1], [1]])
     fileio.write_profile_to_preflib_toi_file(profile, currdir + "/data/test5.toi")
     for use_weights in [True, False]:
-        profile2 = fileio.read_preflib_file(currdir + "/data/test5.toi", use_weights=use_weights)
+        profile2 = fileio.read_preflib_file(
+            currdir + "/data/test5.toi", use_weights=use_weights
+        )
         assert len(profile) == len(profile2)
         for i, pref in enumerate(profile):
             assert pref.weight == profile2[i].weight

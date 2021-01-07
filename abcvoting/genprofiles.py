@@ -10,13 +10,13 @@ from abcvoting.preferences import Profile
 
 def random_urn_profile(num_cand, num_voters, setsize, replace):
     """Generate Polya Urn profile with fixed size approval sets."""
-    currsize = 1.
+    currsize = 1.0
     apprsets = []
     replacedsets = {}
 
     for _ in range(num_voters):
         r = random.random() * currsize
-        if r < 1.:
+        if r < 1.0:
             # base case: sample uniformly at random
             randset = random.sample(range(num_cand), setsize)
             apprsets.append(randset)
@@ -41,19 +41,19 @@ def random_urn_profile(num_cand, num_voters, setsize, replace):
     return profile
 
 
-def random_urn_party_list_profile(num_cand, num_voters, num_parties,
-                                  replace, uniform=False):
+def random_urn_party_list_profile(
+    num_cand, num_voters, num_parties, replace, uniform=False
+):
     """Generate Polya Urn profile from a number of parties.
     If uniform each party gets the same amount of candidates."""
-    currsize = 1.
+    currsize = 1.0
     apprsets = []
     replacedsets = {}
     parties = list(range(num_parties))
-    party_cands = __distribute_candidates_to_parties(
-        num_cand, parties, uniform=uniform)
+    party_cands = __distribute_candidates_to_parties(num_cand, parties, uniform=uniform)
     for _ in range(num_voters):
         r = random.random() * currsize
-        if r < 1.:
+        if r < 1.0:
             # base case: sample uniformly at random
             party = random.choice(parties)
             randpartyset = list(party_cands[party])
@@ -90,15 +90,13 @@ def random_IC_profile(num_cand, num_voters, setsize):
     return profile
 
 
-def random_IC_party_list_profile(num_cand, num_voters, num_parties,
-                                 uniform=False):
+def random_IC_party_list_profile(num_cand, num_voters, num_parties, uniform=False):
     """Generates profile with random assignment of parties.
     A party is a list of candidates.
     If uniform the number of candidates per party is the same,
     else at least 1."""
     parties = list(range(num_parties))
-    party_cands = __distribute_candidates_to_parties(
-        num_cand, parties, uniform=uniform)
+    party_cands = __distribute_candidates_to_parties(num_cand, parties, uniform=uniform)
     apprsets = []
     for _ in range(num_voters):
         apprsets.append(party_cands[random.choice(parties)])
@@ -107,9 +105,9 @@ def random_IC_party_list_profile(num_cand, num_voters, num_parties,
     return profile
 
 
-def random_2d_points_profile(num_cand, num_voters, candpointmode,
-                             voterpointmode, sigma,
-                             approval_threshold):
+def random_2d_points_profile(
+    num_cand, num_voters, candpointmode, voterpointmode, sigma, approval_threshold
+):
     """Generates profiles from randomly generated 2d points according
     to some distributions with the given sigma."""
     voters = list(range(num_voters))
@@ -118,32 +116,38 @@ def random_2d_points_profile(num_cand, num_voters, candpointmode,
     voter_points = __generate_2d_points(voters, voterpointmode, sigma)
     cand_points = __generate_2d_points(cands, candpointmode, sigma)
 
-    apprsets = __get_profile_from_points(voters, cands, voter_points,
-                                         cand_points, approval_threshold)
+    apprsets = __get_profile_from_points(
+        voters, cands, voter_points, cand_points, approval_threshold
+    )
     profile = Profile(num_cand)
     profile.add_voters(apprsets)
     return profile
 
 
-def random_2d_points_party_list_profile(num_cand, num_voters,
-                                        num_parties, partypointmode,
-                                        voterpointmode, sigma,
-                                        uniform=False):
+def random_2d_points_party_list_profile(
+    num_cand,
+    num_voters,
+    num_parties,
+    partypointmode,
+    voterpointmode,
+    sigma,
+    uniform=False,
+):
     """Generates profiles from randomly generated 2d points according
     to some distributions with the given sigma.
     This selects parties for each voter, the parties are either
     uniform (equal size) or randomly generated (at least 1) candidate
     lists."""
     parties = list(range(num_parties))
-    party_cands = __distribute_candidates_to_parties(
-        num_cand, parties, uniform=uniform)
+    party_cands = __distribute_candidates_to_parties(num_cand, parties, uniform=uniform)
     voters = list(range(num_voters))
 
     voter_points = __generate_2d_points(voters, voterpointmode, sigma)
     party_points = __generate_2d_points(parties, partypointmode, sigma)
 
-    party_sets = __get_profile_from_points(voters, parties, voter_points,
-                                           party_points, 1.0)
+    party_sets = __get_profile_from_points(
+        voters, parties, voter_points, party_points, 1.0
+    )
 
     apprsets = []
     for p in party_sets:
@@ -161,8 +165,7 @@ def random_mallows_profile(num_cand, num_voters, setsize, dispersion):
         raise Exception("Invalid dispersion, needs to be in (0, 1].")
     reference_ranking = list(range(num_cand))
     random.shuffle(reference_ranking)
-    insert_dist = __compute_mallows_insert_distributions(
-        num_cand, dispersion)
+    insert_dist = __compute_mallows_insert_distributions(num_cand, dispersion)
     apprsets = []
     for _ in range(num_voters):
         vote = []
@@ -196,8 +199,7 @@ def __select_pos(distribution):
     """Returns a randomly selected value with the help of the
     distribution"""
     if round(sum(distribution), 10) != 1.0:
-        raise Exception("Invalid Distribution", distribution,
-                        "sum:", sum(distribution))
+        raise Exception("Invalid Distribution", distribution, "sum:", sum(distribution))
     r = round(random.random(), 10)  # or random.uniform(0, 1)
     pos = -1
     s = 0
@@ -207,7 +209,7 @@ def __select_pos(distribution):
         if s >= r:
             return pos
 
-    return pos    # in case of rounding errors
+    return pos  # in case of rounding errors
 
 
 def __distribute_candidates_to_parties(num_cand, parties, uniform):
@@ -215,14 +217,15 @@ def __distribute_candidates_to_parties(num_cand, parties, uniform):
     Either uniformly distributed or randomly distributed with
     at least one candidate per party."""
     if num_cand < len(parties):
-        raise ValueError("Not enough candidates to split them between"
-                         + "the parties.")
+        raise ValueError("Not enough candidates to split them between" + "the parties.")
     if uniform:
         if num_cand % len(parties) != 0:
-            raise ValueError("To uniformly distribute candidates "
-                             + "between parties the number of candidates"
-                             + " needs to be divisible by the number of"
-                             + " parties.")
+            raise ValueError(
+                "To uniformly distribute candidates "
+                + "between parties the number of candidates"
+                + " needs to be divisible by the number of"
+                + " parties."
+            )
         party_cands = {}
         party_size = int(num_cand / len(parties))
         cands = set(range(num_cand))
@@ -252,20 +255,16 @@ def __generate_2d_points(agents, mode, sigma):
     #                      2/3 of agents on (0.5,0.5)
     if mode == "twogroups":
         for i in range(int(len(agents) // 3)):
-            points[agents[i]] = (random.gauss(-0.5, sigma),
-                                 random.gauss(-0.5, sigma))
+            points[agents[i]] = (random.gauss(-0.5, sigma), random.gauss(-0.5, sigma))
         for i in range(int(len(agents) // 3), len(agents)):
-            points[agents[i]] = (random.gauss(0.5, sigma),
-                                 random.gauss(0.5, sigma))
+            points[agents[i]] = (random.gauss(0.5, sigma), random.gauss(0.5, sigma))
     # normal distribution
     elif mode == "normal":
         for i in range(len(agents)):
-            points[agents[i]] = (random.gauss(0., sigma),
-                                 random.gauss(0., sigma))
+            points[agents[i]] = (random.gauss(0.0, sigma), random.gauss(0.0, sigma))
     elif mode == "uniform_square":
         for a in agents:
-            points[a] = (random.uniform(-1, 1),
-                         random.uniform(-1, 1))
+            points[a] = (random.uniform(-1, 1), random.uniform(-1, 1))
     else:
         print("mode", mode, "not known")
         quit()
@@ -273,18 +272,15 @@ def __generate_2d_points(agents, mode, sigma):
 
 
 def __euclidean(p1, p2):
-    return sqrt(fabs(p1[0] - p2[0])**2 + fabs(p1[1] - p2[1])**2)
+    return sqrt(fabs(p1[0] - p2[0]) ** 2 + fabs(p1[1] - p2[1]) ** 2)
 
 
-def __get_profile_from_points(voters, cands, voter_points,
-                              cand_points, appr_threshold):
+def __get_profile_from_points(voters, cands, voter_points, cand_points, appr_threshold):
     """Generates a list of approval sets from 2d points according to
     appr_threshold."""
     profile = {}
     for v in voters:
-        distances = {c: __euclidean(voter_points[v], cand_points[c])
-                     for c in cands}
+        distances = {c: __euclidean(voter_points[v], cand_points[c]) for c in cands}
         mindist = min(distances.values())
-        profile[v] = [c for c in cands
-                      if distances[c] <= mindist * appr_threshold]
+        profile[v] = [c for c in cands if distances[c] <= mindist * appr_threshold]
     return list(profile.values())

@@ -7,12 +7,14 @@ from __future__ import print_function
 
 try:
     import cvxpy as cp
+
     cvxpy_available = True
 except ImportError:
     cvxpy_available = False
 
 try:
     import numpy as np
+
     numpy_available = True
 except ImportError:
     numpy_available = False
@@ -49,9 +51,9 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
         `0` to `num_cand`, profile.cand_names is ignored
 
     """
-    if algorithm in ['glpk_mi', 'cbc', 'scip']:
+    if algorithm in ["glpk_mi", "cbc", "scip"]:
         solver = getattr(cp, algorithm.upper())
-    elif algorithm == 'cvxpy_gurobi':
+    elif algorithm == "cvxpy_gurobi":
         solver = cp.GUROBI
     else:
         raise ValueError(f"Unknown algorithm for usage with CVXPY: {algorithm}")
@@ -60,12 +62,9 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
     maxscore = None
 
     # TODO should we use functions for abcvoting.scores? Does it make it slower?
-    if scorefct_str == 'pav':
-        scorefct_value = np.tile(
-            1 / np.arange(1, committeesize + 1),
-            (len(profile), 1)
-        )
-    elif scorefct_str == 'av':
+    if scorefct_str == "pav":
+        scorefct_value = np.tile(1 / np.arange(1, committeesize + 1), (len(profile), 1))
+    elif scorefct_str == "av":
         raise ValueError("scorefct must be monotonic decreasing")
     else:
         raise NotImplementedError(f"invalid scorefct_str: {scorefct_str}")
@@ -90,16 +89,17 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
         lhs = cp.sum(utility, axis=1)
         rhs = cp.hstack([cp.sum([in_committee[c] for c in pref]) for pref in profile])
 
-        constraints = [cp.sum(in_committee) == committeesize,
-                       lhs == rhs]
+        constraints = [cp.sum(in_committee) == committeesize, lhs == rhs]
 
-        if algorithm == 'glpk_mi':
+        if algorithm == "glpk_mi":
             # weird workaround necessary... :(
             # see https://github.com/cvxgrp/cvxpy/issues/1112#issuecomment-730360543
-            constraints = [cp.sum(in_committee) <= committeesize,
-                           cp.sum(in_committee) >= committeesize,
-                           lhs <= rhs,
-                           lhs >= rhs]
+            constraints = [
+                cp.sum(in_committee) <= committeesize,
+                cp.sum(in_committee) >= committeesize,
+                lhs <= rhs,
+                lhs >= rhs,
+            ]
 
         # find a new committee that has not been found yet by excluding previously found committees
         for committee in committees:
@@ -119,13 +119,18 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
             # TODO this is a workaround for https://github.com/cvxgrp/cvxpy/issues/1191
             cvxpy_workaround_infisible = True
 
-        if problem.status in (cp.INFEASIBLE, cp.UNBOUNDED) or cvxpy_workaround_infisible:
+        if (
+            problem.status in (cp.INFEASIBLE, cp.UNBOUNDED)
+            or cvxpy_workaround_infisible
+        ):
             if len(committees) == 0:
                 raise RuntimeError("no solutions found")
             break
         elif problem.status != cp.OPTIMAL:
-            raise RuntimeError(f"Solver returned status {problem.status}. At the moment abcvoting "
-                               "can't handle this error.")
+            raise RuntimeError(
+                f"Solver returned status {problem.status}. At the moment abcvoting "
+                "can't handle this error."
+            )
 
         if maxscore is None:
             maxscore = problem.value

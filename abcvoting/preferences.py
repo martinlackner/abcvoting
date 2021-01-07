@@ -26,18 +26,24 @@ class Profile(object):
         to add approval sets
 
     """
+
     def __init__(self, num_cand, cand_names=None):
         if num_cand <= 0:
-            raise ValueError(str(num_cand) +
-                             " is not a valid number of candidates")
+            raise ValueError(str(num_cand) + " is not a valid number of candidates")
         self.num_cand = num_cand
         self._approval_sets = []  # entries correspond to voters
         self.cand_names = [str(c) for c in range(num_cand)]
         if cand_names:
             if len(cand_names) < num_cand:
-                raise ValueError("cand_names " + str(cand_names) + " has length "
-                                 + str(len(cand_names)) + " < num_cand ("
-                                 + str(num_cand) + ")")
+                raise ValueError(
+                    "cand_names "
+                    + str(cand_names)
+                    + " has length "
+                    + str(len(cand_names))
+                    + " < num_cand ("
+                    + str(num_cand)
+                    + ")"
+                )
             self.cand_names = [str(cand_names[i]) for i in range(num_cand)]
 
     def __len__(self):
@@ -99,16 +105,25 @@ class Profile(object):
 
     def __str__(self):
         if self.has_unit_weights():
-            output = ("profile with %d votes and %d candidates:\n"
-                      % (len(self.approval_sets), self.num_cand))
+            output = "profile with %d votes and %d candidates:\n" % (
+                len(self.approval_sets),
+                self.num_cand,
+            )
             for p in self.approval_sets:
                 output += " " + str_candset(p.approved, self.cand_names) + ",\n"
         else:
-            output = ("weighted profile with %d votes and %d candidates:\n"
-                      % (len(self.approval_sets), self.num_cand))
+            output = "weighted profile with %d votes and %d candidates:\n" % (
+                len(self.approval_sets),
+                self.num_cand,
+            )
             for p in self.approval_sets:
-                output += (" " + str(p.weight) + " * "
-                           + str_candset(p.approved, self.cand_names) + ",\n")
+                output += (
+                    " "
+                    + str(p.weight)
+                    + " * "
+                    + str_candset(p.approved, self.cand_names)
+                    + ",\n"
+                )
         return output[:-2]
 
     def party_list(self):
@@ -119,8 +134,7 @@ class Profile(object):
         """
         for pref1 in self.approval_sets:
             for pref2 in self.approval_sets:
-                if ((len(pref1.approved & pref2.approved)
-                     not in [0, len(pref1.approved)])):
+                if len(pref1.approved & pref2.approved) not in [0, len(pref1.approved)]:
                     return False
         return True
 
@@ -135,11 +149,18 @@ class Profile(object):
             output = ""
         else:
             output = "weighted "
-        output += ("profile with %d votes and %d candidates:\n"
-                   % (len(self.approval_sets), self.num_cand))
+        output += "profile with %d votes and %d candidates:\n" % (
+            len(self.approval_sets),
+            self.num_cand,
+        )
         for apprset in compact:
-            output += (" " + str(compact[apprset]) + " x "
-                       + str_candset(apprset, self.cand_names) + ",\n")
+            output += (
+                " "
+                + str(compact[apprset])
+                + " x "
+                + str_candset(apprset, self.cand_names)
+                + ",\n"
+            )
         output = output[:-2]
         if not self.has_unit_weights():
             output += "\ntotal weight: " + str(self.totalweight())
@@ -155,6 +176,7 @@ class ApprovalSet:
     """
     A set of approved candidates by one voter.
     """
+
     def __init__(self, approved, weight=1):
         self.approved = set(approved)
         self.weight = weight
@@ -171,19 +193,26 @@ class ApprovalSet:
     def __iter__(self):
         return iter(self.approved)
 
-    def check_valid(self, num_cand=float('inf'), approved_raw=None):
+    def check_valid(self, num_cand=float("inf"), approved_raw=None):
         """
         Check if approved candidates are given as non-negative integers. If `num_cand` is known,
         also check if they are too large. Double entries are check if approved_raw is given as
         list or tuple (or similar).
         """
         if approved_raw is not None and len(self.approved) < len(approved_raw):
-            raise ValueError(f"double entries found in list of approved candidates: {approved_raw}")
+            raise ValueError(
+                f"double entries found in list of approved candidates: {approved_raw}"
+            )
 
         # note: empty approval sets are fine
         for candidate in self.approved:
             if not isinstance(candidate, int):
-                raise TypeError("Object of type " + str(type(candidate)) +
-                                " not suitable as candidate")
+                raise TypeError(
+                    "Object of type "
+                    + str(type(candidate))
+                    + " not suitable as candidate"
+                )
             if candidate < 0 or candidate >= num_cand:
-                raise ValueError(str(self) + " not valid for num_cand = " + str(num_cand))
+                raise ValueError(
+                    str(self) + " not valid for num_cand = " + str(num_cand)
+                )

@@ -6,7 +6,8 @@ by Martin Lackner and Piotr Skowron
 
 from __future__ import print_function
 import sys
-sys.path.insert(0, '../..')
+
+sys.path.insert(0, "../..")
 from abcvoting import abcrules
 from abcvoting.preferences import Profile
 from abcvoting import misc

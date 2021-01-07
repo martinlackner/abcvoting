@@ -42,7 +42,7 @@ def test_example07_py():
 
 # noinspection PyUnresolvedReferences
 def test_example08_py():
-    from survey import example08 
+    from survey import example08
 
 
 # noinspection PyUnresolvedReferences
@@ -68,7 +68,7 @@ def test_example12_py():
 
 # noinspection PyUnresolvedReferences
 def test_example13_py():
-    from survey import example13 
+    from survey import example13
 
 
 # noinspection PyUnresolvedReferences

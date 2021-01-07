@@ -15,15 +15,15 @@ from abcvoting.misc import hamming
 
 # returns score function given its name
 def get_scorefct(scorefct_str, committeesize):
-    if scorefct_str == 'pav':
+    if scorefct_str == "pav":
         return __pav_score_fct
-    elif scorefct_str == 'slav':
+    elif scorefct_str == "slav":
         return __slav_score_fct
-    elif scorefct_str == 'cc':
+    elif scorefct_str == "cc":
         return __cc_score_fct
-    elif scorefct_str == 'av':
+    elif scorefct_str == "av":
         return __av_score_fct
-    elif scorefct_str[:4] == 'geom':
+    elif scorefct_str[:4] == "geom":
         base = Fraction(scorefct_str[4:])
         return functools.partial(__geom_score_fct, base=base)
     else:
@@ -31,7 +31,7 @@ def get_scorefct(scorefct_str, committeesize):
 
 
 def thiele_score(scorefct_str, profile, committee):
-    """ computes the Thiele score of a committee subject to
+    """computes the Thiele score of a committee subject to
     a given score function (scorefct_str)
     """
     scorefct = get_scorefct(scorefct_str, len(committee))
@@ -93,8 +93,9 @@ def marginal_thiele_scores_add(scorefct, profile, committee):
     for pref in profile:
         for c in pref:
             if pref.approved & set(committee):
-                marg[c] += pref.weight * scorefct(len(pref.approved &
-                                                      set(committee)) + 1)
+                marg[c] += pref.weight * scorefct(
+                    len(pref.approved & set(committee)) + 1
+                )
             else:
                 marg[c] += pref.weight * scorefct(1)
     for c in committee:
@@ -155,12 +156,12 @@ def monroescore_flowbased(profile, committee):
     # of the lower bounds of districts
     overflow = len(profile) - committeesize * lower_bound
     # add a sink node for the overflow
-    graph.add_node('sink', demand=overflow)
+    graph.add_node("sink", demand=overflow)
     for i in committee:
         graph.add_node(i, demand=lower_bound)
-        graph.add_edge(i, 'sink', weight=0, capacity=1)
+        graph.add_edge(i, "sink", weight=0, capacity=1)
     for i, vote in enumerate(profile):
-        voter_name = 'v' + str(i)
+        voter_name = "v" + str(i)
         graph.add_node(voter_name, demand=-1)
         for cand in committee:
             if cand in vote:

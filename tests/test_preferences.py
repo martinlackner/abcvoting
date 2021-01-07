@@ -21,9 +21,7 @@ def test_invalid_approvalsets():
         ApprovalSet([1, 1, 2, 42])
 
 
-@pytest.mark.parametrize(
-    "num_cand", [6, 8]
-)
+@pytest.mark.parametrize("num_cand", [6, 8])
 def test_invalidprofiles(num_cand):
     with pytest.raises(ValueError):
         Profile(0)
@@ -47,9 +45,7 @@ def test_invalidprofiles(num_cand):
         profile.add_voter([[0, 4, 5]])
 
 
-@pytest.mark.parametrize(
-    "num_cand", [6, 7]
-)
+@pytest.mark.parametrize("num_cand", [6, 7])
 def test_empty_approval(num_cand):
     profile = Profile(num_cand)
     profile.add_voter([])
@@ -60,9 +56,7 @@ def test_empty_approval(num_cand):
     profile.add_voters([[]])
 
 
-@pytest.mark.parametrize(
-    "num_cand", [6, 7]
-)
+@pytest.mark.parametrize("num_cand", [6, 7])
 def test_unitweights(num_cand):
     profile = Profile(num_cand)
     profile.add_voters([])
@@ -79,9 +73,7 @@ def test_unitweights(num_cand):
     assert profile.totalweight() == 6.4
 
 
-@pytest.mark.parametrize(
-    "num_cand", [6, 7]
-)
+@pytest.mark.parametrize("num_cand", [6, 7])
 def test_iterate(num_cand):
     profile = Profile(num_cand)
     profile.add_voter(ApprovalSet([1, 3, 5], 3))
@@ -92,12 +84,9 @@ def test_iterate(num_cand):
 
 
 @pytest.mark.parametrize(
-    "additional_apprset",
-    [[3], [1, 5], [0], [2], [2, 6, 7], [0, 1, 2, 3, 4, 5, 6, 7]]
+    "additional_apprset", [[3], [1, 5], [0], [2], [2, 6, 7], [0, 1, 2, 3, 4, 5, 6, 7]]
 )
-@pytest.mark.parametrize(
-    "num_cand", [8, 9]
-)
+@pytest.mark.parametrize("num_cand", [8, 9])
 def test_party_list(num_cand, additional_apprset):
     profile = Profile(num_cand)
     profile.add_voter(ApprovalSet([1, 3, 5], 3))

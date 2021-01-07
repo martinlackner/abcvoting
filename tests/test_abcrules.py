@@ -15,6 +15,7 @@ class CollectRules:
     Collect all ABC rules that are available for unittesting.
     Exclude Gurobi-based rules if Gurobi is not available
     """
+
     def __init__(self):
         marks = {
             "gurobi": pytest.mark.gurobi,
@@ -31,17 +32,25 @@ class CollectRules:
             for alg in rule.algorithms:
                 for resolute in rule.resolute:
                     if alg in marks:
-                        instance = pytest.param(rule.rule_id, alg, resolute, marks=marks[alg])
-                        instance_no_resolute_param = pytest.param(rule.rule_id, alg, marks=marks[alg])
+                        instance = pytest.param(
+                            rule.rule_id, alg, resolute, marks=marks[alg]
+                        )
+                        instance_no_resolute_param = pytest.param(
+                            rule.rule_id, alg, marks=marks[alg]
+                        )
                     else:
                         instance = pytest.param(rule.rule_id, alg, resolute)
                         instance_no_resolute_param = pytest.param(rule.rule_id, alg)
 
                     self.rule_algorithm_resolute.append(instance)
                     if resolute:
-                        self.rule_algorithm_onlyresolute.append(instance_no_resolute_param)
+                        self.rule_algorithm_onlyresolute.append(
+                            instance_no_resolute_param
+                        )
                     else:
-                        self.rule_algorithm_onlyirresolute.append(instance_no_resolute_param)
+                        self.rule_algorithm_onlyirresolute.append(
+                            instance_no_resolute_param
+                        )
 
 
 class CollectInstances:
@@ -51,65 +60,190 @@ class CollectInstances:
         # first profile
         profile = Profile(6)
         committeesize = 4
-        preflist = [[0, 4, 5], [0], [1, 4, 5], [1],
-                    [2, 4, 5], [2], [3, 4, 5], [3]]
+        preflist = [[0, 4, 5], [0], [1, 4, 5], [1], [2, 4, 5], [2], [3, 4, 5], [3]]
         profile.add_voters(preflist)
         tests = {
-            "seqpav": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
-                       [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "av": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
-                   [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "sav": [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4],
-                    [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
-                    [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5],
-                    [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "pav": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
-                    [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "geom2": [[0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4],
-                      [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
-                      [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5],
-                      [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "revseqpav": [[0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4],
-                          [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4],
-                          [0, 2, 3, 5], [0, 2, 4, 5], [0, 3, 4, 5],
-                          [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5],
-                          [1, 3, 4, 5], [2, 3, 4, 5]],
-            "mav": [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5],
-                    [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5],
-                    [0, 2, 3, 4], [0, 2, 3, 5], [0, 2, 4, 5],
-                    [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5],
-                    [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "lexmav": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
-                       [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "seqphrag": [[0, 1, 4, 5], [0, 2, 4, 5], [0, 3, 4, 5],
-                         [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "seqpav": [
+                [0, 1, 4, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            "av": [
+                [0, 1, 4, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            "sav": [
+                [0, 1, 2, 3],
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 1, 3, 4],
+                [0, 1, 3, 5],
+                [0, 1, 4, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            "pav": [
+                [0, 1, 4, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            "geom2": [
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 1, 3, 4],
+                [0, 1, 3, 5],
+                [0, 1, 4, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            "revseqpav": [
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 1, 3, 4],
+                [0, 1, 3, 5],
+                [0, 1, 4, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            "mav": [
+                [0, 1, 2, 3],
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 1, 3, 4],
+                [0, 1, 3, 5],
+                [0, 1, 4, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            "lexmav": [
+                [0, 1, 4, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            "seqphrag": [
+                [0, 1, 4, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
             "optphrag": [[0, 1, 2, 3]],
             "cc": [[0, 1, 2, 3]],
-            "seqcc": [[0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5],
-                      [0, 2, 3, 4], [0, 2, 3, 5], [1, 2, 3, 4], [1, 2, 3, 5]],
+            "seqcc": [
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 1, 3, 4],
+                [0, 1, 3, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+            ],
             "revseqcc": [[0, 1, 2, 3]],
             "monroe": [[0, 1, 2, 3]],
             "greedy-monroe": [[0, 2, 3, 4]],
-            "slav": [[0, 1, 2, 3],
-                     [0, 1, 2, 4], [0, 1, 2, 5],
-                     [0, 1, 3, 4], [0, 1, 3, 5],
-                     [0, 2, 3, 4], [0, 2, 3, 5],
-                     [1, 2, 3, 4], [1, 2, 3, 5]],
-            "seqslav": [[0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4],
-                        [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
-                        [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5],
-                        [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
-            "rule-x": [[0, 1, 4, 5], [0, 2, 4, 5],
-                       [0, 3, 4, 5], [1, 2, 4, 5],
-                       [1, 3, 4, 5], [2, 3, 4, 5]],
+            "slav": [
+                [0, 1, 2, 3],
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 1, 3, 4],
+                [0, 1, 3, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+            ],
+            "seqslav": [
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 1, 3, 4],
+                [0, 1, 3, 5],
+                [0, 1, 4, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            "rule-x": [
+                [0, 1, 4, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
             "rule-x-without-2nd-phase": [[4, 5]],
-            "phrag-enestr": [[0, 1, 4, 5], [0, 2, 4, 5],
-                             [0, 3, 4, 5], [1, 2, 4, 5],
-                             [1, 3, 4, 5], [2, 3, 4, 5]],
-            "consensus": [[0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4],
-                          [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
-                          [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5],
-                          [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]],
+            "phrag-enestr": [
+                [0, 1, 4, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            "consensus": [
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 1, 3, 4],
+                [0, 1, 3, 5],
+                [0, 1, 4, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+                [0, 3, 4, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+                [1, 2, 4, 5],
+                [1, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -129,8 +263,17 @@ class CollectInstances:
         # second profile
         profile = Profile(5)
         committeesize = 3
-        preflist = [[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2],
-                    [0, 1, 2], [0, 1], [3, 4], [3, 4], [3]]
+        preflist = [
+            [0, 1, 2],
+            [0, 1, 2],
+            [0, 1, 2],
+            [0, 1, 2],
+            [0, 1, 2],
+            [0, 1],
+            [3, 4],
+            [3, 4],
+            [3],
+        ]
         profile.add_voters(preflist)
 
         tests = {
@@ -144,12 +287,9 @@ class CollectInstances:
             "lexmav": [[0, 1, 3]],
             "seqphrag": [[0, 1, 3]],
             "optphrag": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
-            "cc": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
-                   [1, 2, 3], [1, 3, 4]],
-            "seqcc": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
-                      [1, 2, 3], [1, 3, 4]],
-            "revseqcc": [[0, 1, 3], [0, 2, 3], [0, 3, 4],
-                         [1, 2, 3], [1, 3, 4]],
+            "cc": [[0, 1, 3], [0, 2, 3], [0, 3, 4], [1, 2, 3], [1, 3, 4]],
+            "seqcc": [[0, 1, 3], [0, 2, 3], [0, 3, 4], [1, 2, 3], [1, 3, 4]],
+            "revseqcc": [[0, 1, 3], [0, 2, 3], [0, 3, 4], [1, 2, 3], [1, 3, 4]],
             "monroe": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
             "greedy-monroe": [[0, 1, 3]],
             "seqslav": [[0, 1, 3]],
@@ -164,8 +304,16 @@ class CollectInstances:
         # and a third profile
         profile = Profile(6)
         committeesize = 4
-        preflist = [[0, 3, 4, 5], [1, 2], [0, 2, 5], [2],
-                    [0, 1, 2, 3, 4], [0, 3, 4], [0, 2, 4], [0, 1]]
+        preflist = [
+            [0, 3, 4, 5],
+            [1, 2],
+            [0, 2, 5],
+            [2],
+            [0, 1, 2, 3, 4],
+            [0, 3, 4],
+            [0, 2, 4],
+            [0, 1],
+        ]
         profile.add_voters(preflist)
 
         tests = {
@@ -175,34 +323,67 @@ class CollectInstances:
             "pav": [[0, 1, 2, 4]],
             "geom2": [[0, 1, 2, 4]],
             "revseqpav": [[0, 1, 2, 4]],
-            "mav": [[0, 1, 2, 3], [0, 1, 2, 4],
-                    [0, 2, 3, 4], [0, 2, 3, 5],
-                    [0, 2, 4, 5]],
+            "mav": [
+                [0, 1, 2, 3],
+                [0, 1, 2, 4],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+            ],
             "lexmav": [[0, 1, 2, 4]],
             "seqphrag": [[0, 1, 2, 4]],
-            "optphrag": [[0, 1, 2, 3], [0, 1, 2, 4],
-                         [0, 1, 2, 5], [0, 2, 3, 4],
-                         [0, 2, 3, 5], [0, 2, 4, 5],
-                         [1, 2, 3, 4], [1, 2, 3, 5],
-                         [1, 2, 4, 5]],
-            "cc": [[0, 1, 2, 3], [0, 1, 2, 4],
-                   [0, 1, 2, 5], [0, 2, 3, 4],
-                   [0, 2, 3, 5], [0, 2, 4, 5],
-                   [1, 2, 3, 4], [1, 2, 3, 5],
-                   [1, 2, 4, 5]],
-            "seqcc": [[0, 1, 2, 3], [0, 1, 2, 4],
-                      [0, 1, 2, 5], [0, 2, 3, 4],
-                      [0, 2, 3, 5], [0, 2, 4, 5]],
-            "revseqcc": [[0, 1, 2, 3], [0, 1, 2, 4],
-                         [0, 1, 2, 5], [0, 2, 3, 4],
-                         [0, 2, 3, 5], [0, 2, 4, 5],
-                         [1, 2, 3, 4], [1, 2, 3, 5],
-                         [1, 2, 4, 5]],
-            "monroe": [[0, 1, 2, 3], [0, 1, 2, 4],
-                       [0, 1, 2, 5], [0, 2, 3, 4],
-                       [0, 2, 3, 5], [0, 2, 4, 5],
-                       [1, 2, 3, 4], [1, 2, 3, 5],
-                       [1, 2, 4, 5]],
+            "optphrag": [
+                [0, 1, 2, 3],
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+                [1, 2, 4, 5],
+            ],
+            "cc": [
+                [0, 1, 2, 3],
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+                [1, 2, 4, 5],
+            ],
+            "seqcc": [
+                [0, 1, 2, 3],
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+            ],
+            "revseqcc": [
+                [0, 1, 2, 3],
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+                [1, 2, 4, 5],
+            ],
+            "monroe": [
+                [0, 1, 2, 3],
+                [0, 1, 2, 4],
+                [0, 1, 2, 5],
+                [0, 2, 3, 4],
+                [0, 2, 3, 5],
+                [0, 2, 4, 5],
+                [1, 2, 3, 4],
+                [1, 2, 3, 5],
+                [1, 2, 4, 5],
+            ],
             "greedy-monroe": [[0, 1, 2, 4]],
             "seqslav": [[0, 1, 2, 4]],
             "slav": [[0, 1, 2, 4]],
@@ -257,9 +438,7 @@ def idfn(val):
     return str(val)
 
 
-@pytest.mark.parametrize(
-    "rule", abcrules.rules.values(), ids=idfn
-)
+@pytest.mark.parametrize("rule", abcrules.rules.values(), ids=idfn)
 def test_resolute_parameter(rule):
     for alg in rule.algorithms:
         assert len(rule.resolute) in [1, 2]
@@ -275,15 +454,15 @@ def test_resolute_parameter(rule):
                 profile.add_voters(preflist)
 
                 with pytest.raises(NotImplementedError):
-                    rule.compute(profile, committeesize, algorithm=alg, resolute=resolute)
+                    rule.compute(
+                        profile, committeesize, algorithm=alg, resolute=resolute
+                    )
 
 
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize(
-    "verbose", [0, 1, 2]
-)
+@pytest.mark.parametrize("verbose", [0, 1, 2])
 def test_abcrules__toofewcandidates(rule_id, algorithm, resolute, verbose):
     profile = Profile(5)
     committeesize = 4
@@ -292,8 +471,13 @@ def test_abcrules__toofewcandidates(rule_id, algorithm, resolute, verbose):
 
     with pytest.raises(ValueError):
         abcrules.compute(
-            rule_id, profile, committeesize, algorithm=algorithm,
-            resolute=resolute, verbose=verbose)
+            rule_id,
+            profile,
+            committeesize,
+            algorithm=algorithm,
+            resolute=resolute,
+            verbose=verbose,
+        )
 
 
 def test_abcrules_wrong_rule_id():
@@ -305,9 +489,7 @@ def test_abcrules_wrong_rule_id():
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize(
-    "verbose", [0, 1, 2, 3]
-)
+@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
 def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
     profile = Profile(3)
     profile.add_voter(ApprovalSet([0]))
@@ -316,16 +498,26 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
     profile.add_voter(ApprovalSet([0]))
     committeesize = 1
 
-    if (("monroe" in rule_id
-         or rule_id in ["lexmav", "rule-x", "rule-x-without-2nd-phase", "phrag-enestr"])):
+    if "monroe" in rule_id or rule_id in [
+        "lexmav",
+        "rule-x",
+        "rule-x-without-2nd-phase",
+        "phrag-enestr",
+    ]:
         with pytest.raises(ValueError):
-            abcrules.compute(rule_id, profile, committeesize,
-                             algorithm=algorithm, verbose=verbose)
+            abcrules.compute(
+                rule_id, profile, committeesize, algorithm=algorithm, verbose=verbose
+            )
         return
 
     result = abcrules.compute(
-        rule_id, profile, committeesize,
-        algorithm=algorithm, resolute=resolute, verbose=verbose)
+        rule_id,
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        verbose=verbose,
+    )
 
     if rule_id == "mav":
         # Minimax AV ignores weights by definition
@@ -341,17 +533,20 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize(
-    "verbose", [0, 1, 2, 3]
-)
+@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
 def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
     profile = Profile(4)
     profile.add_voters([[0], [1], [2], [3]])
     committeesize = 2
 
     committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm,
-        resolute=resolute, verbose=verbose)
+        rule_id,
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        verbose=verbose,
+    )
 
     if rule_id == "rule-x-without-2nd-phase":
         assert committees == [[]]
@@ -366,25 +561,33 @@ def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize(
-    "verbose", [0, 1, 2, 3]
-)
+@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
 def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
     profile = Profile(4)
     profile.add_voters([[0], [1], [2]])
     committeesize = 3
 
     committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm,
-        resolute=resolute, verbose=verbose)
+        rule_id,
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        verbose=verbose,
+    )
 
     assert committees == [[0, 1, 2]]
 
     profile.add_voters([[]])
 
     committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm,
-        resolute=resolute, verbose=verbose)
+        rule_id,
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        verbose=verbose,
+    )
 
     if rule_id == "rule-x-without-2nd-phase":
         assert committees == [[]]
@@ -392,53 +595,57 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
         assert committees == [[0, 1, 2]]
 
 
-@pytest.mark.parametrize(
-    "algorithm", abcrules.rules["monroe"].algorithms
-)
+@pytest.mark.parametrize("algorithm", abcrules.rules["monroe"].algorithms)
 def test_monroe_indivisible(algorithm):
     profile = Profile(4)
     profile.add_voters([[0], [0], [0], [1, 2], [1, 2], [1], [3]])
     committeesize = 3
 
-    assert (abcrules.compute_monroe(profile, committeesize,
-                                    algorithm=algorithm, resolute=False)
-            == [[0, 1, 2], [0, 1, 3], [0, 2, 3]])
+    assert abcrules.compute_monroe(
+        profile, committeesize, algorithm=algorithm, resolute=False
+    ) == [[0, 1, 2], [0, 1, 3], [0, 2, 3]]
 
 
 @pytest.mark.gurobi
-@pytest.mark.parametrize(
-    "algorithm", abcrules.rules["optphrag"].algorithms
-)
+@pytest.mark.parametrize("algorithm", abcrules.rules["optphrag"].algorithms)
 def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
     # this test shows that lexicographic optimization is not (yet)
     # implemented for opt-Phragmen (as it is described in
     # http://martin.lackner.xyz/publications/phragmen.pdf)
 
     profile = Profile(6)
-    profile.add_voters([[0], [0], [1, 3], [1, 3], [1, 4],
-                        [2, 4], [2, 5], [2, 5]])
+    profile.add_voters([[0], [0], [1, 3], [1, 3], [1, 4], [2, 4], [2, 5], [2, 5]])
     committeesize = 3
 
     # without lexicographic optimization, this profile has 12 winning committees
     # (with lexicographic optimization only [0, 1, 2] is winning)
-    assert len(abcrules.rules["optphrag"].compute(
-        profile, committeesize, algorithm=algorithm, resolute=False)) == 12
+    assert (
+        len(
+            abcrules.rules["optphrag"].compute(
+                profile, committeesize, algorithm=algorithm, resolute=False
+            )
+        )
+        == 12
+    )
 
 
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize(
-    "verbose", [0, 1, 2, 3]
-)
-@pytest.mark.parametrize(
-    "profile, exp_results, committeesize", testinsts.instances
-)
-def test_abcrules_correct(rule_id, algorithm, resolute, verbose, profile, exp_results, committeesize):
+@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
+@pytest.mark.parametrize("profile, exp_results, committeesize", testinsts.instances)
+def test_abcrules_correct(
+    rule_id, algorithm, resolute, verbose, profile, exp_results, committeesize
+):
     print(profile)
     committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm,
-        verbose=verbose, resolute=resolute)
+        rule_id,
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        verbose=verbose,
+        resolute=resolute,
+    )
     if resolute:
         assert len(committees) == 1
         assert committees[0] in exp_results[rule_id]
@@ -452,11 +659,13 @@ def test_seqphragmen_irresolute():
     profile.add_voters([[0, 1], [0, 1], [0], [1, 2], [2]])
     committeesize = 2
     committees = abcrules.rules["seqphrag"].compute(
-        profile, committeesize, resolute=False)
+        profile, committeesize, resolute=False
+    )
     assert committees == [[0, 1], [0, 2]]
 
     committees = abcrules.rules["seqphrag"].compute(
-        profile, committeesize, resolute=True)
+        profile, committeesize, resolute=True
+    )
     assert committees == [[0, 2]]
 
 
@@ -466,11 +675,11 @@ def test_seqpav_irresolute():
     committeesize = 2
 
     committees = abcrules.rules["seqpav"].compute(
-        profile, committeesize, resolute=False)
+        profile, committeesize, resolute=False
+    )
     assert committees == [[0, 1], [0, 2], [1, 2]]
 
-    committees = abcrules.rules["seqpav"].compute(
-        profile, committeesize, resolute=True)
+    committees = abcrules.rules["seqpav"].compute(profile, committeesize, resolute=True)
     assert committees == [[0, 2]]
 
 
@@ -479,7 +688,7 @@ def test_gurobi_cant_compute_av():
     profile.add_voters([[0, 1], [1, 2]])
     committeesize = 2
 
-    scorefct = scores.get_scorefct('av', committeesize)
+    scorefct = scores.get_scorefct("av", committeesize)
 
     with pytest.raises(ValueError):
         __gurobi_thiele_methods(profile, committeesize, scorefct, resolute=False)
@@ -492,21 +701,32 @@ def test_cvxpy_cant_compute_av():
     committeesize = 2
 
     with pytest.raises(ValueError):
-        cvxpy_thiele_methods(profile, committeesize, 'av', resolute=False, algorithm='glpk_mi')
+        cvxpy_thiele_methods(
+            profile, committeesize, "av", resolute=False, algorithm="glpk_mi"
+        )
 
 
 def test_consensus_fails_lower_quota():
     profile = Profile(31)
-    profile.add_voters([[0]] + [[1, 2]] * 3 + [[3, 4, 5]] * 5 + [[6, 7, 8, 9, 10, 11, 12, 13, 14, 15]] * 18
-                       + [[16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 29, 30]] * 27)
+    profile.add_voters(
+        [[0]]
+        + [[1, 2]] * 3
+        + [[3, 4, 5]] * 5
+        + [[6, 7, 8, 9, 10, 11, 12, 13, 14, 15]] * 18
+        + [[16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 29, 30]] * 27
+    )
     committeesize = 30
 
     committees = abcrules.rules["consensus"].compute(
-        profile, committeesize, resolute=True)
+        profile, committeesize, resolute=True
+    )
     for comm in committees:
-        assert not all(cand in comm for cand in [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30])
-    # .. and thus the Consensus rule fails lower quota (and PJR and EJR): the quota of the 27 voters is 15,
-    # but not all of their 15 approved candidates are contained in a winning committee.
+        assert not all(
+            cand in comm
+            for cand in [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+        )
+    # .. and thus the Consensus rule fails lower quota (and PJR and EJR): the quota of the 27 voters
+    # is 15, but not all of their 15 approved candidates are contained in a winning committee.
 
 
 @pytest.mark.parametrize(
@@ -526,24 +746,20 @@ def test_jansonexamples(rule_id, algorithm):
     p = 3
     q = 4
     r = 5
-    profile.add_voters([[a, b, c]] * 1034 + [[p, q, r]] * 519 +
-                       [[a, b, q]] * 90 + [[a, p, q]] * 90)
+    profile.add_voters(
+        [[a, b, c]] * 1034 + [[p, q, r]] * 519 + [[a, b, q]] * 90 + [[a, p, q]] * 90
+    )
     committeesize = 3
 
     committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm, resolute=False)
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=False
+    )
     assert committees == [[a, b, q]]
 
 
-@pytest.mark.parametrize(
-    "rule", abcrules.rules.values(), ids=idfn
-)
-@pytest.mark.parametrize(
-    "verbose", [0, 1, 2, 3]
-)
-@pytest.mark.parametrize(
-    "resolute", [True, False]
-)
+@pytest.mark.parametrize("rule", abcrules.rules.values(), ids=idfn)
+@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
+@pytest.mark.parametrize("resolute", [True, False])
 def test_unspecified_algorithms(rule, verbose, resolute):
     if resolute not in rule.resolute:
         return
@@ -552,13 +768,15 @@ def test_unspecified_algorithms(rule, verbose, resolute):
     committeesize = 2
     with pytest.raises(NotImplementedError):
         rule.compute(
-            profile, committeesize, algorithm="made-up-algorithm",
-            resolute=resolute, verbose=verbose)
+            profile,
+            committeesize,
+            algorithm="made-up-algorithm",
+            resolute=resolute,
+            verbose=verbose,
+        )
 
 
-@pytest.mark.parametrize(
-    "rule", abcrules.rules.values(), ids=idfn
-)
+@pytest.mark.parametrize("rule", abcrules.rules.values(), ids=idfn)
 def test_fastest_algorithms(rule):
     profile = Profile(4)
     profile.add_voters([[0, 1], [1, 2], [0, 2, 3]])
@@ -573,11 +791,9 @@ def test_fastest_algorithms(rule):
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize(
-    "verbose", [0, 1, 2, 3]
-)
+@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
 def test_output(capfd, rule_id, algorithm, resolute, verbose):
-    if algorithm == 'glpk_mi' and verbose == 0:
+    if algorithm == "glpk_mi" and verbose == 0:
         # TODO unfortunately GLPK_MI prints "Long-step dual simplex will be used" to stderr and it
         #  would be very complicated to capture this on all platforms reliably, changing
         #  sys.stderr doesn't help.
@@ -592,9 +808,13 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
     profile.add_voters([[0]])
     committeesize = 1
     abcrules.compute(
-        rule_id, profile, committeesize,
-        algorithm=algorithm, resolute=resolute,
-        verbose=verbose)
+        rule_id,
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        verbose=verbose,
+    )
     out = capfd.readouterr().out
     if verbose == 0:
         assert out == ""
@@ -608,8 +828,10 @@ def test_cvxpy_wrong_score_fct():
     profile.add_voters([[0, 1], [2, 3]])
     committeesize = 1
     with pytest.raises(NotImplementedError):
-        cvxpy_thiele_methods(profile=profile,
-                             committeesize=committeesize,
-                             scorefct_str='non_existing',
-                             resolute=False,
-                             algorithm='glpk_mi')
+        cvxpy_thiele_methods(
+            profile=profile,
+            committeesize=committeesize,
+            scorefct_str="non_existing",
+            resolute=False,
+            algorithm="glpk_mi",
+        )

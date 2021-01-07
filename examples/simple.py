@@ -4,7 +4,8 @@ Very simple example (compute PAV)
 
 from __future__ import print_function
 import sys
-sys.path.insert(0, '..')
+
+sys.path.insert(0, "..")
 from abcvoting.preferences import Profile
 from abcvoting import abcrules
 
