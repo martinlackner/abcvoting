@@ -3,8 +3,6 @@ Approval-based committee (ABC) rules implemented as a integer linear
 programs (ILPs) with Gurobi (https://www.gurobi.com/)
 """
 
-from __future__ import print_function
-
 try:
     import gurobipy as gb
 
