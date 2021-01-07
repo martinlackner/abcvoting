@@ -73,6 +73,20 @@ which corresponds to the two committees {0,1,3} and {0,1,4}. Further examples ca
 * Some functions use fractions (e.g., `compute_seqphragmen`). These compute significantly faster if the module [gmpy2](https://gmpy2.readthedocs.io/) is available. If gmpy2 is not available, the much slower Python module [fractions](https://docs.python.org/2/library/fractions.html) is used.
 * All voting methods have a parameter `resolute`. If it is set to true, only one winning committee is computed. In most cases, `resolute=True` speeds up the computation. 
 
+## Development
+
+### Black formatting
+
+Code needs to be formatted using the [black formatter](https://black.readthedocs.io/en/). This is
+checked by Github actions.
+[Configure your editor](https://black.readthedocs.io/en/latest/editor_integration.html), to run the
+black formatter.
+
+### Pre-commit hooks
+
+Pre-commit hooks are not required, but they are recommended for development.
+[Pre-commit](https://pre-commit.com/) is used to manage and maintain pre-commit hooks. Install
+pre-commit (e.g. via apt, conda or pip) and then run`$ pre-commit install` to install the hooks.
 
 ## Acknowledgements
 
