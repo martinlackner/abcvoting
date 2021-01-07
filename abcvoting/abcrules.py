@@ -1563,7 +1563,7 @@ def compute_optphragmen(
 def compute_phragmen_enestroem(
     profile, committeesize, algorithm="standard", resolute=True, verbose=0
 ):
-    """"Phragmen-Enestroem (aka Phragmen's first method, Enestroem's method)
+    """Phragmen-Enestroem (aka Phragmen's first method, Enestroem's method)
 
     In every round the candidate with the highest combined budget of
     their supporters is put in the committee.
@@ -1651,7 +1651,7 @@ def compute_phragmen_enestroem(
 def compute_consensus_rule(
     profile, committeesize, algorithm="standard", resolute=True, verbose=0
 ):
-    """"Consensus rule,
+    """Consensus rule,
     based on Perpetual Consensus from
     Martin Lackner Perpetual Voting: Fairness in Long-Term Decision Making
     In Proceedings of the 34th AAAI Conference on Artificial Intelligence (AAAI 2020)
