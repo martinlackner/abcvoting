@@ -4,7 +4,8 @@ Compute all implemented ABC rules for a profile
 
 from __future__ import print_function
 import sys
-sys.path.insert(0, '..')
+
+sys.path.insert(0, "..")
 from abcvoting.preferences import Profile
 from abcvoting import abcrules
 from abcvoting.misc import str_candsets
@@ -15,8 +16,7 @@ from abcvoting.misc import str_candsets
 
 num_cand = 6
 profile = Profile(num_cand)
-profile.add_voters([[0, 4, 5], [0], [1, 4, 5], [1],
-                    [2, 4, 5], [2], [3, 4, 5], [3]])
+profile.add_voters([[0, 4, 5], [0], [1, 4, 5], [1], [2, 4, 5], [2], [3, 4, 5], [3]])
 committeesize = 4
 
 """Prints the winning committees for all implemented rules"""

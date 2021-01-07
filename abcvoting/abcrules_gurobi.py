@@ -4,8 +4,10 @@ programs (ILPs) with Gurobi (https://www.gurobi.com/)
 """
 
 from __future__ import print_function
+
 try:
     import gurobipy as gb
+
     available = True
 except ImportError:
     available = False
@@ -13,8 +15,9 @@ except ImportError:
 GUROBI_ACCURACY = 1e-9
 
 
-def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct,
-                          resolute, verbose=False):
+def _optimize_rule_gurobi(
+    set_opt_model_func, profile, committeesize, scorefct, resolute, verbose=False
+):
     """Compute rules, which are given in the form of an optimization problem, using Gurobi.
 
     Parameters
@@ -48,15 +51,17 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct,
         m = gb.Model()
 
         # a binary variable indicating whether c is in the committee
-        in_committee = m.addVars(profile.num_cand,
-                                 vtype=gb.GRB.BINARY,
-                                 name="in_committee")
+        in_committee = m.addVars(
+            profile.num_cand, vtype=gb.GRB.BINARY, name="in_committee"
+        )
 
-        set_opt_model_func(m, profile, in_committee, committeesize, committees, cands, scorefct)
+        set_opt_model_func(
+            m, profile, in_committee, committeesize, committees, cands, scorefct
+        )
 
-        m.setParam('OutputFlag', False)
-        m.setParam('FeasibilityTol', GUROBI_ACCURACY)
-        m.setParam('PoolSearchMode', 0)
+        m.setParam("OutputFlag", False)
+        m.setParam("FeasibilityTol", GUROBI_ACCURACY)
+        m.setParam("PoolSearchMode", 0)
 
         m.optimize()
 
@@ -64,8 +69,10 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct,
             # m.Status == 2 implies solution found
             # m.Status in [3, 4] implies infeasible --> no more solutions
             # otherwise ...
-            raise RuntimeError(f"Gurobi returned an unexpected status code: {m.Status}"
-                               "Warning: solutions may be incomplete or not optimal.")
+            raise RuntimeError(
+                f"Gurobi returned an unexpected status code: {m.Status}"
+                "Warning: solutions may be incomplete or not optimal."
+            )
         elif m.Status != 2:
             if len(committees) == 0:
                 # we are in the first round of searching committees and Gurobi doesn't find anything
@@ -75,14 +82,16 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct,
         if maxscore is None:
             maxscore = m.objVal
         elif m.objVal > maxscore + GUROBI_ACCURACY:
-            raise RuntimeError("Gurobi found a solution better than a previous optimum. This "
-                               f"should not happen (previous optimal score: {maxscore}, "
-                               f"new optimal score: {m.objVal}).")
+            raise RuntimeError(
+                "Gurobi found a solution better than a previous optimum. This "
+                f"should not happen (previous optimal score: {maxscore}, "
+                f"new optimal score: {m.objVal})."
+            )
         elif m.objVal < maxscore - GUROBI_ACCURACY:
             # no longer optimal
             break
 
-        committee = [c for c in cands if in_committee[c].Xn >= 1-GUROBI_ACCURACY]
+        committee = [c for c in cands if in_committee[c].Xn >= 1 - GUROBI_ACCURACY]
         assert len(committee) == committeesize
         committees.append(committee)
 
@@ -99,7 +108,9 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct,
 
 
 def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
-    def set_opt_model_func(m, profile, in_committee, committeesize, committees, cands, scorefct):
+    def set_opt_model_func(
+        m, profile, in_committee, committeesize, committees, cands, scorefct
+    ):
         # utility[(pref, l)] contains (intended binary) variables counting the number of approved
         # candidates in the selected committee by pref. This utility[(pref, l)] is true for
         # exactly the number of candidates in the committee approved by pref for all
@@ -122,84 +133,106 @@ def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
 
         # constraint: utilities are consistent with actual committee
         for pref in profile:
-            m.addConstr(gb.quicksum(utility[pref, l]
-                                    for l in range(1, committeesize + 1)) ==
-                        gb.quicksum(in_committee[c] for c in pref))
+            m.addConstr(
+                gb.quicksum(utility[pref, l] for l in range(1, committeesize + 1))
+                == gb.quicksum(in_committee[c] for c in pref)
+            )
 
         # find a new committee that has not been found yet by excluding previously found committees
         for comm in committees:
             m.addConstr(
-                gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
+                gb.quicksum(in_committee[c] for c in cands if c in comm)
+                <= committeesize - 1
+            )
 
         # objective: the PAV score of the committee
         m.setObjective(
-            gb.quicksum(float(scorefct(l)) * pref.weight * utility[(pref, l)]
-                        for pref in profile
-                        for l in range(1, committeesize + 1)),
-            gb.GRB.MAXIMIZE)
+            gb.quicksum(
+                float(scorefct(l)) * pref.weight * utility[(pref, l)]
+                for pref in profile
+                for l in range(1, committeesize + 1)
+            ),
+            gb.GRB.MAXIMIZE,
+        )
 
     score_values = [scorefct(l) for l in range(1, committeesize + 1)]
-    if not all(first > second or first == second == 0
-               for first, second in zip(score_values, score_values[1:])):
+    if not all(
+        first > second or first == second == 0
+        for first, second in zip(score_values, score_values[1:])
+    ):
         raise ValueError("scorefct must be monotonic decreasing")
 
-    return _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct, resolute)
+    return _optimize_rule_gurobi(
+        set_opt_model_func, profile, committeesize, scorefct, resolute
+    )
 
 
 def __gurobi_monroe(profile, committeesize, resolute):
     def set_opt_model_func(
-            m, profile, in_committee, committeesize, committees, cands, scorefct):
+        m, profile, in_committee, committeesize, committees, cands, scorefct
+    ):
         num_voters = len(profile)
 
         # optimization goal: variable "satisfaction"
         satisfaction = m.addVar(vtype=gb.GRB.INTEGER, name="satisfaction")
 
-        m.addConstr(gb.quicksum(in_committee[c] for c in cands)
-                    == committeesize)
+        m.addConstr(gb.quicksum(in_committee[c] for c in cands) == committeesize)
 
         # a partition of voters into committeesize many sets
-        partition = m.addVars(profile.num_cand, len(profile),
-                              vtype=gb.GRB.INTEGER, lb=0, name="partition")
+        partition = m.addVars(
+            profile.num_cand, len(profile), vtype=gb.GRB.INTEGER, lb=0, name="partition"
+        )
         for i in range(len(profile)):
             # every voter has to be part of a voter partition set
-            m.addConstr(gb.quicksum(partition[(c, i)]
-                                    for c in cands)
-                        == profile[i].weight)
+            m.addConstr(
+                gb.quicksum(partition[(c, i)] for c in cands) == profile[i].weight
+            )
         for c in cands:
             # every voter set in the partition has to contain
             # at least (num_voters // committeesize) candidates
-            m.addConstr(gb.quicksum(partition[(c, j)]
-                                    for j in range(len(profile)))
-                        >= (num_voters // committeesize
-                            - num_voters * (1 - in_committee[c])))
+            m.addConstr(
+                gb.quicksum(partition[(c, j)] for j in range(len(profile)))
+                >= (num_voters // committeesize - num_voters * (1 - in_committee[c]))
+            )
             # every voter set in the partition has to contain
             # at most ceil(num_voters/committeesize) candidates
-            m.addConstr(gb.quicksum(partition[(c, j)]
-                                    for j in range(len(profile)))
-                        <= (num_voters // committeesize
-                            + bool(num_voters % committeesize)
-                            + num_voters * (1 - in_committee[c])))
+            m.addConstr(
+                gb.quicksum(partition[(c, j)] for j in range(len(profile)))
+                <= (
+                    num_voters // committeesize
+                    + bool(num_voters % committeesize)
+                    + num_voters * (1 - in_committee[c])
+                )
+            )
             # if in_committee[i] = 0 then partition[(i,j) = 0
-            m.addConstr(gb.quicksum(partition[(c, j)]
-                                    for j in range(len(profile)))
-                        <= num_voters * in_committee[c])
+            m.addConstr(
+                gb.quicksum(partition[(c, j)] for j in range(len(profile)))
+                <= num_voters * in_committee[c]
+            )
 
         # constraint for objective variable "satisfaction"
-        m.addConstr(gb.quicksum(partition[(c, j)] *
-                                (c in profile[j])
-                                for j in range(len(profile))
-                                for c in cands)
-                    >= satisfaction)
+        m.addConstr(
+            gb.quicksum(
+                partition[(c, j)] * (c in profile[j])
+                for j in range(len(profile))
+                for c in cands
+            )
+            >= satisfaction
+        )
 
         # find a new committee that has not been found before
         for comm in committees:
             m.addConstr(
-                gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
+                gb.quicksum(in_committee[c] for c in cands if c in comm)
+                <= committeesize - 1
+            )
 
         # optimization objective
         m.setObjective(satisfaction, gb.GRB.MAXIMIZE)
-    return _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct=None,
-                                 resolute=resolute)
+
+    return _optimize_rule_gurobi(
+        set_opt_model_func, profile, committeesize, scorefct=None, resolute=resolute
+    )
 
 
 def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
@@ -213,8 +246,10 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
     Instead: minimizes the maximum load (without consideration of the
              second-, third-, ...-largest load
     """
+
     def set_opt_model_func(
-            m, profile, in_committee, committeesize, committees, cands, scorefct):
+        m, profile, in_committee, committeesize, committees, cands, scorefct
+    ):
         load = {}
         for c in cands:
             for pref in profile:
@@ -230,41 +265,51 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
 
         # a candidate's load is distributed among his approvers
         for c in cands:
-            m.addConstr(gb.quicksum(pref.weight * load[(pref, c)]
-                                    for pref in profile if c in cands)
-                        == in_committee[c])
+            m.addConstr(
+                gb.quicksum(
+                    pref.weight * load[(pref, c)] for pref in profile if c in cands
+                )
+                == in_committee[c]
+            )
 
         # find a new committee that has not been found before
         for comm in committees:
             m.addConstr(
-                gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
+                gb.quicksum(in_committee[c] for c in cands if c in comm)
+                <= committeesize - 1
+            )
 
         loadbound = m.addVar(name="loadbound")
         for pref in profile:
-            m.addConstr(gb.quicksum(load[(pref, c)]
-                                    for c in pref)
-                        <= loadbound)
+            m.addConstr(gb.quicksum(load[(pref, c)] for c in pref) <= loadbound)
 
         # maximizing the negative distance makes code more similar to the other methods here
         m.setObjective(-loadbound, gb.GRB.MAXIMIZE)
 
-    return _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct=None,
-                                 resolute=resolute, verbose=verbose)
+    return _optimize_rule_gurobi(
+        set_opt_model_func,
+        profile,
+        committeesize,
+        scorefct=None,
+        resolute=resolute,
+        verbose=verbose,
+    )
 
 
 def __gurobi_minimaxav(profile, committeesize, resolute):
     def set_opt_model_func(
-            m, profile, in_committee, committeesize, committees, cands, scorefct):
+        m, profile, in_committee, committeesize, committees, cands, scorefct
+    ):
         num_voters = len(profile)
         # optimization goal: variable "sum_difference"
         max_hamdistance = m.addVar(vtype=gb.GRB.INTEGER, name="max_hamdistance")
 
-        m.addConstr(gb.quicksum(in_committee[c] for c in cands)
-                    == committeesize)
+        m.addConstr(gb.quicksum(in_committee[c] for c in cands) == committeesize)
 
         # the single differences between the committee and the voters
-        difference = m.addVars(profile.num_cand, num_voters, vtype=gb.GRB.INTEGER,
-                               name="diff")
+        difference = m.addVars(
+            profile.num_cand, num_voters, vtype=gb.GRB.INTEGER, name="diff"
+        )
 
         for i in cands:
             for j in range(num_voters):
@@ -277,18 +322,18 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
 
         for j in range(num_voters):
             # maximum hamming distance is greater of equal than any individual one
-            m.addConstr(max_hamdistance >= gb.quicksum(difference[i, j]
-                                                       for i in cands
-                                                       )
-                        )
+            m.addConstr(max_hamdistance >= gb.quicksum(difference[i, j] for i in cands))
 
         # find a new committee that has not been found before
         for comm in committees:
             m.addConstr(
-                gb.quicksum(in_committee[c] for c in cands if c in comm) <= committeesize - 1)
+                gb.quicksum(in_committee[c] for c in cands if c in comm)
+                <= committeesize - 1
+            )
 
         # maximizing the negative distance makes code more similar to the other methods here
         m.setObjective(-max_hamdistance, gb.GRB.MAXIMIZE)
 
-    return _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct=None,
-                                 resolute=resolute)
+    return _optimize_rule_gurobi(
+        set_opt_model_func, profile, committeesize, scorefct=None, resolute=resolute
+    )

@@ -6,7 +6,8 @@ by Martin Lackner and Piotr Skowron
 
 from __future__ import print_function
 import sys
-sys.path.insert(0, '..')
+
+sys.path.insert(0, "..")
 from abcvoting import abcrules
 from abcvoting.preferences import Profile, ApprovalSet
 from abcvoting import misc
@@ -39,8 +40,7 @@ assert committees_revseqpav == [[c, d]]
 
 
 print("\n")
-print(misc.header(
-    "Example from Janson's survey (Example 13.3) / Thiele:", "*"))
+print(misc.header("Example from Janson's survey (Example 13.3) / Thiele:", "*"))
 
 # Approval profile
 num_cand = 4

@@ -7,7 +7,8 @@ by Martin Lackner and Piotr Skowron
 
 from __future__ import print_function
 import sys
-sys.path.insert(0, '..')
+
+sys.path.insert(0, "..")
 from abcvoting import abcrules
 from survey import example01 as ex1
 from abcvoting import misc

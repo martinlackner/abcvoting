@@ -1,14 +1,15 @@
 # Hopcroft-Karp bipartite max-cardinality matching and max independent set
 # David Eppstein, UC Irvine, 27 Apr 2002
 
+
 def bipartiteMatch(graph):
-    '''Find maximum cardinality matching of a bipartite graph (U,V,E).
+    """Find maximum cardinality matching of a bipartite graph (U,V,E).
     The input format is a dictionary mapping members of U to a list
     of their neighbors in V.  The output is a triple (M,A,B) where M is a
     dictionary mapping members of V to their matches in U, A is the part
     of the maximum independent set in U, and B is the part of the MIS in V.
     The same object may occur in both U and V, and is treated as two
-    distinct vertices if this happens.'''
+    distinct vertices if this happens."""
 
     # initialize greedy matching (redundant, but faster than full search)
     matching = {}

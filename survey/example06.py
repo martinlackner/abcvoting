@@ -6,7 +6,8 @@ by Martin Lackner and Piotr Skowron
 
 from __future__ import print_function
 import sys
-sys.path.insert(0, '..')
+
+sys.path.insert(0, "..")
 from abcvoting import abcrules
 from survey import example01 as ex1
 from abcvoting.scores import monroescore
@@ -27,4 +28,4 @@ assert len(committees) == 6
 # Monroe-score of all committees is the same
 score = monroescore(ex1.profile, committees[0])
 for comm in committees:
-    assert (score == monroescore(ex1.profile, comm))
+    assert score == monroescore(ex1.profile, comm)
