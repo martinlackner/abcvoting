@@ -725,8 +725,8 @@ def test_consensus_fails_lower_quota():
             cand in comm
             for cand in [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
         )
-    # .. and thus the Consensus rule fails lower quota (and PJR and EJR): the quota of the 27 voters is 15,
-    # but not all of their 15 approved candidates are contained in a winning committee.
+    # .. and thus the Consensus rule fails lower quota (and PJR and EJR): the quota of the 27 voters
+    # is 15, but not all of their 15 approved candidates are contained in a winning committee.
 
 
 @pytest.mark.parametrize(

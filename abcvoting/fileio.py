@@ -70,7 +70,8 @@ def get_file_names(dir_name):
 
 
 def get_appr_set(num_appr, ranking, candidate_map):
-    # if num_appr = 1 and the ranking starts with empty set, interpret as empty ballot and return set()
+    # if num_appr = 1 and the ranking starts with empty set, interpret as empty ballot and
+    # return set()
     if (
         num_appr == 1
         and ranking[0].strip()[0] == "{"
@@ -173,7 +174,8 @@ def read_preflib_file(filename, setsize=1, appr_percent=None, use_weights=False)
         lines = [line.strip() for line in f.readlines() if line.strip()]
         if len(lines) != unique_orders:
             raise PreflibException(
-                f"Expected {unique_orders} lines that specify voters in the input, encountered {len(lines)}"
+                f"Expected {unique_orders} lines that specify voters in the input, "
+                f"encountered {len(lines)}"
             )
 
     for line in lines:
