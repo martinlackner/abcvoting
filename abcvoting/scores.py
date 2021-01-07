@@ -31,7 +31,7 @@ def get_scorefct(scorefct_str, committeesize):
 
 
 def thiele_score(scorefct_str, profile, committee):
-    """ computes the Thiele score of a committee subject to
+    """computes the Thiele score of a committee subject to
     a given score function (scorefct_str)
     """
     scorefct = get_scorefct(scorefct_str, len(committee))

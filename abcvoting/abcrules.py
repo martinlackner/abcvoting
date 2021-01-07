@@ -1215,8 +1215,7 @@ def __seqphragmen_resolute(
 def __seqphragmen_irresolute(
     profile, committeesize, division, start_load=None, partial_committee=None
 ):
-    """Algorithm for computing irresolute seq-Phragmen (>=1 winning committees)
-    """
+    """Algorithm for computing irresolute seq-Phragmen (>=1 winning committees)"""
     approvers_weight = {}
     for c in range(profile.num_cand):
         approvers_weight[c] = sum(pref.weight for pref in profile if c in pref)
@@ -1342,7 +1341,7 @@ def compute_rule_x(
     """Rule X
 
     See https://arxiv.org/pdf/1911.11747.pdf, page 7
-    
+
     skip_phragmen_phase : bool, optional
         omit the second phase (that uses seq-Phragmen)
         may result in a committee that is too small
@@ -1504,8 +1503,7 @@ def compute_rule_x(
 def compute_rule_x_without_2nd_phase(
     profile, committeesize, algorithm="standard", resolute=True, verbose=0
 ):
-    """Rule X with skip_phragmen_phase=True
-    """
+    """Rule X with skip_phragmen_phase=True"""
     return compute_rule_x(
         profile,
         committeesize,

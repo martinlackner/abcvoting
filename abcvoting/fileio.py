@@ -36,7 +36,7 @@ def load_preflib_files_from_dir(dir_name, setsize=1, appr_percent=None):
         Returns:
             profiles: list
                 a list of profiles (type Profile)
-        """
+    """
     file_dir, files = get_file_names(dir_name)
     files = [file_dir + f for f in files]
 
@@ -229,7 +229,7 @@ def read_preflib_file(filename, setsize=1, appr_percent=None, use_weights=False)
 
 
 def write_profile_to_preflib_toi_file(profile, filename):
-    """ Writes profile in a preflib toi file
+    """Writes profile in a preflib toi file
 
     Parameters:
 
