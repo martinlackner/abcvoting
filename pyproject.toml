@@ -22,6 +22,15 @@ norecursedirs = [
     "__pycache__",
 ]
 
+markers = [
+    "gurobi: a test that requires Gurobi (gurpbipy)",
+    "scip: a test that requires SCIP",
+    "glpk_mi: a test that requires glpk_mi",
+    "cbc: a test that requires CBC",
+    "cvxpy: a test that requires cvxpy",
+]
+
+
 [tool.coverage.run]
 # https://coverage.readthedocs.io/en/latest/config.html
 branch = true
