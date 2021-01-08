@@ -5,15 +5,16 @@ Read preflib files (soi, toi, soc or toc)
 
 from __future__ import print_function
 import os
-from abcvoting.preferences import Profile, ApprovalSet
+from abcvoting.preferences import Profile, Voter
 from math import ceil
+from abcvoting import misc
 
 
 class PreflibException(Exception):
     pass
 
 
-def load_preflib_files_from_dir(dir_name, setsize=1, appr_percent=None):
+def load_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
     """Loads all election files (soi, toi, soc or toc) from the given dir.
 
     Parameters:
@@ -24,9 +25,9 @@ def load_preflib_files_from_dir(dir_name, setsize=1, appr_percent=None):
             Number of top-ranked candidates that voters approve.
             In case of ties, more than setsize candidates are approved.
 
-            setsize is ignored if appr_percent is used.
+            Paramer `setsize` is ignored if `relative_setsize` is used.
 
-        appr_percent: float in (0, 1]
+        relative_setsize: float in (0, 1]
             Indicates which percentage of candidates of the ranking
             are approved (rounded up). In case of ties, more
             candidates are approved.
@@ -51,7 +52,7 @@ def load_preflib_files_from_dir(dir_name, setsize=1, appr_percent=None):
                 or f.endswith(".toc")
             ):
                 profile = read_preflib_file(
-                    f, setsize=setsize, appr_percent=appr_percent
+                    f, setsize=setsize, relative_setsize=relative_setsize
                 )
                 profiles.append(profile)
 
@@ -69,7 +70,7 @@ def get_file_names(dir_name):
     return file_dir, files
 
 
-def get_appr_set(num_appr, ranking, candidate_map):
+def get_approval_set(num_appr, ranking, candidate_map):
     # if num_appr = 1 and the ranking starts with empty set, interpret as empty ballot and
     # return set()
     if (
@@ -80,7 +81,7 @@ def get_appr_set(num_appr, ranking, candidate_map):
     ):
         return set()
 
-    appr_set = set()
+    approval_set = set()
     tied = False
     for i in range(len(ranking)):
         rank = ranking[i].strip()
@@ -103,23 +104,23 @@ def get_appr_set(num_appr, ranking, candidate_map):
         rank = rank.strip()
         if len(rank) > 0:
             try:
-                c = int(rank)
+                cand = int(rank)
             except ValueError:
                 raise PreflibException(
-                    "Expected candidate number but encountered " + str(c) + ""
+                    "Expected candidate number but encountered " + str(cand) + ""
                 )
-            appr_set.add(c)
-        if len(appr_set) >= num_appr and not tied:
+            approval_set.add(cand)
+        if len(approval_set) >= num_appr and not tied:
             break
     if tied:
         raise PreflibException("Invalid format for tied candidates: " + str(ranking))
-    if len(appr_set) < num_appr:
+    if len(approval_set) < num_appr:
         # all candidates approved
-        appr_set = set(candidate_map.keys())
-    return appr_set
+        approval_set = set(candidate_map.keys())
+    return approval_set
 
 
-def read_preflib_file(filename, setsize=1, appr_percent=None, use_weights=False):
+def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=False):
     """Reads a single preflib file (soi, toi, soc or toc).
 
     Parameters:
@@ -129,21 +130,21 @@ def read_preflib_file(filename, setsize=1, appr_percent=None, use_weights=False)
 
         setsize: int
             Number of top-ranked candidates that voters approve.
-            In case of ties, more than setsize candidates are approved.
+            In case of ties, more than `setsize` candidates are approved.
 
-            setsize is ignored if appr_percent is used.
+            Paramer `setsize` is ignored if `relative_setsize` is used.
 
-        appr_percent: float in (0, 1]
-            Indicates which percentage of candidates of the ranking
+        relative_setsize: float in (0, 1]
+            Indicates which proportion of candidates of the ranking
             are approved (rounded up). In case of ties, more
             candidates are approved.
-            E.g., if a voter has 10 approved candidates and appr_percent is 0.75,
+            E.g., if a voter has 10 approved candidates and `relative_setsize` is 0.75,
             then the approval set contains the top 8 candidates.
 
         use_weights: bool
             If False, treat vote count in preflib file as the number of duplicate ballots,
             i.e., the number of voters that have this approval set.
-            If True, treat vote count as weight and use this weight in ApprovalSet.
+            If True, treat vote count as weight and use this weight in class Voter.
 
     Returns:
         profile: Profile
@@ -152,8 +153,8 @@ def read_preflib_file(filename, setsize=1, appr_percent=None, use_weights=False)
     """
     if setsize <= 0:
         raise ValueError("Parameter setsize must be > 0")
-    if appr_percent and (appr_percent <= 0.0 or appr_percent > 1.0):
-        raise ValueError("Parameter appr_percent not in interval (0, 1]")
+    if relative_setsize and (relative_setsize <= 0.0 or relative_setsize > 1.0):
+        raise ValueError("Parameter relative_setsize not in interval (0, 1]")
     with open(filename, "r") as f:
         line = f.readline()
         num_cand = int(line.strip())
@@ -170,7 +171,7 @@ def read_preflib_file(filename, setsize=1, appr_percent=None, use_weights=False)
                 f"Number of voters ill specified ({str(parts)}), should be triple of integers"
             )
 
-        appr_sets = []
+        approval_sets = []
         lines = [line.strip() for line in f.readlines() if line.strip()]
         if len(lines) != unique_orders:
             raise PreflibException(
@@ -191,30 +192,30 @@ def read_preflib_file(filename, setsize=1, appr_percent=None, use_weights=False)
         ranking = parts[1:]  # ranking starts after count
         if len(ranking) == 0:
             raise PreflibException("Empty ranking: " + str(line))
-        if appr_percent:
-            num_appr = int(ceil(len(ranking) * appr_percent))
+        if relative_setsize:
+            num_appr = int(ceil(len(ranking) * relative_setsize))
         else:
             num_appr = setsize
-        appr_set = get_appr_set(num_appr, ranking, candidate_map)
-        appr_sets.append((count, appr_set))
+        approval_set = get_approval_set(num_appr, ranking, candidate_map)
+        approval_sets.append((count, approval_set))
 
     # normalize candidates to 0, 1, 2, ...
     cand_names = []
     normalize_map = {}
-    for c in candidate_map.keys():
-        cand_names.append(candidate_map[c])
-        normalize_map[c] = len(cand_names) - 1
+    for cand in candidate_map.keys():
+        cand_names.append(candidate_map[cand])
+        normalize_map[cand] = len(cand_names) - 1
 
     profile = Profile(num_cand, cand_names=cand_names)
 
-    for count, appr_set in appr_sets:
-        norm_appr_set = []
-        for c in appr_set:
-            norm_appr_set.append(normalize_map[c])
+    for count, approval_set in approval_sets:
+        normalized_approval_set = []
+        for cand in approval_set:
+            normalized_approval_set.append(normalize_map[cand])
         if use_weights:
-            profile.add_voter(ApprovalSet(norm_appr_set, weight=count))
+            profile.add_voter(Voter(normalized_approval_set, weight=count))
         else:
-            profile.add_voters([norm_appr_set] * count)
+            profile.add_voters([normalized_approval_set] * count)
     if use_weights:
         if len(profile) != unique_orders:
             raise PreflibException(
@@ -246,12 +247,14 @@ def write_profile_to_preflib_toi_file(profile, filename):
         # write: number of candidates
         f.write(str(profile.num_cand) + "\n")
         # write: names of candidates
-        for i in range(profile.num_cand):
-            f.write(f"{i + 1}, {profile.cand_names[i]}\n")
+        for cand in profile.candidates:
+            f.write(f"{cand + 1}, {profile.cand_names[cand]}\n")
         # write: info about number of voters and total weight
-        total_weight = sum(appr_set.weight for appr_set in profile)
+        total_weight = sum(voter.weight for voter in profile)
         f.write(f"{total_weight}, {total_weight}, {len(profile)}\n")
         # write: approval sets and weights
-        for appr_set in profile:
-            appr_set_string = ", ".join(str(cand + 1) for cand in appr_set)
-            f.write(f"{appr_set.weight}, {{{appr_set_string}}}\n")
+        for voter in profile:
+            str_approval_set = misc.str_set_of_candidates(
+                voter.approved, cand_names=list(range(1, profile.num_cand + 1))
+            )
+            f.write(f"{voter.weight}, {str_approval_set}\n")

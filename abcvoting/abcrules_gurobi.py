@@ -41,7 +41,6 @@ def _optimize_rule_gurobi(
 
     """
 
-    cands = list(range(profile.num_cand))
     maxscore = None
     committees = []
 
@@ -50,13 +49,19 @@ def _optimize_rule_gurobi(
     while True:
         m = gb.Model()
 
-        # a binary variable indicating whether c is in the committee
+        # `in_committee` is a binary variable indicating whether `cand` is in the committee
         in_committee = m.addVars(
             profile.num_cand, vtype=gb.GRB.BINARY, name="in_committee"
         )
 
         set_opt_model_func(
-            m, profile, in_committee, committeesize, committees, cands, scorefct
+            m,
+            profile,
+            in_committee,
+            committeesize,
+            committees,
+            profile.candidates,
+            scorefct,
         )
 
         m.setParam("OutputFlag", False)
@@ -91,7 +96,11 @@ def _optimize_rule_gurobi(
             # no longer optimal
             break
 
-        committee = [c for c in cands if in_committee[c].Xn >= 1 - GUROBI_ACCURACY]
+        committee = [
+            cand
+            for cand in profile.candidates
+            if in_committee[cand].Xn >= 1 - GUROBI_ACCURACY
+        ]
         assert len(committee) == committeesize
         committees.append(committee)
 
@@ -111,45 +120,45 @@ def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
     def set_opt_model_func(
         m, profile, in_committee, committeesize, committees, cands, scorefct
     ):
-        # utility[(pref, l)] contains (intended binary) variables counting the number of approved
-        # candidates in the selected committee by pref. This utility[(pref, l)] is true for
-        # exactly the number of candidates in the committee approved by pref for all
+        # utility[(voter, l)] contains (intended binary) variables counting the number of approved
+        # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
+        # exactly the number of candidates in the committee approved by `voter` for all
         # l = 1...committeesize.
         #
         # If scorefct(l) > 0 for l >= 1, we assume that scorefct is monotonic decreasing and
         # therefore in combination with the objective function the following interpreation is
         # valid:
-        # utility[(pref, l)] indicates whether pref approves at least l candidates in the
+        # utility[(voter, l)] indicates whether `voter` approves at least l candidates in the
         # committee (this is the case for scorefct "pav", "slav" or "geom").
         utility = {}
 
-        for pref in profile:
+        for voter in profile:
             for l in range(1, committeesize + 1):
                 # TODO Should we use vtype=gb.GRB.BINARY? Does it make it faster to use ub=1.0?
-                utility[(pref, l)] = m.addVar(ub=1.0)
+                utility[(voter, l)] = m.addVar(ub=1.0)
 
         # constraint: the committee has the required size
         m.addConstr(gb.quicksum(in_committee) == committeesize)
 
         # constraint: utilities are consistent with actual committee
-        for pref in profile:
+        for voter in profile:
             m.addConstr(
-                gb.quicksum(utility[pref, l] for l in range(1, committeesize + 1))
-                == gb.quicksum(in_committee[c] for c in pref)
+                gb.quicksum(utility[voter, l] for l in range(1, committeesize + 1))
+                == gb.quicksum(in_committee[cand] for cand in voter.approved)
             )
 
         # find a new committee that has not been found yet by excluding previously found committees
-        for comm in committees:
+        for committee in committees:
             m.addConstr(
-                gb.quicksum(in_committee[c] for c in cands if c in comm)
+                gb.quicksum(in_committee[cand] for cand in cands if cand in committee)
                 <= committeesize - 1
             )
 
         # objective: the PAV score of the committee
         m.setObjective(
             gb.quicksum(
-                float(scorefct(l)) * pref.weight * utility[(pref, l)]
-                for pref in profile
+                float(scorefct(l)) * voter.weight * utility[(voter, l)]
+                for voter in profile
                 for l in range(1, committeesize + 1)
             ),
             gb.GRB.MAXIMIZE,
@@ -176,7 +185,7 @@ def __gurobi_monroe(profile, committeesize, resolute):
         # optimization goal: variable "satisfaction"
         satisfaction = m.addVar(vtype=gb.GRB.INTEGER, name="satisfaction")
 
-        m.addConstr(gb.quicksum(in_committee[c] for c in cands) == committeesize)
+        m.addConstr(gb.quicksum(in_committee[cand] for cand in cands) == committeesize)
 
         # a partition of voters into committeesize many sets
         partition = m.addVars(
@@ -185,45 +194,45 @@ def __gurobi_monroe(profile, committeesize, resolute):
         for i in range(len(profile)):
             # every voter has to be part of a voter partition set
             m.addConstr(
-                gb.quicksum(partition[(c, i)] for c in cands) == profile[i].weight
+                gb.quicksum(partition[(cand, i)] for cand in cands) == profile[i].weight
             )
-        for c in cands:
+        for cand in cands:
             # every voter set in the partition has to contain
             # at least (num_voters // committeesize) candidates
             m.addConstr(
-                gb.quicksum(partition[(c, j)] for j in range(len(profile)))
-                >= (num_voters // committeesize - num_voters * (1 - in_committee[c]))
+                gb.quicksum(partition[(cand, j)] for j in range(len(profile)))
+                >= (num_voters // committeesize - num_voters * (1 - in_committee[cand]))
             )
             # every voter set in the partition has to contain
             # at most ceil(num_voters/committeesize) candidates
             m.addConstr(
-                gb.quicksum(partition[(c, j)] for j in range(len(profile)))
+                gb.quicksum(partition[(cand, j)] for j in range(len(profile)))
                 <= (
                     num_voters // committeesize
                     + bool(num_voters % committeesize)
-                    + num_voters * (1 - in_committee[c])
+                    + num_voters * (1 - in_committee[cand])
                 )
             )
             # if in_committee[i] = 0 then partition[(i,j) = 0
             m.addConstr(
-                gb.quicksum(partition[(c, j)] for j in range(len(profile)))
-                <= num_voters * in_committee[c]
+                gb.quicksum(partition[(cand, j)] for j in range(len(profile)))
+                <= num_voters * in_committee[cand]
             )
 
         # constraint for objective variable "satisfaction"
         m.addConstr(
             gb.quicksum(
-                partition[(c, j)] * (c in profile[j])
+                partition[(cand, j)] * (cand in profile[j].approved)
                 for j in range(len(profile))
-                for c in cands
+                for cand in cands
             )
             >= satisfaction
         )
 
         # find a new committee that has not been found before
-        for comm in committees:
+        for committee in committees:
             m.addConstr(
-                gb.quicksum(in_committee[c] for c in cands if c in comm)
+                gb.quicksum(in_committee[cand] for cand in cands if cand in committee)
                 <= committeesize - 1
             )
 
@@ -251,37 +260,41 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
         m, profile, in_committee, committeesize, committees, cands, scorefct
     ):
         load = {}
-        for c in cands:
-            for pref in profile:
-                load[(pref, c)] = m.addVar(ub=1.0, lb=0.0)
+        for cand in cands:
+            for voter in profile:
+                load[(voter, cand)] = m.addVar(ub=1.0, lb=0.0)
 
         # constraint: the committee has the required size
-        m.addConstr(gb.quicksum(in_committee[c] for c in cands) == committeesize)
+        m.addConstr(gb.quicksum(in_committee[cand] for cand in cands) == committeesize)
 
-        for c in cands:
-            for pref in profile:
-                if c not in pref:
-                    m.addConstr(load[(pref, c)] == 0)
+        for cand in cands:
+            for voter in profile:
+                if cand not in voter.approved:
+                    m.addConstr(load[(voter, cand)] == 0)
 
         # a candidate's load is distributed among his approvers
-        for c in cands:
+        for cand in cands:
             m.addConstr(
                 gb.quicksum(
-                    pref.weight * load[(pref, c)] for pref in profile if c in cands
+                    voter.weight * load[(voter, cand)]
+                    for voter in profile
+                    if cand in cands
                 )
-                == in_committee[c]
+                == in_committee[cand]
             )
 
         # find a new committee that has not been found before
-        for comm in committees:
+        for committee in committees:
             m.addConstr(
-                gb.quicksum(in_committee[c] for c in cands if c in comm)
+                gb.quicksum(in_committee[cand] for cand in cands if cand in committee)
                 <= committeesize - 1
             )
 
         loadbound = m.addVar(name="loadbound")
-        for pref in profile:
-            m.addConstr(gb.quicksum(load[(pref, c)] for c in pref) <= loadbound)
+        for voter in profile:
+            m.addConstr(
+                gb.quicksum(load[(voter, cand)] for cand in voter.approved) <= loadbound
+            )
 
         # maximizing the negative distance makes code more similar to the other methods here
         m.setObjective(-loadbound, gb.GRB.MAXIMIZE)
@@ -304,7 +317,7 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
         # optimization goal: variable "sum_difference"
         max_hamdistance = m.addVar(vtype=gb.GRB.INTEGER, name="max_hamdistance")
 
-        m.addConstr(gb.quicksum(in_committee[c] for c in cands) == committeesize)
+        m.addConstr(gb.quicksum(in_committee[cand] for cand in cands) == committeesize)
 
         # the single differences between the committee and the voters
         difference = m.addVars(
@@ -313,7 +326,7 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
 
         for i in cands:
             for j in range(num_voters):
-                if i in profile[j]:
+                if i in profile[j].approved:
                     # constraint for the case that the candidate is approved
                     m.addConstr(difference[i, j] == 1 - in_committee[i])
                 else:
@@ -325,9 +338,9 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
             m.addConstr(max_hamdistance >= gb.quicksum(difference[i, j] for i in cands))
 
         # find a new committee that has not been found before
-        for comm in committees:
+        for committee in committees:
             m.addConstr(
-                gb.quicksum(in_committee[c] for c in cands if c in comm)
+                gb.quicksum(in_committee[cand] for cand in cands if cand in committee)
                 <= committeesize - 1
             )
 

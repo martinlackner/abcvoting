@@ -18,11 +18,11 @@ print("Remark 2:\n*********\n")
 # Approval profile
 num_cand = 3
 a, b, c = range(3)  # a = 0, b = 1, c = 2
-apprsets = [[a]] * 99 + [[a, b, c]]
+approval_sets = [[a]] * 99 + [[a, b, c]]
 cand_names = "abc"
 
 profile = Profile(num_cand, cand_names=cand_names)
-profile.add_voters(apprsets)
+profile.add_voters(approval_sets)
 
 print(misc.header("Input:"))
 print(profile.str_compact())

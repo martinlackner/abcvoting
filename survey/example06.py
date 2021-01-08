@@ -27,5 +27,5 @@ a, b, c, d, e, f, g = range(7)  # a = 0, b = 1, c = 2, ...
 assert len(committees) == 6
 # Monroe-score of all committees is the same
 score = monroescore(ex1.profile, committees[0])
-for comm in committees:
-    assert score == monroescore(ex1.profile, comm)
+for committee in committees:
+    assert score == monroescore(ex1.profile, committee)

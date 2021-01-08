@@ -21,11 +21,11 @@ a = 0
 b = 1
 c = 2
 d = 3
-apprsets = [[a, b], [a, b, d], [a, b, c], [a, c, d], [a, c, d], [b], [c], [d]]
+approval_sets = [[a, b], [a, b, d], [a, b, c], [a, c, d], [a, c, d], [b], [c], [d]]
 cand_names = "abcd"
 
 profile = Profile(num_cand, cand_names=cand_names)
-profile.add_voters(apprsets)
+profile.add_voters(approval_sets)
 
 print(misc.header("Input:"))
 print(profile.str_compact())

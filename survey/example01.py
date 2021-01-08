@@ -14,7 +14,7 @@ from abcvoting import misc
 
 num_cand = 8
 a, b, c, d, e, f, g = range(7)  # a = 0, b = 1, c = 2, ...
-apprsets = [
+approval_sets = [
     [a, b],
     [a, b],
     [a, b],
@@ -32,7 +32,7 @@ cand_names = "abcdefgh"
 committeesize = 4
 
 profile = Profile(num_cand, cand_names=cand_names)
-profile.add_voters(apprsets)
+profile.add_voters(approval_sets)
 
 
 if __name__ == "__main__":

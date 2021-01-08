@@ -16,8 +16,8 @@ def test_urn(num_cand, num_voters, setsize, replace):
     profile = genprofiles.random_urn_profile(num_cand, num_voters, setsize, replace)
     assert len(profile) == num_voters
     assert profile.num_cand == num_cand
-    for pref in profile:
-        assert len(pref) == setsize
+    for voter in profile:
+        assert len(voter.approved) == setsize
 
 
 @pytest.mark.parametrize("num_cand", [12])
@@ -34,8 +34,8 @@ def test_urn_party_list(num_cand, num_voters, num_parties, replace, uniform):
     assert len(profile) == num_voters
     assert profile.num_cand == num_cand
     assert profile.party_list()
-    for pref in profile:
-        assert len(pref) > 0
+    for voter in profile:
+        assert len(voter.approved) > 0
 
 
 @pytest.mark.parametrize("num_cand", [6, 7, 8])
@@ -46,8 +46,8 @@ def test_IC(num_cand, num_voters, setsize):
     profile = genprofiles.random_IC_profile(num_cand, num_voters, setsize)
     assert len(profile) == num_voters
     assert profile.num_cand == num_cand
-    for pref in profile:
-        assert len(pref) == setsize
+    for voter in profile:
+        assert len(voter.approved) == setsize
 
 
 @pytest.mark.parametrize("num_cand", [10])
@@ -63,8 +63,8 @@ def test_IC_party_list(num_cand, num_voters, num_parties, uniform):
     assert len(profile) == num_voters
     assert profile.num_cand == num_cand
     assert profile.party_list()
-    for pref in profile:
-        assert len(pref) > 0
+    for voter in profile:
+        assert len(voter.approved) > 0
 
 
 @pytest.mark.parametrize("num_cand", [6, 7, 8])
@@ -78,10 +78,10 @@ def test_mallows(num_cand, num_voters, setsize, dispersion):
     )
     assert len(profile) == num_voters
     assert profile.num_cand == num_cand
-    for pref in profile:
-        assert len(pref) == setsize
-    for pref in profile:
-        assert len(pref) > 0
+    for voter in profile:
+        assert len(voter.approved) == setsize
+    for voter in profile:
+        assert len(voter.approved) > 0
 
 
 @pytest.mark.parametrize("points,distance", [([-1, 1, 3, 1], 4), ([2, 3, -2, 0], 5)])
@@ -99,8 +99,8 @@ def test_2d(num_cand, num_voters, sigma):
     )
     assert len(profile) == num_voters
     assert profile.num_cand == num_cand
-    for pref in profile:
-        assert len(pref) > 0
+    for voter in profile:
+        assert len(voter.approved) > 0
 
 
 @pytest.mark.parametrize("num_cand", [10])
@@ -117,5 +117,5 @@ def test_2d_party_list(num_cand, num_voters, num_parties, uniform, sigma):
     assert len(profile) == num_voters
     assert profile.num_cand == num_cand
     assert profile.party_list()
-    for pref in profile:
-        assert len(pref) > 0
+    for voter in profile:
+        assert len(voter.approved) > 0

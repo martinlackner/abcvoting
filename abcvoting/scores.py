@@ -90,30 +90,30 @@ def cumulative_score_fct(scorefct, cand_in_com):
 #  gained by adding candidate i
 def marginal_thiele_scores_add(scorefct, profile, committee):
     marg = [0] * profile.num_cand
-    for pref in profile:
-        for c in pref:
-            if pref.approved & set(committee):
-                marg[c] += pref.weight * scorefct(
-                    len(pref.approved & set(committee)) + 1
+    for voter in profile:
+        for cand in voter.approved:
+            if voter.approved & set(committee):
+                marg[cand] += voter.weight * scorefct(
+                    len(voter.approved & set(committee)) + 1
                 )
             else:
-                marg[c] += pref.weight * scorefct(1)
-    for c in committee:
-        marg[c] = -1
+                marg[cand] += voter.weight * scorefct(1)
+    for cand in committee:
+        marg[cand] = -1
     return marg
 
 
 def marginal_thiele_scores_remove(scorefct, profile, committee):
     marg_util_cand = [0] * profile.num_cand
     #  marginal utility gained by adding candidate to the committee
-    for pref in profile:
-        for c in pref:
-            satisfaction = len(pref.approved.intersection(committee))
-            marg_util_cand[c] += pref.weight * scorefct(satisfaction)
-    for c in range(profile.num_cand):
-        if c not in committee:
+    for voter in profile:
+        for cand in voter.approved:
+            satisfaction = len(voter.approved.intersection(committee))
+            marg_util_cand[cand] += voter.weight * scorefct(satisfaction)
+    for cand in profile.candidates:
+        if cand not in committee:
             # do not choose candidates that already have been removed
-            marg_util_cand[c] = max(marg_util_cand) + 1
+            marg_util_cand[cand] = max(marg_util_cand) + 1
     return marg_util_cand
 
 
@@ -136,7 +136,7 @@ def monroescore_matching(profile, committee):
     for cand in committee:
         interestedvoters = []
         for i in range(len(profile)):
-            if cand in profile[i]:
+            if cand in profile[i].approved:
                 interestedvoters.append(i)
         for j in range(sizeofdistricts):
             graph[str(cand) + "/" + str(j)] = interestedvoters
@@ -160,11 +160,11 @@ def monroescore_flowbased(profile, committee):
     for i in committee:
         graph.add_node(i, demand=lower_bound)
         graph.add_edge(i, "sink", weight=0, capacity=1)
-    for i, vote in enumerate(profile):
+    for i, voter in enumerate(profile):
         voter_name = "v" + str(i)
         graph.add_node(voter_name, demand=-1)
         for cand in committee:
-            if cand in vote:
+            if cand in voter.approved:
                 graph.add_edge(voter_name, cand, weight=0, capacity=1)
             else:
                 graph.add_edge(voter_name, cand, weight=1, capacity=1)
@@ -176,8 +176,8 @@ def monroescore_flowbased(profile, committee):
 
 def mavscore(profile, committee):
     score = 0
-    for pref in profile:
-        hamdistance = hamming(pref, committee)
+    for voter in profile:
+        hamdistance = hamming(voter.approved, committee)
         if hamdistance > score:
             score = hamdistance
     return score

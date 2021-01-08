@@ -9,7 +9,7 @@ import sys
 
 sys.path.insert(0, "..")
 from abcvoting import abcrules
-from abcvoting.preferences import Profile, ApprovalSet
+from abcvoting.preferences import Profile, Voter
 from abcvoting import misc
 
 
@@ -20,9 +20,9 @@ num_cand = 4
 a, b, c, d = range(4)  # a = 0, b = 1, c = 2, ...
 cand_names = "abcd"
 
-apprsets = [[a, b]] * 3 + [[a, d]] * 6 + [[b]] * 4 + [[c]] * 5 + [[c, d]] * 5
+approval_sets = [[a, b]] * 3 + [[a, d]] * 6 + [[b]] * 4 + [[c]] * 5 + [[c, d]] * 5
 profile = Profile(num_cand, cand_names=cand_names)
-profile.add_voters(apprsets)
+profile.add_voters(approval_sets)
 
 print(misc.header("Input:"))
 print(profile.str_compact())
@@ -48,16 +48,16 @@ a, b, c, d = range(4)  # a = 0, b = 1, c = 2, ...
 cand_names = "abcd"
 
 profile = Profile(num_cand, cand_names=cand_names)
-profile.add_voter(ApprovalSet([a, c, d], 960))
-profile.add_voter(ApprovalSet([b, c, d], 3000))
-profile.add_voter(ApprovalSet([b, c], 520))
-profile.add_voter(ApprovalSet([a, b], 1620))
-profile.add_voter(ApprovalSet([a, d], 1081))
-profile.add_voter(ApprovalSet([a, c], 1240))
-profile.add_voter(ApprovalSet([b, d], 360))
-profile.add_voter(ApprovalSet([d], 360))
-profile.add_voter(ApprovalSet([c], 120))
-profile.add_voter(ApprovalSet([b], 60))
+profile.add_voter(Voter([a, c, d], 960))
+profile.add_voter(Voter([b, c, d], 3000))
+profile.add_voter(Voter([b, c], 520))
+profile.add_voter(Voter([a, b], 1620))
+profile.add_voter(Voter([a, d], 1081))
+profile.add_voter(Voter([a, c], 1240))
+profile.add_voter(Voter([b, d], 360))
+profile.add_voter(Voter([d], 360))
+profile.add_voter(Voter([c], 120))
+profile.add_voter(Voter([b], 60))
 
 print(misc.header("Input:"))
 print(profile.str_compact())

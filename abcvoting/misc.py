@@ -11,42 +11,41 @@ def sort_committees(committees):
     sorts a list of committees,
     converts them to lists, and removes duplicates
     """
-    return [sorted(list(c)) for c in sorted(set(map(tuple, committees)))]
+    return [sorted(list(cand)) for cand in sorted(set(map(tuple, committees)))]
 
 
 def check_enough_approved_candidates(profile, committeesize):
     """
     verifies whether a sufficient number of approved candidates exists
     """
-    appr = set()
-    for pref in profile:
-        appr.update(pref)
-    if len(appr) < committeesize:
+    approved_candidates = set()
+    for voter in profile:
+        approved_candidates.update(voter.approved)
+    if len(approved_candidates) < committeesize:
         raise ValueError(
-            "committeesize = "
-            + str(committeesize)
-            + " is larger than number of approved candidates"
+            f"committeesize = {committeesize} is larger than"
+            f"number of approved candidates ({len(approved_candidates)})"
         )
 
 
-def str_candset(candset, cand_names=None):
+def str_set_of_candidates(candset, cand_names=None):
     """
     nicely format a single committee
     """
     if cand_names is None:
-        namedset = [str(c) for c in candset]
+        namedset = [str(cand) for cand in candset]
     else:
-        namedset = [cand_names[c] for c in candset]
+        namedset = [cand_names[cand] for cand in candset]
     return "{" + ", ".join(map(str, namedset)) + "}"
 
 
-def str_candsets(committees, cand_names=None):
+def str_sets_of_candidates(committees, cand_names=None):
     """
     nicely format a list of committees
     """
     output = ""
-    for comm in sorted(map(tuple, committees)):
-        output += " " + str_candset(comm, cand_names) + "\n"
+    for committee in sorted(map(tuple, committees)):
+        output += f" {str_set_of_candidates(committee, cand_names)}\n"
     return output
 
 
@@ -74,7 +73,7 @@ def str_committees_header(committees, winning=False):
     return output
 
 
-def hamming(a, b):
+def hamming(set1, set2):
     """Hamming distance between sets `a` and `b`.
 
     The Hamming distance for sets is the size of their symmetric difference,
@@ -82,9 +81,9 @@ def hamming(a, b):
 
     Parameters
     ----------
-    a, b : iterable of int
+    set1, set2 : iterable of int
         The two sets, for which the Hamming distance is computed."""
-    diffs = [x for x in a if x not in b] + [x for x in b if x not in a]
+    diffs = [x for x in set1 if x not in set2] + [x for x in set2 if x not in set1]
     return len(diffs)
 
 

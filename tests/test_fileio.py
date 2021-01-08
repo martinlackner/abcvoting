@@ -11,7 +11,9 @@ from abcvoting.preferences import Profile
 @pytest.mark.parametrize("filename", ["test1.toi", "test2.soi", "test3.toc"])
 def test_readfile(filename):
     currdir = os.path.dirname(os.path.abspath(__file__))
-    profile = fileio.read_preflib_file(currdir + "/data/" + filename, appr_percent=0.5)
+    profile = fileio.read_preflib_file(
+        currdir + "/data/" + filename, relative_setsize=0.5
+    )
     assert len(profile) == 5
     assert profile.has_unit_weights()
 
@@ -21,8 +23,8 @@ def test_readfromdir():
     profiles = fileio.load_preflib_files_from_dir(currdir + "/data/", setsize=2)
     assert len(profiles) == 5
     for profile in profiles:
-        for pref in profile:
-            assert len(pref) >= 2
+        for voter in profile:
+            assert len(voter.approved) >= 2
         assert profile.has_unit_weights()
 
 
@@ -30,8 +32,8 @@ def test_readfromdir():
 def test_readfile_setsize(filename):
     currdir = os.path.dirname(os.path.abspath(__file__))
     profile = fileio.read_preflib_file(currdir + "/data/" + filename, setsize=2)
-    for pref in profile:
-        assert len(pref) == 2
+    for voter in profile:
+        assert len(voter.approved) == 2
 
 
 @pytest.mark.parametrize(
@@ -51,9 +53,9 @@ def test_readfile_setsize(filename):
 def test_readfile_setsize_with_ties(filename, setsize, expected):
     currdir = os.path.dirname(os.path.abspath(__file__))
     profile = fileio.read_preflib_file(currdir + "/data/" + filename, setsize=setsize)
-    assert [len(pref) for pref in profile] == expected
-    for pref in profile:
-        assert pref.weight == 1
+    assert [len(voter.approved) for voter in profile] == expected
+    for voter in profile:
+        assert voter.weight == 1
 
 
 @pytest.mark.parametrize(
@@ -82,23 +84,23 @@ def test_readfile_and_weights(filename, total_weight, num_voters):
     currdir = os.path.dirname(os.path.abspath(__file__))
     profile = fileio.read_preflib_file(currdir + "/data/" + filename)
     assert len(profile) == total_weight
-    for pref in profile:
-        assert pref.weight == 1
+    for voter in profile:
+        assert voter.weight == 1
     profile = fileio.read_preflib_file(currdir + "/data/" + filename, use_weights=True)
     assert len(profile) == num_voters
-    assert sum(pref.weight for pref in profile) == total_weight
+    assert sum(voter.weight for voter in profile) == total_weight
 
 
 def test_read_and_write_preflib_file():
     currdir = os.path.dirname(os.path.abspath(__file__))
-    profile = Profile(6)
-    profile.add_voters([[3], [4, 1, 5], [0, 2], [], [0, 1, 2, 3, 4, 5], [5], [1], [1]])
-    fileio.write_profile_to_preflib_toi_file(profile, currdir + "/data/test5.toi")
+    profile1 = Profile(6)
+    profile1.add_voters([[3], [4, 1, 5], [0, 2], [], [0, 1, 2, 3, 4, 5], [5], [1], [1]])
+    fileio.write_profile_to_preflib_toi_file(profile1, currdir + "/data/test5.toi")
     for use_weights in [True, False]:
         profile2 = fileio.read_preflib_file(
             currdir + "/data/test5.toi", use_weights=use_weights
         )
-        assert len(profile) == len(profile2)
-        for i, pref in enumerate(profile):
-            assert pref.weight == profile2[i].weight
-            assert pref.approved == set(profile2[i])
+        assert len(profile1) == len(profile2)
+        for i, voter in enumerate(profile1):
+            assert voter.weight == profile2[i].weight
+            assert voter.approved == set(profile2[i].approved)

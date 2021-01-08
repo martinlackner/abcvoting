@@ -18,11 +18,11 @@ print(misc.header("Example 13", "*"))
 # Approval profile
 num_cand = 5
 a, b, c, d, e = range(5)  # a = 0, b = 1, c = 2, ...
-apprsets = [[a]] + [[b, c, d, e]] * 3
+approval_sets = [[a]] + [[b, c, d, e]] * 3
 cand_names = "abcde"
 
 profile = Profile(num_cand, cand_names=cand_names)
-profile.add_voters(apprsets)
+profile.add_voters(approval_sets)
 
 print(misc.header("Input:"))
 print(profile.str_compact())

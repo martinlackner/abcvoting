@@ -135,38 +135,49 @@ manipulations = [
 ]
 
 for manip in manipulations:
-    rule_id, resolute, committeesize, apprsets, modvote, commsfirst, commsafter = manip
+    (
+        rule_id,
+        resolute,
+        committeesize,
+        approval_sets,
+        modvote,
+        commsfirst,
+        commsafter,
+    ) = manip
 
     print(misc.header(abcrules.rules[rule_id].longname, "-"))
 
     profile = Profile(num_cand, cand_names=cand_names)
-    profile.add_voters(apprsets)
-    truepref = profile.approval_sets[0].approved
+    profile.add_voters(approval_sets)
+    truepref = profile[0].approved
     print(profile.str_compact())
 
     committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)
-    print("original winning committees:\n" + misc.str_candsets(committees, cand_names))
+    print(
+        "original winning committees:\n"
+        + misc.str_sets_of_candidates(committees, cand_names)
+    )
 
     # verify correctness
     assert committees == commsfirst
 
     print(
         "Manipulation by voter 0: "
-        + misc.str_candset(apprsets[0], cand_names)
+        + misc.str_set_of_candidates(approval_sets[0], cand_names)
         + " --> "
-        + misc.str_candset(modvote, cand_names)
+        + misc.str_set_of_candidates(modvote, cand_names)
     )
-    if not all(c in truepref for c in modvote):
+    if not all(cand in truepref for cand in modvote):
         print(" (not a subset!)")
 
-    apprsets[0] = modvote
+    approval_sets[0] = modvote
     profile = Profile(num_cand, cand_names=cand_names)
-    profile.add_voters(apprsets)
+    profile.add_voters(approval_sets)
 
     committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)
     print(
         "\nwinning committees after manipulation:\n"
-        + misc.str_candsets(committees, cand_names)
+        + misc.str_sets_of_candidates(committees, cand_names)
     )
 
     # verify correctness
@@ -176,6 +187,6 @@ for manip in manipulations:
     # with the Kelly (cautious) set extension
     for commfirst in commsfirst:
         for commafter in commsafter:
-            for c in set(commfirst) & set(truepref):
-                assert c in commafter
+            for cand in set(commfirst) & set(truepref):
+                assert cand in commafter
             assert set(commfirst) & set(truepref) < set(commafter) & set(truepref)

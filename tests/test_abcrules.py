@@ -6,7 +6,7 @@ import pytest
 
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.abcrules_gurobi import __gurobi_thiele_methods
-from abcvoting.preferences import Profile, ApprovalSet
+from abcvoting.preferences import Profile, Voter
 from abcvoting import abcrules, scores
 
 
@@ -492,10 +492,10 @@ def test_abcrules_wrong_rule_id():
 @pytest.mark.parametrize("verbose", [0, 1, 2, 3])
 def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
     profile = Profile(3)
-    profile.add_voter(ApprovalSet([0]))
-    profile.add_voter(ApprovalSet([0]))
-    profile.add_voter(ApprovalSet([1], 5))
-    profile.add_voter(ApprovalSet([0]))
+    profile.add_voter(Voter([0]))
+    profile.add_voter(Voter([0]))
+    profile.add_voter(Voter([1], 5))
+    profile.add_voter(Voter([0]))
     committeesize = 1
 
     if "monroe" in rule_id or rule_id in [
@@ -720,9 +720,9 @@ def test_consensus_fails_lower_quota():
     committees = abcrules.rules["consensus"].compute(
         profile, committeesize, resolute=True
     )
-    for comm in committees:
+    for committee in committees:
         assert not all(
-            cand in comm
+            cand in committee
             for cand in [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
         )
     # .. and thus the Consensus rule fails lower quota (and PJR and EJR): the quota of the 27 voters

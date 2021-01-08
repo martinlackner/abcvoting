@@ -71,7 +71,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
 
     # TODO does this make things slower in case of weights == 1 to multiply weights? We could
     #  skip it then of course...
-    weights1d = np.array([pref.weight for pref in profile])
+    weights1d = np.array([voter.weight for voter in profile])
     # for some reason CVXPY doesn't like the broadcasting, so we need a 2d array
     weights = np.tile(weights1d[np.newaxis].T, (1, committeesize))
 
@@ -87,7 +87,12 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
 
         # left-hand-side and right-hand-side of the equality constraints:
         lhs = cp.sum(utility, axis=1)
-        rhs = cp.hstack([cp.sum([in_committee[c] for c in pref]) for pref in profile])
+        rhs = cp.hstack(
+            [
+                cp.sum([in_committee[cand] for cand in voter.approved])
+                for voter in profile
+            ]
+        )
 
         constraints = [cp.sum(in_committee) == committeesize, lhs == rhs]
 

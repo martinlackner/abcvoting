@@ -11,7 +11,7 @@ from abcvoting.preferences import Profile
 def random_urn_profile(num_cand, num_voters, setsize, replace):
     """Generate Polya Urn profile with fixed size approval sets."""
     currsize = 1.0
-    apprsets = []
+    approval_sets = []
     replacedsets = {}
 
     for _ in range(num_voters):
@@ -19,7 +19,7 @@ def random_urn_profile(num_cand, num_voters, setsize, replace):
         if r < 1.0:
             # base case: sample uniformly at random
             randset = random.sample(range(num_cand), setsize)
-            apprsets.append(randset)
+            approval_sets.append(randset)
             key = tuple(set(randset))
             if key in replacedsets:
                 replacedsets[key] += 1
@@ -29,15 +29,15 @@ def random_urn_profile(num_cand, num_voters, setsize, replace):
         else:
             # sample from one of the replaced ballots
             r = random.randint(0, sum(replacedsets.values()))
-            for apprset in replacedsets:
-                count = replacedsets[apprset]
+            for approval_set in replacedsets:
+                count = replacedsets[approval_set]
                 if r <= count:
-                    apprsets.append(list(apprset))
+                    approval_sets.append(list(approval_set))
                     break
                 else:
                     r -= count
     profile = Profile(num_cand)
-    profile.add_voters(apprsets)
+    profile.add_voters(approval_sets)
     return profile
 
 
@@ -47,7 +47,7 @@ def random_urn_party_list_profile(
     """Generate Polya Urn profile from a number of parties.
     If uniform each party gets the same amount of candidates."""
     currsize = 1.0
-    apprsets = []
+    approval_sets = []
     replacedsets = {}
     parties = list(range(num_parties))
     party_cands = __distribute_candidates_to_parties(num_cand, parties, uniform=uniform)
@@ -57,7 +57,7 @@ def random_urn_party_list_profile(
             # base case: sample uniformly at random
             party = random.choice(parties)
             randpartyset = list(party_cands[party])
-            apprsets.append(randpartyset)
+            approval_sets.append(randpartyset)
             if party in replacedsets:
                 replacedsets[party] += 1
             else:
@@ -69,24 +69,24 @@ def random_urn_party_list_profile(
             for party in replacedsets:
                 count = replacedsets[party]
                 if r <= count:
-                    apprsets.append(list(party_cands[party]))
+                    approval_sets.append(list(party_cands[party]))
                     break
                 else:
                     r -= count
     profile = Profile(num_cand)
-    profile.add_voters(apprsets)
+    profile.add_voters(approval_sets)
     return profile
 
 
 def random_IC_profile(num_cand, num_voters, setsize):
     """Generates profile with random assignment of candidates to
     the fix size of setsize."""
-    apprsets = []
+    approval_sets = []
     for _ in range(num_voters):
         randset = random.sample(range(num_cand), setsize)
-        apprsets.append(randset)
+        approval_sets.append(randset)
     profile = Profile(num_cand)
-    profile.add_voters(apprsets)
+    profile.add_voters(approval_sets)
     return profile
 
 
@@ -97,11 +97,11 @@ def random_IC_party_list_profile(num_cand, num_voters, num_parties, uniform=Fals
     else at least 1."""
     parties = list(range(num_parties))
     party_cands = __distribute_candidates_to_parties(num_cand, parties, uniform=uniform)
-    apprsets = []
+    approval_sets = []
     for _ in range(num_voters):
-        apprsets.append(party_cands[random.choice(parties)])
+        approval_sets.append(party_cands[random.choice(parties)])
     profile = Profile(num_cand)
-    profile.add_voters(apprsets)
+    profile.add_voters(approval_sets)
     return profile
 
 
@@ -116,11 +116,11 @@ def random_2d_points_profile(
     voter_points = __generate_2d_points(voters, voterpointmode, sigma)
     cand_points = __generate_2d_points(cands, candpointmode, sigma)
 
-    apprsets = __get_profile_from_points(
+    approval_sets = __get_profile_from_points(
         voters, cands, voter_points, cand_points, approval_threshold
     )
     profile = Profile(num_cand)
-    profile.add_voters(apprsets)
+    profile.add_voters(approval_sets)
     return profile
 
 
@@ -149,11 +149,11 @@ def random_2d_points_party_list_profile(
         voters, parties, voter_points, party_points, 1.0
     )
 
-    apprsets = []
+    approval_sets = []
     for p in party_sets:
-        apprsets.append(party_cands[p[0]])
+        approval_sets.append(party_cands[p[0]])
     profile = Profile(num_cand)
-    profile.add_voters(apprsets)
+    profile.add_voters(approval_sets)
     return profile
 
 
@@ -166,16 +166,16 @@ def random_mallows_profile(num_cand, num_voters, setsize, dispersion):
     reference_ranking = list(range(num_cand))
     random.shuffle(reference_ranking)
     insert_dist = __compute_mallows_insert_distributions(num_cand, dispersion)
-    apprsets = []
+    approval_sets = []
     for _ in range(num_voters):
         vote = []
         for i, distribution in enumerate(insert_dist):
             pos = __select_pos(distribution)
             vote.insert(pos, reference_ranking[i])
 
-        apprsets.append(vote[:setsize])
+        approval_sets.append(vote[:setsize])
     profile = Profile(num_cand)
-    profile.add_voters(apprsets)
+    profile.add_voters(approval_sets)
     return profile
 
 
@@ -275,12 +275,18 @@ def __euclidean(p1, p2):
     return sqrt(fabs(p1[0] - p2[0]) ** 2 + fabs(p1[1] - p2[1]) ** 2)
 
 
-def __get_profile_from_points(voters, cands, voter_points, cand_points, appr_threshold):
+def __get_profile_from_points(
+    voters, cands, voter_points, cand_points, approval_threshold
+):
     """Generates a list of approval sets from 2d points according to
-    appr_threshold."""
+    approval_threshold."""
     profile = {}
     for v in voters:
-        distances = {c: __euclidean(voter_points[v], cand_points[c]) for c in cands}
+        distances = {
+            cand: __euclidean(voter_points[v], cand_points[cand]) for cand in cands
+        }
         mindist = min(distances.values())
-        profile[v] = [c for c in cands if distances[c] <= mindist * appr_threshold]
+        profile[v] = [
+            cand for cand in cands if distances[cand] <= mindist * approval_threshold
+        ]
     return list(profile.values())

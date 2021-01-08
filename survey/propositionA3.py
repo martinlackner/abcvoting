@@ -277,9 +277,9 @@ for inst in monotonicity_instances:
     (
         rule_id,
         committeesize,
-        apprsets,
+        approval_sets,
         addvoter,
-        extravote,
+        new_approval_set,
         commsfirst,
         commsafter,
     ) = inst
@@ -287,8 +287,8 @@ for inst in monotonicity_instances:
     print(misc.header(abcrules.rules[rule_id].longname, "-"))
 
     profile = Profile(num_cand, cand_names=cand_names)
-    profile.add_voters(apprsets)
-    origvote = set(apprsets[0])
+    profile.add_voters(approval_sets)
+    original_approval_set = set(approval_sets[0])
     print(profile.str_compact())
 
     # irresolute if possible
@@ -298,36 +298,52 @@ for inst in monotonicity_instances:
         resolute = True
 
     committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)
-    print("original winning committees:\n" + misc.str_candsets(committees, cand_names))
+    print(
+        "original winning committees:\n"
+        + misc.str_sets_of_candidates(committees, cand_names)
+    )
     # verify correctness
     assert committees == commsfirst
-    some_variant = any(all(c in comm for c in extravote) for comm in commsfirst)
-    all_variant = all(all(c in comm for c in extravote) for comm in commsfirst)
+    some_variant = any(
+        all(cand in committee for cand in new_approval_set) for committee in commsfirst
+    )
+    all_variant = all(
+        all(cand in committee for cand in new_approval_set) for committee in commsfirst
+    )
     assert some_variant or all_variant
     if all_variant:
-        assert not all(all(c in comm for c in extravote) for comm in commsafter)
+        assert not all(
+            all(cand in committee for cand in new_approval_set)
+            for committee in commsafter
+        )
     else:
-        assert not any(all(c in comm for c in extravote) for comm in commsafter)
+        assert not any(
+            all(cand in committee for cand in new_approval_set)
+            for committee in commsafter
+        )
 
     if addvoter:
-        print("additional voter: " + misc.str_candset(extravote, cand_names))
-        apprsets.append(extravote)
+        print(
+            "additional voter: "
+            + misc.str_set_of_candidates(new_approval_set, cand_names)
+        )
+        approval_sets.append(new_approval_set)
     else:
-        apprsets[0] = list(set(extravote) | set(apprsets[0]))
+        approval_sets[0] = list(set(new_approval_set) | set(approval_sets[0]))
         print(
             "change of voter 0: "
-            + misc.str_candset(list(origvote), cand_names)
+            + misc.str_set_of_candidates(list(original_approval_set), cand_names)
             + " --> "
-            + misc.str_candset(apprsets[0], cand_names)
+            + misc.str_set_of_candidates(approval_sets[0], cand_names)
         )
 
     profile = Profile(num_cand, cand_names=cand_names)
-    profile.add_voters(apprsets)
+    profile.add_voters(approval_sets)
 
     committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)
     print(
         "\nwinning committees after the modification:\n"
-        + misc.str_candsets(committees, cand_names)
+        + misc.str_sets_of_candidates(committees, cand_names)
     )
 
     # verify correctness
@@ -335,13 +351,13 @@ for inst in monotonicity_instances:
 
     print(abcrules.rules[rule_id].shortname + " fails ", end="")
     if addvoter:
-        if len(extravote) == 1:
+        if len(new_approval_set) == 1:
             print("candidate", end="")
         else:
             print("support", end="")
         print(" monotonicity with additional voters")
     else:
-        if len(set(extravote) - origvote) == 1:
+        if len(set(new_approval_set) - original_approval_set) == 1:
             print("candidate", end="")
         else:
             print("support", end="")

@@ -20,7 +20,7 @@ from abcvoting.misc import sort_committees
 from abcvoting.misc import hamming
 from abcvoting.misc import check_enough_approved_candidates
 from abcvoting.misc import str_committees_header
-from abcvoting.misc import str_candset, str_candsets
+from abcvoting.misc import str_set_of_candidates, str_sets_of_candidates
 from abcvoting.misc import header
 from abcvoting import scores
 
@@ -331,7 +331,7 @@ def compute_thiele_method(
         print()
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -374,8 +374,8 @@ def __thiele_methods_branchandbound(profile, committeesize, scorefct_str, resolu
                 sorted(marg_util_cand[largest_cand + 1 :])[-missing:]
             ) + scores.thiele_score(scorefct_str, profile, part_com)
             if upper_bound >= best_score:
-                for c in range(largest_cand + 1, profile.num_cand - missing + 1):
-                    part_coms.insert(0, part_com + [c])
+                for cand in range(largest_cand + 1, profile.num_cand - missing + 1):
+                    part_coms.insert(0, part_com + [cand])
 
     committees = sort_committees(best_committees)
     if resolute:
@@ -468,26 +468,26 @@ def compute_av(profile, committeesize, algorithm="standard", resolute=False, ver
 def __separable(rule_id, profile, committeesize, resolute, verbose):
     check_enough_approved_candidates(profile, committeesize)
 
-    appr_scores = [0] * profile.num_cand
-    for pref in profile:
-        for cand in pref:
+    score = [0] * profile.num_cand
+    for voter in profile:
+        for cand in voter.approved:
             if rule_id == "sav":
                 # Satisfaction Approval Voting
-                appr_scores[cand] += pref.weight / len(pref)
+                score[cand] += voter.weight / len(voter.approved)
             elif rule_id == "av":
                 # (Classic) Approval Voting
-                appr_scores[cand] += pref.weight
+                score[cand] += voter.weight
             else:
                 raise UnknownRuleIDError(rule_id)
 
     # smallest score to be in the committee
-    cutoff = sorted(appr_scores)[-committeesize]
+    cutoff = sorted(score)[-committeesize]
 
-    certain_cands = [c for c in range(profile.num_cand) if appr_scores[c] > cutoff]
-    possible_cands = [c for c in range(profile.num_cand) if appr_scores[c] == cutoff]
+    certain_cands = [cand for cand in profile.candidates if score[cand] > cutoff]
+    possible_cands = [cand for cand in profile.candidates if score[cand] == cutoff]
     missing = committeesize - len(certain_cands)
     if len(possible_cands) == missing:
-        # candidates with appr_scores[c] == cutoff
+        # candidates with score[cand] == cutoff
         # are also certain candidates because all these candidates
         # are required to fill the committee
         certain_cands = sorted(certain_cands + possible_cands)
@@ -511,8 +511,8 @@ def __separable(rule_id, profile, committeesize, resolute, verbose):
             print("Computing only one winning committee (resolute=True)\n")
     if verbose >= 2:
         print("Scores of candidates:")
-        for c in range(profile.num_cand):
-            print(profile.cand_names[c] + ": " + str(appr_scores[c]))
+        for cand in profile.candidates:
+            print(profile.cand_names[cand] + ": " + str(score[cand]))
 
         print("\nCandidates are contained in winning committees")
         print("if their score is >= " + str(cutoff) + ".")
@@ -520,14 +520,14 @@ def __separable(rule_id, profile, committeesize, resolute, verbose):
         if len(certain_cands) > 0:
             print("\nThe following candidates are contained in")
             print("every winning committee:")
-            namedset = [profile.cand_names[c] for c in certain_cands]
+            namedset = [profile.cand_names[cand] for cand in certain_cands]
             print(" " + ", ".join(map(str, namedset)))
             print()
 
         if len(possible_cands) > 0:
             print("The following candidates are contained in")
             print("some of the winning committees:")
-            namedset = [profile.cand_names[c] for c in possible_cands]
+            namedset = [profile.cand_names[cand] for cand in possible_cands]
             print(" " + ", ".join(map(str, namedset)))
             print(
                 "("
@@ -537,7 +537,7 @@ def __separable(rule_id, profile, committeesize, resolute, verbose):
             )
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -577,16 +577,16 @@ def __seq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
             output += " to a total of "
             output += str(scores.thiele_score(scorefct_str, profile, committee))
             tied_cands = [
-                c
-                for c in range(len(additional_score_cand))
+                cand
+                for cand in range(len(additional_score_cand))
                 if (
-                    c > next_cand
-                    and (additional_score_cand[c] == max(additional_score_cand))
+                    cand > next_cand
+                    and (additional_score_cand[cand] == max(additional_score_cand))
                 )
             ]
             if len(tied_cands) > 0:
                 output += " tie broken in favor of " + str(next_cand)
-                output += " candidates " + str_candset(tied_cands)
+                output += " candidates " + str_set_of_candidates(tied_cands)
                 output += " would increase the score by the same amount ("
                 output += str(max(additional_score_cand)) + ")"
             print(output + "\n")
@@ -611,10 +611,10 @@ def __seq_thiele_irresolute(profile, committeesize, scorefct_str):
             additional_score_cand = scores.marginal_thiele_scores_add(
                 scorefct, profile, committee
             )
-            for c in range(profile.num_cand):
-                if additional_score_cand[c] >= max(additional_score_cand):
-                    next_comm = tuple(sorted(committee + (c,)))
-                    comm_scores_next[next_comm] = score + additional_score_cand[c]
+            for cand in profile.candidates:
+                if additional_score_cand[cand] >= max(additional_score_cand):
+                    next_comm = tuple(sorted(committee + (cand,)))
+                    comm_scores_next[next_comm] = score + additional_score_cand[cand]
         comm_scores = comm_scores_next
     return sort_committees(list(comm_scores.keys()))
 
@@ -650,13 +650,13 @@ def compute_seq_thiele_method(
     # optional output
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
         if resolute or len(committees) == 1:
             print(scorefct_str.upper() + "-score of winning committee:", end="")
         else:
             print(scorefct_str.upper() + "-score of winning committees:")
-        for comm in committees:
-            print(" " + str(scores.thiele_score(scorefct_str, profile, comm)))
+        for committee in committees:
+            print(" " + str(scores.thiele_score(scorefct_str, profile, committee)))
         print()
     # end of optional output
 
@@ -671,7 +671,7 @@ def __revseq_thiele_irresolute(profile, committeesize, scorefct_str):
     """
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
 
-    allcandcomm = tuple(range(profile.num_cand))
+    allcandcomm = tuple(profile.candidates)
     comm_scores = {allcandcomm: scores.thiele_score(scorefct_str, profile, allcandcomm)}
 
     for _ in range(profile.num_cand - committeesize):
@@ -684,11 +684,11 @@ def __revseq_thiele_irresolute(profile, committeesize, scorefct_str):
             # find smallest elements in marg_util_cand and return indices
             cands_to_remove = [
                 cand
-                for cand in range(profile.num_cand)
+                for cand in profile.candidates
                 if marg_util_cand[cand] == min(marg_util_cand)
             ]
-            for c in cands_to_remove:
-                next_comm = tuple(set(committee) - {c})
+            for cand in cands_to_remove:
+                next_comm = tuple(set(committee) - {cand})
                 comm_scores_next[next_comm] = score - score_reduction
             comm_scores = comm_scores_next
     return sort_committees(list(comm_scores.keys()))
@@ -702,7 +702,7 @@ def __revseq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
     """
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
 
-    committee = set(range(profile.num_cand))
+    committee = set(profile.candidates)
 
     # optional output
     if verbose >= 2:
@@ -720,7 +720,7 @@ def __revseq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
         # find smallest elements in marg_util_cand and return indices
         cands_to_remove = [
             cand
-            for cand in range(profile.num_cand)
+            for cand in profile.candidates
             if marg_util_cand[cand] == min(marg_util_cand)
         ]
         committee.remove(cands_to_remove[-1])
@@ -737,7 +737,7 @@ def __revseq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
             output += str(scores.thiele_score(scorefct_str, profile, committee))
             if len(cands_to_remove) > 1:
                 output += " (tie between candidates "
-                output += str_candset(cands_to_remove) + ")\n"
+                output += str_set_of_candidates(cands_to_remove) + ")\n"
             print(output + "\n")
         # end of optional output
 
@@ -774,14 +774,14 @@ def compute_revseq_thiele_method(
     # optional output
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     if verbose >= 2:
         if resolute or len(committees) == 1:
             print("PAV-score of winning committee:", end="")
         else:
             print("PAV-score of winning committees:")
-        for comm in committees:
-            print(" " + str(scores.thiele_score(scorefct_str, profile, comm)))
+        for committee in committees:
+            print(" " + str(scores.thiele_score(scorefct_str, profile, committee)))
         print()
     # end of optional output
 
@@ -792,13 +792,13 @@ def __minimaxav_bruteforce(profile, committeesize):
     """Brute-force algorithm for computing Minimax AV (MAV)"""
     opt_committees = []
     opt_mavscore = profile.num_cand + 1
-    for comm in combinations(list(range(profile.num_cand)), committeesize):
-        score = scores.mavscore(profile, comm)
+    for committee in combinations(profile.candidates, committeesize):
+        score = scores.mavscore(profile, committee)
         if score < opt_mavscore:
-            opt_committees = [comm]
+            opt_committees = [committee]
             opt_mavscore = score
-        elif scores.mavscore(profile, comm) == opt_mavscore:
-            opt_committees.append(comm)
+        elif scores.mavscore(profile, committee) == opt_mavscore:
+            opt_committees.append(committee)
 
     committees = sort_committees(opt_committees)
 
@@ -845,11 +845,11 @@ def compute_mav(
         print("Minimum maximal distance: " + str(opt_mavscore))
 
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
 
         print("Corresponding distances to voters:")
-        for comm in committees:
-            print([hamming(pref, comm) for pref in profile])
+        for committee in committees:
+            print([hamming(voter.approved, committee) for voter in profile])
         print()
     # end of optional output
 
@@ -875,17 +875,19 @@ def compute_lexmav(
 
     opt_committees = []
     opt_distances = [profile.num_cand + 1] * len(profile)
-    for comm in combinations(list(range(profile.num_cand)), committeesize):
-        distances = sorted([hamming(pref, comm) for pref in profile], reverse=True)
+    for committee in combinations(profile.candidates, committeesize):
+        distances = sorted(
+            [hamming(voter.approved, committee) for voter in profile], reverse=True
+        )
         for i in range(len(distances)):
             if opt_distances[i] < distances[i]:
                 break
             if opt_distances[i] > distances[i]:
                 opt_distances = distances
-                opt_committees = [comm]
+                opt_committees = [committee]
                 break
         else:
-            opt_committees.append(comm)
+            opt_committees.append(committee)
 
     committees = sort_committees(opt_committees)
     if resolute:
@@ -900,11 +902,11 @@ def compute_lexmav(
         print("Minimum maximal distance: " + str(max(opt_distances)))
 
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
 
         print("Corresponding distances to voters:")
-        for comm in committees:
-            print([hamming(pref, comm) for pref in profile])
+        for committee in committees:
+            print([hamming(voter.approved, committee) for voter in profile])
         print()
     # end of optional output
 
@@ -998,7 +1000,7 @@ def compute_monroe(
         )
 
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1009,13 +1011,13 @@ def __monroe_bruteforce(profile, committeesize, resolute):
     """Brute-force computation of Monroe's rule"""
     opt_committees = []
     opt_monroescore = -1
-    for comm in combinations(list(range(profile.num_cand)), committeesize):
-        score = scores.monroescore(profile, comm)
+    for committee in combinations(profile.candidates, committeesize):
+        score = scores.monroescore(profile, committee)
         if score > opt_monroescore:
-            opt_committees = [comm]
+            opt_committees = [committee]
             opt_monroescore = score
-        elif scores.monroescore(profile, comm) == opt_monroescore:
-            opt_committees.append(comm)
+        elif scores.monroescore(profile, committee) == opt_monroescore:
+            opt_committees.append(committee)
 
     committees = sort_committees(opt_committees)
     if resolute:
@@ -1050,17 +1052,19 @@ def compute_greedy_monroe(
 
     # remaining voters
     remaining_voters = list(range(num_voters))
-    remaining_cands = set(range(profile.num_cand))
+    remaining_cands = set(profile.candidates)
 
     assignment = []
     for t in range(committeesize):
         maxapprovals = -1
         selected = None
-        for c in remaining_cands:
-            approvals = len([i for i in remaining_voters if c in profile[i]])
+        for cand in remaining_cands:
+            approvals = len(
+                [i for i in remaining_voters if cand in profile[i].approved]
+            )
             if approvals > maxapprovals:
                 maxapprovals = approvals
-                selected = c
+                selected = cand
 
         # determine how many voters are removed (at most)
         if t < num_voters - committeesize * (num_voters // committeesize):
@@ -1070,7 +1074,7 @@ def compute_greedy_monroe(
 
         # only voters that approve the chosen candidate
         # are removed
-        to_remove = [i for i in remaining_voters if selected in profile[i]]
+        to_remove = [i for i in remaining_voters if selected in profile[i].approved]
         if len(to_remove) > num_remove:
             to_remove = to_remove[:num_remove]
         assignment.append((selected, to_remove))
@@ -1130,7 +1134,7 @@ def compute_greedy_monroe(
 
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1142,8 +1146,10 @@ def __seqphragmen_resolute(
     """Algorithm for computing resolute seq-Phragmen  (1 winning committee)"""
 
     approvers_weight = {}
-    for c in range(profile.num_cand):
-        approvers_weight[c] = sum(pref.weight for pref in profile if c in pref)
+    for cand in profile.candidates:
+        approvers_weight[cand] = sum(
+            voter.weight for voter in profile if cand in voter.approved
+        )
 
     load = start_load
     if load is None:
@@ -1155,27 +1161,29 @@ def __seqphragmen_resolute(
 
     for _ in range(len(committee), committeesize):
         approvers_load = {}
-        for c in range(profile.num_cand):
-            approvers_load[c] = sum(
-                pref.weight * load[v] for v, pref in enumerate(profile) if c in pref
+        for cand in profile.candidates:
+            approvers_load[cand] = sum(
+                voter.weight * load[v]
+                for v, voter in enumerate(profile)
+                if cand in voter.approved
             )
         new_maxload = [
-            division(approvers_load[c] + 1, approvers_weight[c])
-            if approvers_weight[c] > 0
+            division(approvers_load[cand] + 1, approvers_weight[cand])
+            if approvers_weight[cand] > 0
             else committeesize + 1
-            for c in range(profile.num_cand)
+            for cand in profile.candidates
         ]
         # exclude committees already in the committee
         large = max(new_maxload) + 1
-        for c in range(profile.num_cand):
-            if c in committee:
-                new_maxload[c] = large
+        for cand in profile.candidates:
+            if cand in committee:
+                new_maxload[cand] = large
         # find smallest maxload
         opt = min(new_maxload)
         next_cand = new_maxload.index(opt)
         # compute new loads and add new candidate
-        for v, pref in enumerate(profile):
-            if next_cand in pref:
+        for v, voter in enumerate(profile):
+            if next_cand in voter.approved:
                 load[v] = new_maxload[next_cand]
             else:
                 load[v] = load[v]
@@ -1195,13 +1203,13 @@ def __seqphragmen_resolute(
                 output += str(load[v]) + ", "
             print(output[:-2] + ")")
             tied_cands = [
-                c
-                for c in range(profile.num_cand)
-                if (c > next_cand and (new_maxload[c] == new_maxload))
+                cand
+                for cand in profile.candidates
+                if (cand > next_cand and (new_maxload[cand] == new_maxload))
             ]
             if len(tied_cands) > 0:
                 output = " tie broken in favor of " + profile.cand_names[next_cand]
-                output += ",\n candidates " + str_candset(tied_cands)
+                output += ",\n candidates " + str_set_of_candidates(tied_cands)
                 output += " would increase the load to the same amount ("
                 output += str(new_maxload) + ")"
                 print(output)
@@ -1217,8 +1225,10 @@ def __seqphragmen_irresolute(
 ):
     """Algorithm for computing irresolute seq-Phragmen (>=1 winning committees)"""
     approvers_weight = {}
-    for c in range(profile.num_cand):
-        approvers_weight[c] = sum(pref.weight for pref in profile if c in pref)
+    for cand in profile.candidates:
+        approvers_weight[cand] = sum(
+            voter.weight for voter in profile if cand in voter.approved
+        )
 
     load = start_load
     if load is None:
@@ -1232,31 +1242,33 @@ def __seqphragmen_irresolute(
         comm_loads_next = {}
         for committee, load in comm_loads.items():
             approvers_load = {}
-            for c in range(profile.num_cand):
-                approvers_load[c] = sum(
-                    pref.weight * load[v] for v, pref in enumerate(profile) if c in pref
+            for cand in profile.candidates:
+                approvers_load[cand] = sum(
+                    voter.weight * load[v]
+                    for v, voter in enumerate(profile)
+                    if cand in voter.approved
                 )
             new_maxload = [
-                division(approvers_load[c] + 1, approvers_weight[c])
-                if approvers_weight[c] > 0
+                division(approvers_load[cand] + 1, approvers_weight[cand])
+                if approvers_weight[cand] > 0
                 else committeesize + 1
-                for c in range(profile.num_cand)
+                for cand in profile.candidates
             ]
             # exclude committees already in the committee
-            for c in range(profile.num_cand):
-                if c in committee:
-                    new_maxload[c] = sys.maxsize
+            for cand in profile.candidates:
+                if cand in committee:
+                    new_maxload[cand] = sys.maxsize
             # compute new loads
             # and add new committees
-            for c in range(profile.num_cand):
-                if new_maxload[c] <= min(new_maxload):
+            for cand in profile.candidates:
+                if new_maxload[cand] <= min(new_maxload):
                     new_load = {}
-                    for v, pref in enumerate(profile):
-                        if c in pref:
-                            new_load[v] = new_maxload[c]
+                    for v, voter in enumerate(profile):
+                        if cand in voter.approved:
+                            new_load[v] = new_maxload[cand]
                         else:
                             new_load[v] = load[v]
-                    new_comm = tuple(sorted(committee + (c,)))
+                    new_comm = tuple(sorted(committee + (cand,)))
                     comm_loads_next[new_comm] = new_load
         comm_loads = comm_loads_next
 
@@ -1298,16 +1310,16 @@ def compute_seqphragmen(
     # optional output
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     if verbose >= 2:
         if resolute or len(committees) == 1:
             print("corresponding load distribution:")
         else:
             print("corresponding load distributions:")
-        for comm in committees:
+        for committee in committees:
             output = "("
             for v, _ in enumerate(profile):
-                output += str(comm_loads[tuple(comm)][v]) + ", "
+                output += str(comm_loads[tuple(committee)][v]) + ", "
             print(output[:-2] + ")")
     # end of optional output
 
@@ -1315,7 +1327,7 @@ def compute_seqphragmen(
 
 
 def __rule_x_get_min_q(profile, budget, cand, division):
-    rich = set([v for v, pref in enumerate(profile) if cand in pref])
+    rich = set([v for v, voter in enumerate(profile) if cand in voter.approved])
     poor = set()
 
     while len(rich) > 0:
@@ -1371,7 +1383,6 @@ def compute_rule_x(
     start_budget = {
         v: division(committeesize, len(profile)) for v, _ in enumerate(profile)
     }
-    cands = range(profile.num_cand)
     commbugdets = [(set(), start_budget)]
     final_committees = set()
 
@@ -1389,21 +1400,21 @@ def compute_rule_x(
         next_commbudgets = []
         for committee, budget in commbugdets:
 
-            curr_cands = set(cands) - committee
+            curr_cands = set(profile.candidates) - committee
             min_q = {}
-            for c in curr_cands:
-                q = __rule_x_get_min_q(profile, budget, c, division)
+            for cand in curr_cands:
+                q = __rule_x_get_min_q(profile, budget, cand, division)
                 if q is not None:
-                    min_q[c] = q
+                    min_q[cand] = q
 
             if len(min_q) > 0:  # one or more candidates are affordable
                 next_cands = [
-                    c for c in min_q.keys() if min_q[c] == min(min_q.values())
+                    cand for cand in min_q.keys() if min_q[cand] == min(min_q.values())
                 ]
                 for next_cand in next_cands:
                     new_budget = dict(budget)
-                    for v, pref in enumerate(profile):
-                        if next_cand in pref:
+                    for v, voter in enumerate(profile):
+                        if next_cand in voter.approved:
                             new_budget[v] -= min(budget[v], min_q[next_cand])
                     new_comm = set(committee)
                     new_comm.add(next_cand)
@@ -1426,7 +1437,7 @@ def compute_rule_x(
                             output = " tie broken in favor of "
                             output += profile.cand_names[next_cand] + ","
                             output += "\n candidates "
-                            output += str_candset(next_cands[1:])
+                            output += str_set_of_candidates(next_cands[1:])
                             output += " are tied"
                             print(output)
                         print()
@@ -1479,13 +1490,15 @@ def compute_rule_x(
                             partial_committee=list(committee),
                             start_load=start_load,
                         )
-                    final_committees.update([tuple(comm) for comm in committees])
+                    final_committees.update(
+                        [tuple(committee) for committee in committees]
+                    )
                     # after filling the remaining spots these committees
                     # have size committeesize
 
             commbugdets = next_commbudgets
 
-    final_committees.update([tuple(comm) for comm, _ in commbugdets])
+    final_committees.update([tuple(committee) for committee, _ in commbugdets])
 
     committees = sort_committees(final_committees)
     if resolute:
@@ -1494,7 +1507,7 @@ def compute_rule_x(
     # optional output
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1552,7 +1565,7 @@ def compute_optphragmen(
     # optional output
     if verbose:
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1591,8 +1604,6 @@ def compute_phragmen_enestroem(
     start_budget = {i: profile[i].weight for i in range(num_voters)}
     price = division(sum(start_budget.values()), committeesize)
 
-    cands = range(profile.num_cand)
-
     committees = [(start_budget, set())]
     for _ in range(committeesize):
         # here the committees with i+1 candidates are
@@ -1601,14 +1612,14 @@ def compute_phragmen_enestroem(
         # loop in case multiple possible committees
         # with i filled candidates
         for committee in committees:
-            budget, comm = committee
-            curr_cands = set(cands) - comm
-            support = {c: 0 for c in curr_cands}
-            for nr, pref in enumerate(profile):
+            budget, committee = committee
+            curr_cands = set(profile.candidates) - committee
+            support = {cand: 0 for cand in curr_cands}
+            for nr, voter in enumerate(profile):
                 voting_power = budget[nr]
                 if voting_power <= 0:
                     continue
-                for cand in pref:
+                for cand in voter.approved:
                     if cand in curr_cands:
                         support[cand] += voting_power
             max_support = max(support.values())
@@ -1620,17 +1631,17 @@ def compute_phragmen_enestroem(
                     multiplier = division(max_support - price, max_support)
                 else:  # set supporters to 0
                     multiplier = 0
-                for nr, pref in enumerate(profile):
-                    if cand in pref:
+                for nr, voter in enumerate(profile):
+                    if cand in voter.approved:
                         b[nr] *= multiplier
-                c = comm.union([cand])  # new committee with candidate
+                c = committee.union([cand])  # new committee with candidate
                 next_committees.append((b, c))
 
         if resolute:
             committees = [next_committees[0]]
         else:
             committees = next_committees
-    committees = [comm for b, comm in committees]
+    committees = [committee for b, committee in committees]
     committees = sort_committees(committees)
     if resolute:
         committees = [committees[0]]
@@ -1640,7 +1651,7 @@ def compute_phragmen_enestroem(
         print(header(rules["phrag-enestr"].longname))
 
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1666,23 +1677,22 @@ def compute_consensus_rule(
         )
 
     num_voters = len(profile)
-    cands = range(profile.num_cand)
 
     start_budget = {i: 0 for i in range(num_voters)}
 
     committees = [(start_budget, set())]
     for _ in range(committeesize):
         next_committees = []
-        for budget, comm in committees:
+        for budget, committee in committees:
             for i in range(num_voters):
                 budget[i] += profile[i].weight  # weight is 1 by default
-            curr_cands = set(cands) - comm
-            support = {c: 0 for c in curr_cands}
-            supporters = {c: [] for c in curr_cands}
-            for i, appr in enumerate(profile):
+            curr_cands = set(profile.candidates) - committee
+            support = {cand: 0 for cand in curr_cands}
+            supporters = {cand: [] for cand in curr_cands}
+            for i, voter in enumerate(profile):
                 if budget[i] <= 0:
                     continue
-                for cand in appr:
+                for cand in voter.approved:
                     if cand in curr_cands:
                         support[cand] += budget[i]
                         supporters[cand].append(i)
@@ -1692,14 +1702,14 @@ def compute_consensus_rule(
                 b = dict(budget)  # copy of budget
                 for i in supporters[cand]:
                     b[i] -= division(num_voters, len(supporters[cand]))
-                c = comm.union([cand])  # new committee with candidate
+                c = committee.union([cand])  # new committee with candidate
                 next_committees.append((b, c))
 
         if resolute:
             committees = [next_committees[0]]
         else:
             committees = next_committees
-    committees = [comm for b, comm in committees]
+    committees = [committee for b, committee in committees]
     committees = sort_committees(committees)
     if resolute:
         committees = [committees[0]]
@@ -1709,7 +1719,7 @@ def compute_consensus_rule(
         print(header(rules["consensus"].longname))
 
         print(str_committees_header(committees, winning=True))
-        print(str_candsets(committees, cand_names=profile.cand_names))
+        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
