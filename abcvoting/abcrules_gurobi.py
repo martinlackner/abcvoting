@@ -50,18 +50,10 @@ def _optimize_rule_gurobi(
         m = gb.Model()
 
         # `in_committee` is a binary variable indicating whether `cand` is in the committee
-        in_committee = m.addVars(
-            profile.num_cand, vtype=gb.GRB.BINARY, name="in_committee"
-        )
+        in_committee = m.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_committee")
 
         set_opt_model_func(
-            m,
-            profile,
-            in_committee,
-            committeesize,
-            committees,
-            profile.candidates,
-            scorefct,
+            m, profile, in_committee, committeesize, committees, profile.candidates, scorefct
         )
 
         m.setParam("OutputFlag", False)
@@ -97,9 +89,7 @@ def _optimize_rule_gurobi(
             break
 
         committee = [
-            cand
-            for cand in profile.candidates
-            if in_committee[cand].Xn >= 1 - GUROBI_ACCURACY
+            cand for cand in profile.candidates if in_committee[cand].Xn >= 1 - GUROBI_ACCURACY
         ]
         assert len(committee) == committeesize
         committees.append(committee)
@@ -117,9 +107,7 @@ def _optimize_rule_gurobi(
 
 
 def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
-    def set_opt_model_func(
-        m, profile, in_committee, committeesize, committees, cands, scorefct
-    ):
+    def set_opt_model_func(m, profile, in_committee, committeesize, committees, cands, scorefct):
         # utility[(voter, l)] contains (intended binary) variables counting the number of approved
         # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
         # exactly the number of candidates in the committee approved by `voter` for all
@@ -178,9 +166,7 @@ def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
 
 
 def __gurobi_monroe(profile, committeesize, resolute):
-    def set_opt_model_func(
-        m, profile, in_committee, committeesize, committees, cands, scorefct
-    ):
+    def set_opt_model_func(m, profile, in_committee, committeesize, committees, cands, scorefct):
         num_voters = len(profile)
 
         # optimization goal: variable "satisfaction"
@@ -194,9 +180,7 @@ def __gurobi_monroe(profile, committeesize, resolute):
         )
         for i in range(len(profile)):
             # every voter has to be part of a voter partition set
-            m.addConstr(
-                gb.quicksum(partition[(cand, i)] for cand in cands) == profile[i].weight
-            )
+            m.addConstr(gb.quicksum(partition[(cand, i)] for cand in cands) == profile[i].weight)
         for cand in cands:
             # every voter set in the partition has to contain
             # at least (num_voters // committeesize) candidates
@@ -258,9 +242,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
              second-, third-, ...-largest load
     """
 
-    def set_opt_model_func(
-        m, profile, in_committee, committeesize, committees, cands, scorefct
-    ):
+    def set_opt_model_func(m, profile, in_committee, committeesize, committees, cands, scorefct):
         load = {}
         for cand in cands:
             for voter in profile:
@@ -278,9 +260,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
         for cand in cands:
             m.addConstr(
                 gb.quicksum(
-                    voter.weight * load[(voter, cand)]
-                    for voter in profile
-                    if cand in cands
+                    voter.weight * load[(voter, cand)] for voter in profile if cand in cands
                 )
                 == in_committee[cand]
             )
@@ -294,9 +274,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
 
         loadbound = m.addVar(name="loadbound")
         for voter in profile:
-            m.addConstr(
-                gb.quicksum(load[(voter, cand)] for cand in voter.approved) <= loadbound
-            )
+            m.addConstr(gb.quicksum(load[(voter, cand)] for cand in voter.approved) <= loadbound)
 
         # maximizing the negative distance makes code more similar to the other methods here
         m.setObjective(-loadbound, gb.GRB.MAXIMIZE)
@@ -313,9 +291,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
 
 
 def __gurobi_minimaxav(profile, committeesize, resolute):
-    def set_opt_model_func(
-        m, profile, in_committee, committeesize, committees, cands, scorefct
-    ):
+    def set_opt_model_func(m, profile, in_committee, committeesize, committees, cands, scorefct):
         num_voters = len(profile)
         # optimization goal: variable "sum_difference"
         max_hamdistance = m.addVar(vtype=gb.GRB.INTEGER, name="max_hamdistance")
@@ -323,9 +299,7 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
         m.addConstr(gb.quicksum(in_committee[cand] for cand in cands) == committeesize)
 
         # the single differences between the committee and the voters
-        difference = m.addVars(
-            profile.num_cand, num_voters, vtype=gb.GRB.INTEGER, name="diff"
-        )
+        difference = m.addVars(profile.num_cand, num_voters, vtype=gb.GRB.INTEGER, name="diff")
 
         for i in cands:
             for j in range(num_voters):

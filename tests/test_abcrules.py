@@ -32,9 +32,7 @@ class CollectRules:
             for alg in rule.algorithms:
                 for resolute in rule.resolute:
                     if alg in marks:
-                        instance = pytest.param(
-                            rule.rule_id, alg, resolute, marks=marks[alg]
-                        )
+                        instance = pytest.param(rule.rule_id, alg, resolute, marks=marks[alg])
                         instance_no_resolute_param = pytest.param(
                             rule.rule_id, alg, marks=marks[alg]
                         )
@@ -44,13 +42,9 @@ class CollectRules:
 
                     self.rule_algorithm_resolute.append(instance)
                     if resolute:
-                        self.rule_algorithm_onlyresolute.append(
-                            instance_no_resolute_param
-                        )
+                        self.rule_algorithm_onlyresolute.append(instance_no_resolute_param)
                     else:
-                        self.rule_algorithm_onlyirresolute.append(
-                            instance_no_resolute_param
-                        )
+                        self.rule_algorithm_onlyirresolute.append(instance_no_resolute_param)
 
 
 class CollectInstances:
@@ -321,13 +315,7 @@ class CollectInstances:
             "pav": [{0, 1, 2, 4}],
             "geom2": [{0, 1, 2, 4}],
             "revseqpav": [{0, 1, 2, 4}],
-            "mav": [
-                {0, 1, 2, 3},
-                {0, 1, 2, 4},
-                {0, 2, 3, 4},
-                {0, 2, 3, 5},
-                {0, 2, 4, 5},
-            ],
+            "mav": [{0, 1, 2, 3}, {0, 1, 2, 4}, {0, 2, 3, 4}, {0, 2, 3, 5}, {0, 2, 4, 5}],
             "lexmav": [{0, 1, 2, 4}],
             "seqphrag": [{0, 1, 2, 4}],
             "optphrag": [
@@ -452,9 +440,7 @@ def test_resolute_parameter(rule):
                 profile.add_voters(approval_sets)
 
                 with pytest.raises(NotImplementedError):
-                    rule.compute(
-                        profile, committeesize, algorithm=alg, resolute=resolute
-                    )
+                    rule.compute(profile, committeesize, algorithm=alg, resolute=resolute)
 
 
 @pytest.mark.parametrize(
@@ -503,18 +489,11 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
         "phrag-enestr",
     ]:
         with pytest.raises(ValueError):
-            abcrules.compute(
-                rule_id, profile, committeesize, algorithm=algorithm, verbose=verbose
-            )
+            abcrules.compute(rule_id, profile, committeesize, algorithm=algorithm, verbose=verbose)
         return
 
     result = abcrules.compute(
-        rule_id,
-        profile,
-        committeesize,
-        algorithm=algorithm,
-        resolute=resolute,
-        verbose=verbose,
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
     )
 
     if rule_id == "mav":
@@ -538,12 +517,7 @@ def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
     committeesize = 2
 
     committees = abcrules.compute(
-        rule_id,
-        profile,
-        committeesize,
-        algorithm=algorithm,
-        resolute=resolute,
-        verbose=verbose,
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
     )
 
     if rule_id == "rule-x-without-2nd-phase":
@@ -566,12 +540,7 @@ def test_abcrules_return_lists_of_sets(rule_id, algorithm, resolute, verbose):
     committeesize = 2
 
     committees = abcrules.compute(
-        rule_id,
-        profile,
-        committeesize,
-        algorithm=algorithm,
-        resolute=resolute,
-        verbose=verbose,
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
     )
     assert len(committees) >= 1
     for committee in committees:
@@ -588,12 +557,7 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
     committeesize = 3
 
     committees = abcrules.compute(
-        rule_id,
-        profile,
-        committeesize,
-        algorithm=algorithm,
-        resolute=resolute,
-        verbose=verbose,
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
     )
 
     assert committees == [{0, 1, 2}]
@@ -601,12 +565,7 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
     profile.add_voters([[]])
 
     committees = abcrules.compute(
-        rule_id,
-        profile,
-        committeesize,
-        algorithm=algorithm,
-        resolute=resolute,
-        verbose=verbose,
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
     )
 
     if rule_id == "rule-x-without-2nd-phase":
@@ -659,12 +618,7 @@ def test_abcrules_correct(
 ):
     print(profile)
     committees = abcrules.compute(
-        rule_id,
-        profile,
-        committeesize,
-        algorithm=algorithm,
-        verbose=verbose,
-        resolute=resolute,
+        rule_id, profile, committeesize, algorithm=algorithm, verbose=verbose, resolute=resolute
     )
     if resolute:
         assert len(committees) == 1
@@ -677,14 +631,10 @@ def test_seqphragmen_irresolute():
     profile = Profile(3)
     profile.add_voters([[0, 1], [0, 1], [0], [1, 2], [2]])
     committeesize = 2
-    committees = abcrules.rules["seqphrag"].compute(
-        profile, committeesize, resolute=False
-    )
+    committees = abcrules.rules["seqphrag"].compute(profile, committeesize, resolute=False)
     assert committees == [{0, 1}, {0, 2}]
 
-    committees = abcrules.rules["seqphrag"].compute(
-        profile, committeesize, resolute=True
-    )
+    committees = abcrules.rules["seqphrag"].compute(profile, committeesize, resolute=True)
     assert committees == [{0, 2}]
 
 
@@ -693,9 +643,7 @@ def test_seqpav_irresolute():
     profile.add_voters([[0, 1]] * 3 + [[0], [1, 2], [2], [2]])
     committeesize = 2
 
-    committees = abcrules.rules["seqpav"].compute(
-        profile, committeesize, resolute=False
-    )
+    committees = abcrules.rules["seqpav"].compute(profile, committeesize, resolute=False)
     assert committees == [{0, 1}, {0, 2}, {1, 2}]
 
     committees = abcrules.rules["seqpav"].compute(profile, committeesize, resolute=True)
@@ -720,9 +668,7 @@ def test_cvxpy_cant_compute_av():
     committeesize = 2
 
     with pytest.raises(ValueError):
-        cvxpy_thiele_methods(
-            profile, committeesize, "av", resolute=False, algorithm="glpk_mi"
-        )
+        cvxpy_thiele_methods(profile, committeesize, "av", resolute=False, algorithm="glpk_mi")
 
 
 def test_consensus_fails_lower_quota():
@@ -736,9 +682,7 @@ def test_consensus_fails_lower_quota():
     )
     committeesize = 30
 
-    committees = abcrules.rules["consensus"].compute(
-        profile, committeesize, resolute=True
-    )
+    committees = abcrules.rules["consensus"].compute(profile, committeesize, resolute=True)
     for committee in committees:
         assert not all(
             cand in committee
@@ -748,9 +692,7 @@ def test_consensus_fails_lower_quota():
     # is 15, but not all of their 15 approved candidates are contained in a winning committee.
 
 
-@pytest.mark.parametrize(
-    "rule_id, algorithm", testrules.rule_algorithm_onlyirresolute, ids=idfn
-)
+@pytest.mark.parametrize("rule_id, algorithm", testrules.rule_algorithm_onlyirresolute, ids=idfn)
 def test_jansonexamples(rule_id, algorithm):
     # example from Janson's survey (https://arxiv.org/pdf/1611.08826.pdf),
     # Example 3.7, 18.1
@@ -827,12 +769,7 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
     profile.add_voters([[0]])
     committeesize = 1
     abcrules.compute(
-        rule_id,
-        profile,
-        committeesize,
-        algorithm=algorithm,
-        resolute=resolute,
-        verbose=verbose,
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
     )
     out = capfd.readouterr().out
     if verbose == 0:
