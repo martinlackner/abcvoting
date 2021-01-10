@@ -3,9 +3,6 @@ Miscellaneous functions for committees (i.e., subsets of candidates)
 """
 
 
-from __future__ import print_function
-
-
 def sorted_committees(committees):
     """
     sorts a list of committees, ensures that committees are sets

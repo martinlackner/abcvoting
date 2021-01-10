@@ -3,7 +3,6 @@ Approval-based committee (ABC) rules implemented as a integer linear
 programs (ILPs) with CVXPY.
 """
 
-from __future__ import print_function
 from abcvoting.misc import sorted_committees
 
 try:

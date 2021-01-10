@@ -5,7 +5,7 @@ Axioms, Algorithms, and Applications"
 by Martin Lackner and Piotr Skowron
 """
 
-from __future__ import print_function
+
 import sys
 
 sys.path.insert(0, "..")

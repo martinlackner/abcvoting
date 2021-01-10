@@ -2,7 +2,6 @@
 """Approval-based committee (ABC) voting rules"""
 
 
-from __future__ import print_function
 import sys
 import functools
 from itertools import combinations

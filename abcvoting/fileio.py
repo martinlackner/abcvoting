@@ -3,7 +3,6 @@ Read preflib files (soi, toi, soc or toc)
 """
 
 
-from __future__ import print_function
 import os
 from abcvoting.preferences import Profile, Voter
 from math import ceil
