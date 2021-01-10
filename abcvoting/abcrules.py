@@ -228,7 +228,7 @@ def __init_rules():
             "Rule X (without 2nd phase)",
             "Rule X without the second (Phragmén) phase",
             compute_rule_x_without_2nd_phase,
-            ("standard",),
+            ("standard", "exact-fractions"),
             (True, False),
         ),
         (
@@ -244,7 +244,7 @@ def __init_rules():
             "Consensus",
             "Consensus Rule",
             compute_consensus_rule,
-            ("standard",),
+            ("standard", "exact-fractions"),
             (True, False),
         ),
     ]
@@ -581,10 +581,10 @@ def __seq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
                 for cand in range(len(additional_score_cand))
                 if (
                     cand > next_cand
-                    and (additional_score_cand[cand] == max(additional_score_cand))
+                    and additional_score_cand[cand] == max(additional_score_cand)
                 )
             ]
-            if len(tied_cands) > 0:
+            if tied_cands:
                 output += " tie broken in favor of " + str(next_cand)
                 output += " candidates " + str_set_of_candidates(tied_cands)
                 output += " would increase the score by the same amount ("
@@ -1203,9 +1203,9 @@ def __seqphragmen_resolute(
             tied_cands = [
                 cand
                 for cand in profile.candidates
-                if (cand > next_cand and (new_maxload[cand] == new_maxload))
+                if cand > next_cand and new_maxload[cand] == opt
             ]
-            if len(tied_cands) > 0:
+            if tied_cands:
                 output = " tie broken in favor of " + profile.cand_names[next_cand]
                 output += ",\n candidates " + str_set_of_candidates(tied_cands)
                 output += " would increase the load to the same amount ("
