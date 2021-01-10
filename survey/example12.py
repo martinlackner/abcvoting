@@ -31,4 +31,4 @@ committees = abcrules.compute_mav(profile, 1, verbose=2)
 
 
 # verify correctness
-assert committees == [[b], [c]]
+assert committees == [{b}, {c}]

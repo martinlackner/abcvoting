@@ -4,6 +4,7 @@ programs (ILPs) with CVXPY.
 """
 
 from __future__ import print_function
+from abcvoting.misc import sorted_committees
 
 try:
     import cvxpy as cp
@@ -155,4 +156,4 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
         if resolute:
             break
 
-    return committees
+    return sorted_committees(committees)

@@ -31,4 +31,4 @@ committees = abcrules.compute_sav(profile, 1, verbose=2)
 
 
 # verify correctness
-assert committees == [[a]]
+assert committees == [{a}]

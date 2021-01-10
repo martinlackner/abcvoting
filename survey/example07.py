@@ -24,5 +24,5 @@ committees = abcrules.compute_greedy_monroe(ex1.profile, 4, verbose=2)
 
 # verify correctness
 a, b, c, d, e, f, g = range(7)  # a = 0, b = 1, c = 2, ...
-assert committees == [[a, c, d, f]]
+assert committees == [{a, c, d, f}]
 assert monroescore(ex1.profile, committees[0]) == 10

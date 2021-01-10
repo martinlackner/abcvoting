@@ -22,4 +22,4 @@ committees = abcrules.compute_rule_x(ex1.profile, 4, verbose=2)
 
 # verify correctness
 a, b, c, d, e, f, g = range(7)  # a = 0, b = 1, c = 2, ...
-assert committees == [[a, b, c, d]]
+assert committees == [{a, b, c, d}]

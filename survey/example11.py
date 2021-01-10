@@ -39,5 +39,5 @@ committees_seqphragmen = abcrules.compute_seqphragmen(
 )
 
 # verify correctness
-assert committees_rule_x == [[a, b, c, d], [a, b, c, e]]
-assert committees_seqphragmen == [[a, b, d, e]]
+assert committees_rule_x == [{a, b, c, d}, {a, b, c, e}]
+assert committees_seqphragmen == [{a, b, d, e}]

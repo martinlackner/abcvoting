@@ -31,8 +31,8 @@ except ImportError:
 @pytest.mark.parametrize("num_cand", [6, 7, 8])
 def test_monroescore_flowbased(committee, score, num_cand):
     profile = Profile(num_cand)
-    preflist = [[0, 1], [1], [1, 3], [4], [2], [1, 5, 3]]
-    profile.add_voters(preflist)
+    approval_sets = [[0, 1], [1], [1, 3], [4], [2], [1, 5, 3]]
+    profile.add_voters(approval_sets)
 
     assert monroescore_flowbased(profile, committee) == score
 
@@ -44,8 +44,8 @@ def test_monroescore_flowbased(committee, score, num_cand):
 @pytest.mark.parametrize("num_cand", [6, 7, 8])
 def test_monroescore_matching(committee, score, num_cand):
     profile = Profile(num_cand)
-    preflist = [[0, 1], [1], [1, 3], [4], [2], [1, 5, 3]]
-    profile.add_voters(preflist)
+    approval_sets = [[0, 1], [1], [1, 3], [4], [2], [1, 5, 3]]
+    profile.add_voters(approval_sets)
 
     assert monroescore_matching(profile, committee) == score
 
@@ -63,8 +63,16 @@ def test_monroescore_matching(committee, score, num_cand):
 @pytest.mark.parametrize("num_cand", [8, 9])
 def test_thiele_scores(scorefct_str, score, num_cand):
     profile = Profile(num_cand)
-    preflist = [[0, 1], [1], [1, 3], [4], [1, 2, 3, 4, 5], [1, 5, 3], [0, 1, 2, 4, 5]]
-    profile.add_voters(preflist)
+    approval_sets = [
+        [0, 1],
+        [1],
+        [1, 3],
+        [4],
+        [1, 2, 3, 4, 5],
+        [1, 5, 3],
+        [0, 1, 2, 4, 5],
+    ]
+    profile.add_voters(approval_sets)
     committee = [6, 7]
     assert scores.thiele_score(scorefct_str, profile, committee) == 0
     committee = [1, 2, 3, 4]

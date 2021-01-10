@@ -6,12 +6,11 @@ Miscellaneous functions for committees (i.e., subsets of candidates)
 from __future__ import print_function
 
 
-def sort_committees(committees):
+def sorted_committees(committees):
     """
-    sorts a list of committees,
-    converts them to lists, and removes duplicates
+    sorts a list of committees, ensures that committees are sets
     """
-    return [sorted(list(cand)) for cand in sorted(set(map(tuple, committees)))]
+    return sorted([set(committee) for committee in committees], key=str)
 
 
 def check_enough_approved_candidates(profile, committeesize):

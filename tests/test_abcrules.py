@@ -60,368 +60,366 @@ class CollectInstances:
         # first profile
         profile = Profile(6)
         committeesize = 4
-        preflist = [[0, 4, 5], [0], [1, 4, 5], [1], [2, 4, 5], [2], [3, 4, 5], [3]]
-        profile.add_voters(preflist)
+        approval_sets = [{0, 4, 5}, {0}, {1, 4, 5}, {1}, {2, 4, 5}, {2}, {3, 4, 5}, {3}]
+        profile.add_voters(approval_sets)
         tests = {
             "seqpav": [
-                [0, 1, 4, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 4, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
             "av": [
-                [0, 1, 4, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 4, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
             "sav": [
-                [0, 1, 2, 3],
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 1, 3, 4],
-                [0, 1, 3, 5],
-                [0, 1, 4, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 2, 3},
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 1, 3, 4},
+                {0, 1, 3, 5},
+                {0, 1, 4, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
             "pav": [
-                [0, 1, 4, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 4, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
             "geom2": [
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 1, 3, 4],
-                [0, 1, 3, 5],
-                [0, 1, 4, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 1, 3, 4},
+                {0, 1, 3, 5},
+                {0, 1, 4, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
             "revseqpav": [
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 1, 3, 4],
-                [0, 1, 3, 5],
-                [0, 1, 4, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 1, 3, 4},
+                {0, 1, 3, 5},
+                {0, 1, 4, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
             "mav": [
-                [0, 1, 2, 3],
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 1, 3, 4],
-                [0, 1, 3, 5],
-                [0, 1, 4, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 2, 3},
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 1, 3, 4},
+                {0, 1, 3, 5},
+                {0, 1, 4, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
             "lexmav": [
-                [0, 1, 4, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 4, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
             "seqphrag": [
-                [0, 1, 4, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 4, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
-            "optphrag": [[0, 1, 2, 3]],
-            "cc": [[0, 1, 2, 3]],
+            "optphrag": [{0, 1, 2, 3}],
+            "cc": [{0, 1, 2, 3}],
             "seqcc": [
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 1, 3, 4],
-                [0, 1, 3, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 1, 3, 4},
+                {0, 1, 3, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
             ],
-            "revseqcc": [[0, 1, 2, 3]],
-            "monroe": [[0, 1, 2, 3]],
-            "greedy-monroe": [[0, 2, 3, 4]],
+            "revseqcc": [{0, 1, 2, 3}],
+            "monroe": [{0, 1, 2, 3}],
+            "greedy-monroe": [{0, 2, 3, 4}],
             "slav": [
-                [0, 1, 2, 3],
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 1, 3, 4],
-                [0, 1, 3, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
+                {0, 1, 2, 3},
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 1, 3, 4},
+                {0, 1, 3, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
             ],
             "seqslav": [
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 1, 3, 4],
-                [0, 1, 3, 5],
-                [0, 1, 4, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 1, 3, 4},
+                {0, 1, 3, 5},
+                {0, 1, 4, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
             "rule-x": [
-                [0, 1, 4, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 4, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
-            "rule-x-without-2nd-phase": [[4, 5]],
+            "rule-x-without-2nd-phase": [{4, 5}],
             "phrag-enestr": [
-                [0, 1, 4, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 4, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
             "consensus": [
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 1, 3, 4],
-                [0, 1, 3, 5],
-                [0, 1, 4, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
-                [0, 3, 4, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
-                [1, 2, 4, 5],
-                [1, 3, 4, 5],
-                [2, 3, 4, 5],
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 1, 3, 4},
+                {0, 1, 3, 5},
+                {0, 1, 4, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
             ],
         }
         self.instances.append((profile, tests, committeesize))
 
-        # first profile now with reversed preflist
-        preflist.reverse()
-        for p in preflist:
-            p.reverse()
+        # first profile now with reversed list of voters
+        approval_sets.reverse()
         profile = Profile(6)
-        profile.add_voters(preflist)
+        profile.add_voters(approval_sets)
         # Greedy Monroe yields a different result
         # for a different voter ordering
         tests = dict(tests)
-        tests["greedy-monroe"] = [[0, 1, 2, 4]]
+        tests["greedy-monroe"] = [{0, 1, 2, 4}]
         committeesize = 4
         self.instances.append((profile, tests, committeesize))
 
         # second profile
         profile = Profile(5)
         committeesize = 3
-        preflist = [
-            [0, 1, 2],
-            [0, 1, 2],
-            [0, 1, 2],
-            [0, 1, 2],
-            [0, 1, 2],
-            [0, 1],
-            [3, 4],
-            [3, 4],
-            [3],
+        approval_sets = [
+            {0, 1, 2},
+            {0, 1, 2},
+            {0, 1, 2},
+            {0, 1, 2},
+            {0, 1, 2},
+            {0, 1},
+            {3, 4},
+            {3, 4},
+            {3},
         ]
-        profile.add_voters(preflist)
+        profile.add_voters(approval_sets)
 
         tests = {
-            "seqpav": [[0, 1, 3]],
-            "av": [[0, 1, 2]],
-            "sav": [[0, 1, 3]],
-            "pav": [[0, 1, 3]],
-            "geom2": [[0, 1, 3]],
-            "revseqpav": [[0, 1, 3]],
-            "mav": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
-            "lexmav": [[0, 1, 3]],
-            "seqphrag": [[0, 1, 3]],
-            "optphrag": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
-            "cc": [[0, 1, 3], [0, 2, 3], [0, 3, 4], [1, 2, 3], [1, 3, 4]],
-            "seqcc": [[0, 1, 3], [0, 2, 3], [0, 3, 4], [1, 2, 3], [1, 3, 4]],
-            "revseqcc": [[0, 1, 3], [0, 2, 3], [0, 3, 4], [1, 2, 3], [1, 3, 4]],
-            "monroe": [[0, 1, 3], [0, 2, 3], [1, 2, 3]],
-            "greedy-monroe": [[0, 1, 3]],
-            "seqslav": [[0, 1, 3]],
-            "slav": [[0, 1, 3]],
-            "rule-x": [[0, 1, 3]],
-            "rule-x-without-2nd-phase": [[0, 1, 3]],
-            "phrag-enestr": [[0, 1, 3]],
-            "consensus": [[0, 1, 3]],
+            "seqpav": [{0, 1, 3}],
+            "av": [{0, 1, 2}],
+            "sav": [{0, 1, 3}],
+            "pav": [{0, 1, 3}],
+            "geom2": [{0, 1, 3}],
+            "revseqpav": [{0, 1, 3}],
+            "mav": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
+            "lexmav": [{0, 1, 3}],
+            "seqphrag": [{0, 1, 3}],
+            "optphrag": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
+            "cc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
+            "seqcc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
+            "revseqcc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
+            "monroe": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
+            "greedy-monroe": [{0, 1, 3}],
+            "seqslav": [{0, 1, 3}],
+            "slav": [{0, 1, 3}],
+            "rule-x": [{0, 1, 3}],
+            "rule-x-without-2nd-phase": [{0, 1, 3}],
+            "phrag-enestr": [{0, 1, 3}],
+            "consensus": [{0, 1, 3}],
         }
         self.instances.append((profile, tests, committeesize))
 
         # and a third profile
         profile = Profile(6)
         committeesize = 4
-        preflist = [
-            [0, 3, 4, 5],
-            [1, 2],
-            [0, 2, 5],
-            [2],
-            [0, 1, 2, 3, 4],
-            [0, 3, 4],
-            [0, 2, 4],
-            [0, 1],
+        approval_sets = [
+            {0, 3, 4, 5},
+            {1, 2},
+            {0, 2, 5},
+            {2},
+            {0, 1, 2, 3, 4},
+            {0, 3, 4},
+            {0, 2, 4},
+            {0, 1},
         ]
-        profile.add_voters(preflist)
+        profile.add_voters(approval_sets)
 
         tests = {
-            "seqpav": [[0, 1, 2, 4]],
-            "av": [[0, 1, 2, 4], [0, 2, 3, 4]],
-            "sav": [[0, 1, 2, 4]],
-            "pav": [[0, 1, 2, 4]],
-            "geom2": [[0, 1, 2, 4]],
-            "revseqpav": [[0, 1, 2, 4]],
+            "seqpav": [{0, 1, 2, 4}],
+            "av": [{0, 1, 2, 4}, {0, 2, 3, 4}],
+            "sav": [{0, 1, 2, 4}],
+            "pav": [{0, 1, 2, 4}],
+            "geom2": [{0, 1, 2, 4}],
+            "revseqpav": [{0, 1, 2, 4}],
             "mav": [
-                [0, 1, 2, 3],
-                [0, 1, 2, 4],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
+                {0, 1, 2, 3},
+                {0, 1, 2, 4},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
             ],
-            "lexmav": [[0, 1, 2, 4]],
-            "seqphrag": [[0, 1, 2, 4]],
+            "lexmav": [{0, 1, 2, 4}],
+            "seqphrag": [{0, 1, 2, 4}],
             "optphrag": [
-                [0, 1, 2, 3],
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
-                [1, 2, 4, 5],
+                {0, 1, 2, 3},
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
             ],
             "cc": [
-                [0, 1, 2, 3],
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
-                [1, 2, 4, 5],
+                {0, 1, 2, 3},
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
             ],
             "seqcc": [
-                [0, 1, 2, 3],
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
+                {0, 1, 2, 3},
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
             ],
             "revseqcc": [
-                [0, 1, 2, 3],
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
-                [1, 2, 4, 5],
+                {0, 1, 2, 3},
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
             ],
             "monroe": [
-                [0, 1, 2, 3],
-                [0, 1, 2, 4],
-                [0, 1, 2, 5],
-                [0, 2, 3, 4],
-                [0, 2, 3, 5],
-                [0, 2, 4, 5],
-                [1, 2, 3, 4],
-                [1, 2, 3, 5],
-                [1, 2, 4, 5],
+                {0, 1, 2, 3},
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
             ],
-            "greedy-monroe": [[0, 1, 2, 4]],
-            "seqslav": [[0, 1, 2, 4]],
-            "slav": [[0, 1, 2, 4]],
-            "rule-x": [[0, 1, 2, 4]],
-            "rule-x-without-2nd-phase": [[0, 2]],
-            "phrag-enestr": [[0, 1, 2, 4]],
-            "consensus": [[0, 1, 2, 4]],
+            "greedy-monroe": [{0, 1, 2, 4}],
+            "seqslav": [{0, 1, 2, 4}],
+            "slav": [{0, 1, 2, 4}],
+            "rule-x": [{0, 1, 2, 4}],
+            "rule-x-without-2nd-phase": [{0, 2}],
+            "phrag-enestr": [{0, 1, 2, 4}],
+            "consensus": [{0, 1, 2, 4}],
         }
         self.instances.append((profile, tests, committeesize))
 
         # and a fourth profile
         profile = Profile(4)
         committeesize = 2
-        preflist = [[0, 1, 3], [0, 1], [0, 1], [0, 3], [2, 3]]
-        profile.add_voters(preflist)
+        approval_sets = [{0, 1, 3}, {0, 1}, {0, 1}, {0, 3}, {2, 3}]
+        profile.add_voters(approval_sets)
 
         tests = {
-            "seqpav": [[0, 3]],
-            "av": [[0, 1], [0, 3]],
-            "sav": [[0, 1], [0, 3]],
-            "pav": [[0, 3]],
-            "geom2": [[0, 3]],
-            "revseqpav": [[0, 3]],
-            "mav": [[0, 3], [1, 3]],
-            "lexmav": [[0, 3]],
-            "seqphrag": [[0, 3]],
-            "optphrag": [[0, 3], [1, 3]],
-            "cc": [[0, 2], [0, 3], [1, 3]],
-            "seqcc": [[0, 2], [0, 3]],
-            "revseqcc": [[0, 2], [0, 3], [1, 3]],
-            "monroe": [[0, 3], [1, 3]],
-            "greedy-monroe": [[0, 3]],
-            "seqslav": [[0, 3]],
-            "slav": [[0, 3]],
-            "rule-x": [[0, 3]],
-            "rule-x-without-2nd-phase": [[0]],
-            "phrag-enestr": [[0, 3]],
-            "consensus": [[0, 3]],
+            "seqpav": [{0, 3}],
+            "av": [{0, 1}, {0, 3}],
+            "sav": [{0, 1}, {0, 3}],
+            "pav": [{0, 3}],
+            "geom2": [{0, 3}],
+            "revseqpav": [{0, 3}],
+            "mav": [{0, 3}, {1, 3}],
+            "lexmav": [{0, 3}],
+            "seqphrag": [{0, 3}],
+            "optphrag": [{0, 3}, {1, 3}],
+            "cc": [{0, 2}, {0, 3}, {1, 3}],
+            "seqcc": [{0, 2}, {0, 3}],
+            "revseqcc": [{0, 2}, {0, 3}, {1, 3}],
+            "monroe": [{0, 3}, {1, 3}],
+            "greedy-monroe": [{0, 3}],
+            "seqslav": [{0, 3}],
+            "slav": [{0, 3}],
+            "rule-x": [{0, 3}],
+            "rule-x-without-2nd-phase": [{0}],
+            "phrag-enestr": [{0, 3}],
+            "consensus": [{0, 3}],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -450,8 +448,8 @@ def test_resolute_parameter(rule):
             if resolute not in rule.resolute:
                 profile = Profile(5)
                 committeesize = 1
-                preflist = [[0, 1, 2], [1], [1, 2], [0]]
-                profile.add_voters(preflist)
+                approval_sets = [{0, 1, 2}, {1}, {1, 2}, {0}]
+                profile.add_voters(approval_sets)
 
                 with pytest.raises(NotImplementedError):
                     rule.compute(
@@ -466,8 +464,8 @@ def test_resolute_parameter(rule):
 def test_abcrules__toofewcandidates(rule_id, algorithm, resolute, verbose):
     profile = Profile(5)
     committeesize = 4
-    preflist = [[0, 1, 2], [1], [1, 2], [0]]
-    profile.add_voters(preflist)
+    approval_sets = [{0, 1, 2}, {1}, {1, 2}, {0}]
+    profile.add_voters(approval_sets)
 
     with pytest.raises(ValueError):
         abcrules.compute(
@@ -522,12 +520,12 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
     if rule_id == "mav":
         # Minimax AV ignores weights by definition
         if resolute:
-            assert result == [[0]]
+            assert result == [{0}]
         else:
-            assert result == [[0], [1], [2]]
+            assert result == [{0}, {1}, {2}]
     else:
         assert len(result) == 1
-        assert result[0] == [1]
+        assert result[0] == {1}
 
 
 @pytest.mark.parametrize(
@@ -536,7 +534,7 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
 @pytest.mark.parametrize("verbose", [0, 1, 2, 3])
 def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
     profile = Profile(4)
-    profile.add_voters([[0], [1], [2], [3]])
+    profile.add_voters([{0}, {1}, {2}, {3}])
     committeesize = 2
 
     committees = abcrules.compute(
@@ -549,7 +547,7 @@ def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
     )
 
     if rule_id == "rule-x-without-2nd-phase":
-        assert committees == [[]]
+        assert committees == [set()]
         return
 
     if resolute:
@@ -562,9 +560,31 @@ def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
 @pytest.mark.parametrize("verbose", [0, 1, 2, 3])
+def test_abcrules_return_lists_of_sets(rule_id, algorithm, resolute, verbose):
+    profile = Profile(4)
+    profile.add_voters([{0}, [1], [2], {3}])
+    committeesize = 2
+
+    committees = abcrules.compute(
+        rule_id,
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        verbose=verbose,
+    )
+    assert len(committees) >= 1
+    for committee in committees:
+        assert isinstance(committee, set)
+
+
+@pytest.mark.parametrize(
+    "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
+)
+@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
 def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
     profile = Profile(4)
-    profile.add_voters([[0], [1], [2]])
+    profile.add_voters([{0}, {1}, {2}])
     committeesize = 3
 
     committees = abcrules.compute(
@@ -576,7 +596,7 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
         verbose=verbose,
     )
 
-    assert committees == [[0, 1, 2]]
+    assert committees == [{0, 1, 2}]
 
     profile.add_voters([[]])
 
@@ -590,9 +610,9 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
     )
 
     if rule_id == "rule-x-without-2nd-phase":
-        assert committees == [[]]
+        assert committees == [set()]
     else:
-        assert committees == [[0, 1, 2]]
+        assert committees == [{0, 1, 2}]
 
 
 @pytest.mark.parametrize("algorithm", abcrules.rules["monroe"].algorithms)
@@ -603,7 +623,7 @@ def test_monroe_indivisible(algorithm):
 
     assert abcrules.compute_monroe(
         profile, committeesize, algorithm=algorithm, resolute=False
-    ) == [[0, 1, 2], [0, 1, 3], [0, 2, 3]]
+    ) == [{0, 1, 2}, {0, 1, 3}, {0, 2, 3}]
 
 
 @pytest.mark.gurobi
@@ -650,8 +670,7 @@ def test_abcrules_correct(
         assert len(committees) == 1
         assert committees[0] in exp_results[rule_id]
     else:
-        # different solvers won't find solutions in the same order
-        assert sorted(committees) == sorted(exp_results[rule_id])
+        assert committees == sorted(exp_results[rule_id])
 
 
 def test_seqphragmen_irresolute():
@@ -661,12 +680,12 @@ def test_seqphragmen_irresolute():
     committees = abcrules.rules["seqphrag"].compute(
         profile, committeesize, resolute=False
     )
-    assert committees == [[0, 1], [0, 2]]
+    assert committees == [{0, 1}, {0, 2}]
 
     committees = abcrules.rules["seqphrag"].compute(
         profile, committeesize, resolute=True
     )
-    assert committees == [[0, 2]]
+    assert committees == [{0, 2}]
 
 
 def test_seqpav_irresolute():
@@ -677,10 +696,10 @@ def test_seqpav_irresolute():
     committees = abcrules.rules["seqpav"].compute(
         profile, committeesize, resolute=False
     )
-    assert committees == [[0, 1], [0, 2], [1, 2]]
+    assert committees == [{0, 1}, {0, 2}, {1, 2}]
 
     committees = abcrules.rules["seqpav"].compute(profile, committeesize, resolute=True)
-    assert committees == [[0, 2]]
+    assert committees == [{0, 2}]
 
 
 def test_gurobi_cant_compute_av():
@@ -754,7 +773,7 @@ def test_jansonexamples(rule_id, algorithm):
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm, resolute=False
     )
-    assert committees == [[a, b, q]]
+    assert committees == [{a, b, q}]
 
 
 @pytest.mark.parametrize("rule", abcrules.rules.values(), ids=idfn)

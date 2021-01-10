@@ -34,9 +34,9 @@ committees_seqpav = abcrules.compute_seqpav(profile, 2, verbose=2)
 committees_revseqpav = abcrules.compute_revseqpav(profile, 2, verbose=2)
 
 # verify correctness
-assert committees_pav == [[a, c]]
-assert committees_seqpav == [[c, d]]
-assert committees_revseqpav == [[c, d]]
+assert committees_pav == [{a, c}]
+assert committees_seqpav == [{c, d}]
+assert committees_revseqpav == [{c, d}]
 
 
 print("\n")
@@ -70,6 +70,6 @@ committees_revseqpav = abcrules.compute_revseqpav(profile, 2, verbose=2)
 
 
 # verify correctness
-assert committees_pav == [[a, b]]
-assert committees_seqpav == [[a, c]]
-assert committees_revseqpav == [[b, d]]
+assert committees_pav == [{a, b}]
+assert committees_seqpav == [{a, c}]
+assert committees_revseqpav == [{b, d}]

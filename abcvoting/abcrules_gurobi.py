@@ -4,6 +4,7 @@ programs (ILPs) with Gurobi (https://www.gurobi.com/)
 """
 
 from __future__ import print_function
+from abcvoting.misc import sorted_committees
 
 try:
     import gurobipy as gb
@@ -171,9 +172,10 @@ def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
     ):
         raise ValueError("scorefct must be monotonic decreasing")
 
-    return _optimize_rule_gurobi(
+    committees = _optimize_rule_gurobi(
         set_opt_model_func, profile, committeesize, scorefct, resolute
     )
+    return sorted_committees(committees)
 
 
 def __gurobi_monroe(profile, committeesize, resolute):
@@ -239,9 +241,10 @@ def __gurobi_monroe(profile, committeesize, resolute):
         # optimization objective
         m.setObjective(satisfaction, gb.GRB.MAXIMIZE)
 
-    return _optimize_rule_gurobi(
+    committees = _optimize_rule_gurobi(
         set_opt_model_func, profile, committeesize, scorefct=None, resolute=resolute
     )
+    return sorted_committees(committees)
 
 
 def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
@@ -299,7 +302,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
         # maximizing the negative distance makes code more similar to the other methods here
         m.setObjective(-loadbound, gb.GRB.MAXIMIZE)
 
-    return _optimize_rule_gurobi(
+    committees = _optimize_rule_gurobi(
         set_opt_model_func,
         profile,
         committeesize,
@@ -307,6 +310,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
         resolute=resolute,
         verbose=verbose,
     )
+    return sorted_committees(committees)
 
 
 def __gurobi_minimaxav(profile, committeesize, resolute):
@@ -347,6 +351,7 @@ def __gurobi_minimaxav(profile, committeesize, resolute):
         # maximizing the negative distance makes code more similar to the other methods here
         m.setObjective(-max_hamdistance, gb.GRB.MAXIMIZE)
 
-    return _optimize_rule_gurobi(
+    committees = _optimize_rule_gurobi(
         set_opt_model_func, profile, committeesize, scorefct=None, resolute=resolute
     )
+    return sorted_committees(committees)

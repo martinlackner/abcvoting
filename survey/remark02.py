@@ -33,5 +33,5 @@ committees_lexmav = abcrules.compute_lexmav(profile, 1, verbose=2)
 
 
 # verify correctness
-assert committees_mav == [[a], [b], [c]]
-assert committees_lexmav == [[a]]
+assert committees_mav == [{a}, {b}, {c}]
+assert committees_lexmav == [{a}]
