@@ -93,9 +93,7 @@ def marginal_thiele_scores_add(scorefct, profile, committee):
     for voter in profile:
         for cand in voter.approved:
             if voter.approved & set(committee):
-                marg[cand] += voter.weight * scorefct(
-                    len(voter.approved & set(committee)) + 1
-                )
+                marg[cand] += voter.weight * scorefct(len(voter.approved & set(committee)) + 1)
             else:
                 marg[cand] += voter.weight * scorefct(1)
     for cand in committee:

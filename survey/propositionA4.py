@@ -76,15 +76,7 @@ manipulations = [
         [{1, 3, 4}],
         [{1, 2, 3}],
     ),
-    (
-        "greedy-monroe",
-        True,
-        2,
-        [{0, 1}, {0, 2, 5}, {0, 2, 3}, {4, 5}],
-        {1},
-        [{0, 2}],
-        [{0, 1}],
-    ),
+    ("greedy-monroe", True, 2, [{0, 1}, {0, 2, 5}, {0, 2, 3}, {4, 5}], {1}, [{0, 2}], [{0, 1}]),
     (
         "monroe",
         False,
@@ -135,15 +127,7 @@ manipulations = [
 ]
 
 for manip in manipulations:
-    (
-        rule_id,
-        resolute,
-        committeesize,
-        approval_sets,
-        modvote,
-        commsfirst,
-        commsafter,
-    ) = manip
+    (rule_id, resolute, committeesize, approval_sets, modvote, commsfirst, commsafter) = manip
 
     print(misc.header(abcrules.rules[rule_id].longname, "-"))
 
@@ -153,10 +137,7 @@ for manip in manipulations:
     print(profile.str_compact())
 
     committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)
-    print(
-        "original winning committees:\n"
-        + misc.str_sets_of_candidates(committees, cand_names)
-    )
+    print("original winning committees:\n" + misc.str_sets_of_candidates(committees, cand_names))
 
     # verify correctness
     assert committees == commsfirst

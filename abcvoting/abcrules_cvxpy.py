@@ -88,10 +88,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
         # left-hand-side and right-hand-side of the equality constraints:
         lhs = cp.sum(utility, axis=1)
         rhs = cp.hstack(
-            [
-                cp.sum([in_committee[cand] for cand in voter.approved])
-                for voter in profile
-            ]
+            [cp.sum([in_committee[cand] for cand in voter.approved]) for voter in profile]
         )
 
         constraints = [cp.sum(in_committee) == committeesize, lhs == rhs]
@@ -124,10 +121,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
             # TODO this is a workaround for https://github.com/cvxgrp/cvxpy/issues/1191
             cvxpy_workaround_infisible = True
 
-        if (
-            problem.status in (cp.INFEASIBLE, cp.UNBOUNDED)
-            or cvxpy_workaround_infisible
-        ):
+        if problem.status in (cp.INFEASIBLE, cp.UNBOUNDED) or cvxpy_workaround_infisible:
             if len(committees) == 0:
                 raise RuntimeError("no solutions found")
             break

@@ -102,9 +102,7 @@ class Profile(object):
         if self.has_unit_weights():
             output = f"profile with {len(self._voters)} votes and {self.num_cand} candidates:\n"
             for voter in self._voters:
-                output += (
-                    " " + str_set_of_candidates(voter.approved, self.cand_names) + ",\n"
-                )
+                output += " " + str_set_of_candidates(voter.approved, self.cand_names) + ",\n"
         else:
             output = (
                 f"weighted profile with {len(self._voters)} votes"
@@ -122,10 +120,7 @@ class Profile(object):
         """
         for voter1 in self._voters:
             for voter2 in self._voters:
-                if len(voter1.approved & voter2.approved) not in [
-                    0,
-                    len(voter1.approved),
-                ]:
+                if len(voter1.approved & voter2.approved) not in [0, len(voter1.approved)]:
                     return False
         return True
 
@@ -140,10 +135,7 @@ class Profile(object):
             output = ""
         else:
             output = "weighted "
-        output += "profile with %d votes and %d candidates:\n" % (
-            len(self._voters),
-            self.num_cand,
-        )
+        output += "profile with %d votes and %d candidates:\n" % (len(self._voters), self.num_cand)
         for approval_set in compact:
             output += (
                 " "
@@ -169,9 +161,7 @@ class Voter:
     """
 
     def __init__(self, approved, weight=1):
-        self.approved = set(
-            approved
-        )  # approval set, i.e., the set of approved candidates
+        self.approved = set(approved)  # approval set, i.e., the set of approved candidates
         self.weight = weight
 
         # does not check for num_cand, because not known here
@@ -203,11 +193,7 @@ class Voter:
         for candidate in self.approved:
             if not isinstance(candidate, int):
                 raise TypeError(
-                    "Object of type "
-                    + str(type(candidate))
-                    + " not suitable as candidate"
+                    "Object of type " + str(type(candidate)) + " not suitable as candidate"
                 )
             if candidate < 0 or candidate >= num_cand:
-                raise ValueError(
-                    str(self) + " not valid for num_cand = " + str(num_cand)
-                )
+                raise ValueError(str(self) + " not valid for num_cand = " + str(num_cand))

@@ -34,9 +34,7 @@ while True:
 output(profile, "random_urn")
 
 while True:
-    profile = genprofiles.random_urn_party_list_profile(
-        num_cand, 3, 2, 0.4, uniform=False
-    )
+    profile = genprofiles.random_urn_party_list_profile(num_cand, 3, 2, 0.4, uniform=False)
     try:
         check_enough_approved_candidates(profile, committeesize)
         break

@@ -40,17 +40,7 @@ monotonicity_instances = [
     (
         "rule-x",
         3,
-        [
-            {1, 3},
-            {0, 1},
-            {1, 3, 4},
-            {0, 4},
-            {2, 3, 4},
-            {2, 4},
-            {2, 3, 4},
-            {0, 2, 4},
-            {1, 2, 3},
-        ],
+        [{1, 3}, {0, 1}, {1, 3, 4}, {0, 4}, {2, 3, 4}, {2, 4}, {2, 3, 4}, {0, 2, 4}, {1, 2, 3}],
         True,
         [0],
         [{0, 3, 4}],
@@ -118,17 +108,7 @@ monotonicity_instances = [
     (
         "greedy-monroe",
         3,
-        [
-            {1, 2, 3},
-            {0, 2, 5},
-            {0, 3, 4},
-            {2, 4},
-            {0, 1},
-            {3, 5},
-            {3, 5},
-            {1, 4},
-            {1, 5},
-        ],
+        [{1, 2, 3}, {0, 2, 5}, {0, 3, 4}, {2, 4}, {0, 1}, {3, 5}, {3, 5}, {1, 4}, {1, 5}],
         True,
         {4},
         [{1, 4, 5}],
@@ -210,21 +190,7 @@ monotonicity_instances = [
     (
         "seqcc",
         3,
-        [
-            {4},
-            {0},
-            {0},
-            {0, 1, 2},
-            {0, 3},
-            {0, 3},
-            {1},
-            {1},
-            {1, 3},
-            {2},
-            {2},
-            {2},
-            {3},
-        ],
+        [{4}, {0}, {0}, {0, 1, 2}, {0, 3}, {0, 3}, {1}, {1}, {1, 3}, {2}, {2}, {2}, {3}],
         False,
         {1, 2},
         [{0, 1, 2}],
@@ -297,10 +263,7 @@ for inst in monotonicity_instances:
         resolute = True
 
     committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)
-    print(
-        "original winning committees:\n"
-        + misc.str_sets_of_candidates(committees, cand_names)
-    )
+    print("original winning committees:\n" + misc.str_sets_of_candidates(committees, cand_names))
     # verify correctness
     assert committees == commsfirst
     some_variant = any(
@@ -312,20 +275,15 @@ for inst in monotonicity_instances:
     assert some_variant or all_variant
     if all_variant:
         assert not all(
-            all(cand in committee for cand in new_approval_set)
-            for committee in commsafter
+            all(cand in committee for cand in new_approval_set) for committee in commsafter
         )
     else:
         assert not any(
-            all(cand in committee for cand in new_approval_set)
-            for committee in commsafter
+            all(cand in committee for cand in new_approval_set) for committee in commsafter
         )
 
     if addvoter:
-        print(
-            "additional voter: "
-            + misc.str_set_of_candidates(new_approval_set, cand_names)
-        )
+        print("additional voter: " + misc.str_set_of_candidates(new_approval_set, cand_names))
         approval_sets.append(new_approval_set)
     else:
         approval_sets[0] = list(set(new_approval_set) | set(approval_sets[0]))

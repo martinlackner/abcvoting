@@ -41,9 +41,7 @@ def random_urn_profile(num_cand, num_voters, setsize, replace):
     return profile
 
 
-def random_urn_party_list_profile(
-    num_cand, num_voters, num_parties, replace, uniform=False
-):
+def random_urn_party_list_profile(num_cand, num_voters, num_parties, replace, uniform=False):
     """Generate Polya Urn profile from a number of parties.
     If uniform each party gets the same amount of candidates."""
     currsize = 1.0
@@ -125,13 +123,7 @@ def random_2d_points_profile(
 
 
 def random_2d_points_party_list_profile(
-    num_cand,
-    num_voters,
-    num_parties,
-    partypointmode,
-    voterpointmode,
-    sigma,
-    uniform=False,
+    num_cand, num_voters, num_parties, partypointmode, voterpointmode, sigma, uniform=False
 ):
     """Generates profiles from randomly generated 2d points according
     to some distributions with the given sigma.
@@ -145,9 +137,7 @@ def random_2d_points_party_list_profile(
     voter_points = __generate_2d_points(voters, voterpointmode, sigma)
     party_points = __generate_2d_points(parties, partypointmode, sigma)
 
-    party_sets = __get_profile_from_points(
-        voters, parties, voter_points, party_points, 1.0
-    )
+    party_sets = __get_profile_from_points(voters, parties, voter_points, party_points, 1.0)
 
     approval_sets = []
     for p in party_sets:
@@ -275,18 +265,12 @@ def __euclidean(p1, p2):
     return sqrt(fabs(p1[0] - p2[0]) ** 2 + fabs(p1[1] - p2[1]) ** 2)
 
 
-def __get_profile_from_points(
-    voters, cands, voter_points, cand_points, approval_threshold
-):
+def __get_profile_from_points(voters, cands, voter_points, cand_points, approval_threshold):
     """Generates a list of approval sets from 2d points according to
     approval_threshold."""
     profile = {}
     for v in voters:
-        distances = {
-            cand: __euclidean(voter_points[v], cand_points[cand]) for cand in cands
-        }
+        distances = {cand: __euclidean(voter_points[v], cand_points[cand]) for cand in cands}
         mindist = min(distances.values())
-        profile[v] = [
-            cand for cand in cands if distances[cand] <= mindist * approval_threshold
-        ]
+        profile[v] = [cand for cand in cands if distances[cand] <= mindist * approval_threshold]
     return list(profile.values())

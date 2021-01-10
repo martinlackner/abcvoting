@@ -20,9 +20,7 @@ num_cand = 5
 a, b, c, d, e = range(5)
 # approval_sets = [[a, b, c]] * 5 + [[a, b, c, d, e]] * 5 + [[a, b, d, e]] * 2 + [[d, e]] * 3
 # approval_sets = [[a, b]] + [[a, b, c]] * 3 + [[a, b, c, d, e]] * 5 + [[d, e]] * 2 + [[d]]
-approval_sets = (
-    [[a, b, c]] * 6 + [[a, b, c, d, e]] * 4 + [[a, b, d, e]] * 2 + [[d, e]] * 3
-)
+approval_sets = [[a, b, c]] * 6 + [[a, b, c, d, e]] * 4 + [[a, b, d, e]] * 2 + [[d, e]] * 3
 # approval_sets = [[a, b, c]] * 5 + [[a, b, c, e]] + [[a, b, c, d, e]] * 4 + [[a, b, d, e]] * 2 + [[d, e]] * 2 + [[d]]
 cand_names = "abcde"
 
@@ -34,9 +32,7 @@ print(profile.str_compact())
 
 committees_rule_x = abcrules.compute_rule_x(profile, 4, resolute=False, verbose=2)
 
-committees_seqphragmen = abcrules.compute_seqphragmen(
-    profile, 4, resolute=False, verbose=1
-)
+committees_seqphragmen = abcrules.compute_seqphragmen(profile, 4, resolute=False, verbose=1)
 
 # verify correctness
 assert committees_rule_x == [{a, b, c, d}, {a, b, c, e}]

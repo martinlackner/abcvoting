@@ -84,8 +84,7 @@ def test_iterate(num_cand):
 
 
 @pytest.mark.parametrize(
-    "additional_approval_set",
-    [[3], [1, 5], [0], [2], [2, 6, 7], [0, 1, 2, 3, 4, 5, 6, 7]],
+    "additional_approval_set", [[3], [1, 5], [0], [2], [2, 6, 7], [0, 1, 2, 3, 4, 5, 6, 7]]
 )
 @pytest.mark.parametrize("num_cand", [8, 9])
 def test_party_list(num_cand, additional_approval_set):

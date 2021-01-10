@@ -50,9 +50,7 @@ def load_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
                 or f.endswith(".soc")
                 or f.endswith(".toc")
             ):
-                profile = read_preflib_file(
-                    f, setsize=setsize, relative_setsize=relative_setsize
-                )
+                profile = read_preflib_file(f, setsize=setsize, relative_setsize=relative_setsize)
                 profiles.append(profile)
 
     return profiles
@@ -89,17 +87,13 @@ def get_approval_set(num_appr, ranking, candidate_map):
                 tied = True
                 rank = rank[1:]
             else:
-                raise PreflibException(
-                    "Invalid format for tied candidates: " + str(ranking)
-                )
+                raise PreflibException("Invalid format for tied candidates: " + str(ranking))
         if rank.endswith("}"):
             if tied:
                 tied = False
                 rank = rank[:-1]
             else:
-                raise PreflibException(
-                    "Invalid format for tied candidates: " + str(ranking)
-                )
+                raise PreflibException("Invalid format for tied candidates: " + str(ranking))
         rank = rank.strip()
         if len(rank) > 0:
             try:
@@ -185,9 +179,7 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
         try:
             count = int(parts[0])
         except ValueError:
-            raise PreflibException(
-                f"Each ranking must start with count/weight ({line})"
-            )
+            raise PreflibException(f"Each ranking must start with count/weight ({line})")
         ranking = parts[1:]  # ranking starts after count
         if len(ranking) == 0:
             raise PreflibException("Empty ranking: " + str(line))
@@ -217,14 +209,10 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
             profile.add_voters([normalized_approval_set] * count)
     if use_weights:
         if len(profile) != unique_orders:
-            raise PreflibException(
-                "Number of voters wrongly specified in preflib file."
-            )
+            raise PreflibException("Number of voters wrongly specified in preflib file.")
     else:
         if len(profile) != voter_count:
-            raise PreflibException(
-                "Number of voters wrongly specified in preflib file."
-            )
+            raise PreflibException("Number of voters wrongly specified in preflib file.")
     return profile
 
 

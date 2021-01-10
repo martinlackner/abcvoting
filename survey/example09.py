@@ -28,10 +28,4 @@ print("Note: only committee {a, b, c, f} wins according to lexmin-Phragmen.")
 
 # verify correctness
 a, b, c, d, e, f, g = range(7)  # a = 0, b = 1, c = 2, ...
-assert committees == [
-    {a, b, c, d},
-    {a, b, c, f},
-    {a, b, d, f},
-    {a, c, d, f},
-    {b, c, d, f},
-]
+assert committees == [{a, b, c, d}, {a, b, c, f}, {a, b, d, f}, {a, c, d, f}, {b, c, d, f}]
