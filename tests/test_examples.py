@@ -10,8 +10,8 @@ def test_simple_py():
     from examples import simple
 
 
-@pytest.mark.gurobi
 # noinspection PyUnresolvedReferences
+@pytest.mark.gurobi
 def test_allrules_py():
     from examples import allrules
 

@@ -16,16 +16,16 @@ from abcvoting.misc import hamming
 # returns score function given its name
 def get_scorefct(scorefct_str, committeesize):
     if scorefct_str == "pav":
-        return __pav_score_fct
+        return pav_score_fct
     elif scorefct_str == "slav":
-        return __slav_score_fct
+        return slav_score_fct
     elif scorefct_str == "cc":
-        return __cc_score_fct
+        return cc_score_fct
     elif scorefct_str == "av":
-        return __av_score_fct
+        return av_score_fct
     elif scorefct_str[:4] == "geom":
         base = Fraction(scorefct_str[4:])
-        return functools.partial(__geom_score_fct, base=base)
+        return functools.partial(geometric_score_fct, base=base)
     else:
         raise Exception("Score function", scorefct_str, "does not exist.")
 
@@ -44,28 +44,28 @@ def thiele_score(scorefct_str, profile, committee):
     return score
 
 
-def __geom_score_fct(i, base):
+def geometric_score_fct(i, base):
     if i == 0:
         return 0
     else:
         return Fraction(1, base ** (i - 1))
 
 
-def __pav_score_fct(i):
+def pav_score_fct(i):
     if i == 0:
         return 0
     else:
         return Fraction(1, i)
 
 
-def __slav_score_fct(i):
+def slav_score_fct(i):
     if i == 0:
         return 0
     else:
         return Fraction(1, 2 * i - 1)
 
 
-def __av_score_fct(i):
+def av_score_fct(i):
     # note: this is used only for unit tests atm, because AV is separable anyway and therefore not
     # implemented as optimization problem
     if i >= 1:
@@ -74,7 +74,7 @@ def __av_score_fct(i):
         return 0
 
 
-def __cc_score_fct(i):
+def cc_score_fct(i):
     if i == 1:
         return 1
     else:

@@ -87,10 +87,7 @@ class Profile(object):
         return sum(voter.weight for voter in self._voters)
 
     def has_unit_weights(self):
-        for voter in self._voters:
-            if voter.weight != 1:
-                return False
-        return True
+        return all(voter.weight == 1 for voter in self._voters)
 
     def __iter__(self):
         return iter(self._voters)
@@ -109,20 +106,21 @@ class Profile(object):
                 f" and {self.num_cand} candidates:\n"
             )
             for voter in self._voters:
-                output += f" {voter.weight}  * {str_set_of_candidates(voter.approved, self.cand_names)} ,\n"
+                output += f" {voter.weight} * "
+                output += f"{str_set_of_candidates(voter.approved, self.cand_names)} ,\n"
         return output[:-2]
 
-    def party_list(self):
+    def is_party_list(self):
         """
         Is this party a party-list profile?
         In a party-list profile all approval sets are either
         disjoint or equal (see https://arxiv.org/abs/1704.02453).
         """
-        for voter1 in self._voters:
-            for voter2 in self._voters:
-                if len(voter1.approved & voter2.approved) not in [0, len(voter1.approved)]:
-                    return False
-        return True
+        return all(
+            len(voter1.approved & voter2.approved) in (0, len(voter1.approved))
+            for voter1 in self._voters
+            for voter2 in self._voters
+        )
 
     def str_compact(self):
         compact = OrderedDict()
@@ -193,7 +191,8 @@ class Voter:
         for candidate in self.approved:
             if not isinstance(candidate, int):
                 raise TypeError(
-                    "Object of type " + str(type(candidate)) + " not suitable as candidate"
+                    f"Object of type {str(type(candidate))} not suitable as candidate, "
+                    f"only positive integers allowed."
                 )
             if candidate < 0 or candidate >= num_cand:
                 raise ValueError(str(self) + " not valid for num_cand = " + str(num_cand))

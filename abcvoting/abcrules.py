@@ -1497,11 +1497,6 @@ def compute_phragmen_enestroem(
         else:
             voter_budgets_for_partial_committee = next_committees
 
-        if resolute:
-            voter_budgets_for_partial_committee = [next_committees[0]]
-        else:
-            voter_budgets_for_partial_committee = next_committees
-
     # get rid of duplicates
     committees = set(
         [tuple(sorted(committee)) for _, committee in voter_budgets_for_partial_committee]

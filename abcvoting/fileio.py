@@ -140,7 +140,7 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
             If True, treat vote count as weight and use this weight in class Voter.
 
     Returns:
-        profile: Profile
+        profile: abcvoting.preferences.Profile
             Preference profile extracted from preflib file,
             including names of candidates
     """

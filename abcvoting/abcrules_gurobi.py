@@ -72,7 +72,8 @@ def _optimize_rule_gurobi(
             )
         elif m.Status != 2:
             if len(committees) == 0:
-                # we are in the first round of searching committees and Gurobi doesn't find anything
+                # we are in the first round of searching for committees
+                # and Gurobi didn't find any
                 raise RuntimeError("Gurobi found no solution")
             break
 

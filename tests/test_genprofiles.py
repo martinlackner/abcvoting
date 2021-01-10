@@ -31,7 +31,7 @@ def test_urn_party_list(num_cand, num_voters, num_parties, replace, uniform):
     )
     assert len(profile) == num_voters
     assert profile.num_cand == num_cand
-    assert profile.party_list()
+    assert profile.is_party_list()
     for voter in profile:
         assert len(voter.approved) > 0
 
@@ -56,7 +56,7 @@ def test_IC_party_list(num_cand, num_voters, num_parties, uniform):
     profile = genprofiles.random_IC_party_list_profile(num_cand, num_voters, num_parties, uniform)
     assert len(profile) == num_voters
     assert profile.num_cand == num_cand
-    assert profile.party_list()
+    assert profile.is_party_list()
     for voter in profile:
         assert len(voter.approved) > 0
 
@@ -106,6 +106,6 @@ def test_2d_party_list(num_cand, num_voters, num_parties, uniform, sigma):
     )
     assert len(profile) == num_voters
     assert profile.num_cand == num_cand
-    assert profile.party_list()
+    assert profile.is_party_list()
     for voter in profile:
         assert len(voter.approved) > 0

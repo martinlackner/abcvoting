@@ -94,6 +94,6 @@ def test_party_list(num_cand, additional_approval_set):
     profile.add_voter([0, 4, 6])
     profile.add_voter([2, 7])
     profile.add_voter(Voter([1, 3, 5], 3))
-    assert profile.party_list()
+    assert profile.is_party_list()
     profile.add_voter(additional_approval_set)
-    assert not profile.party_list()
+    assert not profile.is_party_list()
