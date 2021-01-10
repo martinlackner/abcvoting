@@ -54,14 +54,20 @@ The following code computes the Proportional Approval Voting (PAV) rule for a pr
 ```python
 from abcvoting.preferences import Profile
 from abcvoting import abcrules
-profile = Profile(5)  # a preference profile with 5 candidates
+
+# a preference profile with 5 candidates (0, 1, 2, 3, 4)
+profile = Profile(5)
+# add six voters, specified by the candidates that they approve;
+# the first voter approves candidates 0, 1, and 2,
+# the second voter approves candidates 0 and 1, etc.
 profile.add_voters([{0,1,2}, {0,1}, {0,1}, {1,2}, {3,4}, {3,4}])
 committeesize = 3
+# find winning committees for this profile according to PAV
 print(abcrules.compute_pav(profile, committeesize))
 ```
 The output is 
 ```
-[[0, 1, 3], [0, 1, 4]]
+[{0, 1, 3}, {0, 1, 4}]
 ```
 which corresponds to the two winning committees {0,1,3} and {0,1,4}. Further examples can be found in the directories [examples/](examples) and [survey/](survey) (which contains all examples from the survey on ABC rules [8]). 
 
