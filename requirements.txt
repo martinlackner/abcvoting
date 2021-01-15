@@ -1,4 +1,4 @@
 networkx>=2.2
-pytest>=4.6
+pytest>=6
 coverage>=5.3
 black==20.8b1
