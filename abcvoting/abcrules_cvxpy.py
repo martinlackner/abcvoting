@@ -23,7 +23,7 @@ except ImportError:
 CVXPY_ACCURACY = 1e-7
 
 
-def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorithm):
+def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, solver_id):
     """Compute thiele method using CVXPY. This is similar to `__gurobi_thiele_methods()`,
     where `gurobipy` is used as interface to Gurobi. This method supports Gurobi too, but also
     other solvers.
@@ -38,7 +38,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
         must be one of: 'pav'
     resolute : bool
         return only one result
-    algorithm : str
+    solver_id : str
         must be one of: 'glpk_mi', 'cbc', 'scip', 'cvxpy_gurobi'
         'cvxpy_gurobi' uses Gurobi in the background, similar to
         `abcrules_gurobi.__gurobi_thiele_methods()`, but using the CVXPY interface instead of
@@ -51,12 +51,12 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
         `0` to `num_cand`, profile.cand_names is ignored
 
     """
-    if algorithm in ["glpk_mi", "cbc", "scip"]:
-        solver = getattr(cp, algorithm.upper())
-    elif algorithm == "cvxpy_gurobi":
+    if solver_id in ["glpk_mi", "cbc", "scip"]:
+        solver = getattr(cp, solver_id.upper())
+    elif solver_id == "gurobi":
         solver = cp.GUROBI
     else:
-        raise ValueError(f"Unknown algorithm for usage with CVXPY: {algorithm}")
+        raise ValueError(f"Unknown solver_id for usage with CVXPY: {solver_id}")
 
     committees = []
     maxscore = None
@@ -93,7 +93,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, algorit
 
         constraints = [cp.sum(in_committee) == committeesize, lhs == rhs]
 
-        if algorithm == "glpk_mi":
+        if solver_id == "glpk_mi":
             # weird workaround necessary... :(
             # see https://github.com/cvxgrp/cvxpy/issues/1112#issuecomment-730360543
             constraints = [

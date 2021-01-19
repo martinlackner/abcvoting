@@ -19,10 +19,13 @@ class CollectRules:
     def __init__(self):
         marks = {
             "gurobi": pytest.mark.gurobi,
-            "scip": [pytest.mark.cvxpy, pytest.mark.scip],
-            "glpk_mi": [pytest.mark.cvxpy, pytest.mark.glpk_mi],
-            "cbc": [pytest.mark.cvxpy, pytest.mark.cbc],
+            "cvxpy_scip": [pytest.mark.cvxpy, pytest.mark.scip],
+            "cvxpy_glpk_mi": [pytest.mark.cvxpy, pytest.mark.glpk_mi],
+            "cvxpy_cbc": [pytest.mark.cvxpy, pytest.mark.cbc],
             "cvxpy_gurobi": [pytest.mark.cvxpy, pytest.mark.gurobi],
+            "ortools-cp": [pytest.mark.ortools],
+            "ortools-gurobi": [pytest.mark.ortools, pytest.mark.gurobi],
+            "ortools-scip": [pytest.mark.ortools, pytest.mark.scip],
         }
 
         self.rule_algorithm_resolute = []
@@ -147,7 +150,7 @@ class CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
-            "lexmav": [
+            "lexminimaxav": [
                 {0, 1, 4, 5},
                 {0, 2, 4, 5},
                 {0, 3, 4, 5},
@@ -276,7 +279,7 @@ class CollectInstances:
             "geom2": [{0, 1, 3}],
             "revseqpav": [{0, 1, 3}],
             "mav": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
-            "lexmav": [{0, 1, 3}],
+            "lexminimaxav": [{0, 1, 3}],
             "seqphrag": [{0, 1, 3}],
             "optphrag": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
             "cc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
@@ -316,7 +319,7 @@ class CollectInstances:
             "geom2": [{0, 1, 2, 4}],
             "revseqpav": [{0, 1, 2, 4}],
             "mav": [{0, 1, 2, 3}, {0, 1, 2, 4}, {0, 2, 3, 4}, {0, 2, 3, 5}, {0, 2, 4, 5}],
-            "lexmav": [{0, 1, 2, 4}],
+            "lexminimaxav": [{0, 1, 2, 4}],
             "seqphrag": [{0, 1, 2, 4}],
             "optphrag": [
                 {0, 1, 2, 3},
@@ -394,7 +397,7 @@ class CollectInstances:
             "geom2": [{0, 3}],
             "revseqpav": [{0, 3}],
             "mav": [{0, 3}, {1, 3}],
-            "lexmav": [{0, 3}],
+            "lexminimaxav": [{0, 3}],
             "seqphrag": [{0, 3}],
             "optphrag": [{0, 3}, {1, 3}],
             "cc": [{0, 2}, {0, 3}, {1, 3}],
@@ -483,7 +486,7 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
     committeesize = 1
 
     if "monroe" in rule_id or rule_id in [
-        "lexmav",
+        "lexminimaxav",
         "rule-x",
         "rule-x-without-2nd-phase",
         "phrag-enestr",
@@ -499,7 +502,7 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
     if rule_id == "mav":
         # Minimax AV ignores weights by definition
         if resolute:
-            assert result == [{0}]
+            assert result == [{0}] or result == [{1}] or result == [{2}]
         else:
             assert result == [{0}, {1}, {2}]
     else:
@@ -668,7 +671,7 @@ def test_cvxpy_cant_compute_av():
     committeesize = 2
 
     with pytest.raises(ValueError):
-        cvxpy_thiele_methods(profile, committeesize, "av", resolute=False, algorithm="glpk_mi")
+        cvxpy_thiele_methods(profile, committeesize, "av", resolute=False, solver_id="glpk_mi")
 
 
 def test_consensus_fails_lower_quota():
@@ -688,8 +691,9 @@ def test_consensus_fails_lower_quota():
             cand in committee
             for cand in [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
         )
-    # .. and thus the Consensus rule fails lower quota (and PJR and EJR): the quota of the 27 voters
-    # is 15, but not all of their 15 approved candidates are contained in a winning committee.
+    # .. and thus the Consensus rule fails lower quota (and PJR and EJR):
+    # the quota of the 27 voters is 15, but not all of their 15 approved candidates
+    # are contained in a winning committee.
 
 
 @pytest.mark.parametrize("rule_id, algorithm", testrules.rule_algorithm_onlyirresolute, ids=idfn)
@@ -754,7 +758,7 @@ def test_fastest_algorithms(rule):
 )
 @pytest.mark.parametrize("verbose", [0, 1, 2, 3])
 def test_output(capfd, rule_id, algorithm, resolute, verbose):
-    if algorithm == "glpk_mi" and verbose == 0:
+    if algorithm == "cvxpy_glpk_mi" and verbose == 0:
         # TODO unfortunately GLPK_MI prints "Long-step dual simplex will be used" to stderr and it
         #  would be very complicated to capture this on all platforms reliably, changing
         #  sys.stderr doesn't help.
@@ -764,6 +768,14 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
         #  This could help to introduce a workaround: https://github.com/xolox/python-capturer
         #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
         pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
+
+    if algorithm == "ortools-gurobi" and verbose == 0:
+        # TODO or-tools with gurobi repeatedly prints
+        #  "Academic license - for non-commercial use only"
+        #  (if an acamedic license is used) as well as
+        #  "Warning: parameter changes on this environment will not affect existing models."
+        #  Thus this test fails.
+        pytest.skip("OR Tools prints Gurobi messages")
 
     profile = Profile(2)
     profile.add_voters([[0]])
@@ -789,5 +801,5 @@ def test_cvxpy_wrong_score_fct():
             committeesize=committeesize,
             scorefct_str="non_existing",
             resolute=False,
-            algorithm="glpk_mi",
+            solver_id="glpk_mi",
         )
