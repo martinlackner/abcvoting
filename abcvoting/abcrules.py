@@ -11,7 +11,7 @@ try:
 except ImportError:
     print("Warning: module gmpy2 not found, " + "resorting to Python's fractions.Fraction")
     from fractions import Fraction
-from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_cvxpy
+from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_cvxpy, abcrules_mip
 from abcvoting.misc import sorted_committees
 from abcvoting.misc import hamming
 from abcvoting.misc import check_enough_approved_candidates
@@ -102,8 +102,12 @@ def __init_rules():
                 "branch-and-bound",
                 "cvxpy_glpk_mi",
                 "cvxpy_cbc",
-                "cvxpy_scip",
                 "cvxpy_gurobi",
+                "ortools_sat_integer",
+                "ortools_cbc",
+                "ortools_gurobi",
+                "mip_cbc",
+                "mip_gurobi",
             ),
             (True, False),
         ),
@@ -200,7 +204,7 @@ def __init_rules():
             "MAV",
             "Minimax Approval Voting (MAV)",
             compute_minimaxav,
-            ("gurobi", "ortools-cp", "ortools-gurobi", "ortools-scip", "brute-force"),
+            ("gurobi", "ortools_cp", "ortools_gurobi", "brute-force"),
             (True, False),
         ),
         (
@@ -292,7 +296,6 @@ def compute_thiele_method(
         committees = abcrules_gurobi.__gurobi_thiele_methods(
             profile, committeesize, scorefct, resolute
         )
-
         committees = sorted_committees(committees)
     elif algorithm == "branch-and-bound":
         committees = __thiele_methods_branchandbound(
@@ -305,6 +308,30 @@ def compute_thiele_method(
             scorefct_str=scorefct_str,
             resolute=resolute,
             solver_id=algorithm[6:],
+        )
+    elif algorithm.startswith("mip_"):
+        committees = abcrules_mip._mip_thiele_methods(
+            profile,
+            committeesize,
+            scorefct,
+            resolute,
+            solver_id=algorithm[4:],
+        )
+    elif algorithm.startswith("mip_"):
+        committees = abcrules_mip._pulp_thiele_methods(
+            profile,
+            committeesize,
+            scorefct,
+            resolute,
+            solver_id=algorithm[4:],
+        )
+    elif algorithm.startswith("ortools_"):
+        committees = abcrules_ortools.__ortools_thiele_methods(
+            profile,
+            committeesize,
+            scorefct=scorefct,
+            resolute=resolute,
+            solver_id=algorithm[8:],
         )
     else:
         raise NotImplementedError(
@@ -755,7 +782,7 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
     if algorithm == "gurobi":
         committees = abcrules_gurobi.__gurobi_minimaxav(profile, committeesize, resolute)
         committees = sorted_committees(committees)
-    elif algorithm.startswith("ortools-"):
+    elif algorithm.startswith("ortools_"):
         solver_id = algorithm[8:]
         committees = abcrules_ortools.__ortools_minimaxav(
             profile, committeesize, resolute, solver_id

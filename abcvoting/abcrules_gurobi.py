@@ -117,7 +117,10 @@ def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
 
         for voter in profile:
             for l in range(1, committeesize + 1):
-                utility[(voter, l)] = m.addVar(vtype=gb.GRB.BINARY)
+                utility[(voter, l)] = m.addVar(ub=1.0)
+                # should be binary. this is guaranteed since the objective
+                # is maximal if all utilitity-values are either 0 or 1.
+                # using vtype=gb.GRB.BINARY does not change result, but makes things slower a bit
 
         # constraint: the committee has the required size
         m.addConstr(gb.quicksum(in_committee) == committeesize)
