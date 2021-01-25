@@ -3,14 +3,14 @@ Approval-based committee (ABC) rules implemented as constraint
  satisfaction programs with OR-Tools.
 """
 
-import mip
+import pulp
 from abcvoting.misc import sorted_committees
 
 
 ACCURACY = 1e-9
 
 
-def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, resolute, solver_id):
+def _optimize_rule_pulp(set_opt_model_func, profile, committeesize, scorefct, resolute, solver_id):
     """Compute rules, which are given in the form of an optimization problem, using Gurobi.
 
     Parameters
@@ -38,20 +38,20 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
     committees = []
 
     if solver_id == "gurobi":
-        solver = mip.GUROBI
+        solver = pulp.GUROBI
     elif solver_id in ["cbc"]:
-        solver = mip.CBC
+        solver = pulp.CBC
     else:
-        raise ValueError(f"Solver {solver_id} not known in MIP.")
+        raise ValueError(f"Solver {solver_id} not known in pulp.")
 
     # TODO add a max iterations parameter with fancy default value which works in almost all
     #  cases to avoid endless hanging computations, e.g. when CI runs the tests
     while True:
-        model = mip.Model()
+        model = pulp.LpProblem()
 
         # `in_committee` is a binary variable indicating whether `cand` is in the committee
         in_committee = [
-            model.add_var(var_type=mip.BINARY, name=f"cand{cand}_in_committee")
+            model.add_var(var_type=pulp.BINARY, name=f"cand{cand}_in_committee")
             for cand in profile.candidates
         ]
 
@@ -74,12 +74,12 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
 
         status = model.optimize()
 
-        if status not in [mip.OptimizationStatus.OPTIMAL, mip.OptimizationStatus.INFEASIBLE]:
+        if status not in [pulp.OptimizationStatus.OPTIMAL, pulp.OptimizationStatus.INFEASIBLE]:
             raise RuntimeError(
                 f"OR Tools returned an unexpected status code: {status}"
                 "Warning: solutions may be incomplete or not optimal."
             )
-        elif status == mip.OptimizationStatus.INFEASIBLE:
+        elif status == pulp.OptimizationStatus.INFEASIBLE:
             if len(committees) == 0:
                 # we are in the first round of searching for committees
                 # and Gurobi didn't find any
@@ -109,7 +109,7 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
     return committees
 
 
-def _mip_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
+def _pulp_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
     def set_opt_model_func(
         model, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):
@@ -133,21 +133,21 @@ def _mip_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
                 # using vtype=gb.GRB.BINARY does not change result, but makes things slower a bit
 
         # constraint: the committee has the required size
-        model += mip.xsum(in_committee) == committeesize
+        model += pulp.xsum(in_committee) == committeesize
 
         # constraint: utilities are consistent with actual committee
         for voter in profile:
-            model += mip.xsum(utility[voter, l] for l in range(1, committeesize + 1)) == mip.xsum(
-                in_committee[cand] for cand in voter.approved
-            )
+            model += pulp.xsum(
+                utility[voter, l] for l in range(1, committeesize + 1)
+            ) == pulp.xsum(in_committee[cand] for cand in voter.approved)
 
         # find a new committee that has not been found yet by excluding previously found committees
         for committee in previously_found_committees:
-            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
+            model += pulp.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
 
         # objective: the PAV score of the committee
-        model.objective = mip.maximize(
-            mip.xsum(
+        model.objective = pulp.maximize(
+            sum(
                 float(scorefct(l)) * voter.weight * utility[(voter, l)]
                 for voter in profile
                 for l in range(1, committeesize + 1)
@@ -161,47 +161,11 @@ def _mip_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
     ):
         raise ValueError("scorefct must be monotonic decreasing")
 
-    committees = _optimize_rule_mip(
+    committees = _optimize_rule_pulp(
         set_opt_model_func,
         profile,
         committeesize,
         scorefct=scorefct,
-        resolute=resolute,
-        solver_id=solver_id,
-    )
-    return sorted_committees(committees)
-
-
-def __mip_minimaxav(profile, committeesize, resolute, solver_id):
-    def set_opt_model_func(
-        model, profile, in_committee, committeesize, previously_found_committees, scorefct
-    ):
-        max_hamming_distance = model.add_var(
-            var_type=mip.INTEGER, lb=0, ub=2 * committeesize, name="max_hamming_distance"
-        )
-
-        model += mip.xsum(in_committee[cand] for cand in profile.candidates) == committeesize
-
-        for voter in profile:
-            not_approved = [cand for cand in profile.candidates if cand not in voter.approved]
-            # maximum hamming distance is greater of equal than the Hamming distances
-            # between individual voters and the committee
-            model += max_hamming_distance >= mip.xsum(
-                1 - in_committee[cand] for cand in voter.approved
-            ) + mip.xsum(in_committee[cand] for cand in not_approved)
-
-        # find a new committee that has not been found before
-        for committee in previously_found_committees:
-            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
-
-        # maximizing the negative distance makes code more similar to the other methods here
-        model.objective = mip.maximize(-max_hamming_distance)
-
-    committees = _optimize_rule_mip(
-        set_opt_model_func,
-        profile,
-        committeesize,
-        scorefct=None,
         resolute=resolute,
         solver_id=solver_id,
     )

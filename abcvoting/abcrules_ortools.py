@@ -168,6 +168,9 @@ def __ortools_thiele_methods(profile, committeesize, scorefct, resolute, solver_
         scorefct,
         cp_formulation=False,
     ):
+        if cp_formulation:
+            raise NotImplementedError("cp-sat solver not supported")
+
         # utility[(voter, l)] contains (intended binary) variables counting the number of approved
         # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
         # exactly the number of candidates in the committee approved by `voter` for all

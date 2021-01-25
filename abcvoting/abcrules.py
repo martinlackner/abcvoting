@@ -103,7 +103,6 @@ def __init_rules():
                 "cvxpy_glpk_mi",
                 "cvxpy_cbc",
                 "cvxpy_gurobi",
-                "ortools_sat_integer",
                 "ortools_cbc",
                 "ortools_gurobi",
                 "mip_cbc",
@@ -204,7 +203,15 @@ def __init_rules():
             "MAV",
             "Minimax Approval Voting (MAV)",
             compute_minimaxav,
-            ("gurobi", "ortools_cp", "ortools_gurobi", "brute-force"),
+            (
+                "gurobi",
+                "ortools_cp",
+                "ortools_cbc",
+                "ortools_gurobi",
+                "brute-force",
+                "mip_gurobi",
+                "mip_cbc",
+            ),
             (True, False),
         ),
         (
@@ -311,14 +318,6 @@ def compute_thiele_method(
         )
     elif algorithm.startswith("mip_"):
         committees = abcrules_mip._mip_thiele_methods(
-            profile,
-            committeesize,
-            scorefct,
-            resolute,
-            solver_id=algorithm[4:],
-        )
-    elif algorithm.startswith("mip_"):
-        committees = abcrules_mip._pulp_thiele_methods(
             profile,
             committeesize,
             scorefct,
@@ -787,6 +786,10 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
         committees = abcrules_ortools.__ortools_minimaxav(
             profile, committeesize, resolute, solver_id
         )
+        committees = sorted_committees(committees)
+    elif algorithm.startswith("mip_"):
+        solver_id = algorithm[4:]
+        committees = abcrules_mip.__mip_minimaxav(profile, committeesize, resolute, solver_id)
         committees = sorted_committees(committees)
     elif algorithm == "brute-force":
         committees = __minimaxav_bruteforce(profile, committeesize)
