@@ -27,11 +27,11 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees_mav = abcrules.compute_mav(profile, 1, verbose=2)
+committees_minimaxav = abcrules.compute_minimaxav(profile, 1, verbose=2)
 
-committees_lexmav = abcrules.compute_lexmav(profile, 1, verbose=2)
+committees_lexminimaxav = abcrules.compute_lexminimaxav(profile, 1, verbose=2)
 
 
 # verify correctness
-assert committees_mav == [{a}, {b}, {c}]
-assert committees_lexmav == [{a}]
+assert committees_minimaxav == [{a}, {b}, {c}]
+assert committees_lexminimaxav == [{a}]

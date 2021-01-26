@@ -27,7 +27,7 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees = abcrules.compute_mav(profile, 1, verbose=2)
+committees = abcrules.compute_minimaxav(profile, 1, verbose=2)
 
 
 # verify correctness

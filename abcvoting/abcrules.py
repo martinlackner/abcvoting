@@ -11,14 +11,12 @@ try:
 except ImportError:
     print("Warning: module gmpy2 not found, " + "resorting to Python's fractions.Fraction")
     from fractions import Fraction
-from abcvoting import abcrules_gurobi
-from abcvoting import abcrules_cvxpy
+from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_cvxpy, abcrules_mip
 from abcvoting.misc import sorted_committees
 from abcvoting.misc import hamming
 from abcvoting.misc import check_enough_approved_candidates
-from abcvoting.misc import str_committees_header
+from abcvoting.misc import str_committees_header, header
 from abcvoting.misc import str_set_of_candidates, str_sets_of_candidates
-from abcvoting.misc import header
 from abcvoting import scores
 
 
@@ -41,13 +39,13 @@ def is_algorithm_supported(algo):
         if not abcrules_cvxpy.cvxpy_available or not abcrules_cvxpy.numpy_available:
             return False
 
-        import cvxpy as cp
+        import cvxpy
 
-        if algo == "glpk_mi" and cp.GLPK_MI not in cp.installed_solvers():
+        if algo == "glpk_mi" and cvxpy.GLPK_MI not in cvxpy.installed_solvers():
             return False
-        elif algo == "cbc" and cp.CBC not in cp.installed_solvers():
+        elif algo == "cbc" and cvxpy.CBC not in cvxpy.installed_solvers():
             return False
-        elif algo == "scip" and cp.SCIP not in cp.installed_solvers():
+        elif algo == "scip" and cvxpy.SCIP not in cvxpy.installed_solvers():
             return False
         elif algo == "cvxpy_gurobi" and not abcrules_gurobi.available:
             return False
@@ -99,7 +97,17 @@ def __init_rules():
             "Proportional Approval Voting (PAV)",
             compute_pav,
             # TODO sort by speed, requires testing I guess...
-            ("gurobi", "branch-and-bound", "glpk_mi", "cbc", "scip", "cvxpy_gurobi"),
+            (
+                "gurobi",
+                "branch-and-bound",
+                "cvxpy_glpk_mi",
+                "cvxpy_cbc",
+                "cvxpy_gurobi",
+                "ortools_cbc",
+                "ortools_gurobi",
+                "mip_cbc",
+                "mip_gurobi",
+            ),
             (True, False),
         ),
         (
@@ -194,15 +202,23 @@ def __init_rules():
             "mav",
             "MAV",
             "Minimax Approval Voting (MAV)",
-            compute_mav,
-            ("gurobi", "brute-force"),
+            compute_minimaxav,
+            (
+                "gurobi",
+                "ortools_cp",
+                "ortools_cbc",
+                "ortools_gurobi",
+                "brute-force",
+                "mip_gurobi",
+                "mip_cbc",
+            ),
             (True, False),
         ),
         (
-            "lexmav",
+            "lexminimaxav",
             "lex-MAV",
             "Lexicographic Minimax Approval Voting (lex-MAV)",
-            compute_lexmav,
+            compute_lexminimaxav,
             ("brute-force",),
             (True, False),
         ),
@@ -280,26 +296,41 @@ def compute_thiele_method(
         if algorithm == "gurobi":
             print("Using the Gurobi ILP solver\n")
         if algorithm == "branch-and-bound":
-            print("Using a branch-and-bound algorithm\n")
+            print("Using a branch-and-bound solver_id\n")
     # end of optional output
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi.__gurobi_thiele_methods(
             profile, committeesize, scorefct, resolute
         )
-
         committees = sorted_committees(committees)
     elif algorithm == "branch-and-bound":
         committees = __thiele_methods_branchandbound(
             profile, committeesize, scorefct_str, resolute
         )
-    elif algorithm in ["glpk_mi", "cbc", "scip", "cvxpy_gurobi"]:
+    elif algorithm.startswith("cvxpy_"):
         committees = abcrules_cvxpy.cvxpy_thiele_methods(
             profile=profile,
             committeesize=committeesize,
             scorefct_str=scorefct_str,
             resolute=resolute,
-            algorithm=algorithm,
+            solver_id=algorithm[6:],
+        )
+    elif algorithm.startswith("mip_"):
+        committees = abcrules_mip._mip_thiele_methods(
+            profile,
+            committeesize,
+            scorefct,
+            resolute,
+            solver_id=algorithm[4:],
+        )
+    elif algorithm.startswith("ortools_"):
+        committees = abcrules_ortools.__ortools_thiele_methods(
+            profile,
+            committeesize,
+            scorefct=scorefct,
+            resolute=resolute,
+            solver_id=algorithm[8:],
         )
     else:
         raise NotImplementedError(
@@ -325,7 +356,7 @@ def compute_thiele_method(
 
 # computes arbitrary Thiele methods via branch-and-bound
 def __thiele_methods_branchandbound(profile, committeesize, scorefct_str, resolute):
-    """Branch-and-bound algorithm to compute winning committees
+    """Branch-and-bound solver_id to compute winning committees
     for Thiele methods"""
     check_enough_approved_candidates(profile, committeesize)
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
@@ -716,22 +747,22 @@ def compute_revseq_thiele_method(
 
 
 def __minimaxav_bruteforce(profile, committeesize):
-    """Brute-force algorithm for computing Minimax AV (MAV)"""
+    """Brute-force solver_id for computing Minimax AV (MAV)"""
     opt_committees = []
-    opt_mavscore = profile.num_cand + 1
+    opt_minimaxav_score = profile.num_cand + 1
     for committee in combinations(profile.candidates, committeesize):
         score = scores.mavscore(profile, committee)
-        if score < opt_mavscore:
+        if score < opt_minimaxav_score:
             opt_committees = [committee]
-            opt_mavscore = score
-        elif scores.mavscore(profile, committee) == opt_mavscore:
+            opt_minimaxav_score = score
+        elif scores.mavscore(profile, committee) == opt_minimaxav_score:
             opt_committees.append(committee)
 
     return sorted_committees(opt_committees)
 
 
 # Minimax Approval Voting
-def compute_mav(profile, committeesize, algorithm="brute-force", resolute=False, verbose=0):
+def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=False, verbose=0):
     """Minimax AV (MAV)"""
     check_enough_approved_candidates(profile, committeesize)
 
@@ -744,24 +775,36 @@ def compute_mav(profile, committeesize, algorithm="brute-force", resolute=False,
         if algorithm == "gurobi":
             print("Using the Gurobi ILP solver\n")
         if algorithm == "brute-force":
-            print("Using a brute-force algorithm\n")
+            print("Using a brute-force solver_id\n")
     # end of optional output
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi.__gurobi_minimaxav(profile, committeesize, resolute)
+        committees = sorted_committees(committees)
+    elif algorithm.startswith("ortools_"):
+        solver_id = algorithm[8:]
+        committees = abcrules_ortools.__ortools_minimaxav(
+            profile, committeesize, resolute, solver_id
+        )
+        committees = sorted_committees(committees)
+    elif algorithm.startswith("mip_"):
+        solver_id = algorithm[4:]
+        committees = abcrules_mip.__mip_minimaxav(profile, committeesize, resolute, solver_id)
         committees = sorted_committees(committees)
     elif algorithm == "brute-force":
         committees = __minimaxav_bruteforce(profile, committeesize)
         if resolute:
             committees = [committees[0]]
     else:
-        raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for compute_mav")
+        raise NotImplementedError(
+            "Algorithm " + str(algorithm) + " not specified for compute_minimaxav"
+        )
 
-    opt_mavscore = scores.mavscore(profile, committees[0])
+    opt_minimaxav_score = scores.mavscore(profile, committees[0])
 
     # optional output
     if verbose:
-        print("Minimum maximal distance: " + str(opt_mavscore))
+        print("Minimum maximal distance: " + str(opt_minimaxav_score))
 
         print(str_committees_header(committees, winning=True))
         print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
@@ -776,18 +819,20 @@ def compute_mav(profile, committeesize, algorithm="brute-force", resolute=False,
 
 
 # Lexicographic Minimax Approval Voting
-def compute_lexmav(profile, committeesize, algorithm="brute-force", resolute=False, verbose=0):
+def compute_lexminimaxav(
+    profile, committeesize, algorithm="brute-force", resolute=False, verbose=0
+):
     """Lexicographic Minimax AV"""
     check_enough_approved_candidates(profile, committeesize)
 
     if not profile.has_unit_weights():
         raise ValueError(
-            rules["lexmav"].shortname + " is only defined for unit weights (weight=1)"
+            rules["lexminimaxav"].shortname + " is only defined for unit weights (weight=1)"
         )
 
     if algorithm != "brute-force":
         raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_lexmav"
+            "Algorithm " + str(algorithm) + " not specified for compute_lexminimaxav"
         )
 
     opt_committees = []
@@ -810,7 +855,7 @@ def compute_lexmav(profile, committeesize, algorithm="brute-force", resolute=Fal
 
     # optional output
     if verbose:
-        print(header(rules["lexmav"].longname))
+        print(header(rules["lexminimaxav"].longname))
         if resolute:
             print("Computing only one winning committee (resolute=True)\n")
 
@@ -865,7 +910,7 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
         if algorithm == "gurobi":
             print("Using the Gurobi ILP solver\n")
         if algorithm == "brute-force":
-            print("Using a brute-force algorithm\n")
+            print("Using a brute-force solver_id\n")
     # end of optional output
 
     if not profile.has_unit_weights():
