@@ -803,3 +803,42 @@ def test_cvxpy_wrong_score_fct():
             resolute=False,
             solver_id="glpk_mi",
         )
+
+
+@pytest.mark.parametrize("sizemultiplier", [1, 2, 3, 4, 5])
+def test_revseqpav_fails_EJR(sizemultiplier):
+    # from "A Note on Justified RepresentationUnder the Reverse Sequential PAV rule"
+    # by Haris Aziz
+    # Proposition 2 for k=5
+
+    num_cand = 12
+    # candidates
+    c, x1, x2, x3, x4, x5, x6, y1, y2, y3, y4, y5 = reversed(list(range(num_cand)))
+    # reversed because c should be removed first in case of ties
+    profile = Profile(num_cand)
+    profile.add_voters([{c, x1, x3, x5}] * 4 * sizemultiplier)
+    profile.add_voters([{c, x2, x4, x6}] * 4 * sizemultiplier)
+    profile.add_voters([{x1}, {x2}, {x3}, {x4}, {x5}, {x6}] * sizemultiplier)
+    profile.add_voters([[y1, y2, y3, y4, y5]] * 26 * sizemultiplier)
+    assert len(profile) == 40 * sizemultiplier
+    assert abcrules.compute_revseqpav(profile, 5) == [{y1, y2, y3, y4, y5}]
+
+
+def test_seqphragmen_fails_EJR():
+    # from "Phragmén's Voting Methods and Justified Representation"
+    # by Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner
+
+    num_cand = 14
+    # candidates
+    a, b, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12 = list(range(num_cand))
+    # reversed because c should be removed first in case of ties
+    profile = Profile(num_cand)
+    profile.add_voters([{a, b, c1}] * 2)
+    profile.add_voters([{a, b, c2}] * 2)
+    profile.add_voters([{c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12}] * 6)
+    profile.add_voters([{c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12}] * 5)
+    profile.add_voters([{c3, c4, c5, c6, c7, c8, c9, c10, c11, c12}] * 9)
+    assert len(profile) == 24
+    assert abcrules.compute_seqphragmen(profile, 12) == [
+        {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12}
+    ]
