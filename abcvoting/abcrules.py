@@ -107,6 +107,7 @@ def __init_rules():
                 "ortools_gurobi",
                 "mip_cbc",
                 "mip_gurobi",
+                "brute-force",
             ),
             (True, False),
         ),
@@ -123,6 +124,7 @@ def __init_rules():
                 "ortools_gurobi",
                 "mip_cbc",
                 "mip_gurobi",
+                "brute-force",
             ),
             (True, False),
         ),
@@ -139,6 +141,7 @@ def __init_rules():
                 "ortools_gurobi",
                 "mip_cbc",
                 "mip_gurobi",
+                "brute-force",
             ),
             (True, False),
         ),
@@ -155,6 +158,7 @@ def __init_rules():
                 "ortools_gurobi",
                 "mip_cbc",
                 "mip_gurobi",
+                "brute-force",
             ),
             (True, False),
         ),
@@ -300,14 +304,17 @@ def compute(rule_id, profile, committeesize, **kwargs):
     return rule.compute(profile, committeesize, **kwargs)
 
 
-# computes arbitrary Thiele methods via branch-and-bound
 def compute_thiele_method(
     scorefct_str, profile, committeesize, algorithm="branch-and-bound", resolute=False, verbose=0
 ):
     """Thiele methods
 
-    Compute winning committees of the Thiele method specified
-    by the score function (scorefct_str)
+    Compute winning committees according to a Thiele method specified
+    by a score function (scorefct_str).
+    Examples of Thiele methods are PAV, CC, and SLAV.
+    An exception is Approval Voting (AV), which should be computed using
+    compute_av(). (AV is polynomial-time computable (separable) and can thus be
+    computed much faster.)
     """
     check_enough_approved_candidates(profile, committeesize)
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
@@ -322,6 +329,8 @@ def compute_thiele_method(
             print("Using the Gurobi ILP solver\n")
         if algorithm == "branch-and-bound":
             print("Using a branch-and-bound algorithm\n")
+        if algorithm == "brute-force":
+            print("Using a brute-force algorithm\n")
     # end of optional output
 
     if algorithm == "gurobi":
@@ -333,6 +342,8 @@ def compute_thiele_method(
         committees = __thiele_methods_branchandbound(
             profile, committeesize, scorefct_str, resolute
         )
+    elif algorithm == "brute-force":
+        committees = __thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute)
     elif algorithm.startswith("cvxpy_"):
         committees = abcrules_cvxpy.cvxpy_thiele_methods(
             profile=profile,
@@ -379,11 +390,30 @@ def compute_thiele_method(
     return committees
 
 
-# computes arbitrary Thiele methods via branch-and-bound
+def __thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute):
+    """Brute-force algorithm for computing Thiele methods
+    Only intended for comparison, much slower than __thiele_methods_branchandbound()"""
+    scorefct = scores.get_scorefct(scorefct_str, committeesize)
+
+    opt_committees = []
+    opt_thiele_score = -1
+    for committee in combinations(profile.candidates, committeesize):
+        score = scores.thiele_score(scorefct_str, profile, committee)
+        if score > opt_thiele_score:
+            opt_committees = [committee]
+            opt_thiele_score = score
+        elif score == opt_thiele_score:
+            opt_committees.append(committee)
+
+    committees = sorted_committees(opt_committees)
+    if resolute:
+        return [committees[0]]
+    return committees
+
+
 def __thiele_methods_branchandbound(profile, committeesize, scorefct_str, resolute):
     """Branch-and-bound algorithm to compute winning committees
     for Thiele methods"""
-    check_enough_approved_candidates(profile, committeesize)
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
 
     best_committees = []
@@ -455,7 +485,7 @@ def compute_seqcc(profile, committeesize, algorithm="standard", resolute=True, v
 def compute_sav(profile, committeesize, algorithm="standard", resolute=False, verbose=0):
     """Satisfaction Approval Voting (SAV)"""
     if algorithm == "standard":
-        return __separable("sav", profile, committeesize, resolute, verbose)
+        return compute_separable_rule("sav", profile, committeesize, resolute, verbose)
     else:
         raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for compute_sav")
 
@@ -464,14 +494,13 @@ def compute_sav(profile, committeesize, algorithm="standard", resolute=False, ve
 def compute_av(profile, committeesize, algorithm="standard", resolute=False, verbose=0):
     """Approval Voting"""
     if algorithm == "standard":
-        return __separable("av", profile, committeesize, resolute, verbose)
+        return compute_separable_rule("av", profile, committeesize, resolute, verbose)
     else:
         raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for compute_av")
 
 
-def __separable(rule_id, profile, committeesize, resolute, verbose):
+def compute_separable_rule(rule_id, profile, committeesize, resolute, verbose):
     check_enough_approved_candidates(profile, committeesize)
-
     score = [0] * profile.num_cand
     for voter in profile:
         for cand in voter.approved:
@@ -554,7 +583,6 @@ def __seq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
     number/index (candidates with larger numbers get deleted first).
     """
     committee = []
-
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
 
     # optional output
@@ -690,7 +718,6 @@ def __revseq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
     number/index (candidates with smaller numbers are added first).
     """
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
-
     committee = set(profile.candidates)
 
     # optional output
@@ -771,7 +798,7 @@ def compute_revseq_thiele_method(
     return committees
 
 
-def __minimaxav_bruteforce(profile, committeesize):
+def __minimaxav_bruteforce(profile, committeesize, resolute):
     """Brute-force algorithm for computing Minimax AV (MAV)"""
     opt_committees = []
     opt_minimaxav_score = profile.num_cand + 1
@@ -780,10 +807,13 @@ def __minimaxav_bruteforce(profile, committeesize):
         if score < opt_minimaxav_score:
             opt_committees = [committee]
             opt_minimaxav_score = score
-        elif scores.mavscore(profile, committee) == opt_minimaxav_score:
+        elif score == opt_minimaxav_score:
             opt_committees.append(committee)
 
-    return sorted_committees(opt_committees)
+    committees = sorted_committees(opt_committees)
+    if resolute:
+        return [committees[0]]
+    return committees
 
 
 # Minimax Approval Voting
@@ -817,9 +847,7 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
         committees = abcrules_mip.__mip_minimaxav(profile, committeesize, resolute, solver_id)
         committees = sorted_committees(committees)
     elif algorithm == "brute-force":
-        committees = __minimaxav_bruteforce(profile, committeesize)
-        if resolute:
-            committees = [committees[0]]
+        committees = __minimaxav_bruteforce(profile, committeesize, resolute)
     else:
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_minimaxav"
@@ -964,9 +992,8 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
     return committees
 
 
-# Monroe's rule, computed via (brute-force) matching
 def __monroe_bruteforce(profile, committeesize, resolute):
-    """Brute-force computation of Monroe's rule"""
+    """A brute-force algorithm for computing Monroe's rule"""
     opt_committees = []
     opt_monroescore = -1
     for committee in combinations(profile.candidates, committeesize):
@@ -1003,7 +1030,6 @@ def compute_greedy_monroe(profile, committeesize, algorithm="standard", resolute
     num_voters = len(profile)
     committee = []
 
-    # remaining voters
     remaining_voters = list(range(num_voters))
     remaining_cands = set(profile.candidates)
 
@@ -1093,7 +1119,6 @@ def __seqphragmen_resolute(
     profile, committeesize, division, verbose=0, start_load=None, partial_committee=None
 ):
     """Algorithm for computing resolute seq-Phragmen  (1 winning committee)"""
-
     approvers_weight = {}
     for cand in profile.candidates:
         approvers_weight[cand] = sum(voter.weight for voter in profile if cand in voter.approved)
