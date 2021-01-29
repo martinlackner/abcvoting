@@ -321,7 +321,7 @@ def compute_thiele_method(
         if algorithm == "gurobi":
             print("Using the Gurobi ILP solver\n")
         if algorithm == "branch-and-bound":
-            print("Using a branch-and-bound solver_id\n")
+            print("Using a branch-and-bound algorithm\n")
     # end of optional output
 
     if algorithm == "gurobi":
@@ -381,7 +381,7 @@ def compute_thiele_method(
 
 # computes arbitrary Thiele methods via branch-and-bound
 def __thiele_methods_branchandbound(profile, committeesize, scorefct_str, resolute):
-    """Branch-and-bound solver_id to compute winning committees
+    """Branch-and-bound algorithm to compute winning committees
     for Thiele methods"""
     check_enough_approved_candidates(profile, committeesize)
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
@@ -772,7 +772,7 @@ def compute_revseq_thiele_method(
 
 
 def __minimaxav_bruteforce(profile, committeesize):
-    """Brute-force solver_id for computing Minimax AV (MAV)"""
+    """Brute-force algorithm for computing Minimax AV (MAV)"""
     opt_committees = []
     opt_minimaxav_score = profile.num_cand + 1
     for committee in combinations(profile.candidates, committeesize):
@@ -800,7 +800,7 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
         if algorithm == "gurobi":
             print("Using the Gurobi ILP solver\n")
         if algorithm == "brute-force":
-            print("Using a brute-force solver_id\n")
+            print("Using a brute-force algorithm\n")
     # end of optional output
 
     if algorithm == "gurobi":
@@ -935,7 +935,7 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
         if algorithm == "gurobi":
             print("Using the Gurobi ILP solver\n")
         if algorithm == "brute-force":
-            print("Using a brute-force solver_id\n")
+            print("Using a brute-force algorithm\n")
     # end of optional output
 
     if not profile.has_unit_weights():
