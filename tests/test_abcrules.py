@@ -465,6 +465,14 @@ def test_abcrules__toofewcandidates(rule_id, algorithm, resolute, verbose):
             resolute=resolute,
             verbose=verbose,
         )
+    with pytest.raises(ValueError):
+        abcrules.rules[rule_id].fct(
+            profile,
+            committeesize,
+            algorithm=algorithm,
+            resolute=resolute,
+            verbose=verbose,
+        )
 
 
 def test_abcrules_wrong_rule_id():
@@ -515,6 +523,15 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
 )
 @pytest.mark.parametrize("verbose", [0, 1, 2, 3])
 def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
+    def simple_checks(_committees):
+        if rule_id == "rule-x-without-2nd-phase":
+            assert _committees == [set()]
+            return
+        if resolute:
+            assert len(_committees) == 1
+        else:
+            assert len(_committees) == 6
+
     profile = Profile(4)
     profile.add_voters([{0}, {1}, {2}, {3}])
     committeesize = 2
@@ -522,15 +539,17 @@ def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
     )
+    simple_checks(committees)
 
-    if rule_id == "rule-x-without-2nd-phase":
-        assert committees == [set()]
-        return
-
-    if resolute:
-        assert len(committees) == 1
-    else:
-        assert len(committees) == 6
+    # call abcrules function differently, results should be the same
+    committees = abcrules.rules[rule_id].fct(
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        verbose=verbose,
+    )
+    simple_checks(committees)
 
 
 @pytest.mark.parametrize(
