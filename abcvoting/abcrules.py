@@ -96,7 +96,7 @@ def __init_rules():
             "PAV",
             "Proportional Approval Voting (PAV)",
             compute_pav,
-            # TODO sort by speed, requires testing I guess...
+            # TODO sort by speed, requires testing
             (
                 "gurobi",
                 "branch-and-bound",
@@ -115,7 +115,15 @@ def __init_rules():
             "SLAV",
             "Sainte-Laguë Approval Voting (SLAV)",
             compute_slav,
-            ("gurobi", "branch-and-bound"),
+            # TODO sort by speed, requires testing
+            (
+                "gurobi",
+                "branch-and-bound",
+                "ortools_cbc",
+                "ortools_gurobi",
+                "mip_cbc",
+                "mip_gurobi",
+            ),
             (True, False),
         ),
         (
@@ -123,7 +131,15 @@ def __init_rules():
             "CC",
             "Approval Chamberlin-Courant (CC)",
             compute_cc,
-            ("gurobi", "branch-and-bound"),
+            # TODO sort by speed, requires testing
+            (
+                "gurobi",
+                "branch-and-bound",
+                "ortools_cbc",
+                "ortools_gurobi",
+                "mip_cbc",
+                "mip_gurobi",
+            ),
             (True, False),
         ),
         (
@@ -131,7 +147,15 @@ def __init_rules():
             "2-Geometric",
             "2-Geometric Rule",
             functools.partial(compute_thiele_method, "geom2"),
-            ("gurobi", "branch-and-bound"),
+            # TODO sort by speed, requires testing
+            (
+                "gurobi",
+                "branch-and-bound",
+                "ortools_cbc",
+                "ortools_gurobi",
+                "mip_cbc",
+                "mip_gurobi",
+            ),
             (True, False),
         ),
         (
@@ -203,6 +227,7 @@ def __init_rules():
             "MAV",
             "Minimax Approval Voting (MAV)",
             compute_minimaxav,
+            # TODO sort by speed, requires testing
             (
                 "gurobi",
                 "ortools_cp",
