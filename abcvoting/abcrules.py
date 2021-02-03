@@ -31,23 +31,23 @@ class UnknownRuleIDError(ValueError):
         super(ValueError, self).__init__(message)
 
 
-def is_algorithm_supported(algo):
-    if algo == "gurobi" and not abcrules_gurobi.available:
+def is_algorithm_supported(algorithm):
+    if "gurobi" in algorithm and not abcrules_gurobi.available:
         return False
 
-    if algo in ("glpk_mi", "cbc", "scip", "cvxpy_gurobi"):
+    if algorithm.startswith("cvxpy"):
         if not abcrules_cvxpy.cvxpy_available or not abcrules_cvxpy.numpy_available:
             return False
 
         import cvxpy
 
-        if algo == "glpk_mi" and cvxpy.GLPK_MI not in cvxpy.installed_solvers():
+        if algorithm == "cvxpy_glpk_mi" and cvxpy.GLPK_MI not in cvxpy.installed_solvers():
             return False
-        elif algo == "cbc" and cvxpy.CBC not in cvxpy.installed_solvers():
+        elif algorithm == "cvxpy_cbc" and cvxpy.CBC not in cvxpy.installed_solvers():
             return False
-        elif algo == "scip" and cvxpy.SCIP not in cvxpy.installed_solvers():
+        elif algorithm == "cvxpy_scip" and cvxpy.SCIP not in cvxpy.installed_solvers():
             return False
-        elif algo == "cvxpy_gurobi" and not abcrules_gurobi.available:
+        elif algorithm == "cvxpy_gurobi" and not abcrules_gurobi.available:
             return False
 
     return True
