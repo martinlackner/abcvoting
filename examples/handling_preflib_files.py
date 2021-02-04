@@ -1,11 +1,9 @@
-import sys
 import os
-
-sys.path.insert(0, "..")
 from abcvoting import fileio
 from abcvoting import abcrules
 from abcvoting.misc import str_sets_of_candidates
 from abcvoting.preferences import Profile
+
 
 currdir = os.path.dirname(os.path.abspath(__file__))
 
@@ -20,7 +18,7 @@ fileio.write_profile_to_preflib_toi_file(profile, currdir + "/toi-files/new_exam
 profiles = fileio.load_preflib_files_from_dir(currdir + "/toi-files/", relative_setsize=0.7)
 # Compute PAV for each profile
 committeesize = 2
-for profile in profiles:
+for profile in profiles.values():
     print("Computing a committee of size", committeesize, end=" ")
     print("with the Proportional Approval Voting (PAV) rule")
     print("given a", profile)

@@ -33,14 +33,13 @@ def load_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
             E.g., if a voter has 10 candidates and this value is 0.75,
             then the approval set contains the top 8 candidates.
 
-        Returns:
-            profiles: list
-                a list of profiles (type Profile)
+    Returns:
+        profiles: dict of str: Profile
+            The key is the filename.
     """
     file_dir, files = get_file_names(dir_name)
-    files = [file_dir + f for f in files]
 
-    profiles = []
+    profiles = {}
     if file_dir is not None:
         files = sorted(files)
         for f in files:
@@ -50,8 +49,10 @@ def load_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
                 or f.endswith(".soc")
                 or f.endswith(".toc")
             ):
-                profile = read_preflib_file(f, setsize=setsize, relative_setsize=relative_setsize)
-                profiles.append(profile)
+                profile = read_preflib_file(
+                    file_dir + f, setsize=setsize, relative_setsize=relative_setsize
+                )
+                profiles[f] = profile
 
     return profiles
 
