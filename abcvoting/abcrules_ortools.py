@@ -90,7 +90,7 @@ def _optimize_rule_ortools(
             objective_value = solver.ObjectiveValue()
         else:
             solver = pywraplp.Solver.CreateSolver(solver_id)
-
+            solver.SuppressOutput()
             solver_parameters = pywraplp.MPSolverParameters()
             solver_parameters.SetDoubleParam(
                 pywraplp.MPSolverParameters.PRIMAL_TOLERANCE, ACCURACY
@@ -137,7 +137,7 @@ def _optimize_rule_ortools(
                 f"should not happen (previous optimal score: {maxscore}, "
                 f"new optimal score: {objective_value})."
             )
-        elif objective_value < maxscore:
+        elif objective_value < maxscore - ACCURACY:
             # no longer optimal
             break
 
@@ -190,7 +190,6 @@ def __ortools_thiele_methods(profile, committeesize, scorefct, resolute, solver_
                 )
                 # should be binary. this is guaranteed since the objective
                 # is maximal if all utilitity-values are either 0 or 1.
-                # using vtype=gb.GRB.BINARY does not change result, but makes things slower a bit
 
         # constraint: the committee has the required size
         model.Add(sum(in_committee) == committeesize)

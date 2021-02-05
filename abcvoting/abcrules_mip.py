@@ -95,7 +95,7 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
                 f"should not happen (previous optimal score: {maxscore}, "
                 f"new optimal score: {objective_value})."
             )
-        elif objective_value < maxscore:
+        elif objective_value < maxscore - ACCURACY:
             # no longer optimal
             break
 
