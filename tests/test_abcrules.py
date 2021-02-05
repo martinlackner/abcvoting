@@ -796,13 +796,17 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
         #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
         pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
 
-    if algorithm == "ortools-gurobi" and verbose == 0:
+    if algorithm == "ortools_gurobi" and verbose == 0:
         # TODO or-tools with gurobi repeatedly prints
         #  "Academic license - for non-commercial use only"
         #  (if an acamedic license is used) as well as
         #  "Warning: parameter changes on this environment will not affect existing models."
         #  Thus this test fails.
         pytest.skip("OR Tools prints Gurobi messages")
+
+    if algorithm.startswith("mip_") and verbose == 0:
+        # TODO mip produces lots of output
+        pytest.skip("mip prints loss of messages")
 
     profile = Profile(2)
     profile.add_voters([[0]])
