@@ -50,7 +50,7 @@ jobs:
       run: |
         pip install pytest
         # note that some tests are skipped because Gurobi is not available on Github
-        PYTHONPATH=$PYTHONPATH:$PWD coverage run --source=. -m pytest -k "not mark.gurobi and not mark.scip and not mark.cbc" -ra tests/
+        PYTHONPATH=$PYTHONPATH:$PWD coverage run --source=. -m pytest -m "not gurobi and not scip and not cbc" -ra tests/
 
     - name: Generate coverage report
       run: coverage xml
