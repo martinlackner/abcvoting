@@ -29,6 +29,8 @@ markers = [
     "cbc: a test that requires CBC",
     "cvxpy: a test that requires cvxpy",
     "ortools: a test that requires ortools",
+    "mip: a test that requires mip",
+    "gmpy2: a test that requires gmpy2",
 ]
 
 

@@ -23,9 +23,16 @@ class CollectRules:
             "cvxpy_glpk_mi": [pytest.mark.cvxpy, pytest.mark.glpk_mi],
             "cvxpy_cbc": [pytest.mark.cvxpy, pytest.mark.cbc],
             "cvxpy_gurobi": [pytest.mark.cvxpy, pytest.mark.gurobi],
-            "ortools-cp": [pytest.mark.ortools],
-            "ortools-gurobi": [pytest.mark.ortools, pytest.mark.gurobi],
-            "ortools-scip": [pytest.mark.ortools, pytest.mark.scip],
+            "ortools_cp": [pytest.mark.ortools],
+            "ortools_cbc": [pytest.mark.ortools, pytest.mark.cbc],
+            "ortools_gurobi": [pytest.mark.ortools, pytest.mark.gurobi],
+            "ortools_scip": [pytest.mark.ortools, pytest.mark.scip],
+            "mip_cbc": [pytest.mark.mip],  # does not require cbc because cbc is included in mip
+            "mip_gurobi": [pytest.mark.mip, pytest.mark.gurobi],
+            "brute-force": [],
+            "branch-and-bound": [],
+            "standard": [],
+            "exact-fractions": [],
         }
 
         self.rule_algorithm_resolute = []
@@ -40,8 +47,9 @@ class CollectRules:
                             rule.rule_id, alg, marks=marks[alg]
                         )
                     else:
-                        instance = pytest.param(rule.rule_id, alg, resolute)
-                        instance_no_resolute_param = pytest.param(rule.rule_id, alg)
+                        raise ValueError(
+                            f"Algorithm {alg} not known in unit tests (pytest marks missing)."
+                        )
 
                     self.rule_algorithm_resolute.append(instance)
                     if resolute:
