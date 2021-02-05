@@ -86,3 +86,11 @@ def hamming(set1, set2):
 def header(text, symbol="-"):
     border = symbol[0] * len(text) + "\n"
     return border + text + "\n" + border
+
+
+def check_equal_list_of_committees(list1, list2):
+    if len(list1) != len(list2):
+        return False
+    return all(committee in list1 for committee in list2) and all(
+        committee in list2 for committee in list1
+    )
