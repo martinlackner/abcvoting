@@ -9,6 +9,24 @@ from abcvoting.abcrules_gurobi import __gurobi_thiele_methods
 from abcvoting.preferences import Profile, Voter
 from abcvoting import abcrules, scores
 
+MARKS = {
+    "gurobi": pytest.mark.gurobi,
+    "cvxpy_scip": [pytest.mark.cvxpy, pytest.mark.scip],
+    "cvxpy_glpk_mi": [pytest.mark.cvxpy, pytest.mark.glpk_mi],
+    "cvxpy_cbc": [pytest.mark.cvxpy, pytest.mark.cbc],
+    "cvxpy_gurobi": [pytest.mark.cvxpy, pytest.mark.gurobi],
+    "ortools_cp": [pytest.mark.ortools],
+    "ortools_cbc": [pytest.mark.ortools, pytest.mark.cbc],
+    "ortools_gurobi": [pytest.mark.ortools, pytest.mark.gurobi],
+    "ortools_scip": [pytest.mark.ortools, pytest.mark.scip],
+    "mip_cbc": [pytest.mark.mip],  # does not require cbc because cbc is included in mip
+    "mip_gurobi": [pytest.mark.mip, pytest.mark.gurobi],
+    "brute-force": [],
+    "branch-and-bound": [],
+    "standard": [],
+    "exact-fractions": [],
+}
+
 
 class CollectRules:
     """
@@ -17,38 +35,23 @@ class CollectRules:
     """
 
     def __init__(self):
-        marks = {
-            "gurobi": pytest.mark.gurobi,
-            "cvxpy_scip": [pytest.mark.cvxpy, pytest.mark.scip],
-            "cvxpy_glpk_mi": [pytest.mark.cvxpy, pytest.mark.glpk_mi],
-            "cvxpy_cbc": [pytest.mark.cvxpy, pytest.mark.cbc],
-            "cvxpy_gurobi": [pytest.mark.cvxpy, pytest.mark.gurobi],
-            "ortools_cp": [pytest.mark.ortools],
-            "ortools_cbc": [pytest.mark.ortools, pytest.mark.cbc],
-            "ortools_gurobi": [pytest.mark.ortools, pytest.mark.gurobi],
-            "ortools_scip": [pytest.mark.ortools, pytest.mark.scip],
-            "mip_cbc": [pytest.mark.mip],  # does not require cbc because cbc is included in mip
-            "mip_gurobi": [pytest.mark.mip, pytest.mark.gurobi],
-            "brute-force": [],
-            "branch-and-bound": [],
-            "standard": [],
-            "exact-fractions": [],
-        }
-
         self.rule_algorithm_resolute = []
         self.rule_algorithm_onlyresolute = []
         self.rule_algorithm_onlyirresolute = []
         for rule in abcrules.rules.values():
-            for alg in rule.algorithms:
+            for algorithm in rule.algorithms:
                 for resolute in rule.resolute:
-                    if alg in marks:
-                        instance = pytest.param(rule.rule_id, alg, resolute, marks=marks[alg])
+                    if algorithm in MARKS:
+                        instance = pytest.param(
+                            rule.rule_id, algorithm, resolute, marks=MARKS[algorithm]
+                        )
                         instance_no_resolute_param = pytest.param(
-                            rule.rule_id, alg, marks=marks[alg]
+                            rule.rule_id, algorithm, marks=MARKS[algorithm]
                         )
                     else:
                         raise ValueError(
-                            f"Algorithm {alg} not known in unit tests (pytest marks missing)."
+                            f"Algorithm {algorithm} not known in unit tests "
+                            f"(pytest marks are missing)."
                         )
 
                     self.rule_algorithm_resolute.append(instance)
@@ -604,7 +607,14 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
         assert committees == [{0, 1, 2}]
 
 
-@pytest.mark.parametrize("algorithm", abcrules.rules["monroe"].algorithms)
+@pytest.mark.parametrize(
+    "algorithm",
+    [
+        pytest.param(algorithm, marks=MARKS[algorithm])
+        for algorithm in abcrules.rules["monroe"].algorithms
+    ],
+    ids=idfn,
+)
 def test_monroe_indivisible(algorithm):
     profile = Profile(4)
     profile.add_voters([[0], [0], [0], [1, 2], [1, 2], [1], [3]])
@@ -615,8 +625,14 @@ def test_monroe_indivisible(algorithm):
     ) == [{0, 1, 2}, {0, 1, 3}, {0, 2, 3}]
 
 
-@pytest.mark.gurobi
-@pytest.mark.parametrize("algorithm", abcrules.rules["optphrag"].algorithms)
+@pytest.mark.parametrize(
+    "algorithm",
+    [
+        pytest.param(algorithm, marks=MARKS[algorithm])
+        for algorithm in abcrules.rules["optphrag"].algorithms
+    ],
+    ids=idfn,
+)
 def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
     # this test shows that lexicographic optimization is not (yet)
     # implemented for opt-Phragmen (as it is described in
@@ -627,7 +643,7 @@ def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
     committeesize = 3
 
     # without lexicographic optimization, this profile has 12 winning committees
-    # (with lexicographic optimization only [0, 1, 2] is winning)
+    # (with lexicographic optimization only {0, 1, 2} is winning)
     assert (
         len(
             abcrules.rules["optphrag"].compute(
@@ -723,14 +739,18 @@ def test_consensus_fails_lower_quota():
     # are contained in a winning committee.
 
 
-@pytest.mark.parametrize("rule_id, algorithm", testrules.rule_algorithm_onlyirresolute, ids=idfn)
+@pytest.mark.parametrize(
+    "rule_id, algorithm",
+    [
+        pytest.param(rule_id, algorithm, marks=MARKS[algorithm])
+        for rule_id in ["phrag-enestr", "seqphrag", "pav", "seqpav", "revseqpav"]
+        for algorithm in abcrules.rules[rule_id].algorithms
+    ],
+    ids=idfn,
+)
 def test_jansonexamples(rule_id, algorithm):
     # example from Janson's survey (https://arxiv.org/pdf/1611.08826.pdf),
     # Example 3.7, 18.1
-
-    if rule_id not in ["phragm-enestr", "seqphrag", "pav", "seqpav", "revseqpav"]:
-        return
-
     profile = Profile(6)
     a = 0
     b = 1
@@ -806,7 +826,7 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
 
     if algorithm.startswith("mip_") and verbose == 0:
         # TODO mip produces lots of output
-        pytest.skip("mip prints loss of messages")
+        pytest.skip("mip prints lots of messages")
 
     profile = Profile(2)
     profile.add_voters([[0]])
