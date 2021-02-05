@@ -27,7 +27,6 @@ jobs:
         pip install -r requirements.txt
 
         # these are optional requirements, but we want GLPK_MI to be installed to run more unitests
-        pip install numpy
         pip install cvxpy
         pip install cvxopt
 
