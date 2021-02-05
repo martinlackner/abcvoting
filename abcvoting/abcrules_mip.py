@@ -38,16 +38,16 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
     committees = []
 
     if solver_id == "gurobi":
-        solver = mip.GUROBI
+        solver_id = "GRB"
     elif solver_id in ["cbc"]:
-        solver = mip.CBC
+        solver_id = "CBC"
     else:
         raise ValueError(f"Solver {solver_id} not known in MIP.")
 
     # TODO add a max iterations parameter with fancy default value which works in almost all
     #  cases to avoid endless hanging computations, e.g. when CI runs the tests
     while True:
-        model = mip.Model()
+        model = mip.Model(solver_name=solver_id)
 
         # `in_committee` is a binary variable indicating whether `cand` is in the committee
         in_committee = [
