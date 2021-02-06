@@ -74,10 +74,9 @@ class ABCRule:
         return self.fct(profile, committeesize, **kwargs)
 
     def fastest_algo(self):
-        for algo in self.algorithms:
-            if not is_algorithm_supported(algo):
-                continue
-            return algo
+        for algorithm in self.algorithms:
+            if is_algorithm_supported(algorithm):
+                return algorithm
 
 
 def __init_rules():
@@ -195,7 +194,7 @@ def __init_rules():
             (True, False),
         ),
         (
-            "seqphrag",
+            "seqphrag",  # TODO: rename to seqphragmen
             "seq-Phragmén",
             "Phragmén's Sequential Rule (seq-Phragmén)",
             compute_seqphragmen,
@@ -203,7 +202,7 @@ def __init_rules():
             (True, False),
         ),
         (
-            "optphrag",
+            "optphrag",  # TODO: rename to optphragmen
             "opt-Phragmén",
             "Phragmén's Optimization Rule (opt-Phragmén)",
             compute_optphragmen,
@@ -284,7 +283,6 @@ def __init_rules():
             (True, False),
         ),
     ]
-    # TODO: add other thiele methods
 
     rulesdict = {}
     for ruleinfo in __RULESINFO:
@@ -332,6 +330,9 @@ def compute_thiele_method(
         if algorithm == "brute-force":
             print("Using a brute-force algorithm\n")
     # end of optional output
+
+    if algorithm == "fastest":
+        algorithm = rules[scorefct_str].fastest_algo()
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi.__gurobi_thiele_methods(
@@ -484,6 +485,8 @@ def compute_seqcc(profile, committeesize, algorithm="standard", resolute=True, v
 
 def compute_sav(profile, committeesize, algorithm="standard", resolute=False, verbose=0):
     """Satisfaction Approval Voting (SAV)"""
+    if algorithm == "fastest":
+        algorithm = rules["sav"].fastest_algo()
     if algorithm == "standard":
         return compute_separable_rule("sav", profile, committeesize, resolute, verbose)
     else:
@@ -493,6 +496,8 @@ def compute_sav(profile, committeesize, algorithm="standard", resolute=False, ve
 # Approval Voting (AV)
 def compute_av(profile, committeesize, algorithm="standard", resolute=False, verbose=0):
     """Approval Voting"""
+    if algorithm == "fastest":
+        algorithm = rules["av"].fastest_algo()
     if algorithm == "standard":
         return compute_separable_rule("av", profile, committeesize, resolute, verbose)
     else:
@@ -651,6 +656,8 @@ def compute_seq_thiele_method(
 
     check_enough_approved_candidates(profile, committeesize)
 
+    if algorithm == "fastest":
+        algorithm = rules["seq" + scorefct_str].fastest_algo()
     if algorithm != "standard":
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_seq_thiele_method"
@@ -762,6 +769,8 @@ def compute_revseq_thiele_method(
     """Reverse sequential Thiele methods"""
     check_enough_approved_candidates(profile, committeesize)
 
+    if algorithm == "fastest":
+        algorithm = rules["revseq" + scorefct_str].fastest_algo()
     if algorithm != "standard":
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_revseq_thiele_method"
@@ -833,6 +842,9 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
             print("Using a brute-force algorithm\n")
     # end of optional output
 
+    if algorithm == "fastest":
+        algorithm = rules["mav"].fastest_algo()
+
     if algorithm == "gurobi":
         committees = abcrules_gurobi.__gurobi_minimaxav(profile, committeesize, resolute)
         committees = sorted_committees(committees)
@@ -882,6 +894,9 @@ def compute_lexminimaxav(
         raise ValueError(
             rules["lexminimaxav"].shortname + " is only defined for unit weights (weight=1)"
         )
+
+    if algorithm == "fastest":
+        algorithm = rules["lexminimaxav"].fastest_algo()
 
     if algorithm != "brute-force":
         raise NotImplementedError(
@@ -971,6 +986,9 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
             rules["monroe"].shortname + " is only defined for unit weights (weight=1)"
         )
 
+    if algorithm == "fastest":
+        algorithm = rules["monroe"].fastest_algo()
+
     if algorithm == "gurobi":
         committees = abcrules_gurobi.__gurobi_monroe(profile, committeesize, resolute)
         committees = sorted_committees(committees)
@@ -1021,6 +1039,9 @@ def compute_greedy_monroe(profile, committeesize, algorithm="standard", resolute
 
     if not resolute:
         raise NotImplementedError("compute_greedy_monroe does not support resolute=False.")
+
+    if algorithm == "fastest":
+        algorithm = rules["greedy-monroe"].fastest_algo()
 
     if algorithm != "standard":
         raise NotImplementedError(
@@ -1250,6 +1271,9 @@ def compute_seqphragmen(
     """Phragmen's sequential rule (seq-Phragmen)"""
     check_enough_approved_candidates(profile, committeesize)
 
+    if algorithm == "fastest":
+        algorithm = rules["seqphrag"].fastest_algo()
+
     if algorithm == "standard":
         division = lambda x, y: x / y  # standard float division
     elif algorithm == "exact-fractions":
@@ -1329,6 +1353,9 @@ def compute_rule_x(
         raise ValueError(
             rules["rule-x"].shortname + " is only defined for unit weights (weight=1)"
         )
+
+    if algorithm == "fastest":
+        algorithm = rules["rule-x"].fastest_algo()
 
     if algorithm == "standard":
         division = lambda x, y: x / y  # standard float division
@@ -1508,6 +1535,9 @@ def compute_optphragmen(profile, committeesize, algorithm="gurobi", resolute=Fal
             print("Using the Gurobi ILP solver")
     # end of optional output
 
+    if algorithm == "fastest":
+        algorithm = rules["optphrag"].fastest_algo()
+
     if algorithm != "gurobi":
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_optphragmen"
@@ -1542,6 +1572,9 @@ def compute_phragmen_enestroem(
         raise ValueError(
             rules["phrag-enestr"].shortname + " is only defined for unit weights (weight=1)"
         )
+
+    if algorithm == "fastest":
+        algorithm = rules["phrag-enestr"].fastest_algo()
 
     if algorithm == "standard":
         division = lambda x, y: x / y  # standard float division
@@ -1618,6 +1651,9 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard", resolut
     In Proceedings of the 34th AAAI Conference on Artificial Intelligence (AAAI 2020)
     """
     check_enough_approved_candidates(profile, committeesize)
+
+    if algorithm == "fastest":
+        algorithm = rules["consensus"].fastest_algo()
 
     if algorithm == "standard":
         division = lambda x, y: x / y  # standard float division

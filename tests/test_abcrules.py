@@ -25,6 +25,7 @@ MARKS = {
     "branch-and-bound": [],
     "standard": [],
     "exact-fractions": [],
+    "fastest": [],
 }
 
 
@@ -39,7 +40,7 @@ class CollectRules:
         self.rule_algorithm_onlyresolute = []
         self.rule_algorithm_onlyirresolute = []
         for rule in abcrules.rules.values():
-            for algorithm in rule.algorithms:
+            for algorithm in list(rule.algorithms) + ["fastest"]:
                 for resolute in rule.resolute:
                     if algorithm in MARKS:
                         instance = pytest.param(
@@ -798,6 +799,8 @@ def test_fastest_algorithms(rule):
         pytest.skip("no supported algorithms for " + rule.shortname)
     for resolute in rule.resolute:
         rule.compute(profile, committeesize, algorithm=algo, resolute=resolute)
+    # second possibility
+    abcrules.compute(rule.rule_id, profile, committeesize, algorithm="fastest")
 
 
 @pytest.mark.parametrize(
