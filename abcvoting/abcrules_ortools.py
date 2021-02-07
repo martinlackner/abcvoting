@@ -7,7 +7,6 @@ from ortools.sat.python import cp_model
 from ortools.linear_solver import pywraplp
 from abcvoting.misc import sorted_committees
 
-
 ACCURACY = 1e-9
 
 
@@ -111,7 +110,7 @@ def _optimize_rule_ortools(
                 committeesize,
                 committees,
                 scorefct,
-                cp_formulation=cp_formulation,
+                cp_formulation,
             )
 
             status = solver.Solve(solver_parameters)
@@ -158,7 +157,7 @@ def _optimize_rule_ortools(
     return committees
 
 
-def __ortools_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
+def _ortools_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
     def set_opt_model_func(
         model,
         profile,
@@ -166,7 +165,7 @@ def __ortools_thiele_methods(profile, committeesize, scorefct, resolute, solver_
         committeesize,
         previously_found_committees,
         scorefct,
-        cp_formulation=False,
+        cp_formulation,
     ):
         if cp_formulation:
             raise NotImplementedError("cp-sat solver not supported")
@@ -232,7 +231,7 @@ def __ortools_thiele_methods(profile, committeesize, scorefct, resolute, solver_
     return sorted_committees(committees)
 
 
-def __ortools_minimaxav(profile, committeesize, resolute, solver_id):
+def _ortools_monroe(profile, committeesize, resolute, solver_id):
     def set_opt_model_func(
         model,
         profile,
@@ -240,7 +239,90 @@ def __ortools_minimaxav(profile, committeesize, resolute, solver_id):
         committeesize,
         previously_found_committees,
         scorefct,
-        cp_formulation=True,
+        cp_formulation,
+    ):
+        if not cp_formulation:
+            raise NotImplementedError("Only cp-sat solver supported")
+
+        num_voters = len(profile)
+
+        # optimization goal: variable "satisfaction"
+        satisfaction = max_hamming_distance = model.NewIntVar(
+            lb=0, ub=num_voters, name="satisfaction"
+        )
+
+        model.Add(sum(in_committee[cand] for cand in profile.candidates) == committeesize)
+
+        # a partition of voters into committeesize many sets
+        partition = {
+            (cand, voter): model.NewBoolVar(name=f"partition{cand}-{voter}")
+            for cand in profile.candidates
+            for voter in range(num_voters)
+        }
+
+        for i in range(len(profile)):
+            # every voter has to be part of a voter partition set
+            model.Add(sum(partition[(cand, i)] for cand in profile.candidates) == 1)
+        for cand in profile.candidates:
+            # every voter set in the partition has to contain
+            # at least (num_voters // committeesize) candidates
+            model.Add(
+                sum(partition[(cand, j)] for j in range(len(profile)))
+                >= (num_voters // committeesize - num_voters * (1 - in_committee[cand]))
+            )
+            # every voter set in the partition has to contain
+            # at most ceil(num_voters/committeesize) candidates
+            model.Add(
+                sum(partition[(cand, j)] for j in range(len(profile)))
+                <= (
+                    num_voters // committeesize
+                    + bool(num_voters % committeesize)
+                    + num_voters * (1 - in_committee[cand])
+                )
+            )
+            # if in_committee[i] = 0 then partition[(i,j) = 0
+            model.Add(
+                sum(partition[(cand, j)] for j in range(len(profile)))
+                <= num_voters * in_committee[cand]
+            )
+
+        # constraint for objective variable "satisfaction"
+        model.Add(
+            sum(
+                partition[(cand, j)] * (cand in profile[j].approved)
+                for j in range(len(profile))
+                for cand in profile.candidates
+            )
+            >= satisfaction
+        )
+
+        # find a new committee that has not been found before
+        for committee in previously_found_committees:
+            model.Add(sum(in_committee[cand] for cand in committee) <= committeesize - 1)
+
+        # optimization objective
+        model.Maximize(satisfaction)
+
+    committees = _optimize_rule_ortools(
+        set_opt_model_func,
+        profile,
+        committeesize,
+        scorefct=None,
+        resolute=resolute,
+        solver_id=solver_id,
+    )
+    return sorted_committees(committees)
+
+
+def _ortools_minimaxav(profile, committeesize, resolute, solver_id):
+    def set_opt_model_func(
+        model,
+        profile,
+        in_committee,
+        committeesize,
+        previously_found_committees,
+        scorefct,
+        cp_formulation,
     ):
 
         if cp_formulation:

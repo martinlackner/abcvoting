@@ -5,7 +5,7 @@ Unit tests for abcrules.py and abcrules_gurobi.py and abcrules_cvxpy.py
 import pytest
 
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
-from abcvoting.abcrules_gurobi import __gurobi_thiele_methods
+from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
 from abcvoting.preferences import Profile, Voter
 from abcvoting import abcrules, scores
 
@@ -705,7 +705,7 @@ def test_gurobi_cant_compute_av():
     scorefct = scores.get_scorefct("av", committeesize)
 
     with pytest.raises(ValueError):
-        __gurobi_thiele_methods(profile, committeesize, scorefct, resolute=False)
+        _gurobi_thiele_methods(profile, committeesize, scorefct, resolute=False)
 
 
 @pytest.mark.cvxpy

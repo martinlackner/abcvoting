@@ -99,7 +99,7 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct, 
     return committees
 
 
-def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
+def _gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
     def set_opt_model_func(
         m, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):
@@ -159,14 +159,14 @@ def __gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
     return sorted_committees(committees)
 
 
-def __gurobi_monroe(profile, committeesize, resolute):
+def _gurobi_monroe(profile, committeesize, resolute):
     def set_opt_model_func(
         m, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):
         num_voters = len(profile)
 
         # optimization goal: variable "satisfaction"
-        satisfaction = m.addVar(vtype=gb.GRB.INTEGER, name="satisfaction")
+        satisfaction = m.addVar(ub=num_voters, vtype=gb.GRB.INTEGER, name="satisfaction")
 
         m.addConstr(
             gb.quicksum(in_committee[cand] for cand in profile.candidates) == committeesize
@@ -178,10 +178,7 @@ def __gurobi_monroe(profile, committeesize, resolute):
         )
         for i in range(len(profile)):
             # every voter has to be part of a voter partition set
-            m.addConstr(
-                gb.quicksum(partition[(cand, i)] for cand in profile.candidates)
-                == profile[i].weight
-            )
+            m.addConstr(gb.quicksum(partition[(cand, i)] for cand in profile.candidates) == 1)
         for cand in profile.candidates:
             # every voter set in the partition has to contain
             # at least (num_voters // committeesize) candidates
@@ -228,7 +225,7 @@ def __gurobi_monroe(profile, committeesize, resolute):
     return sorted_committees(committees)
 
 
-def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
+def _gurobi_optphragmen(profile, committeesize, resolute, verbose):
     """opt-Phragmen
 
     Warning: does not include the lexicographic optimization as specified
@@ -286,7 +283,7 @@ def __gurobi_optphragmen(profile, committeesize, resolute, verbose):
     return sorted_committees(committees)
 
 
-def __gurobi_minimaxav(profile, committeesize, resolute):
+def _gurobi_minimaxav(profile, committeesize, resolute):
     def set_opt_model_func(
         m, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):

@@ -24,7 +24,7 @@ CVXPY_ACCURACY = 1e-7
 
 
 def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, solver_id):
-    """Compute thiele method using CVXPY. This is similar to `__gurobi_thiele_methods()`,
+    """Compute thiele method using CVXPY. This is similar to `_gurobi_thiele_methods()`,
     where `gurobipy` is used as interface to Gurobi. This method supports Gurobi too, but also
     other solvers.
 
@@ -41,7 +41,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, solver_
     solver_id : str
         must be one of: 'glpk_mi', 'cbc', 'scip', 'cvxpy_gurobi'
         'cvxpy_gurobi' uses Gurobi in the background, similar to
-        `abcrules_gurobi.__gurobi_thiele_methods()`, but using the CVXPY interface instead of
+        `abcrules_gurobi._gurobi_thiele_methods()`, but using the CVXPY interface instead of
         gurobipy.
 
     Returns
@@ -82,7 +82,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, solver_
         # committee, i.e. in row i the first l values are true if i approves l candidates in the
         # committee and all other values are false.
         # explicitly setting boolean=True is not necessary, can be skipped and is then implicit
-        # also true as done in abcrules_gurobi.__gurobi_thiele_methods()
+        # also true as done in abcrules_gurobi._gurobi_thiele_methods()
         utility = cp.Variable((len(profile), committeesize), boolean=True)
 
         # left-hand-side and right-hand-side of the equality constraints:

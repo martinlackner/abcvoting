@@ -79,8 +79,8 @@ class ABCRule:
                 return algorithm
 
 
-def __init_rules():
-    __RULESINFO = [
+def _init_rules():
+    _RULESINFO = [
         ("av", "AV", "Approval Voting (AV)", compute_av, ("standard",), (True, False)),
         (
             "sav",
@@ -214,7 +214,7 @@ def __init_rules():
             "Monroe",
             "Monroe's Approval Rule (Monroe)",
             compute_monroe,
-            ("gurobi", "brute-force"),
+            ("gurobi", "ortools_cp", "brute-force"),
             (True, False),
         ),
         (
@@ -285,7 +285,7 @@ def __init_rules():
     ]
 
     rulesdict = {}
-    for ruleinfo in __RULESINFO:
+    for ruleinfo in _RULESINFO:
         rulesdict[ruleinfo[0]] = ABCRule(*ruleinfo)
 
     return rulesdict
@@ -335,16 +335,14 @@ def compute_thiele_method(
         algorithm = rules[scorefct_str].fastest_algo()
 
     if algorithm == "gurobi":
-        committees = abcrules_gurobi.__gurobi_thiele_methods(
+        committees = abcrules_gurobi._gurobi_thiele_methods(
             profile, committeesize, scorefct, resolute
         )
         committees = sorted_committees(committees)
     elif algorithm == "branch-and-bound":
-        committees = __thiele_methods_branchandbound(
-            profile, committeesize, scorefct_str, resolute
-        )
+        committees = _thiele_methods_branchandbound(profile, committeesize, scorefct_str, resolute)
     elif algorithm == "brute-force":
-        committees = __thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute)
+        committees = _thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute)
     elif algorithm.startswith("cvxpy_"):
         committees = abcrules_cvxpy.cvxpy_thiele_methods(
             profile=profile,
@@ -362,7 +360,7 @@ def compute_thiele_method(
             solver_id=algorithm[4:],
         )
     elif algorithm.startswith("ortools_"):
-        committees = abcrules_ortools.__ortools_thiele_methods(
+        committees = abcrules_ortools._ortools_thiele_methods(
             profile,
             committeesize,
             scorefct=scorefct,
@@ -391,9 +389,9 @@ def compute_thiele_method(
     return committees
 
 
-def __thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute):
+def _thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute):
     """Brute-force algorithm for computing Thiele methods
-    Only intended for comparison, much slower than __thiele_methods_branchandbound()"""
+    Only intended for comparison, much slower than _thiele_methods_branchandbound()"""
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
 
     opt_committees = []
@@ -412,7 +410,7 @@ def __thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute):
     return committees
 
 
-def __thiele_methods_branchandbound(profile, committeesize, scorefct_str, resolute):
+def _thiele_methods_branchandbound(profile, committeesize, scorefct_str, resolute):
     """Branch-and-bound algorithm to compute winning committees
     for Thiele methods"""
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
@@ -581,7 +579,7 @@ def compute_separable_rule(rule_id, profile, committeesize, resolute, verbose):
     return committees
 
 
-def __seq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
+def _seq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
     """Compute a *resolute* reverse sequential Thiele method
 
     Tiebreaking between candidates in favor of candidate with smaller
@@ -626,7 +624,7 @@ def __seq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
     return [sorted(committee)]
 
 
-def __seq_thiele_irresolute(profile, committeesize, scorefct_str):
+def _seq_thiele_irresolute(profile, committeesize, scorefct_str):
     """Compute an *irresolute* reverse sequential Thiele method
 
     Consider all possible ways to break ties between candidates
@@ -671,9 +669,9 @@ def compute_seq_thiele_method(
     # end of optional output
 
     if resolute:
-        committees = __seq_thiele_resolute(profile, committeesize, scorefct_str, verbose=verbose)
+        committees = _seq_thiele_resolute(profile, committeesize, scorefct_str, verbose=verbose)
     else:
-        committees = __seq_thiele_irresolute(profile, committeesize, scorefct_str)
+        committees = _seq_thiele_irresolute(profile, committeesize, scorefct_str)
 
     # optional output
     if verbose:
@@ -691,7 +689,7 @@ def compute_seq_thiele_method(
     return sorted_committees(committees)
 
 
-def __revseq_thiele_irresolute(profile, committeesize, scorefct_str):
+def _revseq_thiele_irresolute(profile, committeesize, scorefct_str):
     """Compute an *irresolute* sequential Thiele method
 
     Consider all possible ways to break ties between candidates
@@ -718,7 +716,7 @@ def __revseq_thiele_irresolute(profile, committeesize, scorefct_str):
     return sorted_committees(list(comm_scores.keys()))
 
 
-def __revseq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
+def _revseq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
     """Compute a *resolute* reverse sequential Thiele method
 
     Tiebreaking between candidates in favor of candidate with smaller
@@ -784,11 +782,9 @@ def compute_revseq_thiele_method(
     # end of optional output
 
     if resolute:
-        committees = __revseq_thiele_resolute(
-            profile, committeesize, scorefct_str, verbose=verbose
-        )
+        committees = _revseq_thiele_resolute(profile, committeesize, scorefct_str, verbose=verbose)
     else:
-        committees = __revseq_thiele_irresolute(profile, committeesize, scorefct_str)
+        committees = _revseq_thiele_irresolute(profile, committeesize, scorefct_str)
 
     # optional output
     if verbose:
@@ -807,7 +803,7 @@ def compute_revseq_thiele_method(
     return committees
 
 
-def __minimaxav_bruteforce(profile, committeesize, resolute):
+def _minimaxav_bruteforce(profile, committeesize, resolute):
     """Brute-force algorithm for computing Minimax AV (MAV)"""
     opt_committees = []
     opt_minimaxav_score = profile.num_cand + 1
@@ -846,20 +842,20 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
         algorithm = rules["minimaxav"].fastest_algo()
 
     if algorithm == "gurobi":
-        committees = abcrules_gurobi.__gurobi_minimaxav(profile, committeesize, resolute)
+        committees = abcrules_gurobi._gurobi_minimaxav(profile, committeesize, resolute)
         committees = sorted_committees(committees)
     elif algorithm.startswith("ortools_"):
         solver_id = algorithm[8:]
-        committees = abcrules_ortools.__ortools_minimaxav(
+        committees = abcrules_ortools._ortools_minimaxav(
             profile, committeesize, resolute, solver_id
         )
         committees = sorted_committees(committees)
     elif algorithm.startswith("mip_"):
         solver_id = algorithm[4:]
-        committees = abcrules_mip.__mip_minimaxav(profile, committeesize, resolute, solver_id)
+        committees = abcrules_mip._mip_minimaxav(profile, committeesize, resolute, solver_id)
         committees = sorted_committees(committees)
     elif algorithm == "brute-force":
-        committees = __minimaxav_bruteforce(profile, committeesize, resolute)
+        committees = _minimaxav_bruteforce(profile, committeesize, resolute)
     else:
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_minimaxav"
@@ -990,10 +986,14 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
         algorithm = rules["monroe"].fastest_algo()
 
     if algorithm == "gurobi":
-        committees = abcrules_gurobi.__gurobi_monroe(profile, committeesize, resolute)
+        committees = abcrules_gurobi._gurobi_monroe(profile, committeesize, resolute)
+        committees = sorted_committees(committees)
+    elif algorithm.startswith("ortools_"):
+        solver_id = algorithm[8:]
+        committees = abcrules_ortools._ortools_monroe(profile, committeesize, resolute, solver_id)
         committees = sorted_committees(committees)
     elif algorithm == "brute-force":
-        committees = __monroe_bruteforce(profile, committeesize, resolute)
+        committees = _monroe_bruteforce(profile, committeesize, resolute)
     else:
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_monroe"
@@ -1010,7 +1010,7 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
     return committees
 
 
-def __monroe_bruteforce(profile, committeesize, resolute):
+def _monroe_bruteforce(profile, committeesize, resolute):
     """A brute-force algorithm for computing Monroe's rule"""
     opt_committees = []
     opt_monroescore = -1
@@ -1136,7 +1136,7 @@ def compute_greedy_monroe(profile, committeesize, algorithm="standard", resolute
     return sorted_committees(committees)
 
 
-def __seqphragmen_resolute(
+def _seqphragmen_resolute(
     profile, committeesize, division, verbose=0, start_load=None, partial_committee=None
 ):
     """Algorithm for computing resolute seq-Phragmen  (1 winning committee)"""
@@ -1211,7 +1211,7 @@ def __seqphragmen_resolute(
     return [committee], comm_loads
 
 
-def __seqphragmen_irresolute(
+def _seqphragmen_irresolute(
     profile, committeesize, division, start_load=None, partial_committee=None
 ):
     """Algorithm for computing irresolute seq-Phragmen (>=1 winning committees)"""
@@ -1291,11 +1291,11 @@ def compute_seqphragmen(
     # end of optional output
 
     if resolute:
-        committees, comm_loads = __seqphragmen_resolute(
+        committees, comm_loads = _seqphragmen_resolute(
             profile, committeesize, division, verbose=verbose
         )
     else:
-        committees, comm_loads = __seqphragmen_irresolute(profile, committeesize, division)
+        committees, comm_loads = _seqphragmen_irresolute(profile, committeesize, division)
 
     # optional output
     if verbose:
@@ -1316,7 +1316,7 @@ def compute_seqphragmen(
     return sorted_committees(committees)
 
 
-def __rule_x_get_min_q(profile, budget, cand, division):
+def _rule_x_get_min_q(profile, budget, cand, division):
     rich = set([v for v, voter in enumerate(profile) if cand in voter.approved])
     poor = set()
 
@@ -1394,7 +1394,7 @@ def compute_rule_x(
             curr_cands = set(profile.candidates) - committee
             min_q = {}
             for cand in curr_cands:
-                q = __rule_x_get_min_q(profile, budget, cand, division)
+                q = _rule_x_get_min_q(profile, budget, cand, division)
                 if q is not None:
                     min_q[cand] = q
 
@@ -1461,7 +1461,7 @@ def compute_rule_x(
                     # end of optional output
 
                     if resolute:
-                        committees, _ = __seqphragmen_resolute(
+                        committees, _ = _seqphragmen_resolute(
                             profile,
                             committeesize,
                             division,
@@ -1470,7 +1470,7 @@ def compute_rule_x(
                             start_load=start_load,
                         )
                     else:
-                        committees, _ = __seqphragmen_irresolute(
+                        committees, _ = _seqphragmen_irresolute(
                             profile,
                             committeesize,
                             division,
@@ -1543,7 +1543,7 @@ def compute_optphragmen(profile, committeesize, algorithm="gurobi", resolute=Fal
             "Algorithm " + str(algorithm) + " not specified for compute_optphragmen"
         )
 
-    committees = abcrules_gurobi.__gurobi_optphragmen(
+    committees = abcrules_gurobi._gurobi_optphragmen(
         profile, committeesize, resolute=resolute, verbose=verbose
     )
     committees = sorted_committees(committees)
@@ -1716,4 +1716,4 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard", resolut
     return committees
 
 
-rules = __init_rules()
+rules = _init_rules()

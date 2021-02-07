@@ -172,7 +172,7 @@ def _mip_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
     return sorted_committees(committees)
 
 
-def __mip_minimaxav(profile, committeesize, resolute, solver_id):
+def _mip_minimaxav(profile, committeesize, resolute, solver_id):
     def set_opt_model_func(
         model, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):
