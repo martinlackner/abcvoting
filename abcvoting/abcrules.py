@@ -194,7 +194,7 @@ def __init_rules():
             (True, False),
         ),
         (
-            "seqphrag",  # TODO: rename to seqphragmen
+            "seqphragmen",
             "seq-Phragmén",
             "Phragmén's Sequential Rule (seq-Phragmén)",
             compute_seqphragmen,
@@ -202,7 +202,7 @@ def __init_rules():
             (True, False),
         ),
         (
-            "optphrag",  # TODO: rename to optphragmen
+            "optphragmen",
             "opt-Phragmén",
             "Phragmén's Optimization Rule (opt-Phragmén)",
             compute_optphragmen,
@@ -226,8 +226,8 @@ def __init_rules():
             (True,),
         ),
         (
-            "mav",
-            "MAV",
+            "minimaxav",
+            "minimaxav",
             "Minimax Approval Voting (MAV)",
             compute_minimaxav,
             # TODO sort by speed, requires testing
@@ -267,7 +267,7 @@ def __init_rules():
             (True, False),
         ),
         (
-            "phrag-enestr",
+            "phragmen-enestroem",
             "Phragmén-Eneström",
             "Method of Phragmén-Eneström",
             compute_phragmen_enestroem,
@@ -275,8 +275,8 @@ def __init_rules():
             (True, False),
         ),
         (
-            "consensus",
-            "Consensus",
+            "consensus-rule",
+            "Consensus Rule",
             "Consensus Rule",
             compute_consensus_rule,
             ("standard", "exact-fractions"),
@@ -832,7 +832,7 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
 
     # optional output
     if verbose:
-        print(header(rules["mav"].longname))
+        print(header(rules["minimaxav"].longname))
         if resolute:
             print("Computing only one winning committee (resolute=True)\n")
     if verbose >= 3:
@@ -843,7 +843,7 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
     # end of optional output
 
     if algorithm == "fastest":
-        algorithm = rules["mav"].fastest_algo()
+        algorithm = rules["minimaxav"].fastest_algo()
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi.__gurobi_minimaxav(profile, committeesize, resolute)
@@ -1272,7 +1272,7 @@ def compute_seqphragmen(
     check_enough_approved_candidates(profile, committeesize)
 
     if algorithm == "fastest":
-        algorithm = rules["seqphrag"].fastest_algo()
+        algorithm = rules["seqphragmen"].fastest_algo()
 
     if algorithm == "standard":
         division = lambda x, y: x / y  # standard float division
@@ -1285,7 +1285,7 @@ def compute_seqphragmen(
 
     # optional output
     if verbose:
-        print(header(rules["seqphrag"].longname))
+        print(header(rules["seqphragmen"].longname))
         if resolute:
             print("Computing only one winning committee (resolute=True)\n")
     # end of optional output
@@ -1527,7 +1527,7 @@ def compute_optphragmen(profile, committeesize, algorithm="gurobi", resolute=Fal
 
     # optional output
     if verbose:
-        print(header(rules["optphrag"].longname))
+        print(header(rules["optphragmen"].longname))
         if resolute:
             print("Computing only one winning committee (resolute=True)\n")
     if verbose >= 3:
@@ -1536,7 +1536,7 @@ def compute_optphragmen(profile, committeesize, algorithm="gurobi", resolute=Fal
     # end of optional output
 
     if algorithm == "fastest":
-        algorithm = rules["optphrag"].fastest_algo()
+        algorithm = rules["optphragmen"].fastest_algo()
 
     if algorithm != "gurobi":
         raise NotImplementedError(
@@ -1570,11 +1570,11 @@ def compute_phragmen_enestroem(
     check_enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise ValueError(
-            rules["phrag-enestr"].shortname + " is only defined for unit weights (weight=1)"
+            rules["phragmen-enestroem"].shortname + " is only defined for unit weights (weight=1)"
         )
 
     if algorithm == "fastest":
-        algorithm = rules["phrag-enestr"].fastest_algo()
+        algorithm = rules["phragmen-enestroem"].fastest_algo()
 
     if algorithm == "standard":
         division = lambda x, y: x / y  # standard float division
@@ -1636,7 +1636,7 @@ def compute_phragmen_enestroem(
 
     # optional output
     if verbose:
-        print(header(rules["phrag-enestr"].longname))
+        print(header(rules["phragmen-enestroem"].longname))
         print(str_committees_header(committees, winning=True))
         print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
@@ -1653,7 +1653,7 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard", resolut
     check_enough_approved_candidates(profile, committeesize)
 
     if algorithm == "fastest":
-        algorithm = rules["consensus"].fastest_algo()
+        algorithm = rules["consensus-rule"].fastest_algo()
 
     if algorithm == "standard":
         division = lambda x, y: x / y  # standard float division
@@ -1708,7 +1708,7 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard", resolut
 
     # optional output
     if verbose:
-        print(header(rules["consensus"].longname))
+        print(header(rules["consensus-rule"].longname))
         print(str_committees_header(committees, winning=True))
         print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output

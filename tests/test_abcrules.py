@@ -145,7 +145,7 @@ class CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
-            "mav": [
+            "minimaxav": [
                 {0, 1, 2, 3},
                 {0, 1, 2, 4},
                 {0, 1, 2, 5},
@@ -170,7 +170,7 @@ class CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
-            "seqphrag": [
+            "seqphragmen": [
                 {0, 1, 4, 5},
                 {0, 2, 4, 5},
                 {0, 3, 4, 5},
@@ -178,7 +178,7 @@ class CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
-            "optphrag": [{0, 1, 2, 3}],
+            "optphragmen": [{0, 1, 2, 3}],
             "cc": [{0, 1, 2, 3}],
             "seqcc": [
                 {0, 1, 2, 4},
@@ -229,7 +229,7 @@ class CollectInstances:
                 {2, 3, 4, 5},
             ],
             "rule-x-without-2nd-phase": [{4, 5}],
-            "phrag-enestr": [
+            "phragmen-enestroem": [
                 {0, 1, 4, 5},
                 {0, 2, 4, 5},
                 {0, 3, 4, 5},
@@ -237,7 +237,7 @@ class CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
-            "consensus": [
+            "consensus-rule": [
                 {0, 1, 2, 4},
                 {0, 1, 2, 5},
                 {0, 1, 3, 4},
@@ -290,10 +290,10 @@ class CollectInstances:
             "pav": [{0, 1, 3}],
             "geom2": [{0, 1, 3}],
             "revseqpav": [{0, 1, 3}],
-            "mav": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
+            "minimaxav": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
             "lexminimaxav": [{0, 1, 3}],
-            "seqphrag": [{0, 1, 3}],
-            "optphrag": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
+            "seqphragmen": [{0, 1, 3}],
+            "optphragmen": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
             "cc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
             "seqcc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
             "revseqcc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
@@ -303,8 +303,8 @@ class CollectInstances:
             "slav": [{0, 1, 3}],
             "rule-x": [{0, 1, 3}],
             "rule-x-without-2nd-phase": [{0, 1, 3}],
-            "phrag-enestr": [{0, 1, 3}],
-            "consensus": [{0, 1, 3}],
+            "phragmen-enestroem": [{0, 1, 3}],
+            "consensus-rule": [{0, 1, 3}],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -330,10 +330,10 @@ class CollectInstances:
             "pav": [{0, 1, 2, 4}],
             "geom2": [{0, 1, 2, 4}],
             "revseqpav": [{0, 1, 2, 4}],
-            "mav": [{0, 1, 2, 3}, {0, 1, 2, 4}, {0, 2, 3, 4}, {0, 2, 3, 5}, {0, 2, 4, 5}],
+            "minimaxav": [{0, 1, 2, 3}, {0, 1, 2, 4}, {0, 2, 3, 4}, {0, 2, 3, 5}, {0, 2, 4, 5}],
             "lexminimaxav": [{0, 1, 2, 4}],
-            "seqphrag": [{0, 1, 2, 4}],
-            "optphrag": [
+            "seqphragmen": [{0, 1, 2, 4}],
+            "optphragmen": [
                 {0, 1, 2, 3},
                 {0, 1, 2, 4},
                 {0, 1, 2, 5},
@@ -390,8 +390,8 @@ class CollectInstances:
             "slav": [{0, 1, 2, 4}],
             "rule-x": [{0, 1, 2, 4}],
             "rule-x-without-2nd-phase": [{0, 2}],
-            "phrag-enestr": [{0, 1, 2, 4}],
-            "consensus": [{0, 1, 2, 4}],
+            "phragmen-enestroem": [{0, 1, 2, 4}],
+            "consensus-rule": [{0, 1, 2, 4}],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -408,10 +408,10 @@ class CollectInstances:
             "pav": [{0, 3}],
             "geom2": [{0, 3}],
             "revseqpav": [{0, 3}],
-            "mav": [{0, 3}, {1, 3}],
+            "minimaxav": [{0, 3}, {1, 3}],
             "lexminimaxav": [{0, 3}],
-            "seqphrag": [{0, 3}],
-            "optphrag": [{0, 3}, {1, 3}],
+            "seqphragmen": [{0, 3}],
+            "optphragmen": [{0, 3}, {1, 3}],
             "cc": [{0, 2}, {0, 3}, {1, 3}],
             "seqcc": [{0, 2}, {0, 3}],
             "revseqcc": [{0, 2}, {0, 3}, {1, 3}],
@@ -421,8 +421,8 @@ class CollectInstances:
             "slav": [{0, 3}],
             "rule-x": [{0, 3}],
             "rule-x-without-2nd-phase": [{0}],
-            "phrag-enestr": [{0, 3}],
-            "consensus": [{0, 3}],
+            "phragmen-enestroem": [{0, 3}],
+            "consensus-rule": [{0, 3}],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -509,7 +509,7 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
         "lexminimaxav",
         "rule-x",
         "rule-x-without-2nd-phase",
-        "phrag-enestr",
+        "phragmen-enestroem",
     ]:
         with pytest.raises(ValueError):
             abcrules.compute(rule_id, profile, committeesize, algorithm=algorithm, verbose=verbose)
@@ -519,7 +519,7 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
         rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
     )
 
-    if rule_id == "mav":
+    if rule_id == "minimaxav":
         # Minimax AV ignores weights by definition
         if resolute:
             assert result == [{0}] or result == [{1}] or result == [{2}]
@@ -630,7 +630,7 @@ def test_monroe_indivisible(algorithm):
     "algorithm",
     [
         pytest.param(algorithm, marks=MARKS[algorithm])
-        for algorithm in abcrules.rules["optphrag"].algorithms
+        for algorithm in abcrules.rules["optphragmen"].algorithms
     ],
     ids=idfn,
 )
@@ -647,7 +647,7 @@ def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
     # (with lexicographic optimization only {0, 1, 2} is winning)
     assert (
         len(
-            abcrules.rules["optphrag"].compute(
+            abcrules.rules["optphragmen"].compute(
                 profile, committeesize, algorithm=algorithm, resolute=False
             )
         )
@@ -678,10 +678,10 @@ def test_seqphragmen_irresolute():
     profile = Profile(3)
     profile.add_voters([[0, 1], [0, 1], [0], [1, 2], [2]])
     committeesize = 2
-    committees = abcrules.rules["seqphrag"].compute(profile, committeesize, resolute=False)
+    committees = abcrules.rules["seqphragmen"].compute(profile, committeesize, resolute=False)
     assert committees == [{0, 1}, {0, 2}]
 
-    committees = abcrules.rules["seqphrag"].compute(profile, committeesize, resolute=True)
+    committees = abcrules.rules["seqphragmen"].compute(profile, committeesize, resolute=True)
     assert committees == [{0, 2}]
 
 
@@ -729,7 +729,7 @@ def test_consensus_fails_lower_quota():
     )
     committeesize = 30
 
-    committees = abcrules.rules["consensus"].compute(profile, committeesize, resolute=True)
+    committees = abcrules.rules["consensus-rule"].compute(profile, committeesize, resolute=True)
     for committee in committees:
         assert not all(
             cand in committee
@@ -744,7 +744,7 @@ def test_consensus_fails_lower_quota():
     "rule_id, algorithm",
     [
         pytest.param(rule_id, algorithm, marks=MARKS[algorithm])
-        for rule_id in ["phrag-enestr", "seqphrag", "pav", "seqpav", "revseqpav"]
+        for rule_id in ["phragmen-enestroem", "seqphragmen", "pav", "seqpav", "revseqpav"]
         for algorithm in abcrules.rules[rule_id].algorithms
     ],
     ids=idfn,

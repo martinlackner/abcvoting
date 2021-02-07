@@ -20,7 +20,7 @@ cand_names = "abcdefgh"
 
 monotonicity_instances = [
     (
-        "seqphrag",
+        "seqphragmen",
         3,  # from Xavier Mora, Maria Oliver (2015)
         [{0, 1}] * 10 + [{2}] * 3 + [{3}] * 12 + [{0, 1, 2}] * 21 + [{2, 3}] * 6,
         True,
@@ -29,7 +29,7 @@ monotonicity_instances = [
         [{0, 2, 3}, {1, 2, 3}],
     ),
     (
-        "seqphrag",
+        "seqphragmen",
         3,  # from Xavier Mora, Maria Oliver (2015)
         [{2}] * 7 + [{0, 1}] * 4 + [{0, 1, 2}] + [{0, 1, 3}] * 16 + [{2, 3}] * 4,
         False,
@@ -197,7 +197,7 @@ monotonicity_instances = [
         [{0, 1, 2}, {0, 2, 3}, {1, 2, 3}],
     ),
     (
-        "optphrag",
+        "optphragmen",
         6,  # from Sanchez-Fernandez and Fisteus (2019)
         [{1, 2, 3, 4, 5}] * 13 + [{0, 6}, {0}] * 2 + [{6}] * 1,
         True,
@@ -212,7 +212,7 @@ monotonicity_instances = [
         ],
     ),
     (
-        "optphrag",
+        "optphragmen",
         6,  # from Sanchez-Fernandez and Fisteus (2019)
         [{7}] + [{1, 2, 3, 4, 5}] * 13 + [{0, 6}, {0}] * 2 + [{6}],
         False,
@@ -227,7 +227,7 @@ monotonicity_instances = [
         ],
     ),
     (
-        "mav",
+        "minimaxav",
         5,  # from Sanchez-Fernandez and Fisteus (2019)
         [{5}, {1}, {2}, {3}, {1, 4, 6}, {1, 4, 7}, {1, 5, 6}, {1, 5, 7}, {1, 6}],
         False,

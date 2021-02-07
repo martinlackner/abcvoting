@@ -32,7 +32,7 @@ manipulations = [
         [{a, b}],
     ),
     (
-        "seqphrag",
+        "seqphragmen",
         False,
         2,
         [{0, 1, 2}, {0, 1}, {1, 5}, {2, 4}, {1, 4, 5}, {1, 3, 5}],
@@ -50,7 +50,7 @@ manipulations = [
         [{0, 1, 5}],
     ),
     (
-        "mav",
+        "minimaxav",
         False,
         3,
         [{0, 1, 2}, {1, 3}, {0, 1, 4}, {0, 1, 3}, {0, 1, 4}, {0, 1}],
@@ -121,7 +121,7 @@ manipulations = [
         [{0, 1, 3}],
         [{1, 2, 4}],
     ),
-    # ("optphrag", True, 3, [{a, b}] + [{b, c, d}] * 3, [a}, {{b, c, d}}, {{a, b, c}]),
+    # ("optphragmen", True, 3, [{a, b}] + [{b, c, d}] * 3, [a}, {{b, c, d}}, {{a, b, c}]),
     # this does not work because optphrag does not support a specified tiebreaking
     # between committees ([a, b, c] should be prefered to [b, c, d])
 ]
