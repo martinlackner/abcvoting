@@ -44,6 +44,11 @@ class CollectRules:
                 for algorithm in list(rule.algorithms) + ["fastest"]:
                     for resolute in rule.resolute:
                         if algorithm in MARKS:
+                            if algorithm == "fastest":
+                                try:
+                                    rule.fastest_algo()
+                                except RuntimeError:
+                                    continue
                             instance = pytest.param(
                                 rule.rule_id, algorithm, resolute, marks=MARKS[algorithm]
                             )
@@ -797,11 +802,12 @@ def test_fastest_algorithms(rule):
     profile = Profile(4)
     profile.add_voters([[0, 1], [1, 2], [0, 2, 3]])
     committeesize = 2
-    algo = rule.fastest_algo()
-    if algo is None:
+    try:
+        algorithm = rule.fastest_algo()
+    except RuntimeError:
         pytest.skip("no supported algorithms for " + rule.shortname)
     for resolute in rule.resolute:
-        rule.compute(profile, committeesize, algorithm=algo, resolute=resolute)
+        rule.compute(profile, committeesize, algorithm=algorithm, resolute=resolute)
     # second possibility
     abcrules.compute(rule.rule_id, profile, committeesize, algorithm="fastest")
 

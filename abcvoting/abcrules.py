@@ -77,10 +77,10 @@ class ABCRule:
         for algorithm in self.algorithms:
             if is_algorithm_supported(algorithm):
                 return algorithm
-        raise NotImplementedError(
-            f"No algorithm implemented for {self.rule_id} "
-            f"that is supported on this machinee.\n"
-            f"({self.algorithms} not supported)"
+        raise RuntimeError(
+            f"No algorithm available for {self.rule_id} "
+            f"that is supported on this machine. "
+            f"({', '.join(self.algorithms)} not supported)",
         )
 
 
