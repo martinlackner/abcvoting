@@ -40,20 +40,21 @@ class CollectRules:
         self.rule_algorithm_onlyresolute = []
         self.rule_algorithm_onlyirresolute = []
         for rule in abcrules.rules.values():
-            for algorithm in list(rule.algorithms) + ["fastest"]:
-                for resolute in rule.resolute:
-                    if algorithm in MARKS:
-                        instance = pytest.param(
-                            rule.rule_id, algorithm, resolute, marks=MARKS[algorithm]
-                        )
-                        instance_no_resolute_param = pytest.param(
-                            rule.rule_id, algorithm, marks=MARKS[algorithm]
-                        )
-                    else:
-                        raise ValueError(
-                            f"Algorithm {algorithm} not known in unit tests "
-                            f"(pytest marks are missing)."
-                        )
+            if list(rule.algorithms):
+                for algorithm in list(rule.algorithms) + ["fastest"]:
+                    for resolute in rule.resolute:
+                        if algorithm in MARKS:
+                            instance = pytest.param(
+                                rule.rule_id, algorithm, resolute, marks=MARKS[algorithm]
+                            )
+                            instance_no_resolute_param = pytest.param(
+                                rule.rule_id, algorithm, marks=MARKS[algorithm]
+                            )
+                        else:
+                            raise ValueError(
+                                f"Algorithm {algorithm} not known in unit tests "
+                                f"(pytest marks are missing)."
+                            )
 
                     self.rule_algorithm_resolute.append(instance)
                     if resolute:
