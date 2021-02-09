@@ -663,6 +663,8 @@ def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
 def test_abcrules_correct(
     rule_id, algorithm, resolute, verbose, profile, exp_results, committeesize
 ):
+    if rule_id.startswith("geom") and rule_id != "geom2":
+        return  # correctness tests only for geom2
     print(profile)
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm, verbose=verbose, resolute=resolute

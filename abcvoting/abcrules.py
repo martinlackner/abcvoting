@@ -80,6 +80,16 @@ class ABCRule:
 
 
 def _init_rules():
+    _THIELE_ALGORITHMS = (
+        # TODO sort by speed, requires testing
+        "gurobi",
+        "branch-and-bound",
+        "ortools_cbc",
+        "ortools_gurobi",
+        "mip_cbc",
+        "mip_gurobi",
+        "brute-force",
+    )
     _RULESINFO = [
         ("av", "AV", "Approval Voting (AV)", compute_av, ("standard",), (True, False)),
         (
@@ -116,15 +126,7 @@ def _init_rules():
             "Sainte-Laguë Approval Voting (SLAV)",
             compute_slav,
             # TODO sort by speed, requires testing
-            (
-                "gurobi",
-                "branch-and-bound",
-                "ortools_cbc",
-                "ortools_gurobi",
-                "mip_cbc",
-                "mip_gurobi",
-                "brute-force",
-            ),
+            _THIELE_ALGORITHMS,
             (True, False),
         ),
         (
@@ -133,32 +135,7 @@ def _init_rules():
             "Approval Chamberlin-Courant (CC)",
             compute_cc,
             # TODO sort by speed, requires testing
-            (
-                "gurobi",
-                "branch-and-bound",
-                "ortools_cbc",
-                "ortools_gurobi",
-                "mip_cbc",
-                "mip_gurobi",
-                "brute-force",
-            ),
-            (True, False),
-        ),
-        (
-            "geom2",
-            "2-Geometric",
-            "2-Geometric Rule",
-            functools.partial(compute_thiele_method, "geom2"),
-            # TODO sort by speed, requires testing
-            (
-                "gurobi",
-                "branch-and-bound",
-                "ortools_cbc",
-                "ortools_gurobi",
-                "mip_cbc",
-                "mip_gurobi",
-                "brute-force",
-            ),
+            _THIELE_ALGORITHMS,
             (True, False),
         ),
         (
@@ -283,6 +260,17 @@ def _init_rules():
             (True, False),
         ),
     ]
+    for parameter in [1.5, 2, 5]:
+        _RULESINFO.append(
+            (
+                f"geom{parameter}",
+                f"{parameter}-Geometric",
+                f"{parameter}-Geometric Rule",
+                functools.partial(compute_thiele_method, f"geom{parameter}"),
+                _THIELE_ALGORITHMS,
+                (True, False),
+            )
+        )
 
     rulesdict = {}
     for ruleinfo in _RULESINFO:
