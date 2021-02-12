@@ -37,11 +37,7 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
     maxscore = None
     committees = []
 
-    if solver_id == "gurobi":
-        solver_id = "GRB"
-    elif solver_id in ["cbc"]:
-        solver_id = "CBC"
-    else:
+    if solver_id not in ["gurobi", "cbc"]:
         raise ValueError(f"Solver {solver_id} not known in Python MIP.")
 
     # TODO add a max iterations parameter with fancy default value which works in almost all
