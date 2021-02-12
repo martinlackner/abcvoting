@@ -21,5 +21,10 @@ committeesize = 4
 """Prints the winning committees for all implemented rules"""
 for rule in abcrules.rules.values():
     print(rule.longname + ":")
-    committees = rule.compute(profile, committeesize, resolute=True)
+    committees = rule.compute(
+        profile,
+        committeesize,
+        algorithm="fastest",  # use the fastest algorithm that is available (usually Gurobi)
+        resolute=True,  # only compute one winning committee
+    )
     print(str_sets_of_candidates(committees))
