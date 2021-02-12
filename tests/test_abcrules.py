@@ -838,14 +838,9 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
         # This message appears only sometimes, so even if this test succeeds for gurobi with
         # verbose=0, it's probably just due to the test execution order, i.e. the undesired
         # message was simply printed earlier, or caused by use of different Gurobi versions.
+        #
+        # This might skip too much, if gurobi is not the fastest.
         pytest.skip("Gurbi always prints something when used with academic license")
-    if "mip_cbc" == algorithm and verbose == 0:
-        # TODO don't understand why, but this test prints the Gurobi message too...
-        pytest.skip("MIP prints Gurobi messages for weird reasons")
-
-    if algorithm.startswith("mip_") and verbose == 0:
-        # TODO mip produces lots of output
-        pytest.skip("mip prints lots of messages")
 
     profile = Profile(2)
     profile.add_voters([[0]])
