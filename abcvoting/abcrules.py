@@ -89,8 +89,6 @@ def _init_rules():
         # TODO sort by speed, requires testing
         "gurobi",
         "branch-and-bound",
-        "ortools_cbc",
-        "ortools_gurobi",
         "mip_cbc",
         "mip_gurobi",
         "brute-force",
@@ -111,17 +109,11 @@ def _init_rules():
             "Proportional Approval Voting (PAV)",
             compute_pav,
             # TODO sort by speed, requires testing
-            (
-                "gurobi",
-                "branch-and-bound",
+            _THIELE_ALGORITHMS
+            + (
                 "cvxpy_glpk_mi",
                 "cvxpy_cbc",
-                "cvxpy_gurobi",
-                "ortools_cbc",
-                "ortools_gurobi",
-                "mip_cbc",
-                "mip_gurobi",
-                "brute-force",
+                "cvxpy_scip",
             ),
             (True, False),
         ),
@@ -140,7 +132,7 @@ def _init_rules():
             "Approval Chamberlin-Courant (CC)",
             compute_cc,
             # TODO sort by speed, requires testing
-            _THIELE_ALGORITHMS,
+            _THIELE_ALGORITHMS + ("ortools_cp",),
             (True, False),
         ),
         (
@@ -216,8 +208,6 @@ def _init_rules():
             (
                 "gurobi",
                 "ortools_cp",
-                "ortools_cbc",
-                "ortools_gurobi",
                 "brute-force",
                 "mip_gurobi",
                 "mip_cbc",
@@ -352,14 +342,8 @@ def compute_thiele_method(
             resolute,
             solver_id=algorithm[4:],
         )
-    elif algorithm.startswith("ortools_"):
-        committees = abcrules_ortools._ortools_thiele_methods(
-            profile,
-            committeesize,
-            scorefct=scorefct,
-            resolute=resolute,
-            solver_id=algorithm[8:],
-        )
+    elif algorithm == "ortools_cp" and scorefct_str == "cc":
+        committees = abcrules_ortools._ortools_cc(profile, committeesize, resolute)
     else:
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_thiele_method"
@@ -385,7 +369,6 @@ def compute_thiele_method(
 def _thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute):
     """Brute-force algorithm for computing Thiele methods
     Only intended for comparison, much slower than _thiele_methods_branchandbound()"""
-    scorefct = scores.get_scorefct(scorefct_str, committeesize)
 
     opt_committees = []
     opt_thiele_score = -1
@@ -837,11 +820,8 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_minimaxav(profile, committeesize, resolute)
         committees = sorted_committees(committees)
-    elif algorithm.startswith("ortools_"):
-        solver_id = algorithm[8:]
-        committees = abcrules_ortools._ortools_minimaxav(
-            profile, committeesize, resolute, solver_id
-        )
+    elif algorithm == "ortools_cp":
+        committees = abcrules_ortools._ortools_minimaxav(profile, committeesize, resolute)
         committees = sorted_committees(committees)
     elif algorithm.startswith("mip_"):
         solver_id = algorithm[4:]
@@ -981,9 +961,8 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_monroe(profile, committeesize, resolute)
         committees = sorted_committees(committees)
-    elif algorithm.startswith("ortools_"):
-        solver_id = algorithm[8:]
-        committees = abcrules_ortools._ortools_monroe(profile, committeesize, resolute, solver_id)
+    elif algorithm == "ortools_cp":
+        committees = abcrules_ortools._ortools_monroe(profile, committeesize, resolute)
         committees = sorted_committees(committees)
     elif algorithm == "brute-force":
         committees = _monroe_bruteforce(profile, committeesize, resolute)
