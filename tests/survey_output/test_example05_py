@@ -1,0 +1,132 @@
+*********
+Example 5
+*********
+
+------
+Input:
+------
+
+profile with 23 votes and 4 candidates:
+ 3 x {a, b},
+ 6 x {a, d},
+ 4 x {b},
+ 5 x {c},
+ 5 x {c, d}
+
+----------------------------------
+Proportional Approval Voting (PAV)
+----------------------------------
+
+Optimal PAV-score: 19
+
+1 winning committee:
+ {a, c}
+
+-------------------------------------------------
+Sequential Proportional Approval Voting (seq-PAV)
+-------------------------------------------------
+
+Computing only one winning committee (resolute=True)
+
+starting with the empty committee (score = 0)
+
+adding candidate number 1: d
+ score increases by 11 to a total of 11
+
+adding candidate number 2: c
+ score increases by 15/2 to a total of 37/2
+
+1 winning committee:
+ {c, d}
+
+PAV-score of winning committee: 37/2
+
+------------------------------------------------------------
+Reverse Sequential Proportional Approval Voting (revseq-PAV)
+------------------------------------------------------------
+
+Computing only one winning committee (resolute=True)
+
+full committee (4 candidates) has a total score of 30
+
+removing candidate number 1: a
+ score decreases by 9/2 to a total of 51/2
+
+removing candidate number 2: b
+ score decreases by 7 to a total of 37/2
+
+1 winning committee:
+ {c, d}
+
+PAV-score of winning committee: 37/2
+
+
+
+*****************************************************
+Example from Janson's survey (Example 13.3) / Thiele:
+*****************************************************
+
+------
+Input:
+------
+
+weighted profile with 10 votes and 4 candidates:
+ 960 x {a, c, d},
+ 3000 x {b, c, d},
+ 520 x {b, c},
+ 1620 x {a, b},
+ 1081 x {a, d},
+ 1240 x {a, c},
+ 360 x {b, d},
+ 360 x {d},
+ 120 x {c},
+ 60 x {b}
+total weight: 9321
+
+----------------------------------
+Proportional Approval Voting (PAV)
+----------------------------------
+
+Optimal PAV-score: 9651
+
+1 winning committee:
+ {a, b}
+
+-------------------------------------------------
+Sequential Proportional Approval Voting (seq-PAV)
+-------------------------------------------------
+
+Computing only one winning committee (resolute=True)
+
+starting with the empty committee (score = 0)
+
+adding candidate number 1: c
+ score increases by 5840 to a total of 5840
+
+adding candidate number 2: a
+ score increases by 3801 to a total of 9641
+
+1 winning committee:
+ {a, c}
+
+PAV-score of winning committee: 9641
+
+------------------------------------------------------------
+Reverse Sequential Proportional Approval Voting (revseq-PAV)
+------------------------------------------------------------
+
+Computing only one winning committee (resolute=True)
+
+full committee (4 candidates) has a total score of 30063/2
+
+removing candidate number 1: a
+ score decreases by 4581/2 to a total of 12741
+
+removing candidate number 2: c
+ score decreases by 3100 to a total of 9641
+
+1 winning committee:
+ {b, d}
+
+PAV-score of winning committee: 9641
+

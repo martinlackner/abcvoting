@@ -1,0 +1,125 @@
+***************
+Proposition A.2
+***************
+
+------------
+1st profile:
+------------
+
+profile with 10 votes and 3 candidates:
+ 2 x {a},
+ 3 x {a, c},
+ 3 x {b, c},
+ 2 x {b}
+
+winning committees for k=1 and k=2:
+ PAV: {c} vs {a, b}
+ CC: {c} vs {a, b}
+ Monroe: {c} vs {a, b}
+ opt-Phragmén: {c} vs {a, b}
+ minimaxav: {c} vs {a, b}
+
+------------
+2nd profile:
+------------
+
+profile with 18 votes and 4 candidates:
+ 8 x {a},
+ 4 x {a, c},
+ 2 x {a, b, c},
+ 1 x {a, d},
+ 3 x {b, d}
+
+winning committees for k=2 and k=3:
+ Greedy Monroe: {a, b} vs {a, c, d}
+
+------------
+3rd profile:
+------------
+
+profile with 4 votes and 6 candidates:
+ 1 x {a, d, e},
+ 1 x {a, c},
+ 1 x {b, e},
+ 1 x {c, d, f}
+
+winning committees for k=3 and k=4:
+ Rule X: {a, c, e} vs {a, b, c, d}
+
+
+Detailed calculations:
+------
+Rule X
+------
+
+Computing only one winning committee (resolute=True)
+
+Phase 1:
+
+starting budget:
+  (0.75, 0.75, 0.75, 0.75)
+
+adding candidate number 0: a
+ with maxmimum cost per voter q = 0.5
+ remaining budget:
+  (0.25, 0.25, 0.75, 0.75)
+ tie broken in favor of a,
+ candidates {2, 3, 4} are tied
+
+adding candidate number 1: c
+ with maxmimum cost per voter q = 0.75
+ remaining budget:
+  (0.25, 0.0, 0.75, 0.0)
+ tie broken in favor of c,
+ candidates {3, 4} are tied
+
+adding candidate number 2: e
+ with maxmimum cost per voter q = 0.75
+ remaining budget:
+  (0.0, 0.0, 0.0, 0.0)
+
+1 winning committee:
+ {a, c, e}
+
+------
+Rule X
+------
+
+Computing only one winning committee (resolute=True)
+
+Phase 1:
+
+starting budget:
+  (1.0, 1.0, 1.0, 1.0)
+
+adding candidate number 0: a
+ with maxmimum cost per voter q = 0.5
+ remaining budget:
+  (0.5, 0.5, 1.0, 1.0)
+ tie broken in favor of a,
+ candidates {2, 3, 4} are tied
+
+adding candidate number 1: c
+ with maxmimum cost per voter q = 0.5
+ remaining budget:
+  (0.5, 0.0, 1.0, 0.5)
+ tie broken in favor of c,
+ candidates {3, 4} are tied
+
+adding candidate number 2: d
+ with maxmimum cost per voter q = 0.5
+ remaining budget:
+  (0.0, 0.0, 1.0, 0.0)
+ tie broken in favor of d,
+ candidates {4} are tied
+
+adding candidate number 3: b
+ with maxmimum cost per voter q = 1.0
+ remaining budget:
+  (0.0, 0.0, 0.0, 0.0)
+ tie broken in favor of b,
+ candidates {4} are tied
+
+1 winning committee:
+ {a, b, c, d}
+

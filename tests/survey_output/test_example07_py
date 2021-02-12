@@ -1,0 +1,33 @@
+*********
+Example 7
+*********
+
+-----------------------------------------
+Input (election instance from Example 1):
+-----------------------------------------
+
+profile with 12 votes and 8 candidates:
+ 3 x {a, b},
+ 3 x {a, c},
+ 2 x {a, d},
+ 1 x {b, c, f},
+ 1 x {e},
+ 1 x {f},
+ 1 x {g}
+
+-------------
+Greedy Monroe
+-------------
+
+The Monroe assignment computed by Greedy Monroe
+has a Monroe score of 10.
+Assignment (unsatisfatied voters marked with *):
+
+ candidate a assigned to: 0, 1, 2
+ candidate c assigned to: 3, 4, 5
+ candidate d assigned to: 6, 7, 11*
+ candidate f assigned to: 8, 9*, 10
+
+1 winning committee:
+ {a, c, d, f}
+
