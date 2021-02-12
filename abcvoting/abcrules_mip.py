@@ -44,6 +44,7 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
     #  cases to avoid endless hanging computations, e.g. when CI runs the tests
     while True:
         model = mip.Model(solver_name=solver_id)
+        model.verbose = 0  # TODO could be set to 1, if abcvoting's verbose is set to >= 2
 
         # `in_committee` is a binary variable indicating whether `cand` is in the committee
         in_committee = [
