@@ -1,6 +1,6 @@
 """
 Approval-based committee (ABC) rules implemented as constraint
- satisfaction programs with OR-Tools.
+ satisfaction programs with Python MIP.
 """
 
 import mip
@@ -11,7 +11,7 @@ ACCURACY = 1e-9
 
 
 def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, resolute, solver_id):
-    """Compute rules, which are given in the form of an optimization problem, using Gurobi.
+    """Compute rules, which are given in the form of an optimization problem, using Python MIP.
 
     Parameters
     ----------
@@ -42,7 +42,7 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
     elif solver_id in ["cbc"]:
         solver_id = "CBC"
     else:
-        raise ValueError(f"Solver {solver_id} not known in MIP.")
+        raise ValueError(f"Solver {solver_id} not known in Python MIP.")
 
     # TODO add a max iterations parameter with fancy default value which works in almost all
     #  cases to avoid endless hanging computations, e.g. when CI runs the tests
@@ -76,14 +76,14 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
 
         if status not in [mip.OptimizationStatus.OPTIMAL, mip.OptimizationStatus.INFEASIBLE]:
             raise RuntimeError(
-                f"OR Tools returned an unexpected status code: {status}"
+                f"Python MIP returned an unexpected status code: {status}"
                 "Warning: solutions may be incomplete or not optimal."
             )
         elif status == mip.OptimizationStatus.INFEASIBLE:
             if len(committees) == 0:
                 # we are in the first round of searching for committees
                 # and Gurobi didn't find any
-                raise RuntimeError("OR Tools found no solution (INFEASIBLE)")
+                raise RuntimeError("Python MIP found no solution (INFEASIBLE)")
             break
         objective_value = model.objective_value
 
@@ -91,7 +91,7 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
             maxscore = objective_value
         elif objective_value > maxscore + ACCURACY:
             raise RuntimeError(
-                "OR Tools found a solution better than a previous optimum. This "
+                "Python MIP found a solution better than a previous optimum. This "
                 f"should not happen (previous optimal score: {maxscore}, "
                 f"new optimal score: {objective_value})."
             )
@@ -99,7 +99,9 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
             # no longer optimal
             break
 
-        committee = set(cand for cand in profile.candidates if in_committee[cand].x >= 1)
+        committee = set(
+            cand for cand in profile.candidates if in_committee[cand].x >= 1 - ACCURACY
+        )
         assert len(committee) == committeesize
         committees.append(committee)
 
