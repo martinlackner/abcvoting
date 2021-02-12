@@ -828,13 +828,20 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
         #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
         pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
 
-    if algorithm == "ortools_gurobi" and verbose == 0:
-        # TODO or-tools with gurobi repeatedly prints
+    if ("gurobi" in algorithm or algorithm == "fastest") and verbose == 0:
+        # TODO Gurobi prints:
         #  "Academic license - for non-commercial use only"
         #  (if an acamedic license is used) as well as
         #  "Warning: parameter changes on this environment will not affect existing models."
         #  Thus this test fails.
-        pytest.skip("OR Tools prints Gurobi messages")
+        #
+        # This message appears only sometimes, so even if this test succeeds for gurobi with
+        # verbose=0, it's probably just due to the test execution order, i.e. the undesired
+        # message was simply printed earlier, or caused by use of different Gurobi versions.
+        pytest.skip("Gurbi always prints something when used with academic license")
+    if "mip_cbc" == algorithm and verbose == 0:
+        # TODO don't understand why, but this test prints the Gurobi message too...
+        pytest.skip("MIP prints Gurobi messages for weird reasons")
 
     if algorithm.startswith("mip_") and verbose == 0:
         # TODO mip produces lots of output
