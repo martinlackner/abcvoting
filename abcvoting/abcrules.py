@@ -1340,7 +1340,10 @@ def compute_rule_x(
 
     # optional output
     if verbose:
-        print(header(rules["rule-x"].longname))
+        if skip_phragmen_phase:
+            print(header(rules["rule-x-without-2nd-phase"].longname))
+        else:
+            print(header(rules["rule-x"].longname))
         if resolute:
             print("Computing only one winning committee (resolute=True)\n")
     # end of optional output

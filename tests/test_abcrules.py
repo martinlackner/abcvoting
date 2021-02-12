@@ -7,7 +7,7 @@ import pytest
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
 from abcvoting.preferences import Profile, Voter
-from abcvoting import abcrules, scores
+from abcvoting import abcrules, misc, scores
 
 MARKS = {
     "gurobi": pytest.mark.gurobi,
@@ -840,19 +840,27 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
         # message was simply printed earlier, or caused by use of different Gurobi versions.
         #
         # This might skip too much, if gurobi is not the fastest.
-        pytest.skip("Gurbi always prints something when used with academic license")
+        pytest.skip("Gurobi always prints something when used with an academic license")
 
     profile = Profile(2)
     profile.add_voters([[0]])
     committeesize = 1
-    abcrules.compute(
+    committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
     )
-    out = capfd.readouterr().out
+    out = str(capfd.readouterr().out)
     if verbose == 0:
         assert out == ""
     else:
         assert len(out) > 0
+        print(out)
+        print(misc.header(abcrules.rules[rule_id].longname))
+        assert out.startswith(misc.header(abcrules.rules[rule_id].longname))
+        # assert out.endswith(
+        #     misc.str_committees_header(committees, winning=True)
+        #     + "\n"
+        #     + misc.str_sets_of_candidates(committees, cand_names=profile.cand_names)
+        # )
 
 
 @pytest.mark.cvxpy
