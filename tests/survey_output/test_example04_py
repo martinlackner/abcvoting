@@ -19,6 +19,12 @@ profile with 12 votes and 8 candidates:
 Proportional Approval Voting (PAV)
 ----------------------------------
 
+-------------------------------------------------
+Sequential Proportional Approval Voting (seq-PAV)
+-------------------------------------------------
+
+Computing only one winning committee (resolute=True)
+
 starting with the empty committee (score = 0)
 
 adding candidate number 1: a
@@ -32,6 +38,11 @@ adding candidate number 3: c
 
 adding candidate number 4: f
  score increases by 4/3 to a total of 83/6
+
+1 winning committee:
+ {a, b, c, f}
+
+PAV-score of winning committee: 83/6
 
 Optimal PAV-score: 83/6
 

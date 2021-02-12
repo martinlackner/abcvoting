@@ -17,6 +17,12 @@ profile with 23 votes and 4 candidates:
 Proportional Approval Voting (PAV)
 ----------------------------------
 
+-------------------------------------------------
+Sequential Proportional Approval Voting (seq-PAV)
+-------------------------------------------------
+
+Computing only one winning committee (resolute=True)
+
 starting with the empty committee (score = 0)
 
 adding candidate number 1: d
@@ -24,6 +30,11 @@ adding candidate number 1: d
 
 adding candidate number 2: c
  score increases by 15/2 to a total of 37/2
+
+1 winning committee:
+ {c, d}
+
+PAV-score of winning committee: 37/2
 
 Optimal PAV-score: 19
 
@@ -95,6 +106,12 @@ total weight: 9321
 Proportional Approval Voting (PAV)
 ----------------------------------
 
+-------------------------------------------------
+Sequential Proportional Approval Voting (seq-PAV)
+-------------------------------------------------
+
+Computing only one winning committee (resolute=True)
+
 starting with the empty committee (score = 0)
 
 adding candidate number 1: c
@@ -102,6 +119,11 @@ adding candidate number 1: c
 
 adding candidate number 2: a
  score increases by 3801 to a total of 9641
+
+1 winning committee:
+ {a, c}
+
+PAV-score of winning committee: 9641
 
 Optimal PAV-score: 9651
 

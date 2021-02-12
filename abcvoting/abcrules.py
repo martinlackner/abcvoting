@@ -11,7 +11,7 @@ from abcvoting.output import output
 try:
     from gmpy2 import mpq as Fraction
 except ImportError:
-    print("Warning: module gmpy2 not found, " + "resorting to Python's fractions.Fraction")
+    output.warning("Warning: module gmpy2 not found, resorting to Python's fractions.Fraction")
     from fractions import Fraction
 from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_cvxpy, abcrules_mip
 from abcvoting.misc import sorted_committees
@@ -637,10 +637,9 @@ def compute_seq_thiele_method(
         )
 
     # optional output
-    if verbose:
-        print(header(rules["seq" + scorefct_str].longname))
-        if resolute:
-            print("Computing only one winning committee (resolute=True)\n")
+    output.details(header(rules["seq" + scorefct_str].longname))
+    if resolute:
+        output.details("Computing only one winning committee (resolute=True)\n")
     # end of optional output
 
     if resolute:
@@ -649,16 +648,15 @@ def compute_seq_thiele_method(
         committees = _seq_thiele_irresolute(profile, committeesize, scorefct_str)
 
     # optional output
-    if verbose:
-        print(str_committees_header(committees, winning=True))
-        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
-        if resolute or len(committees) == 1:
-            print(scorefct_str.upper() + "-score of winning committee:", end="")
-        else:
-            print(scorefct_str.upper() + "-score of winning committees:")
-        for committee in committees:
-            print(" " + str(scores.thiele_score(scorefct_str, profile, committee)))
-        print()
+    output.details(str_committees_header(committees, winning=True))
+    output.details(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+
+    msg = scorefct_str.upper() + "-score of winning committee:"
+    if not resolute and len(committees) != 1:
+        msg += "\n"
+    for committee in committees:
+        msg += " " + str(scores.thiele_score(scorefct_str, profile, committee))
+    output.details(msg + "\n")
     # end of optional output
 
     return sorted_committees(committees)
@@ -701,11 +699,10 @@ def _revseq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
     committee = set(profile.candidates)
 
     # optional output
-    if verbose >= 2:
-        output = "full committee (" + str(len(committee))
-        output += " candidates) has a total score of "
-        output += str(scores.thiele_score(scorefct_str, profile, committee))
-        print(output + "\n")
+    msg = "full committee (" + str(len(committee))
+    msg += " candidates) has a total score of "
+    msg += str(scores.thiele_score(scorefct_str, profile, committee))
+    output.debug(msg + "\n")
     # end of optional output
 
     for _ in range(profile.num_cand - committeesize):
@@ -718,19 +715,18 @@ def _revseq_thiele_resolute(profile, committeesize, scorefct_str, verbose):
         committee.remove(cands_to_remove[-1])
 
         # optional output
-        if verbose >= 2:
-            rem_cand = cands_to_remove[-1]
-            output = "removing candidate number "
-            output += str(profile.num_cand - len(committee)) + ": "
-            output += profile.cand_names[rem_cand] + "\n"
-            output += " score decreases by "
-            output += str(score_reduction)
-            output += " to a total of "
-            output += str(scores.thiele_score(scorefct_str, profile, committee))
-            if len(cands_to_remove) > 1:
-                output += " (tie between candidates "
-                output += str_set_of_candidates(cands_to_remove) + ")\n"
-            print(output + "\n")
+        rem_cand = cands_to_remove[-1]
+        msg = "removing candidate number "
+        msg += str(profile.num_cand - len(committee)) + ": "
+        msg += profile.cand_names[rem_cand] + "\n"
+        msg += " score decreases by "
+        msg += str(score_reduction)
+        msg += " to a total of "
+        msg += str(scores.thiele_score(scorefct_str, profile, committee))
+        if len(cands_to_remove) > 1:
+            msg += " (tie between candidates "
+            msg += str_set_of_candidates(cands_to_remove) + ")\n"
+        output.debug(msg + "\n")
         # end of optional output
 
     return sorted_committees([committee])
@@ -750,10 +746,9 @@ def compute_revseq_thiele_method(
         )
 
     # optional output
-    if verbose:
-        print(header(rules["revseq" + scorefct_str].longname))
-        if resolute:
-            print("Computing only one winning committee (resolute=True)\n")
+    output.details(header(rules["revseq" + scorefct_str].longname))
+    if resolute:
+        output.details("Computing only one winning committee (resolute=True)\n")
     # end of optional output
 
     if resolute:
@@ -762,17 +757,16 @@ def compute_revseq_thiele_method(
         committees = _revseq_thiele_irresolute(profile, committeesize, scorefct_str)
 
     # optional output
-    if verbose:
-        print(str_committees_header(committees, winning=True))
-        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
-    if verbose >= 2:
-        if resolute or len(committees) == 1:
-            print("PAV-score of winning committee:", end="")
-        else:
-            print("PAV-score of winning committees:")
-        for committee in committees:
-            print(" " + str(scores.thiele_score(scorefct_str, profile, committee)))
-        print()
+    output.details(str_committees_header(committees, winning=True))
+    output.details(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+
+    msg = "PAV-score of winning committee:"
+    if not resolute and len(committees) != 1:
+        msg += "\n"
+    for committee in committees:
+        msg += " " + str(scores.thiele_score(scorefct_str, profile, committee))
+    msg += "\n"
+    output.debug(msg)
     # end of optional output
 
     return committees
@@ -802,15 +796,14 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
     check_enough_approved_candidates(profile, committeesize)
 
     # optional output
-    if verbose:
-        print(header(rules["minimaxav"].longname))
-        if resolute:
-            print("Computing only one winning committee (resolute=True)\n")
-    if verbose >= 3:
-        if algorithm == "gurobi":
-            print("Using the Gurobi ILP solver\n")
-        if algorithm == "brute-force":
-            print("Using a brute-force algorithm\n")
+    output.details(header(rules["minimaxav"].longname))
+    if resolute:
+        output.details("Computing only one winning committee (resolute=True)\n")
+
+    if algorithm == "gurobi":
+        output.debug2("Using the Gurobi ILP solver\n")
+    if algorithm == "brute-force":
+        output.debug2("Using a brute-force algorithm\n")
     # end of optional output
 
     if algorithm == "fastest":
@@ -836,16 +829,15 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
     opt_minimaxav_score = scores.mavscore(profile, committees[0])
 
     # optional output
-    if verbose:
-        print("Minimum maximal distance: " + str(opt_minimaxav_score))
+    output.details("Minimum maximal distance: " + str(opt_minimaxav_score))
 
-        print(str_committees_header(committees, winning=True))
-        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.details(str_committees_header(committees, winning=True))
+    output.details(str_sets_of_candidates(committees, cand_names=profile.cand_names))
 
-        print("Corresponding distances to voters:")
-        for committee in committees:
-            print([hamming(voter.approved, committee) for voter in profile])
-        print()
+    msg = "Corresponding distances to voters:\n"
+    for committee in committees:
+        msg += str([hamming(voter.approved, committee) for voter in profile]) + "\n"
+    output.details(msg)
     # end of optional output
 
     return committees
@@ -890,20 +882,19 @@ def compute_lexminimaxav(
         committees = [committees[0]]
 
     # optional output
-    if verbose:
-        print(header(rules["lexminimaxav"].longname))
-        if resolute:
-            print("Computing only one winning committee (resolute=True)\n")
+    output.details(header(rules["lexminimaxav"].longname))
+    if resolute:
+        output.details("Computing only one winning committee (resolute=True)\n")
 
-        print("Minimum maximal distance: " + str(max(opt_distances)))
+    output.details("Minimum maximal distance: " + str(max(opt_distances)))
 
-        print(str_committees_header(committees, winning=True))
-        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.details(str_committees_header(committees, winning=True))
+    output.details(str_sets_of_candidates(committees, cand_names=profile.cand_names))
 
-        print("Corresponding distances to voters:")
-        for committee in committees:
-            print([hamming(voter.approved, committee) for voter in profile])
-        print()
+    msg = "Corresponding distances to voters:\n"
+    for committee in committees:
+        msg += str([hamming(voter.approved, committee) for voter in profile])
+    output.details(msg + "\n")
     # end of optional output
 
     return committees
@@ -938,15 +929,14 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
     check_enough_approved_candidates(profile, committeesize)
 
     # optional output
-    if verbose:
-        print(header(rules["monroe"].longname))
-        if resolute:
-            print("Computing only one winning committee (resolute=True)\n")
-    if verbose >= 3:
-        if algorithm == "gurobi":
-            print("Using the Gurobi ILP solver\n")
-        if algorithm == "brute-force":
-            print("Using a brute-force algorithm\n")
+    output.details(header(rules["monroe"].longname))
+    if resolute:
+        output.details("Computing only one winning committee (resolute=True)\n")
+
+    if algorithm == "gurobi":
+        output.debug2("Using the Gurobi ILP solver\n")
+    if algorithm == "brute-force":
+        output.debug2("Using a brute-force algorithm\n")
     # end of optional output
 
     if not profile.has_unit_weights():
@@ -971,11 +961,12 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
         )
 
     # optional output
-    if verbose:
-        print("Optimal Monroe score: " + str(scores.monroescore(profile, committees[0])) + "\n")
+    output.details(
+        "Optimal Monroe score: " + str(scores.monroescore(profile, committees[0])) + "\n"
+    )
 
-        print(str_committees_header(committees, winning=True))
-        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.details(str_committees_header(committees, winning=True))
+    output.details(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1054,54 +1045,50 @@ def compute_greedy_monroe(profile, committeesize, algorithm="standard", resolute
     committees = sorted_committees([committee])
 
     # optional output
-    if verbose:
-        print(header(rules["greedy-monroe"].longname))
+    output.details(header(rules["greedy-monroe"].longname))
 
-    if verbose >= 2:
-        score1 = scores.monroescore(profile, committees[0])
+    score1 = scores.monroescore(profile, committees[0])
+    score2 = len(profile) - len(remaining_voters)
+    output.debug("The Monroe assignment computed by Greedy Monroe")
+    output.debug("has a Monroe score of " + str(score2) + ".")
 
-        score2 = len(profile) - len(remaining_voters)
-        print("The Monroe assignment computed by Greedy Monroe")
-        print("has a Monroe score of " + str(score2) + ".")
+    if score1 > score2:
+        output.debug(
+            "Monroe assignment found by Greedy Monroe is not "
+            + "optimal for the winning committee,"
+        )
+        output.debug(
+            "i.e., by redistributing voters to candidates a higher "
+            + "satisfaction is possible "
+            + "(without changing the committee)."
+        )
+        output.debug("Optimal Monroe score of the winning committee is " + str(score1) + ".")
 
-        if score1 > score2:
-            print(
-                "Monroe assignment found by Greedy Monroe is not "
-                + "optimal for the winning committee,"
-            )
-            print(
-                "i.e., by redistributing voters to candidates a higher "
-                + "satisfaction is possible "
-                + "(without changing the committee)."
-            )
-            print("Optimal Monroe score of the winning committee is " + str(score1) + ".")
+    # build actual Monroe assignment for winning committee
+    for t, district in enumerate(assignment):
+        cand, voters = district
+        if t < num_voters - committeesize * (num_voters // committeesize):
+            missing = num_voters // committeesize + 1 - len(voters)
+        else:
+            missing = num_voters // committeesize - len(voters)
+        for _ in range(missing):
+            v = remaining_voters.pop()
+            voters.append(v)
 
-        # build actual Monroe assignment for winning committee
-        for t, district in enumerate(assignment):
-            cand, voters = district
-            if t < num_voters - committeesize * (num_voters // committeesize):
-                missing = num_voters // committeesize + 1 - len(voters)
-            else:
-                missing = num_voters // committeesize - len(voters)
-            for _ in range(missing):
-                v = remaining_voters.pop()
-                voters.append(v)
+    msg = "Assignment (unsatisfatied voters marked with *):\n\n"
+    for cand, voters in assignment:
+        msg += " candidate " + profile.cand_names[cand] + " assigned to: "
+        assing_msg = ""
+        for v in sorted(voters):
+            assing_msg += str(v)
+            if cand not in profile[v].approved:
+                assing_msg += "*"
+            assing_msg += ", "
+        msg += assing_msg[:-2] + "\n"
+    output.debug(msg)
 
-        print("Assignment (unsatisfatied voters marked with *):\n")
-        for cand, voters in assignment:
-            print(" candidate " + profile.cand_names[cand] + " assigned to: ", end="")
-            output = ""
-            for v in sorted(voters):
-                output += str(v)
-                if cand not in profile[v].approved:
-                    output += "*"
-                output += ", "
-            print(output[:-2])
-        print()
-
-    if verbose:
-        print(str_committees_header(committees, winning=True))
-        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.details(str_committees_header(committees, winning=True))
+    output.details(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return sorted_committees(committees)
@@ -1152,30 +1139,27 @@ def _seqphragmen_resolute(
         committee = sorted(committee + [next_cand])
 
         # optional output
-        if verbose >= 2:
-            output = "adding candidate number "
-            output += str(len(committee)) + ": "
-            output += profile.cand_names[next_cand] + "\n"
-            output += " maximum load increased to "
-            output += str(opt)
-            print(output)
-            print(" load distribution:")
-            output = "  ("
-            for v, _ in enumerate(profile):
-                output += str(load[v]) + ", "
-            print(output[:-2] + ")")
-            tied_cands = [
-                cand
-                for cand in profile.candidates
-                if cand > next_cand and new_maxload[cand] == opt
-            ]
-            if tied_cands:
-                output = " tie broken in favor of " + profile.cand_names[next_cand]
-                output += ",\n candidates " + str_set_of_candidates(tied_cands)
-                output += " would increase the load to the same amount ("
-                output += str(new_maxload) + ")"
-                print(output)
-            print()
+        msg = "adding candidate number "
+        msg += str(len(committee)) + ": "
+        msg += profile.cand_names[next_cand] + "\n"
+        msg += " maximum load increased to "
+        msg += str(opt)
+        output.debug(msg)
+        output.debug(" load distribution:")
+        msg = "  ("
+        for v, _ in enumerate(profile):
+            msg += str(load[v]) + ", "
+        output.debug(msg[:-2] + ")")
+        tied_cands = [
+            cand for cand in profile.candidates if cand > next_cand and new_maxload[cand] == opt
+        ]
+        if tied_cands:
+            msg = " tie broken in favor of " + profile.cand_names[next_cand]
+            msg += ",\n candidates " + str_set_of_candidates(tied_cands)
+            msg += " would increase the load to the same amount ("
+            msg += str(new_maxload) + ")"
+            output.debug(msg)
+        output.debug("")
         # end of optional output
 
     comm_loads = {tuple(committee): load}
@@ -1255,10 +1239,9 @@ def compute_seqphragmen(
         )
 
     # optional output
-    if verbose:
-        print(header(rules["seqphragmen"].longname))
-        if resolute:
-            print("Computing only one winning committee (resolute=True)\n")
+    output.details(header(rules["seqphragmen"].longname))
+    if resolute:
+        output.details("Computing only one winning committee (resolute=True)\n")
     # end of optional output
 
     if resolute:
@@ -1269,19 +1252,18 @@ def compute_seqphragmen(
         committees, comm_loads = _seqphragmen_irresolute(profile, committeesize, division)
 
     # optional output
-    if verbose:
-        print(str_committees_header(committees, winning=True))
-        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
-    if verbose >= 2:
-        if resolute or len(committees) == 1:
-            print("corresponding load distribution:")
-        else:
-            print("corresponding load distributions:")
-        for committee in committees:
-            output = "("
-            for v, _ in enumerate(profile):
-                output += str(comm_loads[tuple(committee)][v]) + ", "
-            print(output[:-2] + ")")
+    output.details(str_committees_header(committees, winning=True))
+    output.details(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+
+    if resolute or len(committees) == 1:
+        output.debug("corresponding load distribution:")
+    else:
+        output.debug("corresponding load distributions:")
+    for committee in committees:
+        msg = "("
+        for v, _ in enumerate(profile):
+            msg += str(comm_loads[tuple(committee)][v]) + ", "
+        output.debug(msg[:-2] + ")")
     # end of optional output
 
     return sorted_committees(committees)
@@ -1338,13 +1320,12 @@ def compute_rule_x(
         )
 
     # optional output
-    if verbose:
-        if skip_phragmen_phase:
-            print(header(rules["rule-x-without-2nd-phase"].longname))
-        else:
-            print(header(rules["rule-x"].longname))
-        if resolute:
-            print("Computing only one winning committee (resolute=True)\n")
+    if skip_phragmen_phase:
+        output.details(header(rules["rule-x-without-2nd-phase"].longname))
+    else:
+        output.details(header(rules["rule-x"].longname))
+    if resolute:
+        output.details("Computing only one winning committee (resolute=True)\n")
     # end of optional output
 
     start_budget = {v: division(committeesize, len(profile)) for v, _ in enumerate(profile)}
@@ -1352,13 +1333,13 @@ def compute_rule_x(
     final_committees = set()
 
     # optional output
-    if resolute and verbose >= 2:
-        print("Phase 1:\n")
-        print("starting budget:")
-        output = "  ("
+    if resolute:
+        output.debug("Phase 1:\n")
+        output.debug("starting budget:")
+        msg = "  ("
         for v, _ in enumerate(profile):
-            output += str(start_budget[v]) + ", "
-        print(output[:-2] + ")\n")
+            msg += str(start_budget[v]) + ", "
+        output.debug(msg[:-2] + ")\n")
     # end of optional output
 
     for _ in range(committeesize):
@@ -1384,26 +1365,26 @@ def compute_rule_x(
                     next_commbudgets.append((new_comm, new_budget))
 
                     # optional output
-                    if resolute and verbose >= 2:
-                        output = "adding candidate number "
-                        output += str(len(committee)) + ": "
-                        output += profile.cand_names[next_cand] + "\n"
-                        output += " with maxmimum cost per voter q = "
-                        output += str(min(min_q.values()))
-                        print(output)
-                        print(" remaining budget:")
-                        output = "  ("
+                    if resolute:
+                        msg = "adding candidate number "
+                        msg += str(len(committee)) + ": "
+                        msg += profile.cand_names[next_cand] + "\n"
+                        msg += " with maxmimum cost per voter q = "
+                        msg += str(min(min_q.values()))
+                        output.debug(msg)
+                        output.debug(" remaining budget:")
+                        msg = "  ("
                         for v, _ in enumerate(profile):
-                            output += str(new_budget[v]) + ", "
-                        print(output[:-2] + ")")
+                            msg += str(new_budget[v]) + ", "
+                        output.debug(msg[:-2] + ")")
                         if len(next_cands) > 1:
-                            output = " tie broken in favor of "
-                            output += profile.cand_names[next_cand] + ","
-                            output += "\n candidates "
-                            output += str_set_of_candidates(next_cands[1:])
-                            output += " are tied"
-                            print(output)
-                        print()
+                            msg = " tie broken in favor of "
+                            msg += profile.cand_names[next_cand] + ","
+                            msg += "\n candidates "
+                            msg += str_set_of_candidates(next_cands[1:])
+                            msg += " are tied"
+                            output.debug(msg)
+                        output.debug("")
                     # end of optional output
 
                     if resolute:
@@ -1416,8 +1397,8 @@ def compute_rule_x(
                     # fill committee via seq-Phragmen
 
                     # optional output
-                    if resolute and verbose >= 2:
-                        print("Phase 2 (seq-Phragmén):\n")
+                    if resolute:
+                        output.debug("Phase 2 (seq-Phragmén):\n")
                     # end of optional output
 
                     start_load = {}
@@ -1426,12 +1407,12 @@ def compute_rule_x(
                         start_load[v] = division(committeesize, len(profile)) - budget[v]
 
                     # optional output
-                    if resolute and verbose >= 2:
-                        print("starting loads (= budget spent):")
-                        output = "  ("
+                    if resolute:
+                        output.debug("starting loads (= budget spent):")
+                        msg = "  ("
                         for v, _ in enumerate(profile):
-                            output += str(start_load[v]) + ", "
-                        print(output[:-2] + ")\n")
+                            msg += str(start_load[v]) + ", "
+                        output.debug(msg[:-2] + ")\n")
                     # end of optional output
 
                     if resolute:
@@ -1464,9 +1445,8 @@ def compute_rule_x(
         committees = committees[:1]
 
     # optional output
-    if verbose:
-        print(str_committees_header(committees, winning=True))
-        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.details(str_committees_header(committees, winning=True))
+    output.details(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return sorted_committees(committees)
@@ -1500,13 +1480,12 @@ def compute_optphragmen(profile, committeesize, algorithm="gurobi", resolute=Fal
     check_enough_approved_candidates(profile, committeesize)
 
     # optional output
-    if verbose:
-        print(header(rules["optphragmen"].longname))
-        if resolute:
-            print("Computing only one winning committee (resolute=True)\n")
-    if verbose >= 3:
-        if algorithm == "gurobi":
-            print("Using the Gurobi ILP solver")
+    output.details(header(rules["optphragmen"].longname))
+    if resolute:
+        output.details("Computing only one winning committee (resolute=True)\n")
+
+    if algorithm == "gurobi":
+        output.debug2("Using the Gurobi ILP solver")
     # end of optional output
 
     if algorithm == "fastest":
@@ -1523,9 +1502,8 @@ def compute_optphragmen(profile, committeesize, algorithm="gurobi", resolute=Fal
     committees = sorted_committees(committees)
 
     # optional output
-    if verbose:
-        print(str_committees_header(committees, winning=True))
-        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.details(str_committees_header(committees, winning=True))
+    output.details(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1609,10 +1587,9 @@ def compute_phragmen_enestroem(
         committees = [committees[0]]
 
     # optional output
-    if verbose:
-        print(header(rules["phragmen-enestroem"].longname))
-        print(str_committees_header(committees, winning=True))
-        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.details(header(rules["phragmen-enestroem"].longname))
+    output.details(str_committees_header(committees, winning=True))
+    output.details(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
@@ -1681,10 +1658,9 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard", resolut
         committees = [committees[0]]
 
     # optional output
-    if verbose:
-        print(header(rules["consensus-rule"].longname))
-        print(str_committees_header(committees, winning=True))
-        print(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.details(header(rules["consensus-rule"].longname))
+    output.details(str_committees_header(committees, winning=True))
+    output.details(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
 
     return committees
