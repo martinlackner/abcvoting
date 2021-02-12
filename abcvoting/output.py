@@ -48,6 +48,9 @@ class Output:
         self.verbosity = verbosity
         self.logger = logger
 
+    def set_verbosity(self, verbosity):
+        self.verbosity = verbosity
+
     def _print(self, verbosity, msg):
         if verbosity >= self.verbosity:
             print(msg)

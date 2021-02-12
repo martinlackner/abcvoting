@@ -24,6 +24,26 @@ def test_verbosity(capfd, verbosity):
             assert verbosity_name.lower() not in stdout
 
 
+def test_verbosity(capfd):
+    output = Output(verbosity=INFO)
+    output.details("details")
+    output.info("info")
+
+    stdout = capfd.readouterr().out
+
+    assert "info\n" in stdout
+    assert "details\n" not in stdout
+
+    output.set_verbosity(DETAILS)
+    output.details("details")
+    output.info("info")
+
+    stdout = capfd.readouterr().out
+
+    assert "info\n" in stdout
+    assert "details\n" in stdout
+
+
 @pytest.mark.parametrize("verbosity", [INFO, DETAILS])
 def test_logger(capfd, verbosity):
     logger = logging.getLogger("testoutput")
