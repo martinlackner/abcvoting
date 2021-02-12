@@ -9,6 +9,9 @@ from pathlib import Path
 import abcvoting.abcrules
 import abcvoting.abcrules_gurobi
 
+from abcvoting.output import WARNING
+from abcvoting.output import output
+
 
 @pytest.fixture
 def check_output(capfd, request):
@@ -18,8 +21,15 @@ def check_output(capfd, request):
     If a test fails, the actual output is copied to a file called <testname>.new, so it should
     be easy to accept changes by `mv survey_output/<testnaem>.new survey_output/<testnaem>`.
     """
+    # reset verbosity, because might have been modified, this is just paranoia
+    output.set_verbosity(WARNING)
+
     yield
-    output = capfd.readouterr().out
+
+    # reset verbosity, examples modify the verbosity level
+    output.set_verbosity(WARNING)
+
+    stdout = capfd.readouterr().out
     test_name = request.node.name
     fname = Path(__file__).parent / "survey_output" / test_name
     try:
@@ -28,11 +38,11 @@ def check_output(capfd, request):
     except FileNotFoundError:
         expected_output = None
 
-    if expected_output != output:
+    if expected_output != stdout:
         with open(f"{fname}.new", "w", encoding="utf8") as file:
-            file.write(output)
+            file.write(stdout)
 
-    assert expected_output == output, f"Unexpected output, output written to {fname}.new"
+    assert expected_output == stdout, f"Unexpected output, output written to {fname}.new"
 
 
 # noinspection PyUnresolvedReferences
