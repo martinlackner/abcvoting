@@ -8,10 +8,14 @@ by Martin Lackner and Piotr Skowron
 import sys
 
 sys.path.insert(0, "../..")
+from abcvoting.output import DETAILS
+from abcvoting.output import output
 from abcvoting import abcrules
 from abcvoting.preferences import Profile
 from abcvoting import misc
 
+
+output.set_verbosity(DETAILS)
 
 print("Remark 3:\n*********\n")
 

@@ -11,7 +11,10 @@ sys.path.insert(0, "..")
 from abcvoting import abcrules
 from survey import example01 as ex1
 from abcvoting import misc
+from abcvoting.output import output
+from abcvoting.output import DEBUG
 
+output.set_verbosity(DEBUG)
 
 print(misc.header("Example 3", "*"))
 

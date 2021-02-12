@@ -13,7 +13,77 @@ profile with 10 votes and 3 candidates:
  2 x {b}
 
 winning committees for k=1 and k=2:
+----------------------------------
+Proportional Approval Voting (PAV)
+----------------------------------
+
+Computing only one winning committee (resolute=True)
+
+starting with the empty committee (score = 0)
+
+adding candidate number 1: c
+ score increases by 6 to a total of 6
+
+Optimal PAV-score: 6
+
+1 winning committee:
+ {c}
+
+----------------------------------
+Proportional Approval Voting (PAV)
+----------------------------------
+
+Computing only one winning committee (resolute=True)
+
+starting with the empty committee (score = 0)
+
+adding candidate number 1: c
+ score increases by 6 to a total of 6
+
+adding candidate number 2: a
+ score increases by 7/2 to a total of 19/2 tie broken in favor of 0 candidates {1} would increase the score by the same amount (7/2)
+
+Optimal PAV-score: 10
+
+1 winning committee:
+ {a, b}
+
  PAV: {c} vs {a, b}
+--------------------------------
+Approval Chamberlin-Courant (CC)
+--------------------------------
+
+Computing only one winning committee (resolute=True)
+
+starting with the empty committee (score = 0)
+
+adding candidate number 1: c
+ score increases by 6 to a total of 6
+
+Optimal CC-score: 6
+
+1 winning committee:
+ {c}
+
+--------------------------------
+Approval Chamberlin-Courant (CC)
+--------------------------------
+
+Computing only one winning committee (resolute=True)
+
+starting with the empty committee (score = 0)
+
+adding candidate number 1: c
+ score increases by 6 to a total of 6
+
+adding candidate number 2: a
+ score increases by 2 to a total of 8 tie broken in favor of 0 candidates {1} would increase the score by the same amount (2)
+
+Optimal CC-score: 10
+
+1 winning committee:
+ {a, b}
+
  CC: {c} vs {a, b}
  Monroe: {c} vs {a, b}
  opt-Phragmén: {c} vs {a, b}

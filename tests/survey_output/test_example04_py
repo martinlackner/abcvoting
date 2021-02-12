@@ -19,6 +19,20 @@ profile with 12 votes and 8 candidates:
 Proportional Approval Voting (PAV)
 ----------------------------------
 
+starting with the empty committee (score = 0)
+
+adding candidate number 1: a
+ score increases by 8 to a total of 8
+
+adding candidate number 2: b
+ score increases by 5/2 to a total of 21/2 tie broken in favor of 1 candidates {2} would increase the score by the same amount (5/2)
+
+adding candidate number 3: c
+ score increases by 2 to a total of 25/2
+
+adding candidate number 4: f
+ score increases by 4/3 to a total of 83/6
+
 Optimal PAV-score: 83/6
 
 1 winning committee:

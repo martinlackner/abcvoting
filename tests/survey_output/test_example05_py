@@ -17,6 +17,14 @@ profile with 23 votes and 4 candidates:
 Proportional Approval Voting (PAV)
 ----------------------------------
 
+starting with the empty committee (score = 0)
+
+adding candidate number 1: d
+ score increases by 11 to a total of 11
+
+adding candidate number 2: c
+ score increases by 15/2 to a total of 37/2
+
 Optimal PAV-score: 19
 
 1 winning committee:
@@ -86,6 +94,14 @@ total weight: 9321
 ----------------------------------
 Proportional Approval Voting (PAV)
 ----------------------------------
+
+starting with the empty committee (score = 0)
+
+adding candidate number 1: c
+ score increases by 5840 to a total of 5840
+
+adding candidate number 2: a
+ score increases by 3801 to a total of 9641
 
 Optimal PAV-score: 9651
 
