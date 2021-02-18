@@ -637,7 +637,12 @@ def compute_seq_thiele_method(
         )
 
     # optional output
-    output.details(header(rules["seq" + scorefct_str].longname))
+    try:
+        output.details(header(rules["seq" + scorefct_str].longname))
+    except KeyError:
+        # FIXME this is a bug which never occurred until the output refactoring, because the
+        #  verbose parameter was not passed on correctly
+        ...
     if resolute:
         output.details("Computing only one winning committee (resolute=True)\n")
     # end of optional output
