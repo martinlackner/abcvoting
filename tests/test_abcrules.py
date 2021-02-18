@@ -812,57 +812,6 @@ def test_fastest_algorithms(rule):
     abcrules.compute(rule.rule_id, profile, committeesize, algorithm="fastest")
 
 
-@pytest.mark.parametrize(
-    "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
-)
-@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
-def test_output(capfd, rule_id, algorithm, resolute, verbose):
-    if algorithm == "cvxpy_glpk_mi" and verbose == 0:
-        # TODO unfortunately GLPK_MI prints "Long-step dual simplex will be used" to stderr and it
-        #  would be very complicated to capture this on all platforms reliably, changing
-        #  sys.stderr doesn't help.
-        #  This seems to be fixed in GLPK 5.0 but not in GLPK 4.65. For some weird reason this
-        #  test succeeds and does not need to be skipped when using conda-forge, although the
-        #  version from conda-forge is given as glpk 4.65 he80fd80_1002.
-        #  This could help to introduce a workaround: https://github.com/xolox/python-capturer
-        #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
-        pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
-
-    if ("gurobi" in algorithm or algorithm == "fastest") and verbose == 0:
-        # TODO Gurobi prints:
-        #  "Academic license - for non-commercial use only"
-        #  (if an acamedic license is used) as well as
-        #  "Warning: parameter changes on this environment will not affect existing models."
-        #  Thus this test fails.
-        #
-        # This message appears only sometimes, so even if this test succeeds for gurobi with
-        # verbose=0, it's probably just due to the test execution order, i.e. the undesired
-        # message was simply printed earlier, or caused by use of different Gurobi versions.
-        #
-        # This might skip too much, if gurobi is not the fastest.
-        pytest.skip("Gurobi always prints something when used with an academic license")
-
-    profile = Profile(2)
-    profile.add_voters([[0]])
-    committeesize = 1
-    committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
-    )
-    out = str(capfd.readouterr().out)
-    if verbose == 0:
-        assert out == ""
-    else:
-        assert len(out) > 0
-        print(out)
-        print(misc.header(abcrules.rules[rule_id].longname))
-        assert out.startswith(misc.header(abcrules.rules[rule_id].longname))
-        # assert out.endswith(
-        #     misc.str_committees_header(committees, winning=True)
-        #     + "\n"
-        #     + misc.str_sets_of_candidates(committees, cand_names=profile.cand_names)
-        # )
-
-
 @pytest.mark.cvxpy
 def test_cvxpy_wrong_score_fct():
     profile = Profile(4)
@@ -915,3 +864,59 @@ def test_seqphragmen_fails_EJR():
     assert abcrules.compute_seqphragmen(profile, 12) == [
         {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12}
     ]
+
+
+@pytest.mark.parametrize(
+    "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
+)
+@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
+def test_output(capfd, rule_id, algorithm, resolute, verbose):
+    if algorithm == "fastest":
+        return
+        # not necessary, output for "fastest" is the same as
+        # whatever algorithm is selected as fastest
+
+    if algorithm == "cvxpy_glpk_mi" and verbose == 0:
+        # TODO unfortunately GLPK_MI prints "Long-step dual simplex will be used" to stderr and it
+        #  would be very complicated to capture this on all platforms reliably, changing
+        #  sys.stderr doesn't help.
+        #  This seems to be fixed in GLPK 5.0 but not in GLPK 4.65. For some weird reason this
+        #  test succeeds and does not need to be skipped when using conda-forge, although the
+        #  version from conda-forge is given as glpk 4.65 he80fd80_1002.
+        #  This could help to introduce a workaround: https://github.com/xolox/python-capturer
+        #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
+        pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
+
+    if "gurobi" in algorithm and verbose == 0:
+        # TODO Gurobi prints:
+        #  "Academic license - for non-commercial use only"
+        #  (if an acamedic license is used) as well as
+        #  "Warning: parameter changes on this environment will not affect existing models."
+        #  Thus this test fails.
+        #
+        # This message appears only sometimes, so even if this test succeeds for gurobi with
+        # verbose=0, it's probably just due to the test execution order, i.e. the undesired
+        # message was simply printed earlier, or caused by use of different Gurobi versions.
+        #
+        # This might skip too much, if gurobi is not the fastest.
+        pytest.skip("Gurobi always prints something when used with an academic license")
+
+    profile = Profile(2)
+    profile.add_voters([[0]])
+    committeesize = 1
+    committees = abcrules.compute(
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
+    )
+    out = str(capfd.readouterr().out)
+    if verbose == 0:
+        assert out == ""
+    else:
+        assert len(out) > 0
+        print(out)
+        print(misc.header(abcrules.rules[rule_id].longname))
+        assert out.startswith(misc.header(abcrules.rules[rule_id].longname))
+        # assert out.endswith(
+        #     misc.str_committees_header(committees, winning=True)
+        #     + "\n"
+        #     + misc.str_sets_of_candidates(committees, cand_names=profile.cand_names)
+        # )
