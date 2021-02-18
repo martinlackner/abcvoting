@@ -6,6 +6,7 @@ import pytest
 
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
+from abcvoting.output import INFO, VERBOSITY_TO_NAME, WARNING, output
 from abcvoting.preferences import Profile, Voter
 from abcvoting import abcrules, misc, scores
 
@@ -815,9 +816,9 @@ def test_fastest_algorithms(rule):
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
-def test_output(capfd, rule_id, algorithm, resolute, verbose):
-    if algorithm == "cvxpy_glpk_mi" and verbose == 0:
+@pytest.mark.parametrize("verbosity", VERBOSITY_TO_NAME.keys())
+def test_output(capfd, rule_id, algorithm, resolute, verbosity):
+    if algorithm == "cvxpy_glpk_mi" and verbosity >= INFO:
         # TODO unfortunately GLPK_MI prints "Long-step dual simplex will be used" to stderr and it
         #  would be very complicated to capture this on all platforms reliably, changing
         #  sys.stderr doesn't help.
@@ -828,7 +829,7 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
         #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
         pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
 
-    if ("gurobi" in algorithm or algorithm == "fastest") and verbose == 0:
+    if ("gurobi" in algorithm or algorithm == "fastest") and verbosity >= INFO:
         # TODO Gurobi prints:
         #  "Academic license - for non-commercial use only"
         #  (if an acamedic license is used) as well as
@@ -842,14 +843,18 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
         # This might skip too much, if gurobi is not the fastest.
         pytest.skip("Gurobi always prints something when used with an academic license")
 
+    output.set_verbosity(verbosity=verbosity)
+
     profile = Profile(2)
     profile.add_voters([[0]])
     committeesize = 1
+
     committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
     )
     out = str(capfd.readouterr().out)
-    if verbose == 0:
+
+    if verbosity >= INFO:
         assert out == ""
     else:
         assert len(out) > 0
@@ -861,6 +866,9 @@ def test_output(capfd, rule_id, algorithm, resolute, verbose):
         #     + "\n"
         #     + misc.str_sets_of_candidates(committees, cand_names=profile.cand_names)
         # )
+
+    # TODO this should be called in an exception safe way, e.g. add a fixture
+    output.set_verbosity(verbosity=WARNING)
 
 
 @pytest.mark.cvxpy
