@@ -31,13 +31,13 @@ print(misc.header("Input:"))
 print(profile.str_compact())
 
 committees_rule_x = abcrules.compute_rule_x(
-    profile, 4, algorithm="exact-fractions", resolute=False, verbose=2
+    profile, 4, algorithm="exact-fractions", resolute=False
 )
 # detailed output is only available if resolute=True:
-abcrules.compute_rule_x(profile, 4, algorithm="exact-fractions", resolute=True, verbose=2)
+abcrules.compute_rule_x(profile, 4, algorithm="exact-fractions", resolute=True)
 
 committees_seqphragmen = abcrules.compute_seqphragmen(
-    profile, 4, algorithm="exact-fractions", resolute=False, verbose=2
+    profile, 4, algorithm="exact-fractions", resolute=False
 )
 
 # verify correctness

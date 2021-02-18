@@ -21,7 +21,7 @@ print(misc.header("Example 4", "*"))
 print(misc.header("Input (election instance from Example 1):"))
 print(ex1.profile.str_compact())
 
-committees = abcrules.compute_pav(ex1.profile, 4, verbose=2)
+committees = abcrules.compute_pav(ex1.profile, 4)
 
 
 # verify correctness

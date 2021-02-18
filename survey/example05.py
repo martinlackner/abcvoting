@@ -30,11 +30,11 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees_pav = abcrules.compute_pav(profile, 2, verbose=2)
+committees_pav = abcrules.compute_pav(profile, 2)
 
-committees_seqpav = abcrules.compute_seqpav(profile, 2, verbose=2)
+committees_seqpav = abcrules.compute_seqpav(profile, 2)
 
-committees_revseqpav = abcrules.compute_revseqpav(profile, 2, verbose=2)
+committees_revseqpav = abcrules.compute_revseqpav(profile, 2)
 
 # verify correctness
 assert committees_pav == [{a, c}]
@@ -65,11 +65,11 @@ profile.add_voter(Voter([b], 60))
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees_pav = abcrules.compute_pav(profile, 2, verbose=2)
+committees_pav = abcrules.compute_pav(profile, 2)
 
-committees_seqpav = abcrules.compute_seqpav(profile, 2, verbose=2)
+committees_seqpav = abcrules.compute_seqpav(profile, 2)
 
-committees_revseqpav = abcrules.compute_revseqpav(profile, 2, verbose=2)
+committees_revseqpav = abcrules.compute_revseqpav(profile, 2)
 
 
 # verify correctness

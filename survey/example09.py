@@ -24,7 +24,7 @@ print("Using opt-Phragmen instead (without lexicographic order).\n")
 print(misc.header("Input (election instance from Example 1):"))
 print(ex1.profile.str_compact())
 
-committees = abcrules.compute_optphragmen(ex1.profile, 4, verbose=2)
+committees = abcrules.compute_optphragmen(ex1.profile, 4)
 
 print("Note: only committee {a, b, c, f} wins according to lexmin-Phragmen.")
 

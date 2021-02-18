@@ -19,4 +19,4 @@ print(
     f"with the Proportional Approval Voting (PAV) rule\n"
     f"given the following {profile}"
 )
-committees = abcrules.compute_pav(profile, committeesize, verbose=1)
+committees = abcrules.compute_pav(profile, committeesize)

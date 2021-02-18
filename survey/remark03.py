@@ -34,6 +34,6 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-abcrules.compute_revseqpav(profile, 1, resolute=False, verbose=1)
+abcrules.compute_revseqpav(profile, 1, resolute=False)
 
-abcrules.compute_av(profile, 1, verbose=1)
+abcrules.compute_av(profile, 1)

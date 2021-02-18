@@ -30,9 +30,9 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees_minimaxav = abcrules.compute_minimaxav(profile, 1, verbose=2)
+committees_minimaxav = abcrules.compute_minimaxav(profile, 1)
 
-committees_lexminimaxav = abcrules.compute_lexminimaxav(profile, 1, verbose=2)
+committees_lexminimaxav = abcrules.compute_lexminimaxav(profile, 1)
 
 
 # verify correctness

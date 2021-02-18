@@ -468,8 +468,7 @@ def test_resolute_parameter(rule):
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize("verbose", [0, 1, 2])
-def test_abcrules__toofewcandidates(rule_id, algorithm, resolute, verbose):
+def test_abcrules__toofewcandidates(rule_id, algorithm, resolute):
     profile = Profile(5)
     committeesize = 4
     approval_sets = [{0, 1, 2}, {1}, {1, 2}, {0}]
@@ -482,7 +481,6 @@ def test_abcrules__toofewcandidates(rule_id, algorithm, resolute, verbose):
             committeesize,
             algorithm=algorithm,
             resolute=resolute,
-            verbose=verbose,
         )
     with pytest.raises(ValueError):
         abcrules.rules[rule_id].fct(
@@ -490,7 +488,6 @@ def test_abcrules__toofewcandidates(rule_id, algorithm, resolute, verbose):
             committeesize,
             algorithm=algorithm,
             resolute=resolute,
-            verbose=verbose,
         )
 
 
@@ -503,8 +500,7 @@ def test_abcrules_wrong_rule_id():
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
-def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
+def test_abcrules_weightsconsidered(rule_id, algorithm, resolute):
     profile = Profile(3)
     profile.add_voter(Voter([0]))
     profile.add_voter(Voter([0]))
@@ -519,11 +515,11 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
         "phragmen-enestroem",
     ]:
         with pytest.raises(ValueError):
-            abcrules.compute(rule_id, profile, committeesize, algorithm=algorithm, verbose=verbose)
+            abcrules.compute(rule_id, profile, committeesize, algorithm=algorithm)
         return
 
     result = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
     )
 
     if rule_id == "minimaxav":
@@ -540,8 +536,7 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute, verbose):
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
-def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
+def test_abcrules_correct_simple(rule_id, algorithm, resolute):
     def simple_checks(_committees):
         if rule_id == "rule-x-without-2nd-phase":
             assert _committees == [set()]
@@ -556,7 +551,7 @@ def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
     committeesize = 2
 
     committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
     )
     simple_checks(committees)
 
@@ -566,7 +561,6 @@ def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
         committeesize,
         algorithm=algorithm,
         resolute=resolute,
-        verbose=verbose,
     )
     simple_checks(committees)
 
@@ -574,14 +568,13 @@ def test_abcrules_correct_simple(rule_id, algorithm, resolute, verbose):
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
-def test_abcrules_return_lists_of_sets(rule_id, algorithm, resolute, verbose):
+def test_abcrules_return_lists_of_sets(rule_id, algorithm, resolute):
     profile = Profile(4)
     profile.add_voters([{0}, [1], [2], {3}])
     committeesize = 2
 
     committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
     )
     assert len(committees) >= 1
     for committee in committees:
@@ -591,14 +584,13 @@ def test_abcrules_return_lists_of_sets(rule_id, algorithm, resolute, verbose):
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
-def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
+def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute):
     profile = Profile(4)
     profile.add_voters([{0}, {1}, {2}])
     committeesize = 3
 
     committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
     )
 
     assert committees == [{0, 1, 2}]
@@ -606,7 +598,7 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute, verbose):
     profile.add_voters([[]])
 
     committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute, verbose=verbose
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
     )
 
     if rule_id == "rule-x-without-2nd-phase":
@@ -665,16 +657,13 @@ def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
 @pytest.mark.parametrize(
     "rule_id, algorithm, resolute", testrules.rule_algorithm_resolute, ids=idfn
 )
-@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
 @pytest.mark.parametrize("profile, exp_results, committeesize", testinsts.instances)
-def test_abcrules_correct(
-    rule_id, algorithm, resolute, verbose, profile, exp_results, committeesize
-):
+def test_abcrules_correct(rule_id, algorithm, resolute, profile, exp_results, committeesize):
     if rule_id.startswith("geom") and rule_id != "geom2":
         return  # correctness tests only for geom2
     print(profile)
     committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm, verbose=verbose, resolute=resolute
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
     )
     if resolute:
         assert len(committees) == 1
@@ -780,9 +769,8 @@ def test_jansonexamples(rule_id, algorithm):
 
 
 @pytest.mark.parametrize("rule", abcrules.rules.values(), ids=idfn)
-@pytest.mark.parametrize("verbose", [0, 1, 2, 3])
 @pytest.mark.parametrize("resolute", [True, False])
-def test_unspecified_algorithms(rule, verbose, resolute):
+def test_unspecified_algorithms(rule, resolute):
     if resolute not in rule.resolute:
         return
     profile = Profile(3)
@@ -794,7 +782,6 @@ def test_unspecified_algorithms(rule, verbose, resolute):
             committeesize,
             algorithm="made-up-algorithm",
             resolute=resolute,
-            verbose=verbose,
         )
 
 
@@ -837,7 +824,7 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
         #  Thus this test fails.
         #
         # This message appears only sometimes, so even if this test succeeds for gurobi with
-        # verbose=0, it's probably just due to the test execution order, i.e. the undesired
+        # verbosity>=INFO, it's probably just due to the test execution order, i.e. the undesired
         # message was simply printed earlier, or caused by use of different Gurobi versions.
         #
         # This might skip too much, if gurobi is not the fastest.

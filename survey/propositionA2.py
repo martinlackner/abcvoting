@@ -102,5 +102,5 @@ print(
 assert not all(cand in comm1 for cand in comm2)
 
 print("\n\nDetailed calculations:")
-abcrules.compute("rule-x", profile, 3, resolute=True, verbose=2)
-abcrules.compute("rule-x", profile, 4, resolute=True, verbose=2)
+abcrules.compute("rule-x", profile, 3, resolute=True)
+abcrules.compute("rule-x", profile, 4, resolute=True)
