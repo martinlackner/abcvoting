@@ -845,30 +845,31 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
 
     output.set_verbosity(verbosity=verbosity)
 
-    profile = Profile(2)
-    profile.add_voters([[0]])
-    committeesize = 1
+    try:
+        profile = Profile(2)
+        profile.add_voters([[0]])
+        committeesize = 1
 
-    committees = abcrules.compute(
-        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
-    )
-    out = str(capfd.readouterr().out)
+        committees = abcrules.compute(
+            rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
+        )
+        out = str(capfd.readouterr().out)
 
-    if verbosity >= INFO:
-        assert out == ""
-    else:
-        assert len(out) > 0
-        print(out)
-        print(misc.header(abcrules.rules[rule_id].longname))
-        assert out.startswith(misc.header(abcrules.rules[rule_id].longname))
-        # assert out.endswith(
-        #     misc.str_committees_header(committees, winning=True)
-        #     + "\n"
-        #     + misc.str_sets_of_candidates(committees, cand_names=profile.cand_names)
-        # )
+        if verbosity >= INFO:
+            assert out == ""
+        else:
+            assert len(out) > 0
+            print(out)
+            print(misc.header(abcrules.rules[rule_id].longname))
+            assert out.startswith(misc.header(abcrules.rules[rule_id].longname))
+            # assert out.endswith(
+            #     misc.str_committees_header(committees, winning=True)
+            #     + "\n"
+            #     + misc.str_sets_of_candidates(committees, cand_names=profile.cand_names)
+            # )
 
-    # TODO this should be called in an exception safe way, e.g. add a fixture
-    output.set_verbosity(verbosity=WARNING)
+    finally:
+        output.set_verbosity(verbosity=WARNING)
 
 
 @pytest.mark.cvxpy
