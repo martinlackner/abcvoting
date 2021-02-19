@@ -1,0 +1,50 @@
+*********
+Example 8
+*********
+
+-----------------------------------------
+Input (election instance from Example 1):
+-----------------------------------------
+
+profile with 12 votes and 8 candidates:
+ 3 x {a, b},
+ 3 x {a, c},
+ 2 x {a, d},
+ 1 x {b, c, f},
+ 1 x {e},
+ 1 x {f},
+ 1 x {g}
+
+-----------------------------------------
+Phragmén's Sequential Rule (seq-Phragmén)
+-----------------------------------------
+
+Computing only one winning committee (resolute=True)
+
+adding candidate number 1: a
+ maximum load increased to 0.125
+ load distribution:
+  (0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0, 0, 0, 0)
+
+adding candidate number 2: b
+ maximum load increased to 0.34375
+ load distribution:
+  (0.34375, 0.34375, 0.34375, 0.125, 0.125, 0.125, 0.125, 0.125, 0.34375, 0, 0, 0)
+ tie broken in favor of b,
+ candidates {2} would increase the load to the same amount ([6, 0.34375, 0.34375, 0.625, 1.0, 0.5, 1.0, 5])
+
+adding candidate number 3: c
+ maximum load increased to 0.4296875
+ load distribution:
+  (0.34375, 0.34375, 0.34375, 0.4296875, 0.4296875, 0.4296875, 0.125, 0.125, 0.4296875, 0, 0, 0)
+
+adding candidate number 4: d
+ maximum load increased to 0.625
+ load distribution:
+  (0.34375, 0.34375, 0.34375, 0.4296875, 0.4296875, 0.4296875, 0.625, 0.625, 0.4296875, 0, 0, 0)
+
+1 winning committee:
+ {a, b, c, d}
+
+corresponding load distribution:
+(0.34375, 0.34375, 0.34375, 0.4296875, 0.4296875, 0.4296875, 0.625, 0.625, 0.4296875, 0, 0, 0)

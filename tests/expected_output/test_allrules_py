@@ -1,0 +1,66 @@
+Approval Voting (AV):
+ {0, 1, 4, 5}
+
+Satisfaction Approval Voting (SAV):
+ {0, 1, 2, 3}
+
+Proportional Approval Voting (PAV):
+ {0, 1, 4, 5}
+
+Sainte-Laguë Approval Voting (SLAV):
+ {0, 1, 2, 3}
+
+Approval Chamberlin-Courant (CC):
+ {0, 1, 2, 3}
+
+Sequential Proportional Approval Voting (seq-PAV):
+ {0, 1, 4, 5}
+
+Reverse Sequential Proportional Approval Voting (revseq-PAV):
+ {0, 1, 2, 4}
+
+Sequential Sainte-Laguë Approval Voting (seq-SLAV):
+ {0, 1, 2, 4}
+
+Sequential Approval Chamberlin-Courant (seq-CC):
+ {0, 1, 2, 4}
+
+Phragmén's Sequential Rule (seq-Phragmén):
+ {0, 1, 4, 5}
+
+Phragmén's Optimization Rule (opt-Phragmén):
+ {0, 1, 2, 3}
+
+Monroe's Approval Rule (Monroe):
+ {0, 1, 2, 3}
+
+Greedy Monroe:
+ {0, 2, 3, 4}
+
+Minimax Approval Voting (MAV):
+ {2, 3, 4, 5}
+
+Lexicographic Minimax Approval Voting (lex-MAV):
+ {0, 1, 4, 5}
+
+Rule X:
+ {0, 1, 4, 5}
+
+Rule X without the second (Phragmén) phase:
+ {4, 5}
+
+Method of Phragmén-Eneström:
+ {0, 1, 4, 5}
+
+Consensus Rule:
+ {0, 1, 2, 4}
+
+1.5-Geometric Rule:
+ {0, 1, 4, 5}
+
+2-Geometric Rule:
+ {0, 2, 3, 4}
+
+5-Geometric Rule:
+ {0, 1, 2, 3}
+

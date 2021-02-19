@@ -11,7 +11,10 @@ sys.path.insert(0, "..")
 from abcvoting import abcrules
 from abcvoting.preferences import Profile
 from abcvoting import misc
+from abcvoting.output import output
+from abcvoting.output import DETAILS
 
+output.set_verbosity(DETAILS)
 
 print(misc.header("Example 11", "*"))
 
@@ -28,13 +31,13 @@ print(misc.header("Input:"))
 print(profile.str_compact())
 
 committees_rule_x = abcrules.compute_rule_x(
-    profile, 4, algorithm="exact-fractions", resolute=False, verbose=2
+    profile, 4, algorithm="exact-fractions", resolute=False
 )
 # detailed output is only available if resolute=True:
-abcrules.compute_rule_x(profile, 4, algorithm="exact-fractions", resolute=True, verbose=2)
+abcrules.compute_rule_x(profile, 4, algorithm="exact-fractions", resolute=True)
 
 committees_seqphragmen = abcrules.compute_seqphragmen(
-    profile, 4, algorithm="exact-fractions", resolute=False, verbose=2
+    profile, 4, algorithm="exact-fractions", resolute=False
 )
 
 # verify correctness

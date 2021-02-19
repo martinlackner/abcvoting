@@ -225,7 +225,7 @@ def _gurobi_monroe(profile, committeesize, resolute):
     return sorted_committees(committees)
 
 
-def _gurobi_optphragmen(profile, committeesize, resolute, verbose):
+def _gurobi_optphragmen(profile, committeesize, resolute):
     """opt-Phragmen
 
     Warning: does not include the lexicographic optimization as specified

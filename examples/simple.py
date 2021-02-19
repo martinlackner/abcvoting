@@ -6,9 +6,13 @@ Very simple example (compute PAV)
 import sys
 
 sys.path.insert(0, "..")
+from abcvoting.output import INFO
+from abcvoting.output import output
 from abcvoting.preferences import Profile
 from abcvoting import abcrules
 
+
+output.set_verbosity(INFO)
 
 num_cand = 5
 profile = Profile(num_cand)
@@ -19,4 +23,4 @@ print(
     f"with the Proportional Approval Voting (PAV) rule\n"
     f"given the following {profile}"
 )
-committees = abcrules.compute_pav(profile, committeesize, verbose=1)
+committees = abcrules.compute_pav(profile, committeesize)

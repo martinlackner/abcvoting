@@ -1,0 +1,31 @@
+*********
+Example 6
+*********
+
+-----------------------------------------
+Input (election instance from Example 1):
+-----------------------------------------
+
+profile with 12 votes and 8 candidates:
+ 3 x {a, b},
+ 3 x {a, c},
+ 2 x {a, d},
+ 1 x {b, c, f},
+ 1 x {e},
+ 1 x {f},
+ 1 x {g}
+
+-------------------------------
+Monroe's Approval Rule (Monroe)
+-------------------------------
+
+Optimal Monroe score: 10
+
+6 winning committees:
+ {a, b, c, e}
+ {a, b, c, f}
+ {a, b, c, g}
+ {a, b, d, f}
+ {a, c, d, f}
+ {b, c, d, f}
+

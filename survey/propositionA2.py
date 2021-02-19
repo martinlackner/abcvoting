@@ -11,7 +11,11 @@ sys.path.insert(0, "..")
 from abcvoting import abcrules
 from abcvoting.preferences import Profile
 from abcvoting import misc
+from abcvoting.output import output
+from abcvoting.output import DETAILS
 
+
+output.set_verbosity(DETAILS)
 
 print(misc.header("Proposition A.2", "*"))
 
@@ -98,5 +102,5 @@ print(
 assert not all(cand in comm1 for cand in comm2)
 
 print("\n\nDetailed calculations:")
-abcrules.compute("rule-x", profile, 3, resolute=True, verbose=2)
-abcrules.compute("rule-x", profile, 4, resolute=True, verbose=2)
+abcrules.compute("rule-x", profile, 3, resolute=True)
+abcrules.compute("rule-x", profile, 4, resolute=True)
