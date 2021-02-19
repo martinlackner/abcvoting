@@ -1,0 +1,69 @@
+**********
+Example 11
+**********
+
+------
+Input:
+------
+
+profile with 15 votes and 5 candidates:
+ 6 x {a, b, c},
+ 4 x {a, b, c, d, e},
+ 2 x {a, b, d, e},
+ 3 x {d, e}
+
+------
+Rule X
+------
+
+2 winning committees:
+ {a, b, c, d}
+ {a, b, c, e}
+
+------
+Rule X
+------
+
+Computing only one winning committee (resolute=True)
+
+Phase 1:
+
+starting budget:
+  (4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15)
+
+adding candidate number 0: a
+ with maxmimum cost per voter q = 1/12
+ remaining budget:
+  (11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 4/15, 4/15, 4/15)
+ tie broken in favor of a,
+ candidates {1} are tied
+
+adding candidate number 1: b
+ with maxmimum cost per voter q = 1/12
+ remaining budget:
+  (1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 4/15, 4/15, 4/15)
+
+adding candidate number 2: c
+ with maxmimum cost per voter q = 1/10
+ remaining budget:
+  (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1/10, 1/10, 4/15, 4/15, 4/15)
+
+adding candidate number 3: d
+ with maxmimum cost per voter q = 4/15
+ remaining budget:
+  (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+ tie broken in favor of d,
+ candidates {4} are tied
+
+1 winning committee:
+ {a, b, c, d}
+
+-----------------------------------------
+Phragmén's Sequential Rule (seq-Phragmén)
+-----------------------------------------
+
+1 winning committee:
+ {a, b, d, e}
+
+corresponding load distribution:
+(5/24, 5/24, 5/24, 5/24, 5/24, 5/24, 11/36, 11/36, 11/36, 11/36, 11/36, 11/36, 11/36, 11/36, 11/36)

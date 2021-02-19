@@ -8,10 +8,14 @@ by Martin Lackner and Piotr Skowron
 import sys
 
 sys.path.insert(0, "../..")
+from abcvoting.output import INFO
+from abcvoting.output import output
 from abcvoting import abcrules
 from abcvoting.preferences import Profile
 from abcvoting import misc
 
+
+output.set_verbosity(INFO)
 
 print("Remark 3:\n*********\n")
 
@@ -30,6 +34,6 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-abcrules.compute_revseqpav(profile, 1, resolute=False, verbose=1)
+abcrules.compute_revseqpav(profile, 1, resolute=False)
 
-abcrules.compute_av(profile, 1, verbose=1)
+abcrules.compute_av(profile, 1)

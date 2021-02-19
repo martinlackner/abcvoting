@@ -11,7 +11,10 @@ sys.path.insert(0, "..")
 from abcvoting import abcrules
 from abcvoting.preferences import Profile
 from abcvoting import misc
+from abcvoting.output import output
+from abcvoting.output import DETAILS
 
+output.set_verbosity(DETAILS)
 
 print("Remark 2:\n*********\n")
 
@@ -27,9 +30,9 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees_minimaxav = abcrules.compute_minimaxav(profile, 1, verbose=2)
+committees_minimaxav = abcrules.compute_minimaxav(profile, 1)
 
-committees_lexminimaxav = abcrules.compute_lexminimaxav(profile, 1, verbose=2)
+committees_lexminimaxav = abcrules.compute_lexminimaxav(profile, 1)
 
 
 # verify correctness

@@ -11,7 +11,10 @@ sys.path.insert(0, "..")
 from abcvoting import abcrules
 from abcvoting.preferences import Profile, Voter
 from abcvoting import misc
+from abcvoting.output import output
+from abcvoting.output import DETAILS
 
+output.set_verbosity(DETAILS)
 
 print(misc.header("Example 5", "*"))
 
@@ -27,11 +30,11 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees_pav = abcrules.compute_pav(profile, 2, verbose=2)
+committees_pav = abcrules.compute_pav(profile, 2)
 
-committees_seqpav = abcrules.compute_seqpav(profile, 2, verbose=2)
+committees_seqpav = abcrules.compute_seqpav(profile, 2)
 
-committees_revseqpav = abcrules.compute_revseqpav(profile, 2, verbose=2)
+committees_revseqpav = abcrules.compute_revseqpav(profile, 2)
 
 # verify correctness
 assert committees_pav == [{a, c}]
@@ -62,11 +65,11 @@ profile.add_voter(Voter([b], 60))
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees_pav = abcrules.compute_pav(profile, 2, verbose=2)
+committees_pav = abcrules.compute_pav(profile, 2)
 
-committees_seqpav = abcrules.compute_seqpav(profile, 2, verbose=2)
+committees_seqpav = abcrules.compute_seqpav(profile, 2)
 
-committees_revseqpav = abcrules.compute_revseqpav(profile, 2, verbose=2)
+committees_revseqpav = abcrules.compute_revseqpav(profile, 2)
 
 
 # verify correctness

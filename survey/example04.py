@@ -11,14 +11,17 @@ sys.path.insert(0, "..")
 from abcvoting import abcrules
 from survey import example01 as ex1
 from abcvoting import misc
+from abcvoting.output import output
+from abcvoting.output import DETAILS
 
+output.set_verbosity(DETAILS)
 
 print(misc.header("Example 4", "*"))
 
 print(misc.header("Input (election instance from Example 1):"))
 print(ex1.profile.str_compact())
 
-committees = abcrules.compute_pav(ex1.profile, 4, verbose=2)
+committees = abcrules.compute_pav(ex1.profile, 4)
 
 
 # verify correctness
