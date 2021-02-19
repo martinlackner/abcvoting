@@ -12,9 +12,9 @@ from abcvoting import abcrules
 from abcvoting.preferences import Profile
 from abcvoting import misc
 from abcvoting.output import output
-from abcvoting.output import DEBUG
+from abcvoting.output import DETAILS
 
-output.set_verbosity(DEBUG)
+output.set_verbosity(DETAILS)
 
 print("Remark 2:\n*********\n")
 

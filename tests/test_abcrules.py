@@ -6,7 +6,7 @@ import pytest
 
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
-from abcvoting.output import INFO, VERBOSITY_TO_NAME, WARNING, output
+from abcvoting.output import VERBOSITY_TO_NAME, WARNING, output
 from abcvoting.preferences import Profile, Voter
 from abcvoting import abcrules, misc, scores
 
@@ -805,7 +805,7 @@ def test_fastest_algorithms(rule):
 )
 @pytest.mark.parametrize("verbosity", VERBOSITY_TO_NAME.keys())
 def test_output(capfd, rule_id, algorithm, resolute, verbosity):
-    if algorithm == "cvxpy_glpk_mi" and verbosity >= INFO:
+    if algorithm == "cvxpy_glpk_mi" and verbosity >= WARNING:
         # TODO unfortunately GLPK_MI prints "Long-step dual simplex will be used" to stderr and it
         #  would be very complicated to capture this on all platforms reliably, changing
         #  sys.stderr doesn't help.
@@ -816,7 +816,7 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
         #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
         pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
 
-    if ("gurobi" in algorithm or algorithm == "fastest") and verbosity >= INFO:
+    if ("gurobi" in algorithm or algorithm == "fastest") and verbosity >= WARNING:
         # TODO Gurobi prints:
         #  "Academic license - for non-commercial use only"
         #  (if an acamedic license is used) as well as
@@ -824,8 +824,9 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
         #  Thus this test fails.
         #
         # This message appears only sometimes, so even if this test succeeds for gurobi with
-        # verbosity>=INFO, it's probably just due to the test execution order, i.e. the undesired
-        # message was simply printed earlier, or caused by use of different Gurobi versions.
+        # verbosity>=WARNING, it's probably just due to the test execution order, i.e. the
+        # undesired message was simply printed earlier, or caused by use of different Gurobi
+        # versions.
         #
         # This might skip too much, if gurobi is not the fastest.
         pytest.skip("Gurobi always prints something when used with an academic license")
@@ -842,7 +843,7 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
         )
         out = str(capfd.readouterr().out)
 
-        if verbosity >= INFO:
+        if verbosity >= WARNING:
             assert out == ""
         else:
             assert len(out) > 0

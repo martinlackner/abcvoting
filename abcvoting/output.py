@@ -59,23 +59,22 @@ class Output:
             self.logger.log(verbosity if verbosity not in (DETAILS, DEBUG2) else DEBUG, msg)
 
     def debug2(self, msg):
-        # this is the old verbose >= 3
         self._print(DEBUG2, msg)
 
     def debug(self, msg):
-        # this is the old verbose >= 2
+        # this is the old verbose >= 3
         self._print(DEBUG, msg)
 
     def details(self, msg):
-        # this is the old verbose >= 1
+        # this is the old verbose >= 2
         self._print(DETAILS, msg)
 
     def info(self, msg):
-        # this is the old verbose >= 0
+        # this is the old verbose >= 1
         self._print(INFO, msg)
 
     def warning(self, msg):
-        # this was always printed when we still used the verbose parameter
+        # this is the old verbose >= 0
         self._print(WARNING, msg)
 
     def error(self, msg):
