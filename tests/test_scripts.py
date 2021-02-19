@@ -1,6 +1,3 @@
-"""
-Test if examples in directory examples/ work
-"""
 import pytest
 from pathlib import Path
 
@@ -19,7 +16,7 @@ def check_output(capfd, request):
     installed packages, might need to be adjusted to make test work on all platforms.
 
     If a test fails, the actual output is copied to a file called <testname>.new, so it should
-    be easy to accept changes by `mv survey_output/<testnaem>.new survey_output/<testnaem>`.
+    be easy to accept changes by `mv expected_output/<testnaem>.new survey_output/<testnaem>`.
     """
     # reset verbosity, because might have been modified, this is just paranoia
     output.set_verbosity(WARNING)
@@ -31,7 +28,7 @@ def check_output(capfd, request):
 
     stdout = capfd.readouterr().out
     test_name = request.node.name
-    fname = Path(__file__).parent / "survey_output" / test_name
+    fname = Path(__file__).parent / "expected_output" / test_name
     try:
         with open(fname, "r", encoding="utf8") as file:
             expected_output = file.read()
@@ -137,3 +134,24 @@ def test_propositionA3_py(check_output):
 # noinspection PyUnresolvedReferences
 def test_propositionA4_py(check_output):
     from survey import propositionA4
+
+
+# noinspection PyUnresolvedReferences
+def test_simple_py(check_output):
+    from examples import simple
+
+
+# noinspection PyUnresolvedReferences
+@pytest.mark.gurobi
+def test_allrules_py(check_output):
+    from examples import allrules
+
+
+# noinspection PyUnresolvedReferences
+def test_preflib_py(check_output):
+    from examples import handling_preflib_files
+
+
+# noinspection PyUnresolvedReferences
+def test_random_profiles_py(check_output):
+    from examples import random_profiles

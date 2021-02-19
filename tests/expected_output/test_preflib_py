@@ -1,0 +1,34 @@
+Computing a committee of size 2 with the Proportional Approval Voting (PAV) rule
+given a profile with 5 votes and 6 candidates:
+ {a, b, c},
+ {a, b, d},
+ {a, b, d},
+ {a, b, d},
+ {d, five, e}
+Output:
+ {0, 3}
+ {1, 3}
+
+****************************************
+Computing a committee of size 2 with the Proportional Approval Voting (PAV) rule
+given a profile with 5 votes and 5 candidates:
+ {A, B},
+ {B, D, E},
+ {C},
+ {D},
+ {D}
+Output:
+ {1, 3}
+
+****************************************
+Computing a committee of size 2 with Phragmen's sequential rule
+given a profile with 5 votes and 6 candidates:
+ {a},
+ {b},
+ {b},
+ {a, b},
+ {d}
+Output:
+ {0, 1}
+
+****************************************
