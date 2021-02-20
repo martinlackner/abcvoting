@@ -257,21 +257,58 @@ def _init_rules():
             (True, False),
         ),
     ]
-    for parameter in [1.5, 2, 5]:
-        _RULESINFO.append(
-            (
-                f"geom{parameter}",
-                f"{parameter}-Geometric",
-                f"{parameter}-Geometric Rule",
-                functools.partial(compute_thiele_method, f"geom{parameter}"),
-                _THIELE_ALGORITHMS,
-                (True, False),
-            )
-        )
 
     rulesdict = {}
     for ruleinfo in _RULESINFO:
         rulesdict[ruleinfo[0]] = ABCRule(*ruleinfo)
+
+    for rule_id in scores.THIELE_SCOREFCTS_STRINGS:
+        if rule_id in rulesdict.keys():
+            continue
+        if rule_id.startswith("geom"):
+            parameter = rule_id[4:]
+            rulesdict[rule_id] = ABCRule(
+                f"geom{parameter}",
+                f"{parameter}-Geometric",
+                f"{parameter}-Geometric Rule",
+                functools.partial(compute_thiele_method, scorefct_str=rule_id),
+                _THIELE_ALGORITHMS,
+                (True, False),
+            )
+        else:
+            raise UnknownRuleIDError(rule_id)
+
+    # sequential and reverse sequential Thiele methods
+    # that are not explicitly included
+    for rule_id in scores.THIELE_SCOREFCTS_STRINGS:
+        if rule_id == "av":
+            continue  # seq-AV and revseq-AV are equivalent to AV
+
+        # sequential Thiele methods
+        seq_rule_id = f"seq{rule_id}"
+        if seq_rule_id in rulesdict.keys():
+            continue
+        rulesdict[seq_rule_id] = ABCRule(
+            seq_rule_id,
+            f"seq-{rulesdict[rule_id].shortname}",
+            f"Sequential {rulesdict[rule_id].longname}",
+            functools.partial(compute_seq_thiele_method, scorefct_str=rule_id),
+            ("standard",),
+            (True, False),
+        )
+
+        # reverse sequential Thiele methods
+        revseq_rule_id = f"revseq{rule_id}"
+        if revseq_rule_id in rulesdict.keys():
+            continue
+        rulesdict[revseq_rule_id] = ABCRule(
+            revseq_rule_id,
+            f"revseq-{rulesdict[rule_id].shortname}",
+            f"Reverse Sequential {rulesdict[rule_id].longname}",
+            functools.partial(compute_revseq_thiele_method, scorefct_str=rule_id),
+            ("standard",),
+            (True, False),
+        )
 
     return rulesdict
 
@@ -288,7 +325,7 @@ def compute(rule_id, profile, committeesize, **kwargs):
 
 
 def compute_thiele_method(
-    scorefct_str, profile, committeesize, algorithm="branch-and-bound", resolute=False
+    profile, committeesize, scorefct_str, algorithm="branch-and-bound", resolute=False
 ):
     """Thiele methods
 
@@ -640,9 +677,7 @@ def compute_seq_thiele_method(
     try:
         output.info(header(rules["seq" + scorefct_str].longname))
     except KeyError:
-        # FIXME this is a bug which never occurred until the output refactoring, because the
-        #  verbose parameter was not passed on correctly
-        ...
+        output.info(header(f"Sequential Thiele Method ({scorefct_str.upper()})"))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     # end of optional output
@@ -904,7 +939,7 @@ def compute_lexminimaxav(profile, committeesize, algorithm="brute-force", resolu
 def compute_pav(profile, committeesize, algorithm="branch-and-bound", resolute=False):
     """Proportional Approval Voting (PAV)"""
     return compute_thiele_method(
-        "pav", profile, committeesize, algorithm=algorithm, resolute=resolute
+        profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
     )
 
 
@@ -912,7 +947,7 @@ def compute_pav(profile, committeesize, algorithm="branch-and-bound", resolute=F
 def compute_slav(profile, committeesize, algorithm="branch-and-bound", resolute=False):
     """Sainte-Lague Approval Voting (SLAV)"""
     return compute_thiele_method(
-        "slav", profile, committeesize, algorithm=algorithm, resolute=resolute
+        profile, committeesize, "slav", algorithm=algorithm, resolute=resolute
     )
 
 
@@ -920,7 +955,7 @@ def compute_slav(profile, committeesize, algorithm="branch-and-bound", resolute=
 def compute_cc(profile, committeesize, algorithm="branch-and-bound", resolute=False):
     """Approval Chamberlin-Courant (CC)"""
     return compute_thiele_method(
-        "cc", profile, committeesize, algorithm=algorithm, resolute=resolute
+        profile, committeesize, "cc", algorithm=algorithm, resolute=resolute
     )
 
 

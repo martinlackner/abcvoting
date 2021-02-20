@@ -13,8 +13,16 @@ import networkx as nx
 from abcvoting.misc import hamming
 
 
-# returns score function given its name
+THIELE_SCOREFCTS_STRINGS = _THIELE_METHODS = ["pav", "slav", "cc", "av"] + [
+    f"geom{param}" for param in [1.5, 2, 5]
+]
+
+
 def get_scorefct(scorefct_str, committeesize):
+    """returns score function (for Thiele method) given its name"""
+    if scorefct_str not in THIELE_SCOREFCTS_STRINGS:
+        raise NotImplementedError(f"Score function {scorefct_str} is not implemented.")
+
     if scorefct_str == "pav":
         return pav_score_fct
     elif scorefct_str == "slav":
@@ -26,8 +34,10 @@ def get_scorefct(scorefct_str, committeesize):
     elif scorefct_str[:4] == "geom":
         base = Fraction(scorefct_str[4:])
         return functools.partial(geometric_score_fct, base=base)
-    else:
-        raise Exception("Score function", scorefct_str, "does not exist.")
+
+    raise RuntimeError(
+        f"Score function {scorefct_str} is valid but not handled correctly in get_scorefct()."
+    )
 
 
 def thiele_score(scorefct_str, profile, committee):

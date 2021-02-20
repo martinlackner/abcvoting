@@ -58,7 +58,8 @@ class CollectRules:
                             )
                         else:
                             raise ValueError(
-                                f"Algorithm {algorithm} not known in unit tests "
+                                f"Algorithm {algorithm} (for {rule.rule_id}) "
+                                f"not known in unit tests "
                                 f"(pytest marks are missing)."
                             )
 
@@ -661,6 +662,10 @@ def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
 def test_abcrules_correct(rule_id, algorithm, resolute, profile, exp_results, committeesize):
     if rule_id.startswith("geom") and rule_id != "geom2":
         return  # correctness tests only for geom2
+    if rule_id.startswith("seq") and rule_id not in ("seqpav", "seqslav", "seqcc"):
+        return  # correctness tests only for selected sequential rules
+    if rule_id.startswith("revseq") and rule_id != "revseqpav":
+        return  # correctness tests only for selected reverse sequential rules (only for revseqpav)
     print(profile)
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
