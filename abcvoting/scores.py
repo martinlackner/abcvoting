@@ -18,10 +18,18 @@ THIELE_SCOREFCTS_STRINGS = _THIELE_METHODS = ["pav", "slav", "cc", "av"] + [
 ]
 
 
+class UnknownScoreFunctionError(ValueError):
+    """Exception raised if unknown rule id is used"""
+
+    def __init__(self, scorefct_str):
+        message = 'Thiele score function "' + str(scorefct_str) + '" is not known.'
+        super(ValueError, self).__init__(message)
+
+
 def get_scorefct(scorefct_str, committeesize):
     """returns score function (for Thiele method) given its name"""
     if scorefct_str not in THIELE_SCOREFCTS_STRINGS:
-        raise NotImplementedError(f"Score function {scorefct_str} is not implemented.")
+        raise UnknownScoreFunctionError(scorefct_str)
 
     if scorefct_str == "pav":
         return pav_score_fct
@@ -138,7 +146,10 @@ def monroescore_matching(profile, committee):
     Uses a matching-based algorithm that works only if
     the committee size divides the number of voters"""
     if len(profile) % len(committee) != 0:
-        raise ValueError
+        raise ValueError(
+            "monroescore_matching() works only if "
+            + "the committee size divides the number of voters "
+        )
     graph = {}
     sizeofdistricts = len(profile) // len(committee)
     for cand in committee:

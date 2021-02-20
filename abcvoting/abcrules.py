@@ -376,8 +376,8 @@ def compute_thiele_method(
         committees = abcrules_mip._mip_thiele_methods(
             profile,
             committeesize,
-            scorefct,
-            resolute,
+            scorefct=scorefct,
+            resolute=resolute,
             solver_id=algorithm[4:],
         )
     elif algorithm == "ortools_cp" and scorefct_str == "cc":
@@ -665,6 +665,7 @@ def compute_seq_thiele_method(
     """Sequential Thiele methods"""
 
     check_enough_approved_candidates(profile, committeesize)
+    scores.get_scorefct(scorefct_str, committeesize)  # check that scorefct_str is valid
 
     if algorithm == "fastest":
         algorithm = rules["seq" + scorefct_str].fastest_algo()
@@ -674,10 +675,7 @@ def compute_seq_thiele_method(
         )
 
     # optional output
-    try:
-        output.info(header(rules["seq" + scorefct_str].longname))
-    except KeyError:
-        output.info(header(f"Sequential Thiele Method ({scorefct_str.upper()})"))
+    output.info(header(rules["seq" + scorefct_str].longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     # end of optional output
@@ -778,6 +776,7 @@ def compute_revseq_thiele_method(
 ):
     """Reverse sequential Thiele methods"""
     check_enough_approved_candidates(profile, committeesize)
+    scores.get_scorefct(scorefct_str, committeesize)  # check that scorefct_str is valid
 
     if algorithm == "fastest":
         algorithm = rules["revseq" + scorefct_str].fastest_algo()
