@@ -656,12 +656,13 @@ def compute_seq_thiele_method(
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
 
-    msg = scorefct_str.upper() + "-score of winning committee:"
-    if not resolute and len(committees) != 1:
-        msg += "\n"
+    msg = scorefct_str.upper() + "-score of winning committee(s):\n"
     for committee in committees:
-        msg += " " + str(scores.thiele_score(scorefct_str, profile, committee))
-    output.info(msg + "\n")
+        msg += (
+            f" {str_set_of_candidates(committee)}: "
+            f"{scores.thiele_score(scorefct_str, profile, committee)}"
+        )
+    output.details(msg + "\n")
     # end of optional output
 
     return sorted_committees(committees)
@@ -805,6 +806,7 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
 
+    # TODO algorithms should be printed in every function, dict for names
     if algorithm == "gurobi":
         output.debug("Using the Gurobi ILP solver\n")
     if algorithm == "brute-force":
@@ -834,15 +836,13 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
     opt_minimaxav_score = scores.mavscore(profile, committees[0])
 
     # optional output
-    output.info("Minimum maximal distance: " + str(opt_minimaxav_score))
-
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
-
+    output.details("Minimum maximal distance: " + str(opt_minimaxav_score))
     msg = "Corresponding distances to voters:\n"
     for committee in committees:
         msg += str([hamming(voter.approved, committee) for voter in profile]) + "\n"
-    output.info(msg)
+    output.details(msg)
     # end of optional output
 
     return committees
@@ -888,16 +888,13 @@ def compute_lexminimaxav(profile, committeesize, algorithm="brute-force", resolu
     output.info(header(rules["lexminimaxav"].longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-
-    output.info("Minimum maximal distance: " + str(max(opt_distances)))
-
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
-
+    output.details("Minimum maximal distance: " + str(max(opt_distances)))
     msg = "Corresponding distances to voters:\n"
     for committee in committees:
         msg += str([hamming(voter.approved, committee) for voter in profile])
-    output.info(msg + "\n")
+    output.details(msg + "\n")
     # end of optional output
 
     return committees
@@ -1202,7 +1199,7 @@ def _seqphragmen_irresolute(
             # exclude committees already in the committee
             for cand in profile.candidates:
                 if cand in committee:
-                    new_maxload[cand] = sys.maxsize
+                    new_maxload[cand] = sys.maxsize  # TODO: better constant
             # compute new loads
             # and add new committees
             for cand in profile.candidates:

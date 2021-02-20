@@ -4,9 +4,6 @@ Axioms, Algorithms, and Applications"
 by Martin Lackner and Piotr Skowron
 """
 
-import sys
-
-sys.path.insert(0, "..")
 from abcvoting.preferences import Profile
 from abcvoting import misc
 
@@ -34,7 +31,11 @@ profile = Profile(num_cand, cand_names=cand_names)
 profile.add_voters(approval_sets)
 
 
-if __name__ == "__main__":
+def print_profile():
     print(misc.header("Example 1", "*"))
     print(profile.str_compact())
     print("desired committee size k = " + str(committeesize))
+
+
+if __name__ == "__main__":
+    print_profile()

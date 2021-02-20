@@ -1,0 +1,14 @@
+*********
+Example 1
+*********
+
+profile with 12 votes and 8 candidates:
+ 3 x {a, b},
+ 3 x {a, c},
+ 2 x {a, d},
+ 1 x {b, c, f},
+ 1 x {e},
+ 1 x {f},
+ 1 x {g}
+
+desired committee size k = 4

@@ -6,7 +6,7 @@ import pytest
 
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
-from abcvoting.output import VERBOSITY_TO_NAME, WARNING, output
+from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, output
 from abcvoting.preferences import Profile, Voter
 from abcvoting import abcrules, misc, scores
 
@@ -906,14 +906,15 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
             assert out == ""
         else:
             assert len(out) > 0
-            print(out)
-            print(misc.header(abcrules.rules[rule_id].longname))
             assert out.startswith(misc.header(abcrules.rules[rule_id].longname))
-            # assert out.endswith(
-            #     misc.str_committees_header(committees, winning=True)
-            #     + "\n"
-            #     + misc.str_sets_of_candidates(committees, cand_names=profile.cand_names)
-            # )
+            main_output = (
+                f"{misc.str_committees_header(committees, winning=True)}\n"
+                f"{misc.str_sets_of_candidates(committees, cand_names=profile.cand_names)}\n"
+            )
+            if verbosity == INFO:
+                assert out.endswith(main_output)
+            else:
+                assert main_output in out
 
     finally:
         output.set_verbosity(verbosity=WARNING)

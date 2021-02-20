@@ -1,7 +1,4 @@
-import sys
 import random
-
-sys.path.insert(0, "..")
 from abcvoting import genprofiles
 from abcvoting.misc import check_enough_approved_candidates
 

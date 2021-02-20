@@ -2,9 +2,6 @@
 Compute all implemented ABC rules for a profile
 """
 
-import sys
-
-sys.path.insert(0, "..")
 from abcvoting.preferences import Profile
 from abcvoting import abcrules
 from abcvoting.misc import str_sets_of_candidates

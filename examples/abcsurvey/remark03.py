@@ -4,10 +4,6 @@ Axioms, Algorithms, and Applications"
 by Martin Lackner and Piotr Skowron
 """
 
-
-import sys
-
-sys.path.insert(0, "../..")
 from abcvoting.output import INFO
 from abcvoting.output import output
 from abcvoting import abcrules

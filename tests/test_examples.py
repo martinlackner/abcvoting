@@ -3,8 +3,6 @@ from pathlib import Path
 
 # this is a workaround to print text, which is printed during import time, before tests are run
 # to guarantee independence of test run order
-import abcvoting.abcrules
-import abcvoting.abcrules_gurobi
 
 from abcvoting.output import WARNING
 from abcvoting.output import output
@@ -42,98 +40,98 @@ def check_output(capfd, request):
     assert expected_output == stdout, f"Unexpected output, output written to {fname}.new"
 
 
-# noinspection PyUnresolvedReferences
-def test_example01_py(check_output):
-    # Note: this test does not output anything if imported, prints only when run as script.
-    from survey import example01
+def test_abcsurvey_example01_py(check_output):
+    from examples.abcsurvey import example01
+
+    example01.print_profile()
 
 
 # noinspection PyUnresolvedReferences
-def test_example02_py(check_output):
-    from survey import example02
+def test_abcsurvey_example02_py(check_output):
+    from examples.abcsurvey import example02
 
 
 # noinspection PyUnresolvedReferences
-def test_example03_py(check_output):
-    from survey import example03
+def test_abcsurvey_example03_py(check_output):
+    from examples.abcsurvey import example03
 
 
 # noinspection PyUnresolvedReferences
-def test_example04_py(check_output):
-    from survey import example04
+def test_abcsurvey_example04_py(check_output):
+    from examples.abcsurvey import example04
 
 
 # noinspection PyUnresolvedReferences
-def test_example05_py(check_output):
-    from survey import example05
+def test_abcsurvey_example05_py(check_output):
+    from examples.abcsurvey import example05
 
 
 # noinspection PyUnresolvedReferences
-def test_example06_py(check_output):
-    from survey import example06
+def test_abcsurvey_example06_py(check_output):
+    from examples.abcsurvey import example06
 
 
 # noinspection PyUnresolvedReferences
-def test_example07_py(check_output):
-    from survey import example07
+def test_abcsurvey_example07_py(check_output):
+    from examples.abcsurvey import example07
 
 
 # noinspection PyUnresolvedReferences
-def test_example08_py(check_output):
-    from survey import example08
+def test_abcsurvey_example08_py(check_output):
+    from examples.abcsurvey import example08
 
 
 # noinspection PyUnresolvedReferences
 @pytest.mark.gurobi
-def test_example09_py(check_output):
-    from survey import example09
+def test_abcsurvey_example09_py(check_output):
+    from examples.abcsurvey import example09
 
 
 # noinspection PyUnresolvedReferences
-def test_example10_py(check_output):
-    from survey import example10
+def test_abcsurvey_example10_py(check_output):
+    from examples.abcsurvey import example10
 
 
 # noinspection PyUnresolvedReferences
-def test_example11_py(check_output):
-    from survey import example11
+def test_abcsurvey_example11_py(check_output):
+    from examples.abcsurvey import example11
 
 
 # noinspection PyUnresolvedReferences
-def test_example12_py(check_output):
-    from survey import example12
+def test_abcsurvey_example12_py(check_output):
+    from examples.abcsurvey import example12
 
 
 # noinspection PyUnresolvedReferences
-def test_example13_py(check_output):
-    from survey import example13
+def test_abcsurvey_example13_py(check_output):
+    from examples.abcsurvey import example13
 
 
 # noinspection PyUnresolvedReferences
 def test_remark02_py(check_output):
-    from survey import remark02
+    from examples.abcsurvey import remark02
 
 
 # noinspection PyUnresolvedReferences
 def test_remark03_py(check_output):
-    from survey import remark03
+    from examples.abcsurvey import remark03
 
 
 # noinspection PyUnresolvedReferences
 @pytest.mark.gurobi
-def test_propositionA2_py(check_output):
-    from survey import propositionA2
+def test_abcsurvey_propositionA2_py(check_output):
+    from examples.abcsurvey import propositionA2
 
 
 # noinspection PyUnresolvedReferences
 @pytest.mark.gurobi
-def test_propositionA3_py(check_output):
-    from survey import propositionA3
+def test_abcsurvey_propositionA3_py(check_output):
+    from examples.abcsurvey import propositionA3
 
 
 # noinspection PyUnresolvedReferences
-def test_propositionA4_py(check_output):
-    from survey import propositionA4
+def test_abcsurvey_propositionA4_py(check_output):
+    from examples.abcsurvey import propositionA4
 
 
 # noinspection PyUnresolvedReferences
