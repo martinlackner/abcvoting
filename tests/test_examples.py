@@ -83,7 +83,9 @@ def test_abcsurvey_example08_py(check_output):
 
 # noinspection PyUnresolvedReferences
 @pytest.mark.gurobi
-def test_abcsurvey_example09_py(check_output):
+def test_abcsurvey_example09_py():
+    # TODO check_ouput test does not work here because of
+    #      undeterministic Gurobi output
     from examples.abcsurvey import example09
 
 
