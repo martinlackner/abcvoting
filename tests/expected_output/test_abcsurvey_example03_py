@@ -19,30 +19,7 @@ profile with 12 votes and 8 candidates:
 Approval Chamberlin-Courant (CC)
 --------------------------------
 
------------------------------------------------
-Sequential Approval Chamberlin-Courant (seq-CC)
------------------------------------------------
-
-Computing only one winning committee (resolute=True)
-
-starting with the empty committee (score = 0)
-
-adding candidate number 1: a
- score increases by 8 to a total of 8
-
-adding candidate number 2: f
- score increases by 2 to a total of 10
-
-adding candidate number 3: e
- score increases by 1 to a total of 11 tie broken in favor of 4 candidates {6} would increase the score by the same amount (1)
-
-adding candidate number 4: g
- score increases by 1 to a total of 12
-
-1 winning committee:
- {a, e, f, g}
-
-CC-score of winning committee: 12
+Algorithm: branch-and-bound
 
 Optimal CC-score: 12
 

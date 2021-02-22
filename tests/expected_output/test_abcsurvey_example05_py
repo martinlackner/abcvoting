@@ -17,24 +17,7 @@ profile with 23 votes and 4 candidates:
 Proportional Approval Voting (PAV)
 ----------------------------------
 
--------------------------------------------------
-Sequential Proportional Approval Voting (seq-PAV)
--------------------------------------------------
-
-Computing only one winning committee (resolute=True)
-
-starting with the empty committee (score = 0)
-
-adding candidate number 1: d
- score increases by 11 to a total of 11
-
-adding candidate number 2: c
- score increases by 15/2 to a total of 37/2
-
-1 winning committee:
- {c, d}
-
-PAV-score of winning committee: 37/2
+Algorithm: branch-and-bound
 
 Optimal PAV-score: 19
 
@@ -47,6 +30,8 @@ Sequential Proportional Approval Voting (seq-PAV)
 
 Computing only one winning committee (resolute=True)
 
+Algorithm: Standard algorithm
+
 starting with the empty committee (score = 0)
 
 adding candidate number 1: d
@@ -58,13 +43,17 @@ adding candidate number 2: c
 1 winning committee:
  {c, d}
 
-PAV-score of winning committee: 37/2
+PAV-score of winning committee(s):
+ {c, d}: 37/2
+
 
 ------------------------------------------------------------
 Reverse Sequential Proportional Approval Voting (revseq-PAV)
 ------------------------------------------------------------
 
 Computing only one winning committee (resolute=True)
+
+Algorithm: Standard algorithm
 
 full committee (4 candidates) has a total score of 30
 
@@ -106,24 +95,7 @@ total weight: 9321
 Proportional Approval Voting (PAV)
 ----------------------------------
 
--------------------------------------------------
-Sequential Proportional Approval Voting (seq-PAV)
--------------------------------------------------
-
-Computing only one winning committee (resolute=True)
-
-starting with the empty committee (score = 0)
-
-adding candidate number 1: c
- score increases by 5840 to a total of 5840
-
-adding candidate number 2: a
- score increases by 3801 to a total of 9641
-
-1 winning committee:
- {a, c}
-
-PAV-score of winning committee: 9641
+Algorithm: branch-and-bound
 
 Optimal PAV-score: 9651
 
@@ -136,6 +108,8 @@ Sequential Proportional Approval Voting (seq-PAV)
 
 Computing only one winning committee (resolute=True)
 
+Algorithm: Standard algorithm
+
 starting with the empty committee (score = 0)
 
 adding candidate number 1: c
@@ -147,13 +121,17 @@ adding candidate number 2: a
 1 winning committee:
  {a, c}
 
-PAV-score of winning committee: 9641
+PAV-score of winning committee(s):
+ {a, c}: 9641
+
 
 ------------------------------------------------------------
 Reverse Sequential Proportional Approval Voting (revseq-PAV)
 ------------------------------------------------------------
 
 Computing only one winning committee (resolute=True)
+
+Algorithm: Standard algorithm
 
 full committee (4 candidates) has a total score of 30063/2
 

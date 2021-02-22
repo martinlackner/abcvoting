@@ -21,6 +21,8 @@ Phragmén's Sequential Rule (seq-Phragmén)
 
 Computing only one winning committee (resolute=True)
 
+Algorithm: Standard algorithm
+
 adding candidate number 1: a
  maximum load increased to 0.125
  load distribution:
@@ -31,7 +33,7 @@ adding candidate number 2: b
  load distribution:
   (0.34375, 0.34375, 0.34375, 0.125, 0.125, 0.125, 0.125, 0.125, 0.34375, 0, 0, 0)
  tie broken in favor of b,
- candidates {2} would increase the load to the same amount ([6, 0.34375, 0.34375, 0.625, 1.0, 0.5, 1.0, 5])
+ candidates {c} would increase the load to the same amount (0.34375)
 
 adding candidate number 3: c
  maximum load increased to 0.4296875

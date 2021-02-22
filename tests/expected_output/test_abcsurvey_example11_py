@@ -16,6 +16,8 @@ profile with 15 votes and 5 candidates:
 Rule X
 ------
 
+Algorithm: Standard algorithm with exact fractions
+
 2 winning committees:
  {a, b, c, d}
  {a, b, c, e}
@@ -26,34 +28,36 @@ Rule X
 
 Computing only one winning committee (resolute=True)
 
+Algorithm: Standard algorithm with exact fractions
+
 Phase 1:
 
 starting budget:
   (4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15)
 
-adding candidate number 0: a
+adding candidate number 1: a
  with maxmimum cost per voter q = 1/12
  remaining budget:
   (11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 4/15, 4/15, 4/15)
  tie broken in favor of a,
- candidates {1} are tied
+ candidates {b} are tied
 
-adding candidate number 1: b
+adding candidate number 2: b
  with maxmimum cost per voter q = 1/12
  remaining budget:
   (1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 4/15, 4/15, 4/15)
 
-adding candidate number 2: c
+adding candidate number 3: c
  with maxmimum cost per voter q = 1/10
  remaining budget:
   (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1/10, 1/10, 4/15, 4/15, 4/15)
 
-adding candidate number 3: d
+adding candidate number 4: d
  with maxmimum cost per voter q = 4/15
  remaining budget:
   (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
  tie broken in favor of d,
- candidates {4} are tied
+ candidates {e} are tied
 
 1 winning committee:
  {a, b, c, d}
@@ -61,6 +65,8 @@ adding candidate number 3: d
 -----------------------------------------
 Phragmén's Sequential Rule (seq-Phragmén)
 -----------------------------------------
+
+Algorithm: Standard algorithm with exact fractions
 
 1 winning committee:
  {a, b, d, e}

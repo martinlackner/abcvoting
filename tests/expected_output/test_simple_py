@@ -11,17 +11,6 @@ given the following profile with 6 votes and 5 candidates:
 Proportional Approval Voting (PAV)
 ----------------------------------
 
--------------------------------------------------
-Sequential Proportional Approval Voting (seq-PAV)
--------------------------------------------------
-
-Computing only one winning committee (resolute=True)
-
-1 winning committee:
- {0, 1, 3}
-
-PAV-score of winning committee: 15/2
-
 2 winning committees:
  {0, 1, 3}
  {0, 1, 4}

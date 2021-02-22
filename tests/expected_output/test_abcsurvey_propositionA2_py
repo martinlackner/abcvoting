@@ -19,21 +19,7 @@ Proportional Approval Voting (PAV)
 
 Computing only one winning committee (resolute=True)
 
--------------------------------------------------
-Sequential Proportional Approval Voting (seq-PAV)
--------------------------------------------------
-
-Computing only one winning committee (resolute=True)
-
-starting with the empty committee (score = 0)
-
-adding candidate number 1: c
- score increases by 6 to a total of 6
-
-1 winning committee:
- {c}
-
-PAV-score of winning committee: 6
+Algorithm: branch-and-bound
 
 Optimal PAV-score: 6
 
@@ -46,24 +32,7 @@ Proportional Approval Voting (PAV)
 
 Computing only one winning committee (resolute=True)
 
--------------------------------------------------
-Sequential Proportional Approval Voting (seq-PAV)
--------------------------------------------------
-
-Computing only one winning committee (resolute=True)
-
-starting with the empty committee (score = 0)
-
-adding candidate number 1: c
- score increases by 6 to a total of 6
-
-adding candidate number 2: a
- score increases by 7/2 to a total of 19/2 tie broken in favor of 0 candidates {1} would increase the score by the same amount (7/2)
-
-1 winning committee:
- {a, c}
-
-PAV-score of winning committee: 19/2
+Algorithm: branch-and-bound
 
 Optimal PAV-score: 10
 
@@ -77,21 +46,7 @@ Approval Chamberlin-Courant (CC)
 
 Computing only one winning committee (resolute=True)
 
------------------------------------------------
-Sequential Approval Chamberlin-Courant (seq-CC)
------------------------------------------------
-
-Computing only one winning committee (resolute=True)
-
-starting with the empty committee (score = 0)
-
-adding candidate number 1: c
- score increases by 6 to a total of 6
-
-1 winning committee:
- {c}
-
-CC-score of winning committee: 6
+Algorithm: branch-and-bound
 
 Optimal CC-score: 6
 
@@ -104,24 +59,7 @@ Approval Chamberlin-Courant (CC)
 
 Computing only one winning committee (resolute=True)
 
------------------------------------------------
-Sequential Approval Chamberlin-Courant (seq-CC)
------------------------------------------------
-
-Computing only one winning committee (resolute=True)
-
-starting with the empty committee (score = 0)
-
-adding candidate number 1: c
- score increases by 6 to a total of 6
-
-adding candidate number 2: a
- score increases by 2 to a total of 8 tie broken in favor of 0 candidates {1} would increase the score by the same amount (2)
-
-1 winning committee:
- {a, c}
-
-CC-score of winning committee: 8
+Algorithm: branch-and-bound
 
 Optimal CC-score: 10
 
@@ -135,6 +73,8 @@ Monroe's Approval Rule (Monroe)
 
 Computing only one winning committee (resolute=True)
 
+Algorithm: brute-force
+
 Optimal Monroe score: 6
 
 1 winning committee:
@@ -145,6 +85,8 @@ Monroe's Approval Rule (Monroe)
 -------------------------------
 
 Computing only one winning committee (resolute=True)
+
+Algorithm: brute-force
 
 Optimal Monroe score: 10
 
@@ -177,10 +119,12 @@ Minimax Approval Voting (MAV)
 
 Computing only one winning committee (resolute=True)
 
-Minimum maximal distance: 2
+Algorithm: brute-force
+
 1 winning committee:
  {c}
 
+Minimum maximal distance: 2
 Corresponding distances to voters:
 [2, 2, 1, 1, 1, 1, 1, 1, 2, 2]
 
@@ -190,10 +134,12 @@ Minimax Approval Voting (MAV)
 
 Computing only one winning committee (resolute=True)
 
-Minimum maximal distance: 2
+Algorithm: brute-force
+
 1 winning committee:
  {a, b}
 
+Minimum maximal distance: 2
 Corresponding distances to voters:
 [1, 1, 2, 2, 2, 2, 2, 2, 1, 1]
 
@@ -215,6 +161,8 @@ winning committees for k=2 and k=3:
 Greedy Monroe
 -------------
 
+Algorithm: Standard algorithm
+
 The Monroe assignment computed by Greedy Monroe
 has a Monroe score of 14.
 Assignment (unsatisfatied voters marked with *):
@@ -228,6 +176,8 @@ Assignment (unsatisfatied voters marked with *):
 -------------
 Greedy Monroe
 -------------
+
+Algorithm: Standard algorithm
 
 The Monroe assignment computed by Greedy Monroe
 has a Monroe score of 16.
@@ -259,26 +209,28 @@ Rule X
 
 Computing only one winning committee (resolute=True)
 
+Algorithm: Standard algorithm
+
 Phase 1:
 
 starting budget:
   (0.75, 0.75, 0.75, 0.75)
 
-adding candidate number 0: a
+adding candidate number 1: a
  with maxmimum cost per voter q = 0.5
  remaining budget:
   (0.25, 0.25, 0.75, 0.75)
  tie broken in favor of a,
- candidates {2, 3, 4} are tied
+ candidates {c, d, e} are tied
 
-adding candidate number 1: c
+adding candidate number 2: c
  with maxmimum cost per voter q = 0.75
  remaining budget:
   (0.25, 0.0, 0.75, 0.0)
  tie broken in favor of c,
- candidates {3, 4} are tied
+ candidates {d, e} are tied
 
-adding candidate number 2: e
+adding candidate number 3: e
  with maxmimum cost per voter q = 0.75
  remaining budget:
   (0.0, 0.0, 0.0, 0.0)
@@ -292,38 +244,40 @@ Rule X
 
 Computing only one winning committee (resolute=True)
 
+Algorithm: Standard algorithm
+
 Phase 1:
 
 starting budget:
   (1.0, 1.0, 1.0, 1.0)
 
-adding candidate number 0: a
+adding candidate number 1: a
  with maxmimum cost per voter q = 0.5
  remaining budget:
   (0.5, 0.5, 1.0, 1.0)
  tie broken in favor of a,
- candidates {2, 3, 4} are tied
+ candidates {c, d, e} are tied
 
-adding candidate number 1: c
+adding candidate number 2: c
  with maxmimum cost per voter q = 0.5
  remaining budget:
   (0.5, 0.0, 1.0, 0.5)
  tie broken in favor of c,
- candidates {3, 4} are tied
+ candidates {d, e} are tied
 
-adding candidate number 2: d
+adding candidate number 3: d
  with maxmimum cost per voter q = 0.5
  remaining budget:
   (0.0, 0.0, 1.0, 0.0)
  tie broken in favor of d,
- candidates {4} are tied
+ candidates {e} are tied
 
-adding candidate number 3: b
+adding candidate number 4: b
  with maxmimum cost per voter q = 1.0
  remaining budget:
   (0.0, 0.0, 0.0, 0.0)
  tie broken in favor of b,
- candidates {4} are tied
+ candidates {e} are tied
 
 1 winning committee:
  {a, b, c, d}
@@ -338,26 +292,28 @@ Rule X
 
 Computing only one winning committee (resolute=True)
 
+Algorithm: Standard algorithm
+
 Phase 1:
 
 starting budget:
   (0.75, 0.75, 0.75, 0.75)
 
-adding candidate number 0: a
+adding candidate number 1: a
  with maxmimum cost per voter q = 0.5
  remaining budget:
   (0.25, 0.25, 0.75, 0.75)
  tie broken in favor of a,
- candidates {2, 3, 4} are tied
+ candidates {c, d, e} are tied
 
-adding candidate number 1: c
+adding candidate number 2: c
  with maxmimum cost per voter q = 0.75
  remaining budget:
   (0.25, 0.0, 0.75, 0.0)
  tie broken in favor of c,
- candidates {3, 4} are tied
+ candidates {d, e} are tied
 
-adding candidate number 2: e
+adding candidate number 3: e
  with maxmimum cost per voter q = 0.75
  remaining budget:
   (0.0, 0.0, 0.0, 0.0)
@@ -371,38 +327,40 @@ Rule X
 
 Computing only one winning committee (resolute=True)
 
+Algorithm: Standard algorithm
+
 Phase 1:
 
 starting budget:
   (1.0, 1.0, 1.0, 1.0)
 
-adding candidate number 0: a
+adding candidate number 1: a
  with maxmimum cost per voter q = 0.5
  remaining budget:
   (0.5, 0.5, 1.0, 1.0)
  tie broken in favor of a,
- candidates {2, 3, 4} are tied
+ candidates {c, d, e} are tied
 
-adding candidate number 1: c
+adding candidate number 2: c
  with maxmimum cost per voter q = 0.5
  remaining budget:
   (0.5, 0.0, 1.0, 0.5)
  tie broken in favor of c,
- candidates {3, 4} are tied
+ candidates {d, e} are tied
 
-adding candidate number 2: d
+adding candidate number 3: d
  with maxmimum cost per voter q = 0.5
  remaining budget:
   (0.0, 0.0, 1.0, 0.0)
  tie broken in favor of d,
- candidates {4} are tied
+ candidates {e} are tied
 
-adding candidate number 3: b
+adding candidate number 4: b
  with maxmimum cost per voter q = 1.0
  remaining budget:
   (0.0, 0.0, 0.0, 0.0)
  tie broken in favor of b,
- candidates {4} are tied
+ candidates {e} are tied
 
 1 winning committee:
  {a, b, c, d}

@@ -64,3 +64,21 @@ Consensus Rule:
 5-Geometric Rule:
  {0, 1, 2, 3}
 
+Sequential 1.5-Geometric Rule:
+ {0, 1, 4, 5}
+
+Reverse Sequential 1.5-Geometric Rule:
+ {0, 1, 4, 5}
+
+Sequential 2-Geometric Rule:
+ {0, 1, 4, 5}
+
+Reverse Sequential 2-Geometric Rule:
+ {0, 1, 2, 4}
+
+Sequential 5-Geometric Rule:
+ {0, 1, 2, 4}
+
+Reverse Sequential 5-Geometric Rule:
+ {0, 1, 2, 3}
+

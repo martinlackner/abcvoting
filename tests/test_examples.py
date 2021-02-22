@@ -110,12 +110,12 @@ def test_abcsurvey_example13_py(check_output):
 
 
 # noinspection PyUnresolvedReferences
-def test_remark02_py(check_output):
+def test_abcsurvey_remark02_py(check_output):
     from examples.abcsurvey import remark02
 
 
 # noinspection PyUnresolvedReferences
-def test_remark03_py(check_output):
+def test_abcsurvey_remark03_py(check_output):
     from examples.abcsurvey import remark03
 
 

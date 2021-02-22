@@ -6,7 +6,7 @@ import pytest
 
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
-from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, output
+from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, output
 from abcvoting.preferences import Profile, Voter
 from abcvoting import abcrules, misc, scores
 
@@ -868,8 +868,9 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
         return
         # not necessary, output for "fastest" is the same as
         # whatever algorithm is selected as fastest
+        # (and "fastest" depends on the available solvers)
 
-    if algorithm == "cvxpy_glpk_mi" and verbosity >= WARNING:
+    if algorithm == "cvxpy_glpk_mi":
         # TODO unfortunately GLPK_MI prints "Long-step dual simplex will be used" to stderr and it
         #  would be very complicated to capture this on all platforms reliably, changing
         #  sys.stderr doesn't help.
@@ -880,7 +881,7 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
         #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
         pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
 
-    if "gurobi" in algorithm and verbosity >= WARNING:
+    if "gurobi" in algorithm:
         # TODO Gurobi prints:
         #  "Academic license - for non-commercial use only"
         #  (if an acamedic license is used) as well as
@@ -891,8 +892,6 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
         # verbosity>=WARNING, it's probably just due to the test execution order, i.e. the
         # undesired message was simply printed earlier, or caused by use of different Gurobi
         # versions.
-        #
-        # This might skip too much, if gurobi is not the fastest.
         pytest.skip("Gurobi always prints something when used with an academic license")
 
     output.set_verbosity(verbosity=verbosity)
@@ -911,15 +910,21 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
             assert out == ""
         else:
             assert len(out) > 0
-            assert out.startswith(misc.header(abcrules.rules[rule_id].longname))
-            main_output = (
+            start_output = misc.header(abcrules.rules[rule_id].longname) + "\n"
+            if resolute and False in abcrules.rules[rule_id].resolute:
+                # only if irresolute is available but resolute is chosen
+                start_output += "Computing only one winning committee (resolute=True)\n\n"
+            if verbosity <= DETAILS:
+                start_output += abcrules._algorithm_fullnames(algorithm) + "\n"
+            assert out.startswith(start_output)
+            end_output = (
                 f"{misc.str_committees_header(committees, winning=True)}\n"
                 f"{misc.str_sets_of_candidates(committees, cand_names=profile.cand_names)}\n"
             )
             if verbosity == INFO:
-                assert out.endswith(main_output)
+                assert out.endswith(end_output)
             else:
-                assert main_output in out
+                assert end_output in out
 
     finally:
         output.set_verbosity(verbosity=WARNING)

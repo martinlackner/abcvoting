@@ -21,12 +21,14 @@ Rule X
 
 Computing only one winning committee (resolute=True)
 
+Algorithm: Standard algorithm
+
 Phase 1:
 
 starting budget:
   (0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333)
 
-adding candidate number 0: a
+adding candidate number 1: a
  with maxmimum cost per voter q = 0.125
  remaining budget:
   (0.20833333333333331, 0.20833333333333331, 0.20833333333333331, 0.20833333333333331, 0.20833333333333331, 0.20833333333333331, 0.20833333333333331, 0.20833333333333331, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333)
@@ -41,7 +43,7 @@ adding candidate number 2: b
  load distribution:
   (0.34375, 0.34375, 0.34375, 0.125, 0.125, 0.125, 0.125, 0.125, 0.34375, 0.0, 0.0, 0.0)
  tie broken in favor of b,
- candidates {2} would increase the load to the same amount ([6, 0.34375, 0.34375, 0.625, 1.0, 0.5, 1.0, 5])
+ candidates {c} would increase the load to the same amount (0.34375)
 
 adding candidate number 3: c
  maximum load increased to 0.4296875

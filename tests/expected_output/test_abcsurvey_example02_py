@@ -19,6 +19,8 @@ profile with 12 votes and 8 candidates:
 Approval Voting (AV)
 --------------------
 
+Algorithm: Standard algorithm
+
 Scores of candidates:
 a: 8
 b: 4
@@ -39,7 +41,7 @@ every winning committee:
 The following candidates are contained in
 some of the winning committees:
  d, f
-(1 of those candidates is contained
+(1 of those candidates are contained
  in every winning committee.)
 
 2 winning committees:
