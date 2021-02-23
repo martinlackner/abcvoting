@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Approval-based committee (ABC) voting rules"""
+"""Approval-based committee (ABC) voting rules."""
 
 import functools
 from itertools import combinations
@@ -22,7 +22,7 @@ except ImportError:
 
 
 class UnknownRuleIDError(ValueError):
-    """Exception raised if unknown rule id is used"""
+    """UnknownRuleIDError exception raised if an unknown rule id is used."""
 
     def __init__(self, rule_id):
         message = 'Rule ID "' + str(rule_id) + '" is not known.'
@@ -30,6 +30,10 @@ class UnknownRuleIDError(ValueError):
 
 
 def is_algorithm_supported(algorithm):
+    """Verify whether algorithm `algorithm` is supported on the current machine.
+
+    In particular, the functions verifies that required modules and solvers are available.
+    """
     if "gurobi" in algorithm and not abcrules_gurobi.available:
         return False
 
@@ -52,7 +56,7 @@ def is_algorithm_supported(algorithm):
 
 
 class ABCRule:
-    """Class for ABC rules containing basic information and function call"""
+    """Class for ABC rules containing basic information and function call."""
 
     def __init__(
         self, rule_id, shortname, longname, fct, algorithms=("standard",), resolute=(True, False)
@@ -69,9 +73,11 @@ class ABCRule:
         assert len(algorithms) > 0
 
     def compute(self, profile, committeesize, **kwargs):
+        """Compute winning committee(s)."""
         return self.fct(profile, committeesize, **kwargs)
 
     def fastest_algo(self):
+        """Return Fastest *available* algorithm."""
         for algorithm in self.algorithms:
             if is_algorithm_supported(algorithm):
                 return algorithm
@@ -168,10 +174,10 @@ def _init_rules():
             (True, False),
         ),
         (
-            "optphragmen",
-            "opt-Phragmén",
-            "Phragmén's Optimization Rule (opt-Phragmén)",
-            compute_optphragmen,
+            "minimaxphragmen",
+            "minimax-Phragmén",
+            "Phragmén's Minimax Rule (minimax-Phragmén)",
+            compute_minimaxphragmen,
             ("gurobi",),
             (True, False),
         ),
@@ -323,6 +329,7 @@ def _algorithm_fullnames(algorithm):
 
 
 def compute(rule_id, profile, committeesize, **kwargs):
+    """Compute rule given by `rule_id`."""
     try:
         rule = rules[rule_id]
     except KeyError:
@@ -333,7 +340,7 @@ def compute(rule_id, profile, committeesize, **kwargs):
 def compute_thiele_method(
     profile, committeesize, scorefct_str, algorithm="branch-and-bound", resolute=False
 ):
-    """Thiele methods
+    """Thiele methods.
 
     Compute winning committees according to a Thiele method specified
     by a score function (scorefct_str).
@@ -403,9 +410,10 @@ def compute_thiele_method(
 
 
 def _thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute):
-    """Brute-force algorithm for computing Thiele methods
-    Only intended for comparison, much slower than _thiele_methods_branchandbound()"""
+    """Brute-force algorithm for Thiele methods (PAV, CC, etc.).
 
+    Only intended for comparison, much slower than _thiele_methods_branchandbound()
+    """
     opt_committees = []
     opt_thiele_score = -1
     for committee in combinations(profile.candidates, committeesize):
@@ -424,8 +432,7 @@ def _thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute):
 
 
 def _thiele_methods_branchandbound(profile, committeesize, scorefct_str, resolute):
-    """Branch-and-bound algorithm to compute winning committees
-    for Thiele methods"""
+    """Branch-and-bound algorithm for Thiele methods."""
     scorefct = scores.get_scorefct(scorefct_str, committeesize)
 
     best_committees = []
@@ -467,21 +474,21 @@ def _thiele_methods_branchandbound(profile, committeesize, scorefct_str, resolut
 
 
 def compute_pav(profile, committeesize, algorithm="branch-and-bound", resolute=False):
-    """Proportional Approval Voting (PAV)"""
+    """Proportional Approval Voting (PAV)."""
     return compute_thiele_method(
         profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
     )
 
 
 def compute_slav(profile, committeesize, algorithm="branch-and-bound", resolute=False):
-    """Sainte-Lague Approval Voting (SLAV)"""
+    """Sainte-Lague Approval Voting (SLAV)."""
     return compute_thiele_method(
         profile, committeesize, "slav", algorithm=algorithm, resolute=resolute
     )
 
 
 def compute_cc(profile, committeesize, algorithm="branch-and-bound", resolute=False):
-    """Approval Chamberlin-Courant (CC)"""
+    """Approval Chamberlin-Courant (CC)."""
     return compute_thiele_method(
         profile, committeesize, "cc", algorithm=algorithm, resolute=resolute
     )
@@ -490,8 +497,7 @@ def compute_cc(profile, committeesize, algorithm="branch-and-bound", resolute=Fa
 def compute_seq_thiele_method(
     profile, committeesize, scorefct_str, algorithm="standard", resolute=True
 ):
-    """Sequential Thiele methods"""
-
+    """Sequential Thiele methods."""
     check_enough_approved_candidates(profile, committeesize)
     scores.get_scorefct(scorefct_str, committeesize)  # check that scorefct_str is valid
 
@@ -552,7 +558,7 @@ def compute_seq_thiele_method(
 
 
 def _seq_thiele_resolute(profile, committeesize, scorefct_str):
-    """Compute a *resolute* reverse sequential Thiele method
+    """Compute one winning committee (=resolute) for sequential Thiele methods.
 
     Tiebreaking between candidates in favor of candidate with smaller
     number/index (candidates with larger numbers get deleted first).
@@ -579,7 +585,7 @@ def _seq_thiele_resolute(profile, committeesize, scorefct_str):
 
 
 def _seq_thiele_irresolute(profile, committeesize, scorefct_str):
-    """Compute an *irresolute* reverse sequential Thiele method
+    """Compute all winning committee (=irresolute) for sequential Thiele methods.
 
     Consider all possible ways to break ties between candidates
     (aka parallel universe tiebreaking)
@@ -604,21 +610,21 @@ def _seq_thiele_irresolute(profile, committeesize, scorefct_str):
 
 # Sequential PAV
 def compute_seqpav(profile, committeesize, algorithm="standard", resolute=True):
-    """Sequential PAV (seq-PAV)"""
+    """Sequential PAV (seq-PAV)."""
     return compute_seq_thiele_method(
         profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
     )
 
 
 def compute_seqslav(profile, committeesize, algorithm="standard", resolute=True):
-    """Sequential Sainte-Lague Approval Voting (SLAV)"""
+    """Sequential Sainte-Lague Approval Voting (SLAV)."""
     return compute_seq_thiele_method(
         profile, committeesize, "slav", algorithm=algorithm, resolute=resolute
     )
 
 
 def compute_seqcc(profile, committeesize, algorithm="standard", resolute=True):
-    """Sequential Chamberlin-Courant (seq-CC)"""
+    """Sequential Chamberlin-Courant (seq-CC)."""
     return compute_seq_thiele_method(
         profile, committeesize, "cc", algorithm=algorithm, resolute=resolute
     )
@@ -627,7 +633,7 @@ def compute_seqcc(profile, committeesize, algorithm="standard", resolute=True):
 def compute_revseq_thiele_method(
     profile, committeesize, scorefct_str, algorithm="standard", resolute=True
 ):
-    """Reverse sequential Thiele methods"""
+    """Reverse sequential Thiele methods."""
     check_enough_approved_candidates(profile, committeesize)
     scores.get_scorefct(scorefct_str, committeesize)  # check that scorefct_str is valid
 
@@ -659,23 +665,26 @@ def compute_revseq_thiele_method(
             committee.remove(next_cand)
             tied_cands = detailed_info["tied_cands"][i]
             delta_score = detailed_info["delta_score"][i]
-            msg = f"removing candidate number {profile.num_cand - len(committee)}: "
-            msg += profile.cand_names[next_cand] + "\n"
-            msg += f" score decreases by {delta_score} to a total of "
-            msg += str(scores.thiele_score(scorefct_str, profile, committee))
-            if len(tied_cands):
-                msg += (
-                    f" (tie between candidates "
-                    f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}\n"
-                )
+            output.details(
+                f"removing candidate number {profile.num_cand - len(committee)}: "
+                f"{profile.cand_names[next_cand]}"
+            )
+            output.details(
+                f" score decreases by {delta_score} to a total of "
+                f"{scores.thiele_score(scorefct_str, profile, committee)}"
+            )
             if tied_cands:
+                output.details(
+                    f" (tie between candidates "
+                    f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
+                )
                 output.details(f" tie broken to the disadvantage of {next_cand}")
                 output.details(
                     f" candidates "
                     f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
                     f" would decrease the score by the same amount {delta_score})"
                 )
-            output.details(msg + "\n")
+            output.details("")
 
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
@@ -693,7 +702,7 @@ def compute_revseq_thiele_method(
 
 
 def _revseq_thiele_resolute(profile, committeesize, scorefct_str):
-    """Compute a *resolute* reverse sequential Thiele method
+    """Compute one winning committee (=resolute) for reverse sequential Thiele methods.
 
     Tiebreaking between candidates in favor of candidate with smaller
     number/index (candidates with smaller numbers are added first).
@@ -721,7 +730,7 @@ def _revseq_thiele_resolute(profile, committeesize, scorefct_str):
 
 
 def _revseq_thiele_irresolute(profile, committeesize, scorefct_str):
-    """Compute an *irresolute* sequential Thiele method
+    """Compute all winning committee (=irresolute) for reverse sequential Thiele methods.
 
     Consider all possible ways to break ties between candidates
     (aka parallel universe tiebreaking)
@@ -751,13 +760,14 @@ def _revseq_thiele_irresolute(profile, committeesize, scorefct_str):
 
 # Reverse Sequential PAV
 def compute_revseqpav(profile, committeesize, algorithm="standard", resolute=True):
-    """Reverse sequential PAV (revseq-PAV)"""
+    """Reverse sequential PAV (revseq-PAV)."""
     return compute_revseq_thiele_method(
         profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
     )
 
 
 def compute_separable_rule(profile, committeesize, rule_id, algorithm, resolute=True):
+    """Separable rules (such as AV and SAV)."""
     check_enough_approved_candidates(profile, committeesize)
 
     if algorithm == "fastest":
@@ -815,6 +825,7 @@ def compute_separable_rule(profile, committeesize, rule_id, algorithm, resolute=
 
 
 def _separable_rule_algorithm(profile, committeesize, rule_id, resolute):
+    """Algorithm for separable rules (such as AV and SAV)."""
     score = [0] * profile.num_cand
     for voter in profile:
         for cand in voter.approved:
@@ -861,17 +872,17 @@ def _separable_rule_algorithm(profile, committeesize, rule_id, resolute):
 
 
 def compute_sav(profile, committeesize, algorithm="standard", resolute=False):
-    """Satisfaction Approval Voting (SAV)"""
+    """Satisfaction Approval Voting (SAV)."""
     return compute_separable_rule(profile, committeesize, "sav", algorithm, resolute)
 
 
 def compute_av(profile, committeesize, algorithm="standard", resolute=False):
-    """Approval Voting"""
+    """Approval Voting (AV)."""
     return compute_separable_rule(profile, committeesize, "av", algorithm, resolute)
 
 
 def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=False):
-    """Minimax Approval Voting (MAV)"""
+    """Minimax Approval Voting (MAV)."""
     check_enough_approved_candidates(profile, committeesize)
 
     if algorithm == "fastest":
@@ -914,7 +925,7 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
 
 
 def _minimaxav_bruteforce(profile, committeesize, resolute):
-    """Brute-force algorithm for computing Minimax AV (MAV)"""
+    """Brute-force algorithm for Minimax AV (MAV)."""
     opt_committees = []
     opt_minimaxav_score = profile.num_cand + 1
     for committee in combinations(profile.candidates, committeesize):
@@ -933,7 +944,7 @@ def _minimaxav_bruteforce(profile, committeesize, resolute):
 
 
 def compute_lexminimaxav(profile, committeesize, algorithm="brute-force", resolute=False):
-    """Lexicographic Minimax AV"""
+    """Lexicographic Minimax AV (lex-MAV)."""
     check_enough_approved_candidates(profile, committeesize)
 
     if not profile.has_unit_weights():
@@ -992,7 +1003,7 @@ def _lexminimaxav_bruteforce(profile, committeesize, resolute):
 
 
 def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=False):
-    """Monroe's rule"""
+    """Monroe's rule."""
     check_enough_approved_candidates(profile, committeesize)
 
     if not profile.has_unit_weights():
@@ -1031,7 +1042,7 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
 
 
 def _monroe_bruteforce(profile, committeesize, resolute):
-    """A brute-force algorithm for computing Monroe's rule"""
+    """Brute-force algorithm for Monroe's rule."""
     opt_committees = []
     opt_monroescore = -1
     for committee in combinations(profile.candidates, committeesize):
@@ -1051,7 +1062,7 @@ def _monroe_bruteforce(profile, committeesize, resolute):
 
 
 def compute_greedy_monroe(profile, committeesize, algorithm="standard", resolute=True):
-    """"Greedy Monroe"""
+    """Greedy Monroe."""
     check_enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise ValueError(
@@ -1163,7 +1174,7 @@ def _greedy_monroe_algorithm(profile, committeesize):
 
 
 def compute_seqphragmen(profile, committeesize, algorithm="standard", resolute=True):
-    """Phragmen's sequential rule (seq-Phragmen)"""
+    """Phragmen's sequential rule (seq-Phragmen)."""
     check_enough_approved_candidates(profile, committeesize)
 
     if algorithm == "fastest":
@@ -1238,7 +1249,7 @@ def compute_seqphragmen(profile, committeesize, algorithm="standard", resolute=T
 def _seqphragmen_resolute(
     profile, committeesize, division, start_load=None, partial_committee=None
 ):
-    """Algorithm for computing resolute seq-Phragmen  (1 winning committee)"""
+    """Algorithm for computing resolute seq-Phragmen (1 winning committee)."""
     approvers_weight = {}
     for cand in profile.candidates:
         approvers_weight[cand] = sum(voter.weight for voter in profile if cand in voter.approved)
@@ -1298,7 +1309,7 @@ def _seqphragmen_resolute(
 def _seqphragmen_irresolute(
     profile, committeesize, division, start_load=None, partial_committee=None
 ):
-    """Algorithm for computing irresolute seq-Phragmen (>=1 winning committees)"""
+    """Algorithm for computing irresolute seq-Phragmen (all winning committees)."""
     approvers_weight = {}
     for cand in profile.candidates:
         approvers_weight[cand] = sum(voter.weight for voter in profile if cand in voter.approved)
@@ -1357,7 +1368,7 @@ def compute_rule_x(
     resolute=True,
     skip_phragmen_phase=False,
 ):
-    """Rule X
+    """Rule X.
 
     See https://arxiv.org/pdf/1911.11747.pdf, page 7
 
@@ -1365,7 +1376,6 @@ def compute_rule_x(
         omit the second phase (that uses seq-Phragmen)
         may result in a committee that is too small
     """
-
     check_enough_approved_candidates(profile, committeesize)
     if not profile.has_unit_weights():
         raise ValueError(
@@ -1469,6 +1479,8 @@ def compute_rule_x(
 
 
 def _rule_x_algorithm(profile, committeesize, resolute, division, skip_phragmen_phase=False):
+    """Algorithm for Rule X."""
+
     def _rule_x_get_min_q(profile, budget, cand, division):
         rich = set([v for v, voter in enumerate(profile) if cand in voter.approved])
         poor = set()
@@ -1568,7 +1580,10 @@ def _rule_x_algorithm(profile, committeesize, resolute, division, skip_phragmen_
 
 
 def compute_rule_x_without_2nd_phase(profile, committeesize, algorithm="standard", resolute=True):
-    """Rule X with skip_phragmen_phase=True"""
+    """Rule X with skip_phragmen_phase=True.
+
+    May return committees with fewer than `committeesize` candidates.
+    """
     return compute_rule_x(
         profile,
         committeesize,
@@ -1578,8 +1593,8 @@ def compute_rule_x_without_2nd_phase(profile, committeesize, algorithm="standard
     )
 
 
-def compute_optphragmen(profile, committeesize, algorithm="gurobi", resolute=False):
-    """opt-Phragmen
+def compute_minimaxphragmen(profile, committeesize, algorithm="gurobi", resolute=False):
+    """Phragmen's minimax rule (minimax-Phragmen).
 
     Warning: does not include the lexicographic optimization as specified
     in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
@@ -1592,7 +1607,7 @@ def compute_optphragmen(profile, committeesize, algorithm="gurobi", resolute=Fal
     check_enough_approved_candidates(profile, committeesize)
 
     # optional output
-    output.info(header(rules["optphragmen"].longname))
+    output.info(header(rules["minimaxphragmen"].longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
 
@@ -1601,14 +1616,14 @@ def compute_optphragmen(profile, committeesize, algorithm="gurobi", resolute=Fal
     # end of optional output
 
     if algorithm == "fastest":
-        algorithm = rules["optphragmen"].fastest_algo()
+        algorithm = rules["minimaxphragmen"].fastest_algo()
 
     if algorithm != "gurobi":
         raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_optphragmen"
+            "Algorithm " + str(algorithm) + " not specified for compute_minimaxphragmen"
         )
 
-    committees = abcrules_gurobi._gurobi_optphragmen(profile, committeesize, resolute=resolute)
+    committees = abcrules_gurobi._gurobi_minimaxphragmen(profile, committeesize, resolute=resolute)
     committees = sorted_committees(committees)
 
     # optional output
@@ -1620,7 +1635,7 @@ def compute_optphragmen(profile, committeesize, algorithm="gurobi", resolute=Fal
 
 
 def compute_phragmen_enestroem(profile, committeesize, algorithm="standard", resolute=True):
-    """Phragmen-Enestroem (aka Phragmen's first method, Enestroem's method)
+    """Phragmen-Enestroem (aka Phragmen's first method, Enestroem's method).
 
     In every round the candidate with the highest combined budget of
     their supporters is put in the committee.
@@ -1712,8 +1727,9 @@ def _phragmen_enestroem_algorithm(profile, committeesize, resolute, division):
 
 
 def compute_consensus_rule(profile, committeesize, algorithm="standard", resolute=True):
-    """Consensus rule,
-    based on Perpetual Consensus from
+    """Consensus rule.
+
+    Based on Perpetual Consensus from
     Martin Lackner Perpetual Voting: Fairness in Long-Term Decision Making
     In Proceedings of the 34th AAAI Conference on Artificial Intelligence (AAAI 2020)
     """
@@ -1747,7 +1763,7 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard", resolut
 
 
 def _consensus_rule_algorithm(profile, committeesize, resolute, division):
-
+    """Algorithm for the consensus rule."""
     num_voters = len(profile)
 
     initial_voter_budget = {i: 0 for i in range(num_voters)}

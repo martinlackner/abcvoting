@@ -392,9 +392,9 @@ winning committees after the modification:
 
 seq-CC fails support monotonicity without additional voters
 
--------------------------------------------
-Phragmén's Optimization Rule (opt-Phragmén)
--------------------------------------------
+------------------------------------------
+Phragmén's Minimax Rule (minimax-Phragmén)
+------------------------------------------
 
 profile with 18 votes and 8 candidates:
  13 x {b, c, d, e, f},
@@ -415,11 +415,11 @@ winning committees after the modification:
  {a, b, d, e, f, g}
  {a, c, d, e, f, g}
 
-opt-Phragmén fails support monotonicity with additional voters
+minimax-Phragmén fails support monotonicity with additional voters
 
--------------------------------------------
-Phragmén's Optimization Rule (opt-Phragmén)
--------------------------------------------
+------------------------------------------
+Phragmén's Minimax Rule (minimax-Phragmén)
+------------------------------------------
 
 profile with 19 votes and 8 candidates:
  1 x {h},
@@ -441,7 +441,7 @@ winning committees after the modification:
  {a, b, d, e, f, g}
  {a, c, d, e, f, g}
 
-opt-Phragmén fails support monotonicity without additional voters
+minimax-Phragmén fails support monotonicity without additional voters
 
 -----------------------------
 Minimax Approval Voting (MAV)

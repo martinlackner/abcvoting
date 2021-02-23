@@ -186,7 +186,7 @@ class CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
-            "optphragmen": [{0, 1, 2, 3}],
+            "minimaxphragmen": [{0, 1, 2, 3}],
             "cc": [{0, 1, 2, 3}],
             "seqcc": [
                 {0, 1, 2, 4},
@@ -301,7 +301,7 @@ class CollectInstances:
             "minimaxav": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
             "lexminimaxav": [{0, 1, 3}],
             "seqphragmen": [{0, 1, 3}],
-            "optphragmen": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
+            "minimaxphragmen": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
             "cc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
             "seqcc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
             "revseqcc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
@@ -341,7 +341,7 @@ class CollectInstances:
             "minimaxav": [{0, 1, 2, 3}, {0, 1, 2, 4}, {0, 2, 3, 4}, {0, 2, 3, 5}, {0, 2, 4, 5}],
             "lexminimaxav": [{0, 1, 2, 4}],
             "seqphragmen": [{0, 1, 2, 4}],
-            "optphragmen": [
+            "minimaxphragmen": [
                 {0, 1, 2, 3},
                 {0, 1, 2, 4},
                 {0, 1, 2, 5},
@@ -419,7 +419,7 @@ class CollectInstances:
             "minimaxav": [{0, 3}, {1, 3}],
             "lexminimaxav": [{0, 3}],
             "seqphragmen": [{0, 3}],
-            "optphragmen": [{0, 3}, {1, 3}],
+            "minimaxphragmen": [{0, 3}, {1, 3}],
             "cc": [{0, 2}, {0, 3}, {1, 3}],
             "seqcc": [{0, 2}, {0, 3}],
             "revseqcc": [{0, 2}, {0, 3}, {1, 3}],
@@ -630,7 +630,7 @@ def test_monroe_indivisible(algorithm):
     "algorithm",
     [
         pytest.param(algorithm, marks=MARKS[algorithm])
-        for algorithm in abcrules.rules["optphragmen"].algorithms
+        for algorithm in abcrules.rules["minimaxphragmen"].algorithms
     ],
     ids=idfn,
 )
@@ -647,7 +647,7 @@ def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
     # (with lexicographic optimization only {0, 1, 2} is winning)
     assert (
         len(
-            abcrules.rules["optphragmen"].compute(
+            abcrules.rules["minimaxphragmen"].compute(
                 profile, committeesize, algorithm=algorithm, resolute=False
             )
         )

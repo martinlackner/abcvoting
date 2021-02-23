@@ -28,7 +28,7 @@ Sequential Approval Chamberlin-Courant (seq-CC):
 Phragmén's Sequential Rule (seq-Phragmén):
  {0, 1, 4, 5}
 
-Phragmén's Optimization Rule (opt-Phragmén):
+Phragmén's Minimax Rule (minimax-Phragmén):
  {0, 1, 2, 3}
 
 Monroe's Approval Rule (Monroe):

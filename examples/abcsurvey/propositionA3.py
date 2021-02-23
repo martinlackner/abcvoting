@@ -194,7 +194,7 @@ monotonicity_instances = [
         [{0, 1, 2}, {0, 2, 3}, {1, 2, 3}],
     ),
     (
-        "optphragmen",
+        "minimaxphragmen",
         6,  # from Sanchez-Fernandez and Fisteus (2019)
         [{1, 2, 3, 4, 5}] * 13 + [{0, 6}, {0}] * 2 + [{6}] * 1,
         True,
@@ -209,7 +209,7 @@ monotonicity_instances = [
         ],
     ),
     (
-        "optphragmen",
+        "minimaxphragmen",
         6,  # from Sanchez-Fernandez and Fisteus (2019)
         [{7}] + [{1, 2, 3, 4, 5}] * 13 + [{0, 6}, {0}] * 2 + [{6}],
         False,

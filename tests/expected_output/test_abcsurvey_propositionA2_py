@@ -94,25 +94,25 @@ Optimal Monroe score: 10
  {a, b}
 
  Monroe: {c} vs {a, b}
--------------------------------------------
-Phragmén's Optimization Rule (opt-Phragmén)
--------------------------------------------
+------------------------------------------
+Phragmén's Minimax Rule (minimax-Phragmén)
+------------------------------------------
 
 Computing only one winning committee (resolute=True)
 
 1 winning committee:
  {c}
 
--------------------------------------------
-Phragmén's Optimization Rule (opt-Phragmén)
--------------------------------------------
+------------------------------------------
+Phragmén's Minimax Rule (minimax-Phragmén)
+------------------------------------------
 
 Computing only one winning committee (resolute=True)
 
 1 winning committee:
  {a, b}
 
- opt-Phragmén: {c} vs {a, b}
+ minimax-Phragmén: {c} vs {a, b}
 -----------------------------
 Minimax Approval Voting (MAV)
 -----------------------------

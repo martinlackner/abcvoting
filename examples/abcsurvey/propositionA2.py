@@ -29,7 +29,7 @@ print(profile.str_compact())
 
 
 print("winning committees for k=1 and k=2:")
-for rule_id in ["pav", "cc", "monroe", "optphragmen", "minimaxav"]:
+for rule_id in ["pav", "cc", "monroe", "minimaxphragmen", "minimaxav"]:
     comm1 = abcrules.compute(rule_id, profile, 1, resolute=True)[0]
     comm2 = abcrules.compute(rule_id, profile, 2, resolute=True)[0]
     print(
