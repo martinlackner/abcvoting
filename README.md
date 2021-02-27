@@ -70,7 +70,7 @@ The output is
 [{0, 1, 3}, {0, 1, 4}]
 ```
 which corresponds to the two winning committees {0,1,3} and {0,1,4}. Further examples can be found in the directory [examples/](examples).
-In [examples/survey/](examples/abcsurvey), all examples from the survey on ABC rules [8] can be found. 
+In [examples/survey/](examples/abcsurvey), all examples from the survey on ABC rules [8] are implemented. 
 
 ## Comments
 
