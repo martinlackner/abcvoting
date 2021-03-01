@@ -5,6 +5,7 @@ Approval-based committee (ABC) rules implemented as (mixed) integer linear progr
 
 import mip
 from abcvoting.misc import sorted_committees
+from abcvoting.output import output, DEBUG
 
 
 ACCURACY = 1e-9
@@ -44,7 +45,10 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
     #  cases to avoid endless hanging computations, e.g. when CI runs the tests
     while True:
         model = mip.Model(solver_name=solver_id)
-        model.verbose = 0  # TODO could be changed according to output.verbosity
+        if output.verbosity <= DEBUG:
+            model.verbose = 1
+        else:
+            model.verbose = 0
 
         # `in_committee` is a binary variable indicating whether `cand` is in the committee
         in_committee = [

@@ -6,7 +6,7 @@ import pytest
 
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
-from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, output
+from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, DEBUG, output
 from abcvoting.preferences import Profile, Voter
 from abcvoting import abcrules, misc, scores
 
@@ -951,7 +951,10 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
                 start_output += "Computing only one winning committee (resolute=True)\n\n"
             if verbosity <= DETAILS:
                 start_output += abcrules._algorithm_fullnames(algorithm) + "\n"
-            assert out.startswith(start_output)
+            if verbosity <= DEBUG:
+                assert start_output in out
+            else:
+                assert out.startswith(start_output)
             end_output = (
                 f"{misc.str_committees_header(committees, winning=True)}\n"
                 f"{misc.str_sets_of_candidates(committees, cand_names=profile.cand_names)}\n"
