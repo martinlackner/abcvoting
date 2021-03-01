@@ -434,6 +434,39 @@ class CollectInstances:
         }
         self.instances.append((profile, tests, committeesize))
 
+        # add a fifth profile
+        # this tests a corner case of minimax
+        profile = Profile(10)
+        committeesize = 2
+        approval_sets = [range(5), range(5, 10)]
+        profile.add_voters(approval_sets)
+        one_each = [{i, j} for i in range(5) for j in range(5, 10)]
+        all_possibilities = [{i, j} for i in range(10) for j in range(10) if i != j]
+        tests = {
+            "seqpav": one_each,
+            "av": all_possibilities,
+            "sav": all_possibilities,
+            "pav": one_each,
+            "geom2": one_each,
+            "revseqpav": one_each,
+            "minimaxav": one_each,
+            "lexminimaxav": one_each,
+            "seqphragmen": one_each,
+            "minimaxphragmen": one_each,
+            "cc": one_each,
+            "seqcc": one_each,
+            "revseqcc": one_each,
+            "monroe": one_each,
+            "greedy-monroe": one_each,
+            "seqslav": one_each,
+            "slav": one_each,
+            "rule-x": one_each,
+            "rule-x-without-2nd-phase": one_each,
+            "phragmen-enestroem": one_each,
+            "consensus-rule": one_each,
+        }
+        self.instances.append((profile, tests, committeesize))
+
 
 testinsts = CollectInstances()
 testrules = CollectRules()
