@@ -33,6 +33,8 @@ def check_output(capfd, request):
     except FileNotFoundError:
         expected_output = None
 
+    # TODO: remove gurobi output from stdout
+
     if expected_output != stdout:
         with open(f"{fname}.new", "w", encoding="utf8") as file:
             file.write(stdout)
@@ -83,9 +85,7 @@ def test_abcsurvey_example08_py(check_output):
 
 # noinspection PyUnresolvedReferences
 @pytest.mark.gurobi
-def test_abcsurvey_example09_py():
-    # TODO check_ouput test does not work here because of
-    #      undeterministic Gurobi output
+def test_abcsurvey_example09_py(check_output):
     from examples.abcsurvey import example09
 
 
