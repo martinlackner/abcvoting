@@ -81,7 +81,11 @@ def _optimize_rule_ortools(set_opt_model_func, profile, committeesize, resolute)
         committee = set(
             cand for cand in profile.candidates if solver.Value(in_committee[cand]) >= 1
         )
-        assert len(committee) == committeesize
+        if len(committee) != committeesize:
+            raise RuntimeError(
+                "_optimize_rule_ortools produced a committee with "
+                "fewer than `committeesize` members."
+            )
         committees.append(committee)
 
         if resolute:
@@ -230,7 +234,7 @@ def _ortools_minimaxav(profile, committeesize, resolute):
 
         for voter in profile:
             not_approved = [cand for cand in profile.candidates if cand not in voter.approved]
-            # maximum hamming distance is greater of equal than the Hamming distances
+            # maximum Hamming distance is greater of equal than the Hamming distances
             # between individual voters and the committee
             model.Add(
                 max_hamming_distance

@@ -18,9 +18,11 @@ profile with 12 votes and 8 candidates:
  1 x {f},
  1 x {g}
 
--------------------------------------------
-Phragmén's Optimization Rule (opt-Phragmén)
--------------------------------------------
+------------------------------------------
+Phragmén's Minimax Rule (minimax-Phragmén)
+------------------------------------------
+
+Algorithm: Gurobi ILP solver
 
 5 winning committees:
  {a, b, c, d}

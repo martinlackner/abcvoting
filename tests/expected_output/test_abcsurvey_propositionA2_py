@@ -100,6 +100,8 @@ Phragmén's Minimax Rule (minimax-Phragmén)
 
 Computing only one winning committee (resolute=True)
 
+Algorithm: Gurobi ILP solver
+
 1 winning committee:
  {c}
 
@@ -108,6 +110,8 @@ Phragmén's Minimax Rule (minimax-Phragmén)
 ------------------------------------------
 
 Computing only one winning committee (resolute=True)
+
+Algorithm: Gurobi ILP solver
 
 1 winning committee:
  {a, b}

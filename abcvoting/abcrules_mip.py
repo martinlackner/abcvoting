@@ -1,6 +1,6 @@
 """
-Approval-based committee (ABC) rules implemented as constraint
- satisfaction programs with Python MIP.
+Approval-based committee (ABC) rules implemented as (mixed) integer linear programs (ILPs)
+ with Python MIP.
 """
 
 import mip
@@ -44,7 +44,7 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
     #  cases to avoid endless hanging computations, e.g. when CI runs the tests
     while True:
         model = mip.Model(solver_name=solver_id)
-        model.verbose = 0  # TODO could be set to 1, if abcvoting's verbose is set to >= 2
+        model.verbose = 0  # TODO could be changed according to output.verbosity
 
         # `in_committee` is a binary variable indicating whether `cand` is in the committee
         in_committee = [
@@ -61,13 +61,12 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
             scorefct,
         )
 
-        #
         # emphasis is optimality:
         # activates procedures that produce improved lower bounds, focusing in pruning the search
         # tree even if the production of the first feasible solutions is delayed.
         model.emphasis = 2
-        model.max_gap = ACCURACY
-        model.max_mip_gap = ACCURACY
+        model.opt_tol = ACCURACY
+        model.integer_tol = ACCURACY
 
         status = model.optimize()
 
@@ -99,7 +98,12 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
         committee = set(
             cand for cand in profile.candidates if in_committee[cand].x >= 1 - ACCURACY
         )
-        assert len(committee) == committeesize
+        if len(committee) != committeesize:
+            print([in_committee[cand].x for cand in profile.candidates])
+            raise RuntimeError(
+                "_optimize_rule_mip produced a committee with "
+                "fewer than `committeesize` members."
+            )
         committees.append(committee)
 
         if resolute:
@@ -126,10 +130,8 @@ def _mip_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
 
         for i, voter in enumerate(profile):
             for l in range(1, committeesize + 1):
-                utility[(voter, l)] = model.add_var(lb=0.0, ub=1.0, name=f"utility-v{i}-l{l}")
-                # should be binary. this is guaranteed since the objective
-                # is maximal if all utilitity-values are either 0 or 1.
-                # using vtype=gb.GRB.BINARY does not change result, but makes things slower a bit
+                utility[(voter, l)] = model.add_var(var_type=mip.BINARY, name=f"utility-v{i}-l{l}")
+                # TODO: could be faster with lb=0.0, ub=1.0, var_type=mip.CONTINUOUS
 
         # constraint: the committee has the required size
         model += mip.xsum(in_committee) == committeesize
@@ -171,6 +173,136 @@ def _mip_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
     return sorted_committees(committees)
 
 
+def _mip_monroe(profile, committeesize, resolute, solver_id):
+    def set_opt_model_func(
+        model, profile, in_committee, committeesize, previously_found_committees, scorefct
+    ):
+        num_voters = len(profile)
+
+        # optimization goal: variable "satisfaction"
+        satisfaction = model.add_var(ub=num_voters, var_type=mip.INTEGER, name="satisfaction")
+
+        model += mip.xsum(in_committee[cand] for cand in profile.candidates) == committeesize
+
+        # a partition of voters into `committeesize` many sets
+        partition = {}
+        for cand in profile.candidates:
+            for voter in range(len(profile)):
+                partition[(cand, voter)] = model.add_var(var_type=mip.BINARY, name="partition")
+        for voter in range(len(profile)):
+            # every voter has to be part of a voter partition set
+            model += mip.xsum(partition[(cand, voter)] for cand in profile.candidates) == 1
+        for cand in profile.candidates:
+            # every voter set in the partition has to contain
+            # at least (num_voters // committeesize) candidates
+            model += mip.xsum(partition[(cand, voter)] for voter in range(len(profile))) >= (
+                num_voters // committeesize - num_voters * (1 - in_committee[cand])
+            )
+            # every voter set in the partition has to contain
+            # at most ceil(num_voters/committeesize) candidates
+            model += mip.xsum(partition[(cand, voter)] for voter in range(len(profile))) <= (
+                num_voters // committeesize
+                + bool(num_voters % committeesize)
+                + num_voters * (1 - in_committee[cand])
+            )
+            # if in_committee[i] = 0 then partition[(i,j) = 0
+            model += (
+                mip.xsum(partition[(cand, voter)] for voter in range(len(profile)))
+                <= num_voters * in_committee[cand]
+            )
+
+        # constraint for objective variable "satisfaction"
+        model += (
+            mip.xsum(
+                partition[(cand, voter)] * (cand in profile[voter].approved)
+                for voter in range(len(profile))
+                for cand in profile.candidates
+            )
+            >= satisfaction
+        )
+
+        # find a new committee that has not been found before
+        for committee in previously_found_committees:
+            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
+
+        # optimization objective
+        model.objective = mip.maximize(satisfaction)
+
+    committees = _optimize_rule_mip(
+        set_opt_model_func,
+        profile,
+        committeesize,
+        scorefct=None,
+        resolute=resolute,
+        solver_id=solver_id,
+    )
+    return sorted_committees(committees)
+
+
+def _mip_minimaxphragmen(profile, committeesize, resolute, solver_id):
+    """ILP for Phragmen's minimax rule (minimax-Phragmen), using Python MIP.
+
+    Minimizes the maximum load.
+
+    Warning: does not include the lexicographic optimization as specified
+    in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
+    Phragmen's Voting Methods and Justified Representation.
+    https://arxiv.org/abs/2102.12305
+    Instead: minimizes the maximum load (without consideration of the
+             second-, third-, ...-largest load
+    """
+
+    def set_opt_model_func(
+        model, profile, in_committee, committeesize, previously_found_committees, scorefct
+    ):
+        load = {}
+        for cand in profile.candidates:
+            for voter in profile:
+                load[(voter, cand)] = model.add_var(lb=0.0, ub=1.0, var_type=mip.CONTINUOUS)
+
+        # constraint: the committee has the required size
+        model += mip.xsum(in_committee[cand] for cand in profile.candidates) == committeesize
+
+        for cand in profile.candidates:
+            for voter in profile:
+                if cand not in voter.approved:
+                    load[(voter, cand)] = 0
+
+        # a candidate's load is distributed among his approvers
+        for cand in profile.candidates:
+            model += (
+                mip.xsum(
+                    voter.weight * load[(voter, cand)]
+                    for voter in profile
+                    if cand in profile.candidates
+                )
+                >= in_committee[cand]
+            )
+
+        # find a new committee that has not been found before
+        for committee in previously_found_committees:
+            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
+
+        loadbound = model.add_var(
+            lb=0, ub=committeesize, var_type=mip.CONTINUOUS, name="loadbound"
+        )
+        for voter in profile:
+            model += mip.xsum(load[(voter, cand)] for cand in voter.approved) <= loadbound
+
+        # maximizing the negative distance makes code more similar to the other methods here
+        model.objective = mip.maximize(-loadbound)
+
+    committees = _optimize_rule_mip(
+        set_opt_model_func,
+        profile,
+        committeesize,
+        scorefct=None,
+        resolute=resolute,
+        solver_id=solver_id,
+    )
+    return sorted_committees(committees)
+
+
 def _mip_minimaxav(profile, committeesize, resolute, solver_id):
     def set_opt_model_func(
         model, profile, in_committee, committeesize, previously_found_committees, scorefct
@@ -183,7 +315,7 @@ def _mip_minimaxav(profile, committeesize, resolute, solver_id):
 
         for voter in profile:
             not_approved = [cand for cand in profile.candidates if cand not in voter.approved]
-            # maximum hamming distance is greater of equal than the Hamming distances
+            # maximum Hamming distance is greater of equal than the Hamming distances
             # between individual voters and the committee
             model += max_hamming_distance >= mip.xsum(
                 1 - in_committee[cand] for cand in voter.approved

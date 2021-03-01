@@ -69,8 +69,8 @@ class ABCRule:
         # algorithms should be sorted by speed (fastest first)
         self.resolute = resolute
 
-        assert len(resolute) > 0
-        assert len(algorithms) > 0
+        if len(resolute) == 0 or len(algorithms) == 0:
+            raise ValueError
 
     def compute(self, profile, committeesize, **kwargs):
         """Compute winning committee(s)."""
@@ -178,7 +178,7 @@ def _init_rules():
             "minimax-Phragmén",
             "Phragmén's Minimax Rule (minimax-Phragmén)",
             compute_minimaxphragmen,
-            ("gurobi",),
+            ("gurobi", "mip_gurobi", "mip_cbc"),
             (True, False),
         ),
         (
@@ -186,7 +186,7 @@ def _init_rules():
             "Monroe",
             "Monroe's Approval Rule (Monroe)",
             compute_monroe,
-            ("gurobi", "ortools_cp", "brute-force"),
+            ("gurobi", "mip_gurobi", "mip_cbc", "ortools_cp", "brute-force"),
             (True, False),
         ),
         (
@@ -1020,6 +1020,13 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
     elif algorithm == "ortools_cp":
         committees = abcrules_ortools._ortools_monroe(profile, committeesize, resolute)
         committees = sorted_committees(committees)
+    elif algorithm.startswith("mip_"):
+        committees = abcrules_mip._mip_monroe(
+            profile,
+            committeesize,
+            resolute=resolute,
+            solver_id=algorithm[4:],
+        )
     elif algorithm == "brute-force":
         committees, detailed_info = _monroe_bruteforce(profile, committeesize, resolute)
     else:
@@ -1596,37 +1603,41 @@ def compute_rule_x_without_2nd_phase(profile, committeesize, algorithm="standard
 def compute_minimaxphragmen(profile, committeesize, algorithm="gurobi", resolute=False):
     """Phragmen's minimax rule (minimax-Phragmen).
 
+    Minimizes the maximum load.
+
     Warning: does not include the lexicographic optimization as specified
     in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
     Phragmen's Voting Methods and Justified Representation.
-    http://martin.lackner.xyz/publications/phragmen.pdf
-
+    https://arxiv.org/abs/2102.12305
     Instead: minimizes the maximum load (without consideration of the
              second-, third-, ...-largest load
     """
     check_enough_approved_candidates(profile, committeesize)
 
-    # optional output
-    output.info(header(rules["minimaxphragmen"].longname))
-    if resolute:
-        output.info("Computing only one winning committee (resolute=True)\n")
-
-    if algorithm == "gurobi":
-        output.debug("Using the Gurobi ILP solver")
-    # end of optional output
-
     if algorithm == "fastest":
         algorithm = rules["minimaxphragmen"].fastest_algo()
 
-    if algorithm != "gurobi":
+    if algorithm == "gurobi":
+        committees = abcrules_gurobi._gurobi_minimaxphragmen(
+            profile, committeesize, resolute=resolute
+        )
+    elif algorithm.startswith("mip_"):
+        committees = abcrules_mip._mip_minimaxphragmen(
+            profile,
+            committeesize,
+            resolute=resolute,
+            solver_id=algorithm[4:],
+        )
+    else:
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_minimaxphragmen"
         )
 
-    committees = abcrules_gurobi._gurobi_minimaxphragmen(profile, committeesize, resolute=resolute)
-    committees = sorted_committees(committees)
-
     # optional output
+    output.info(header(rules["minimaxphragmen"].longname))
+    if resolute:
+        output.info("Computing only one winning committee (resolute=True)\n")
+    output.details(_algorithm_fullnames(algorithm) + "\n")
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output

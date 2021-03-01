@@ -634,25 +634,22 @@ def test_monroe_indivisible(algorithm):
     ],
     ids=idfn,
 )
-def test_optphrag_does_not_use_lexicographic_optimization(algorithm):
+def test_minimaxphragmen_does_not_use_lexicographic_optimization(algorithm):
     # this test shows that lexicographic optimization is not (yet)
     # implemented for opt-Phragmen (as it is described in
     # http://martin.lackner.xyz/publications/phragmen.pdf)
 
-    profile = Profile(6)
-    profile.add_voters([[0], [0], [1, 3], [1, 3], [1, 4], [2, 4], [2, 5], [2, 5]])
+    profile = Profile(7)
+    profile.add_voters([[6], [6], [1, 3], [1, 3], [1, 4], [2, 4], [2, 5], [2, 5]])
     committeesize = 3
 
     # without lexicographic optimization, this profile has 12 winning committees
-    # (with lexicographic optimization only {0, 1, 2} is winning)
-    assert (
-        len(
-            abcrules.rules["minimaxphragmen"].compute(
-                profile, committeesize, algorithm=algorithm, resolute=False
-            )
-        )
-        == 12
+    # (with lexicographic optimization only {1, 2, 6} is winning)
+    committees = abcrules.rules["minimaxphragmen"].compute(
+        profile, committeesize, algorithm=algorithm, resolute=False
     )
+    print(committees)
+    assert len(committees) == 12
 
 
 @pytest.mark.parametrize(
@@ -670,6 +667,8 @@ def test_abcrules_correct(rule_id, algorithm, resolute, profile, exp_results, co
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
     )
+    print(f"output: {committees}")
+    print(f"expected: {exp_results[rule_id]}")
     if resolute:
         assert len(committees) == 1
         assert committees[0] in exp_results[rule_id]

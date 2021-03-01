@@ -118,7 +118,7 @@ manipulations = [
         [{1, 2, 4}],
     ),
     # ("minimaxphragmen", True, 3, [{a, b}] + [{b, c, d}] * 3, [a}, {{b, c, d}}, {{a, b, c}]),
-    # this does not work because optphrag does not support a specified tiebreaking
+    # this does not work because minimax-Phragmen does not support a specified tiebreaking
     # between committees ([a, b, c] should be prefered to [b, c, d])
 ]
 
