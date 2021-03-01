@@ -29,3 +29,15 @@ def test_compare_list_of_committees():
     assert not misc.check_equal_list_of_committees(committees1, committees2)
     committees1 = [{1, 2}, {3}, {0, 3}]
     assert not misc.check_equal_list_of_committees(committees1, committees2)
+
+
+def test_str_committees_header():
+    assert misc.str_committees_header([{1, 0}]) == "1 committee:"
+    assert misc.str_committees_header([{1, 0}, {1, 2, 3}]) == "2 committees:"
+    assert misc.str_committees_header([]) == "No committees"
+    assert misc.str_committees_header([{1, 0}], winning=True) == "1 winning committee:"
+    assert misc.str_committees_header([{1, 0}, {1, 2, 3}], winning=True) == "2 winning committees:"
+    assert (
+        misc.str_committees_header([], winning=True)
+        == "No winning committees (this should not happen)"
+    )
