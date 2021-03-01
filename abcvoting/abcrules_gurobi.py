@@ -289,7 +289,7 @@ def _gurobi_minimaxav(profile, committeesize, resolute):
     ):
         max_hamming_distance = m.addVar(
             lb=0,
-            ub=profile.num_cand + committeesize,
+            ub=profile.num_cand,
             vtype=gb.GRB.INTEGER,
             name="max_hamming_distance",
         )

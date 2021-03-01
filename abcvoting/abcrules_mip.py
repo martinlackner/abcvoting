@@ -178,7 +178,7 @@ def _mip_minimaxav(profile, committeesize, resolute, solver_id):
         max_hamming_distance = model.add_var(
             var_type=mip.INTEGER,
             lb=0,
-            ub=profile.num_cand + committeesize,
+            ub=profile.num_cand,
             name="max_hamming_distance",
         )
 
