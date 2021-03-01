@@ -176,7 +176,10 @@ def _mip_minimaxav(profile, committeesize, resolute, solver_id):
         model, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):
         max_hamming_distance = model.add_var(
-            var_type=mip.INTEGER, lb=0, ub=2 * committeesize, name="max_hamming_distance"
+            var_type=mip.INTEGER,
+            lb=0,
+            ub=profile.num_cand + committeesize,
+            name="max_hamming_distance",
         )
 
         model += mip.xsum(in_committee[cand] for cand in profile.candidates) == committeesize

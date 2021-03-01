@@ -224,7 +224,7 @@ def _ortools_minimaxav(profile, committeesize, resolute):
         previously_found_committees,
     ):
         max_hamming_distance = model.NewIntVar(
-            lb=0, ub=2 * committeesize, name="max_hamming_distance"
+            lb=0, ub=profile.num_cand + committeesize, name="max_hamming_distance"
         )
         model.Add(sum(in_committee[cand] for cand in profile.candidates) == committeesize)
 
