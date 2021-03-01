@@ -674,7 +674,10 @@ def test_abcrules_correct(rule_id, algorithm, resolute, profile, exp_results, co
         assert len(committees) == 1
         assert committees[0] in exp_results[rule_id]
     else:
-        assert committees == sorted(exp_results[rule_id])
+        # test unordered equality, this requires sets of sets, only possible with frozensets
+        committees_ = {frozenset(committee) for committee in committees}
+        exp_results_ = {frozenset(committee) for committee in exp_results[rule_id]}
+        assert committees_ == exp_results_
 
 
 def test_seqphragmen_irresolute():
