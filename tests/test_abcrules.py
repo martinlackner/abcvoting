@@ -480,6 +480,19 @@ def idfn(val):
     return str(val)
 
 
+def remove_solver_output(out):
+    """Remove extra, unwanted solver output (e.g. from Gurobi)."""
+    out = out.split("\n")
+    out = [
+        line
+        for line in out
+        if not line.startswith("Academic license - for non-commercial use only")
+    ]
+    out = [line for line in out if not line.startswith("Using license file")]
+    out = "\n".join(out)
+    return out
+
+
 @pytest.mark.parametrize("rule", abcrules.rules.values(), ids=idfn)
 def test_resolute_parameter(rule):
     for alg in rule.algorithms:
@@ -916,18 +929,18 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
         #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
         pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
 
-    if "gurobi" in algorithm:
-        # TODO Gurobi prints:
-        #  "Academic license - for non-commercial use only"
-        #  (if an acamedic license is used) as well as
-        #  "Warning: parameter changes on this environment will not affect existing models."
-        #  Thus this test fails.
-        #
-        # This message appears only sometimes, so even if this test succeeds for gurobi with
-        # verbosity>=WARNING, it's probably just due to the test execution order, i.e. the
-        # undesired message was simply printed earlier, or caused by use of different Gurobi
-        # versions.
-        pytest.skip("Gurobi always prints something when used with an academic license")
+    # if "gurobi" in algorithm:
+    #     # TODO Gurobi prints:
+    #     #  "Academic license - for non-commercial use only"
+    #     #  (if an acamedic license is used) as well as
+    #     #  "Warning: parameter changes on this environment will not affect existing models."
+    #     #  Thus this test fails.
+    #     #
+    #     # This message appears only sometimes, so even if this test succeeds for gurobi with
+    #     # verbosity>=WARNING, it's probably just due to the test execution order, i.e. the
+    #     # undesired message was simply printed earlier, or caused by use of different Gurobi
+    #     # versions.
+    #     pytest.skip("Gurobi always prints something when used with an academic license")
 
     output.set_verbosity(verbosity=verbosity)
 
@@ -940,6 +953,9 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
             rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
         )
         out = str(capfd.readouterr().out)
+
+        # remove unwanted solver output
+        out = remove_solver_output(out)
 
         if verbosity >= WARNING:
             assert out == ""

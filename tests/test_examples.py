@@ -6,6 +6,7 @@ from pathlib import Path
 
 from abcvoting.output import WARNING
 from abcvoting.output import output
+from test_abcrules import remove_solver_output
 
 
 @pytest.fixture
@@ -33,7 +34,7 @@ def check_output(capfd, request):
     except FileNotFoundError:
         expected_output = None
 
-    # TODO: remove gurobi output from stdout
+    stdout = remove_solver_output(str(stdout))
 
     if expected_output != stdout:
         with open(f"{fname}.new", "w", encoding="utf8") as file:
