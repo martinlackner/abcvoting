@@ -855,7 +855,7 @@ def test_cvxpy_wrong_score_fct():
         cvxpy_thiele_methods(
             profile=profile,
             committeesize=committeesize,
-            scorefct_str="non_existing",
+            scorefct_id="non_existing",
             resolute=False,
             solver_id="glpk_mi",
         )

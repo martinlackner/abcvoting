@@ -19,38 +19,38 @@ THIELE_SCOREFCTS_STRINGS = ["pav", "slav", "cc", "av"] + [f"geom{param}" for par
 class UnknownScoreFunctionError(ValueError):
     """Exception raised if unknown rule id is used"""
 
-    def __init__(self, scorefct_str):
-        message = 'Thiele score function "' + str(scorefct_str) + '" is not known.'
+    def __init__(self, scorefct_id):
+        message = 'Thiele score function "' + str(scorefct_id) + '" is not known.'
         super(ValueError, self).__init__(message)
 
 
-def get_scorefct(scorefct_str, committeesize=None):
-    """returns score function (for Thiele method) given its name"""
-    if scorefct_str not in THIELE_SCOREFCTS_STRINGS and not scorefct_str.startswith("geom"):
-        raise UnknownScoreFunctionError(scorefct_str)
+def get_scorefct(scorefct_id, committeesize=None):
+    """returns score function (for a Thiele method) given its name"""
+    if scorefct_id not in THIELE_SCOREFCTS_STRINGS and not scorefct_id.startswith("geom"):
+        raise UnknownScoreFunctionError(scorefct_id)
 
-    if scorefct_str == "pav":
+    if scorefct_id == "pav":
         return pav_score_fct
-    elif scorefct_str == "slav":
+    elif scorefct_id == "slav":
         return slav_score_fct
-    elif scorefct_str == "cc":
+    elif scorefct_id == "cc":
         return cc_score_fct
-    elif scorefct_str == "av":
+    elif scorefct_id == "av":
         return av_score_fct
-    elif scorefct_str[:4] == "geom":
-        base = Fraction(scorefct_str[4:])
+    elif scorefct_id[:4] == "geom":
+        base = Fraction(scorefct_id[4:])
         return functools.partial(geometric_score_fct, base=base)
 
     raise RuntimeError(
-        f"Score function {scorefct_str} is valid but not handled correctly in get_scorefct()."
+        f"Score function {scorefct_id} is valid but not handled correctly in get_scorefct()."
     )
 
 
-def thiele_score(scorefct_str, profile, committee):
+def thiele_score(scorefct_id, profile, committee):
     """computes the Thiele score of a committee subject to
-    a given score function (scorefct_str)
+    a given score function (scorefct_id)
     """
-    scorefct = get_scorefct(scorefct_str, len(committee))
+    scorefct = get_scorefct(scorefct_id, len(committee))
     score = 0
     for vote in profile:
         cand_in_com = 0
@@ -60,6 +60,7 @@ def thiele_score(scorefct_str, profile, committee):
     return score
 
 
+### Thiele score functions
 def geometric_score_fct(i, base):
     if i == 0:
         return 0
@@ -97,6 +98,9 @@ def cc_score_fct(i):
         return 0
 
 
+### end of Thiele score functions
+
+
 def cumulative_score_fct(scorefct, cand_in_com):
     return sum(scorefct(i + 1) for i in range(cand_in_com))
 
@@ -132,6 +136,7 @@ def marginal_thiele_scores_remove(scorefct, profile, committee):
 
 
 def monroescore(profile, committee):
+    """Returns Monroe score of a given committee."""
     if len(profile) % len(committee) == 0:
         # faster
         return monroescore_matching(profile, committee)
@@ -192,6 +197,7 @@ def monroescore_flowbased(profile, committee):
 
 
 def mavscore(profile, committee):
+    """Returns the Minimax AV (MAV) score of a committee."""
     score = 0
     for voter in profile:
         hamdistance = hamming(voter.approved, committee)

@@ -23,7 +23,7 @@ except ImportError:
 CVXPY_ACCURACY = 1e-7
 
 
-def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, solver_id):
+def cvxpy_thiele_methods(profile, committeesize, scorefct_id, resolute, solver_id):
     """Compute thiele method using CVXPY. This is similar to `_gurobi_thiele_methods()`,
     where `gurobipy` is used as interface to Gurobi. This method supports Gurobi too, but also
     other solvers.
@@ -34,7 +34,7 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, solver_
         approval sets of voters
     committeesize : int
         number of chosen alternatives
-    scorefct_str : str
+    scorefct_id : str
         must be one of: 'pav'
     resolute : bool
         return only one result
@@ -62,12 +62,12 @@ def cvxpy_thiele_methods(profile, committeesize, scorefct_str, resolute, solver_
     maxscore = None
 
     # TODO should we use functions for abcvoting.scores? Does it make it slower?
-    if scorefct_str == "pav":
+    if scorefct_id == "pav":
         scorefct_value = np.tile(1 / np.arange(1, committeesize + 1), (len(profile), 1))
-    elif scorefct_str == "av":
+    elif scorefct_id == "av":
         raise ValueError("scorefct must be monotonic decreasing")
     else:
-        raise NotImplementedError(f"invalid scorefct_str: {scorefct_str}")
+        raise NotImplementedError(f"invalid scorefct_id: {scorefct_id}")
 
     # TODO does this make things slower in case of weights == 1 to multiply weights? We could
     #  skip it then of course...

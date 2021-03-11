@@ -50,7 +50,7 @@ def test_monroescore_matching(committee, score, num_cand):
 
 
 @pytest.mark.parametrize(
-    "scorefct_str,score",
+    "scorefct_id,score",
     [
         ("pav", Fraction(119, 12)),
         ("av", 14),
@@ -60,11 +60,11 @@ def test_monroescore_matching(committee, score, num_cand):
     ],
 )
 @pytest.mark.parametrize("num_cand", [8, 9])
-def test_thiele_scores(scorefct_str, score, num_cand):
+def test_thiele_scores(scorefct_id, score, num_cand):
     profile = Profile(num_cand)
     approval_sets = [[0, 1], [1], [1, 3], [4], [1, 2, 3, 4, 5], [1, 5, 3], [0, 1, 2, 4, 5]]
     profile.add_voters(approval_sets)
     committee = [6, 7]
-    assert scores.thiele_score(scorefct_str, profile, committee) == 0
+    assert scores.thiele_score(scorefct_id, profile, committee) == 0
     committee = [1, 2, 3, 4]
-    assert scores.thiele_score(scorefct_str, profile, committee) == score
+    assert scores.thiele_score(scorefct_id, profile, committee) == score

@@ -251,7 +251,7 @@ def get_ruleinfo(rule_id):
         return RuleInfo(
             f"{parameter}-Geometric",
             f"{parameter}-Geometric Rule",
-            functools.partial(compute_thiele_method, scorefct_str=rule_id),
+            functools.partial(compute_thiele_method, scorefct_id=rule_id),
             _THIELE_ALGORITHMS,
             (True, False),
         )
@@ -273,7 +273,7 @@ def get_ruleinfo(rule_id):
             return RuleInfo(
                 f"seq-{get_shortname(scorefct_id)}",
                 f"Sequential {get_longname(scorefct_id)}",
-                functools.partial(compute_seq_thiele_method, scorefct_str=rule_id),
+                functools.partial(compute_seq_thiele_method, scorefct_id=rule_id),
                 ("standard",),
                 (True, False),
             )
@@ -282,7 +282,7 @@ def get_ruleinfo(rule_id):
             return RuleInfo(
                 f"revseq-{get_shortname(scorefct_id)}",
                 f"Reverse Sequential {get_longname(scorefct_id)}",
-                functools.partial(compute_revseq_thiele_method, scorefct_str=rule_id),
+                functools.partial(compute_revseq_thiele_method, scorefct_id=rule_id),
                 ("standard",),
                 (True, False),
             )
@@ -343,22 +343,22 @@ def compute(rule_id, profile, committeesize, **kwargs):
 
 
 def compute_thiele_method(
-    profile, committeesize, scorefct_str, algorithm="branch-and-bound", resolute=False
+    profile, committeesize, scorefct_id, algorithm="branch-and-bound", resolute=False
 ):
     """Thiele methods.
 
     Compute winning committees according to a Thiele method specified
-    by a score function (scorefct_str).
+    by a score function (scorefct_id).
     Examples of Thiele methods are PAV, CC, and SLAV.
     An exception is Approval Voting (AV), which should be computed using
     compute_av(). (AV is polynomial-time computable (separable) and can thus be
     computed much faster.)
     """
     check_enough_approved_candidates(profile, committeesize)
-    scorefct = scores.get_scorefct(scorefct_str, committeesize)
+    scorefct = scores.get_scorefct(scorefct_id, committeesize)
 
     if algorithm == "fastest":
-        algorithm = fastest_algo(scorefct_str)
+        algorithm = fastest_algo(scorefct_id)
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_thiele_methods(
@@ -367,17 +367,17 @@ def compute_thiele_method(
         committees = sorted_committees(committees)
     elif algorithm == "branch-and-bound":
         committees, detailed_info = _thiele_methods_branchandbound(
-            profile, committeesize, scorefct_str, resolute
+            profile, committeesize, scorefct_id, resolute
         )
     elif algorithm == "brute-force":
         committees, detailed_info = _thiele_methods_bruteforce(
-            profile, committeesize, scorefct_str, resolute
+            profile, committeesize, scorefct_id, resolute
         )
     elif algorithm.startswith("cvxpy_"):
         committees = abcrules_cvxpy.cvxpy_thiele_methods(
             profile=profile,
             committeesize=committeesize,
-            scorefct_str=scorefct_str,
+            scorefct_id=scorefct_id,
             resolute=resolute,
             solver_id=algorithm[6:],
         )
@@ -389,7 +389,7 @@ def compute_thiele_method(
             resolute=resolute,
             solver_id=algorithm[4:],
         )
-    elif algorithm == "ortools_cp" and scorefct_str == "cc":
+    elif algorithm == "ortools_cp" and scorefct_id == "cc":
         committees = abcrules_ortools._ortools_cc(profile, committeesize, resolute)
     else:
         raise NotImplementedError(
@@ -397,14 +397,14 @@ def compute_thiele_method(
         )
 
     # optional output
-    output.info(header(get_longname(scorefct_str)))
+    output.info(header(get_longname(scorefct_id)))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(_algorithm_fullnames(algorithm) + "\n")
 
     output.details(
-        f"Optimal {scorefct_str.upper()}-score: "
-        f"{scores.thiele_score(scorefct_str, profile, committees[0])}\n"
+        f"Optimal {scorefct_id.upper()}-score: "
+        f"{scores.thiele_score(scorefct_id, profile, committees[0])}\n"
     )
 
     output.info(str_committees_header(committees, winning=True))
@@ -414,7 +414,7 @@ def compute_thiele_method(
     return committees
 
 
-def _thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute):
+def _thiele_methods_bruteforce(profile, committeesize, scorefct_id, resolute):
     """Brute-force algorithm for Thiele methods (PAV, CC, etc.).
 
     Only intended for comparison, much slower than _thiele_methods_branchandbound()
@@ -422,7 +422,7 @@ def _thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute):
     opt_committees = []
     opt_thiele_score = -1
     for committee in combinations(profile.candidates, committeesize):
-        score = scores.thiele_score(scorefct_str, profile, committee)
+        score = scores.thiele_score(scorefct_id, profile, committee)
         if score > opt_thiele_score:
             opt_committees = [committee]
             opt_thiele_score = score
@@ -436,21 +436,21 @@ def _thiele_methods_bruteforce(profile, committeesize, scorefct_str, resolute):
     return committees, detailed_info
 
 
-def _thiele_methods_branchandbound(profile, committeesize, scorefct_str, resolute):
+def _thiele_methods_branchandbound(profile, committeesize, scorefct_id, resolute):
     """Branch-and-bound algorithm for Thiele methods."""
-    scorefct = scores.get_scorefct(scorefct_str, committeesize)
+    scorefct = scores.get_scorefct(scorefct_id, committeesize)
 
     best_committees = []
-    init_com, _ = _seq_thiele_resolute(profile, committeesize, scorefct_str)
+    init_com, _ = _seq_thiele_resolute(profile, committeesize, scorefct_id)
     init_com = init_com[0]
-    best_score = scores.thiele_score(scorefct_str, profile, init_com)
+    best_score = scores.thiele_score(scorefct_id, profile, init_com)
     part_coms = [[]]
     while part_coms:
         part_com = part_coms.pop(0)
         # potential committee, check if at least as good
         # as previous best committee
         if len(part_com) == committeesize:
-            score = scores.thiele_score(scorefct_str, profile, part_com)
+            score = scores.thiele_score(scorefct_id, profile, part_com)
             if score == best_score:
                 best_committees.append(part_com)
             elif score > best_score:
@@ -465,7 +465,7 @@ def _thiele_methods_branchandbound(profile, committeesize, scorefct_str, resolut
             marg_util_cand = scores.marginal_thiele_scores_add(scorefct, profile, part_com)
             upper_bound = sum(
                 sorted(marg_util_cand[largest_cand + 1 :])[-missing:]
-            ) + scores.thiele_score(scorefct_str, profile, part_com)
+            ) + scores.thiele_score(scorefct_id, profile, part_com)
             if upper_bound >= best_score:
                 for cand in range(largest_cand + 1, profile.num_cand - missing + 1):
                     part_coms.insert(0, part_com + [cand])
@@ -500,32 +500,32 @@ def compute_cc(profile, committeesize, algorithm="branch-and-bound", resolute=Fa
 
 
 def compute_seq_thiele_method(
-    profile, committeesize, scorefct_str, algorithm="standard", resolute=True
+    profile, committeesize, scorefct_id, algorithm="standard", resolute=True
 ):
     """Sequential Thiele methods."""
     check_enough_approved_candidates(profile, committeesize)
-    scores.get_scorefct(scorefct_str, committeesize)  # check that scorefct_str is valid
+    scores.get_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
 
     if algorithm == "fastest":
-        algorithm = fastest_algo("seq" + scorefct_str)
+        algorithm = fastest_algo("seq" + scorefct_id)
     if algorithm != "standard":
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_seq_thiele_method"
         )
 
     if resolute:
-        committees, detailed_info = _seq_thiele_resolute(profile, committeesize, scorefct_str)
+        committees, detailed_info = _seq_thiele_resolute(profile, committeesize, scorefct_id)
     else:
-        committees, detailed_info = _seq_thiele_irresolute(profile, committeesize, scorefct_str)
+        committees, detailed_info = _seq_thiele_irresolute(profile, committeesize, scorefct_id)
 
     # optional output
-    output.info(header(get_longname("seq" + scorefct_str)))
+    output.info(header(get_longname("seq" + scorefct_id)))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(_algorithm_fullnames(algorithm) + "\n")
     output.details(
         f"starting with the empty committee (score = "
-        f"{scores.thiele_score(scorefct_str, profile, [])})\n"
+        f"{scores.thiele_score(scorefct_id, profile, [])})\n"
     )
     if resolute:
         committee = []
@@ -536,7 +536,7 @@ def compute_seq_thiele_method(
             output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
             output.details(
                 f" score increases by {delta_score} to"
-                f" a total of {scores.thiele_score(scorefct_str, profile, committee)}"
+                f" a total of {scores.thiele_score(scorefct_id, profile, committee)}"
             )
             if tied_cands:
                 output.details(f" tie broken in favor of {next_cand}")
@@ -550,11 +550,11 @@ def compute_seq_thiele_method(
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
 
-    output.details(scorefct_str.upper() + "-score of winning committee(s):")
+    output.details(scorefct_id.upper() + "-score of winning committee(s):")
     for committee in committees:
         output.details(
             f" {str_set_of_candidates(committee, cand_names=profile.cand_names)}: "
-            f"{scores.thiele_score(scorefct_str, profile, committee)}"
+            f"{scores.thiele_score(scorefct_id, profile, committee)}"
         )
     output.details("\n")
     # end of optional output
@@ -562,14 +562,14 @@ def compute_seq_thiele_method(
     return sorted_committees(committees)
 
 
-def _seq_thiele_resolute(profile, committeesize, scorefct_str):
+def _seq_thiele_resolute(profile, committeesize, scorefct_id):
     """Compute one winning committee (=resolute) for sequential Thiele methods.
 
     Tiebreaking between candidates in favor of candidate with smaller
     number/index (candidates with larger numbers get deleted first).
     """
     committee = []
-    scorefct = scores.get_scorefct(scorefct_str, committeesize)
+    scorefct = scores.get_scorefct(scorefct_id, committeesize)
     detailed_info = {"next_cand": [], "tied_cands": [], "delta_score": []}
 
     # build a committee starting with the empty set
@@ -589,13 +589,13 @@ def _seq_thiele_resolute(profile, committeesize, scorefct_str):
     return sorted_committees([committee]), detailed_info
 
 
-def _seq_thiele_irresolute(profile, committeesize, scorefct_str):
+def _seq_thiele_irresolute(profile, committeesize, scorefct_id):
     """Compute all winning committee (=irresolute) for sequential Thiele methods.
 
     Consider all possible ways to break ties between candidates
     (aka parallel universe tiebreaking)
     """
-    scorefct = scores.get_scorefct(scorefct_str, committeesize)
+    scorefct = scores.get_scorefct(scorefct_id, committeesize)
 
     comm_scores = {(): 0}
     # build committees starting with the empty set
@@ -636,26 +636,26 @@ def compute_seqcc(profile, committeesize, algorithm="standard", resolute=True):
 
 
 def compute_revseq_thiele_method(
-    profile, committeesize, scorefct_str, algorithm="standard", resolute=True
+    profile, committeesize, scorefct_id, algorithm="standard", resolute=True
 ):
     """Reverse sequential Thiele methods."""
     check_enough_approved_candidates(profile, committeesize)
-    scores.get_scorefct(scorefct_str, committeesize)  # check that scorefct_str is valid
+    scores.get_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
 
     if algorithm == "fastest":
-        algorithm = fastest_algo("revseq" + scorefct_str)
+        algorithm = fastest_algo("revseq" + scorefct_id)
     if algorithm != "standard":
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_revseq_thiele_method"
         )
 
     if resolute:
-        committees, detailed_info = _revseq_thiele_resolute(profile, committeesize, scorefct_str)
+        committees, detailed_info = _revseq_thiele_resolute(profile, committeesize, scorefct_id)
     else:
-        committees, detailed_info = _revseq_thiele_irresolute(profile, committeesize, scorefct_str)
+        committees, detailed_info = _revseq_thiele_irresolute(profile, committeesize, scorefct_id)
 
     # optional output
-    output.info(header(get_longname("revseq" + scorefct_str)))
+    output.info(header(get_longname("revseq" + scorefct_id)))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(_algorithm_fullnames(algorithm) + "\n")
@@ -664,7 +664,7 @@ def compute_revseq_thiele_method(
         committee = set(profile.candidates)
         output.details(
             f"full committee ({len(committee)} candidates) has a total score of "
-            f"{scores.thiele_score(scorefct_str, profile, committee)}\n"
+            f"{scores.thiele_score(scorefct_id, profile, committee)}\n"
         )
         for i, next_cand in enumerate(detailed_info["next_cand"]):
             committee.remove(next_cand)
@@ -676,7 +676,7 @@ def compute_revseq_thiele_method(
             )
             output.details(
                 f" score decreases by {delta_score} to a total of "
-                f"{scores.thiele_score(scorefct_str, profile, committee)}"
+                f"{scores.thiele_score(scorefct_id, profile, committee)}"
             )
             if tied_cands:
                 output.details(
@@ -698,7 +698,7 @@ def compute_revseq_thiele_method(
     if not resolute and len(committees) != 1:
         msg += "\n"
     for committee in committees:
-        msg += " " + str(scores.thiele_score(scorefct_str, profile, committee))
+        msg += " " + str(scores.thiele_score(scorefct_id, profile, committee))
     msg += "\n"
     output.details(msg)
     # end of optional output
@@ -706,13 +706,13 @@ def compute_revseq_thiele_method(
     return committees
 
 
-def _revseq_thiele_resolute(profile, committeesize, scorefct_str):
+def _revseq_thiele_resolute(profile, committeesize, scorefct_id):
     """Compute one winning committee (=resolute) for reverse sequential Thiele methods.
 
     Tiebreaking between candidates in favor of candidate with smaller
     number/index (candidates with smaller numbers are added first).
     """
-    scorefct = scores.get_scorefct(scorefct_str, committeesize)
+    scorefct = scores.get_scorefct(scorefct_id, committeesize)
     committee = set(profile.candidates)
 
     detailed_info = {"next_cand": [], "tied_cands": [], "delta_score": []}
@@ -734,16 +734,16 @@ def _revseq_thiele_resolute(profile, committeesize, scorefct_str):
     return sorted_committees([committee]), detailed_info
 
 
-def _revseq_thiele_irresolute(profile, committeesize, scorefct_str):
+def _revseq_thiele_irresolute(profile, committeesize, scorefct_id):
     """Compute all winning committee (=irresolute) for reverse sequential Thiele methods.
 
     Consider all possible ways to break ties between candidates
     (aka parallel universe tiebreaking)
     """
-    scorefct = scores.get_scorefct(scorefct_str, committeesize)
+    scorefct = scores.get_scorefct(scorefct_id, committeesize)
 
     allcandcomm = tuple(profile.candidates)
-    comm_scores = {allcandcomm: scores.thiele_score(scorefct_str, profile, allcandcomm)}
+    comm_scores = {allcandcomm: scores.thiele_score(scorefct_id, profile, allcandcomm)}
 
     for _ in range(profile.num_cand - committeesize):
         comm_scores_next = {}
