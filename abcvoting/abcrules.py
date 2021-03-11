@@ -259,7 +259,11 @@ def get_ruleinfo(rule_id):
     # handle sequential and reverse sequential Thiele methods
     # that are not explicitly included in the list above
     if rule_id.startswith("seq") or rule_id.startswith("revseq"):
-        scorefct_id = rule_id[3:]  # score function id of Thiele method
+        if rule_id.startswith("seq"):
+            scorefct_id = rule_id[3:]  # score function id of Thiele method
+        else:
+            scorefct_id = rule_id[6:]  # score function id of Thiele method
+
         try:
             scores.get_scorefct(scorefct_id)
         except scores.UnknownScoreFunctionError:
@@ -273,7 +277,7 @@ def get_ruleinfo(rule_id):
             return RuleInfo(
                 f"seq-{get_shortname(scorefct_id)}",
                 f"Sequential {get_longname(scorefct_id)}",
-                functools.partial(compute_seq_thiele_method, scorefct_id=rule_id),
+                functools.partial(compute_seq_thiele_method, scorefct_id=scorefct_id),
                 ("standard",),
                 (True, False),
             )
@@ -282,7 +286,7 @@ def get_ruleinfo(rule_id):
             return RuleInfo(
                 f"revseq-{get_shortname(scorefct_id)}",
                 f"Reverse Sequential {get_longname(scorefct_id)}",
-                functools.partial(compute_revseq_thiele_method, scorefct_id=rule_id),
+                functools.partial(compute_revseq_thiele_method, scorefct_id=scorefct_id),
                 ("standard",),
                 (True, False),
             )
