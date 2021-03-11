@@ -741,6 +741,37 @@ def test_seqpav_irresolute():
     assert committees == [{0, 2}]
 
 
+@pytest.mark.parametrize("parameter", [1.001, "1.1", 1.5, 5, 10, 100.901, "100.901"])
+@pytest.mark.parametrize("resolute", [True, False])
+@pytest.mark.parametrize(
+    "prefix,algorithm",
+    [
+        pytest.param(prefix, algorithm, marks=MARKS[algorithm])
+        for prefix in ["", "seq", "revseq"]
+        for algorithm in abcrules.get_algorithms(prefix + "geom2")
+    ],
+)
+def test_geometric_rules_with_arbitrary_parameter(parameter, prefix, algorithm, resolute):
+    profile = Profile(4)
+    profile.add_voters([{0}, {1}, {2}, {3}])
+    committeesize = 2
+
+    rule_id = f"{prefix}geom{parameter}"
+    committees = abcrules.compute(
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
+    )
+    if resolute:
+        assert len(committees) == 1
+    else:
+        assert len(committees) == 6
+    abcrules.get_shortname(rule_id)
+    abcrules.get_longname(rule_id)
+    abcrules.get_ruleinfo(rule_id)
+    abcrules.get_resolute_values(rule_id)
+    abcrules.get_algorithms(rule_id)
+    abcrules.get_available_algorithms(rule_id)
+
+
 def test_gurobi_cant_compute_av():
     profile = Profile(4)
     profile.add_voters([[0, 1], [1, 2]])
