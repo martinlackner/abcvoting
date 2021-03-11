@@ -15,10 +15,11 @@ profile = Profile(num_cand)
 profile.add_voters([{0, 4, 5}, {0}, {1, 4, 5}, {1}, {2, 4, 5}, {2}, {3, 4, 5}, {3}])
 committeesize = 4
 
-"""Prints the winning committees for all implemented rules"""
-for rule in abcrules.rules.values():
-    print(rule.longname + ":")
-    committees = rule.compute(
+"""Prints the winning committees for the main ABC rules"""
+for rule_id in abcrules.MAIN_RULE_IDS:
+    print(abcrules.get_longname(rule_id) + ":")
+    committees = abcrules.compute(
+        rule_id,
         profile,
         committeesize,
         algorithm="fastest",  # use the fastest algorithm that is available (usually Gurobi)

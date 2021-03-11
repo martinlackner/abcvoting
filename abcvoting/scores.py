@@ -13,9 +13,7 @@ import networkx as nx
 from abcvoting.misc import hamming
 
 
-THIELE_SCOREFCTS_STRINGS = _THIELE_METHODS = ["pav", "slav", "cc", "av"] + [
-    f"geom{param}" for param in [1.5, 2, 5]
-]
+THIELE_SCOREFCTS_STRINGS = ["pav", "slav", "cc", "av"] + [f"geom{param}" for param in [1.5, 2, 5]]
 
 
 class UnknownScoreFunctionError(ValueError):
@@ -26,9 +24,9 @@ class UnknownScoreFunctionError(ValueError):
         super(ValueError, self).__init__(message)
 
 
-def get_scorefct(scorefct_str, committeesize):
+def get_scorefct(scorefct_str, committeesize=None):
     """returns score function (for Thiele method) given its name"""
-    if scorefct_str not in THIELE_SCOREFCTS_STRINGS:
+    if scorefct_str not in THIELE_SCOREFCTS_STRINGS and not scorefct_str.startswith("geom"):
         raise UnknownScoreFunctionError(scorefct_str)
 
     if scorefct_str == "pav":

@@ -34,7 +34,7 @@ for rule_id in ["pav", "cc", "monroe", "minimaxphragmen", "minimaxav"]:
     comm2 = abcrules.compute(rule_id, profile, 2, resolute=True)[0]
     print(
         " "
-        + abcrules.rules[rule_id].shortname
+        + abcrules.get_shortname(rule_id)
         + ": "
         + misc.str_set_of_candidates(comm1, cand_names)
         + " vs "
@@ -62,12 +62,9 @@ for rule_id in ["greedy-monroe"]:
     comm1 = abcrules.compute(rule_id, profile, 2, resolute=True)[0]
     comm2 = abcrules.compute(rule_id, profile, 3, resolute=True)[0]
     print(
-        " "
-        + abcrules.rules[rule_id].shortname
-        + ": "
-        + misc.str_set_of_candidates(comm1, cand_names)
-        + " vs "
-        + misc.str_set_of_candidates(comm2, cand_names)
+        f" {abcrules.get_shortname(rule_id)}: "
+        f"{misc.str_set_of_candidates(comm1, cand_names)} vs "
+        f"{misc.str_set_of_candidates(comm2, cand_names)}"
     )
     assert not all(cand in comm1 for cand in comm2)
 
@@ -89,7 +86,7 @@ comm1 = abcrules.compute("rule-x", profile, 3, resolute=True)[0]
 comm2 = abcrules.compute("rule-x", profile, 4, resolute=True)[0]
 print(
     " "
-    + abcrules.rules["rule-x"].shortname
+    + abcrules.get_shortname("rule-x")
     + ": "
     + misc.str_set_of_candidates(comm1, cand_names)
     + " vs "

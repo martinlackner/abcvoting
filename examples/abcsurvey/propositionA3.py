@@ -246,7 +246,7 @@ for inst in monotonicity_instances:
         commsafter,
     ) = inst
 
-    print(misc.header(abcrules.rules[rule_id].longname, "-"))
+    print(misc.header(abcrules.get_longname(rule_id), "-"))
 
     profile = Profile(num_cand, cand_names=cand_names)
     profile.add_voters(approval_sets)
@@ -254,7 +254,7 @@ for inst in monotonicity_instances:
     print(profile.str_compact())
 
     # irresolute if possible
-    if False in abcrules.rules[rule_id].resolute:
+    if False in abcrules.get_resolute_values(rule_id):
         resolute = False
     else:
         resolute = True
@@ -303,7 +303,7 @@ for inst in monotonicity_instances:
     # verify correctness
     assert committees == commsafter
 
-    print(abcrules.rules[rule_id].shortname + " fails ", end="")
+    print(f"{abcrules.get_shortname(rule_id)} fails ", end="")
     if addvoter:
         if len(new_approval_set) == 1:
             print("candidate", end="")

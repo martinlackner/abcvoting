@@ -13,6 +13,9 @@ Sainte-Laguë Approval Voting (SLAV):
 Approval Chamberlin-Courant (CC):
  {0, 1, 2, 3}
 
+2-Geometric Rule:
+ {0, 2, 3, 4}
+
 Sequential Proportional Approval Voting (seq-PAV):
  {0, 1, 4, 5}
 
@@ -54,31 +57,4 @@ Method of Phragmén-Eneström:
 
 Consensus Rule:
  {0, 1, 2, 4}
-
-1.5-Geometric Rule:
- {0, 1, 4, 5}
-
-2-Geometric Rule:
- {0, 2, 3, 4}
-
-5-Geometric Rule:
- {0, 1, 2, 3}
-
-Sequential 1.5-Geometric Rule:
- {0, 1, 4, 5}
-
-Reverse Sequential 1.5-Geometric Rule:
- {0, 1, 4, 5}
-
-Sequential 2-Geometric Rule:
- {0, 1, 4, 5}
-
-Reverse Sequential 2-Geometric Rule:
- {0, 1, 2, 4}
-
-Sequential 5-Geometric Rule:
- {0, 1, 2, 4}
-
-Reverse Sequential 5-Geometric Rule:
- {0, 1, 2, 3}
 
