@@ -2,6 +2,8 @@
 Unit tests for abcrules.py and abcrules_gurobi.py and abcrules_cvxpy.py
 """
 
+import re
+
 import pytest
 
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
@@ -482,14 +484,19 @@ def idfn(val):
 
 def remove_solver_output(out):
     """Remove extra, unwanted solver output (e.g. from Gurobi)."""
-    out = out.split("\n")
-    out = [
-        line
-        for line in out
-        if not line.startswith("Academic license - for non-commercial use only")
-    ]
-    out = [line for line in out if not line.startswith("Using license file")]
-    out = "\n".join(out)
+    filter_patterns = (
+        (
+            "\n--------------------------------------------\n"
+            "Warning: your license will expire in .*\n"
+            "--------------------------------------------\n\n"
+        ),
+        "Using license file.*\n",
+        "Academic license - for non-commercial use only.*\n",
+    )
+
+    for filter_pattern in filter_patterns:
+        out = re.sub(filter_pattern, "", out)
+
     return out
 
 
