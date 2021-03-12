@@ -125,7 +125,7 @@ manipulations = [
 for manip in manipulations:
     (rule_id, resolute, committeesize, approval_sets, modvote, commsfirst, commsafter) = manip
 
-    print(misc.header(abcrules.get_longname(rule_id), "-"))
+    print(misc.header(abcrules.get_rule(rule_id).longname, "-"))
 
     profile = Profile(num_cand, cand_names=cand_names)
     profile.add_voters(approval_sets)

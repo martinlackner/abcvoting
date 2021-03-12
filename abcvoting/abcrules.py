@@ -3,7 +3,6 @@
 
 import functools
 from itertools import combinations
-from collections import namedtuple
 from abcvoting.output import output
 from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_cvxpy, abcrules_mip
 from abcvoting.misc import sorted_committees
@@ -40,15 +39,63 @@ MAIN_RULE_IDS = [
     "minimaxav",
     "lexminimaxav",
     "rule-x",
-    "rule-x-without-2nd-phase",
     "phragmen-enestroem",
     "consensus-rule",
 ]
 
+ALGORITHM_NAMES = {
+    "gurobi": "Gurobi ILP solver",
+    "branch-and-bound": "branch-and-bound",
+    "brute-force": "brute-force",
+    "mip_cbc": "CBC ILP solver via Python MIP library",
+    "mip_gurobi": "Gurobi ILP solver via Python MIP library",
+    "cvxpy_gurobi": "Gurobi ILP solver via CVXPY library",
+    "cvxpy_scip": "SCIP ILP solver via CVXPY library",
+    "cvxpy_glpk_mi": "GLPK ILP solver via CVXPY library",
+    "cvxpy_cbc": "CBC ILP solver via CVXPY library",
+    "standard": "Standard algorithm",
+    "exact-fractions": "Standard algorithm with exact fractions",
+    "ortools_cp": "OR-Tools CP-SAT solver",
+}
 
-RuleInfo = namedtuple(
-    "RuleInfo", ["shortname", "longname", "function", "algorithms", "resolute_values"]
-)
+
+class Rule:
+    def __init__(
+        self,
+        rule_id,
+        shortname,
+        longname,
+        compute_fct,
+        algorithms,
+        resolute_values,
+    ):
+        self.rule_id = rule_id
+        self.shortname = shortname
+        self.longname = longname
+        self._compute_fct = compute_fct
+        self.algorithms = algorithms
+        self.resolute_values = resolute_values
+
+        # find all *available* algorithms for this ABC rule
+        self.available_algorithms = []
+        for algorithm in algorithms:
+            if algorithm in AVAILABLE_ALGORITHMS:
+                self.available_algorithms.append(algorithm)
+        # if not self.available_algorithms:
+        #     raise RuntimeError(
+        #         f"No algorithm available for {self.rule_id} "
+        #         f"that is supported on this machine. "
+        #         f"({', '.join(self.algorithms)} not supported)",
+        #     )
+
+        if self.available_algorithms:
+            # This rests on the assumption that ``self.algorithms`` are sorted by speed.
+            self.fastest_available_algorithm = self.available_algorithms[0]
+        else:
+            self.fastest_available_algorithm = None
+
+    def compute(self, profile, committeesize, **kwargs):
+        return self._compute_fct(profile, committeesize, **kwargs)
 
 
 class UnknownRuleIDError(ValueError):
@@ -59,49 +106,42 @@ class UnknownRuleIDError(ValueError):
         super(ValueError, self).__init__(message)
 
 
-def is_algorithm_available(algorithm):
-    """Verify whether algorithm `algorithm` is supported on the current machine.
+def _available_algorithms():
+    """Verify which algorithms are supported on the current machine.
 
-    In particular, the functions verifies that required modules and solvers are available.
+    This is done by verifying that the required modules and solvers are available.
     """
-    if "gurobi" in algorithm and not abcrules_gurobi.available:
-        return False
+    available_algorithms = []
 
-    if algorithm.startswith("cvxpy"):
-        if not abcrules_cvxpy.cvxpy_available or not abcrules_cvxpy.numpy_available:
-            return False
+    for algorithm in ALGORITHM_NAMES.keys():
 
-        import cvxpy
+        if "gurobi" in algorithm and not abcrules_gurobi.available:
+            continue
 
-        if algorithm == "cvxpy_glpk_mi" and cvxpy.GLPK_MI not in cvxpy.installed_solvers():
-            return False
-        elif algorithm == "cvxpy_cbc" and cvxpy.CBC not in cvxpy.installed_solvers():
-            return False
-        elif algorithm == "cvxpy_scip" and cvxpy.SCIP not in cvxpy.installed_solvers():
-            return False
-        elif algorithm == "cvxpy_gurobi" and not abcrules_gurobi.available:
-            return False
+        if algorithm.startswith("cvxpy"):
+            if not abcrules_cvxpy.cvxpy_available or not abcrules_cvxpy.numpy_available:
+                continue
 
-    return True
+            import cvxpy
 
+            if algorithm == "cvxpy_glpk_mi" and cvxpy.GLPK_MI not in cvxpy.installed_solvers():
+                continue
+            elif algorithm == "cvxpy_cbc" and cvxpy.CBC not in cvxpy.installed_solvers():
+                continue
+            elif algorithm == "cvxpy_scip" and cvxpy.SCIP not in cvxpy.installed_solvers():
+                continue
+            elif algorithm == "cvxpy_gurobi" and not abcrules_gurobi.available:
+                continue
 
-def fastest_algo(rule_id):
-    """Return fastest *available* algorithm for ABC rule `rule_id`.
+        available_algorithms.append(algorithm)
 
-    This function rests on the assumption that the available algorithms returned by
-    get_ruleinfo() are sorted by speed."""
-    algorithms = get_algorithms(rule_id)
-    for algorithm in algorithms:
-        if is_algorithm_available(algorithm):
-            return algorithm
-    raise RuntimeError(
-        f"No algorithm available for {rule_id} "
-        f"that is supported on this machine. "
-        f"({', '.join(algorithms)} not supported)",
-    )
+    return available_algorithms
 
 
-def get_ruleinfo(rule_id):
+AVAILABLE_ALGORITHMS = _available_algorithms()
+
+
+def get_rule(rule_id):
     _THIELE_ALGORITHMS = (
         # TODO sort by speed, requires testing
         "gurobi",
@@ -110,150 +150,190 @@ def get_ruleinfo(rule_id):
         "mip_gurobi",
         "brute-force",
     )
-    _RULESINFO = {
-        "av": RuleInfo("AV", "Approval Voting (AV)", compute_av, ("standard",), (True, False)),
-        "sav": RuleInfo(
-            "SAV",
-            "Satisfaction Approval Voting (SAV)",
-            compute_sav,
-            ("standard",),
-            (True, False),
-        ),
-        "pav": RuleInfo(
-            "PAV",
-            "Proportional Approval Voting (PAV)",
-            compute_pav,
+    if rule_id == "av":
+        return Rule(
+            rule_id=rule_id,
+            shortname="AV",
+            longname="Approval Voting (AV)",
+            compute_fct=compute_av,
+            algorithms=("standard",),
+            resolute_values=(True, False),
+        )
+    if rule_id == "sav":
+        return Rule(
+            rule_id=rule_id,
+            shortname="SAV",
+            longname="Satisfaction Approval Voting (SAV)",
+            compute_fct=compute_sav,
+            algorithms=("standard",),
+            resolute_values=(True, False),
+        )
+    if rule_id == "pav":
+        return Rule(
+            rule_id=rule_id,
+            shortname="PAV",
+            longname="Proportional Approval Voting (PAV)",
+            compute_fct=compute_pav,
             # TODO sort by speed, requires testing
-            _THIELE_ALGORITHMS + ("cvxpy_glpk_mi", "cvxpy_cbc", "cvxpy_scip"),
-            (True, False),
-        ),
-        "slav": RuleInfo(
-            "SLAV",
-            "Sainte-Laguë Approval Voting (SLAV)",
-            compute_slav,
-            _THIELE_ALGORITHMS,
-            (True, False),
-        ),
-        "cc": RuleInfo(
-            "CC",
-            "Approval Chamberlin-Courant (CC)",
-            compute_cc,
+            algorithms=_THIELE_ALGORITHMS + ("cvxpy_glpk_mi", "cvxpy_cbc", "cvxpy_scip"),
+            resolute_values=(True, False),
+        )
+    if rule_id == "slav":
+        return Rule(
+            rule_id=rule_id,
+            shortname="SLAV",
+            longname="Sainte-Laguë Approval Voting (SLAV)",
+            compute_fct=compute_slav,
+            algorithms=_THIELE_ALGORITHMS,
+            resolute_values=(True, False),
+        )
+    if rule_id == "cc":
+        return Rule(
+            rule_id=rule_id,
+            shortname="CC",
+            longname="Approval Chamberlin-Courant (CC)",
+            compute_fct=compute_cc,
             # TODO sort by speed, requires testing
-            _THIELE_ALGORITHMS + ("ortools_cp",),
-            (True, False),
-        ),
-        "seqpav": RuleInfo(
-            "seq-PAV",
-            "Sequential Proportional Approval Voting (seq-PAV)",
-            compute_seqpav,
-            ("standard",),
-            (True, False),
-        ),
-        "revseqpav": RuleInfo(
-            "revseq-PAV",
-            "Reverse Sequential Proportional Approval Voting (revseq-PAV)",
-            compute_revseqpav,
-            ("standard",),
-            (True, False),
-        ),
-        "seqslav": RuleInfo(
-            "seq-SLAV",
-            "Sequential Sainte-Laguë Approval Voting (seq-SLAV)",
-            compute_seqslav,
-            ("standard",),
-            (True, False),
-        ),
-        "seqcc": RuleInfo(
-            "seq-CC",
-            "Sequential Approval Chamberlin-Courant (seq-CC)",
-            compute_seqcc,
-            ("standard",),
-            (True, False),
-        ),
-        "seqphragmen": RuleInfo(
-            "seq-Phragmén",
-            "Phragmén's Sequential Rule (seq-Phragmén)",
-            compute_seqphragmen,
-            ("standard", "exact-fractions"),
-            (True, False),
-        ),
-        "minimaxphragmen": RuleInfo(
-            "minimax-Phragmén",
-            "Phragmén's Minimax Rule (minimax-Phragmén)",
-            compute_minimaxphragmen,
-            ("gurobi", "mip_gurobi", "mip_cbc"),
-            (True, False),
-        ),
-        "monroe": RuleInfo(
-            "Monroe",
-            "Monroe's Approval Rule (Monroe)",
-            compute_monroe,
-            ("gurobi", "mip_gurobi", "mip_cbc", "ortools_cp", "brute-force"),
-            (True, False),
-        ),
-        "greedy-monroe": RuleInfo(
-            "Greedy Monroe",
-            "Greedy Monroe",
-            compute_greedy_monroe,
-            ("standard",),
-            (True,),
-        ),
-        "minimaxav": RuleInfo(
-            "minimaxav",
-            "Minimax Approval Voting (MAV)",
-            compute_minimaxav,
+            algorithms=_THIELE_ALGORITHMS + ("ortools_cp",),
+            resolute_values=(True, False),
+        )
+    if rule_id == "seqpav":
+        return Rule(
+            rule_id=rule_id,
+            shortname="seq-PAV",
+            longname="Sequential Proportional Approval Voting (seq-PAV)",
+            compute_fct=compute_seqpav,
+            algorithms=("standard",),
+            resolute_values=(True, False),
+        )
+    if rule_id == "revseqpav":
+        return Rule(
+            rule_id=rule_id,
+            shortname="revseq-PAV",
+            longname="Reverse Sequential Proportional Approval Voting (revseq-PAV)",
+            compute_fct=compute_revseqpav,
+            algorithms=("standard",),
+            resolute_values=(True, False),
+        )
+    if rule_id == "seqslav":
+        return Rule(
+            rule_id=rule_id,
+            shortname="seq-SLAV",
+            longname="Sequential Sainte-Laguë Approval Voting (seq-SLAV)",
+            compute_fct=compute_seqslav,
+            algorithms=("standard",),
+            resolute_values=(True, False),
+        )
+    if rule_id == "seqcc":
+        return Rule(
+            rule_id=rule_id,
+            shortname="seq-CC",
+            longname="Sequential Approval Chamberlin-Courant (seq-CC)",
+            compute_fct=compute_seqcc,
+            algorithms=("standard",),
+            resolute_values=(True, False),
+        )
+    if rule_id == "seqphragmen":
+        return Rule(
+            rule_id=rule_id,
+            shortname="seq-Phragmén",
+            longname="Phragmén's Sequential Rule (seq-Phragmén)",
+            compute_fct=compute_seqphragmen,
+            algorithms=("standard", "exact-fractions"),
+            resolute_values=(True, False),
+        )
+    if rule_id == "minimaxphragmen":
+        return Rule(
+            rule_id=rule_id,
+            shortname="minimax-Phragmén",
+            longname="Phragmén's Minimax Rule (minimax-Phragmén)",
+            compute_fct=compute_minimaxphragmen,
+            algorithms=("gurobi", "mip_gurobi", "mip_cbc"),
+            resolute_values=(True, False),
+        )
+    if rule_id == "monroe":
+        return Rule(
+            rule_id=rule_id,
+            shortname="Monroe",
+            longname="Monroe's Approval Rule (Monroe)",
+            compute_fct=compute_monroe,
+            algorithms=("gurobi", "mip_gurobi", "mip_cbc", "ortools_cp", "brute-force"),
+            resolute_values=(True, False),
+        )
+    if rule_id == "greedy-monroe":
+        return Rule(
+            rule_id=rule_id,
+            shortname="Greedy Monroe",
+            longname="Greedy Monroe",
+            compute_fct=compute_greedy_monroe,
+            algorithms=("standard",),
+            resolute_values=(True,),
+        )
+    if rule_id == "minimaxav":
+        return Rule(
+            rule_id=rule_id,
+            shortname="minimaxav",
+            longname="Minimax Approval Voting (MAV)",
+            compute_fct=compute_minimaxav,
             # TODO sort by speed, requires testing
-            ("gurobi", "ortools_cp", "brute-force", "mip_gurobi", "mip_cbc"),
-            (True, False),
-        ),
-        "lexminimaxav": RuleInfo(
-            "lex-MAV",
-            "Lexicographic Minimax Approval Voting (lex-MAV)",
-            compute_lexminimaxav,
-            ("brute-force",),
-            (True, False),
-        ),
-        "rule-x": RuleInfo(
-            "Rule X",
-            "Rule X",
-            compute_rule_x,
-            ("standard", "exact-fractions"),
-            (True, False),
-        ),
-        "rule-x-without-2nd-phase": RuleInfo(
-            "Rule X (without 2nd phase)",
-            "Rule X without the second (Phragmén) phase",
-            compute_rule_x_without_2nd_phase,
-            ("standard", "exact-fractions"),
-            (True, False),
-        ),
-        "phragmen-enestroem": RuleInfo(
-            "Phragmén-Eneström",
-            "Method of Phragmén-Eneström",
-            compute_phragmen_enestroem,
-            ("standard", "exact-fractions"),
-            (True, False),
-        ),
-        "consensus-rule": RuleInfo(
-            "Consensus Rule",
-            "Consensus Rule",
-            compute_consensus_rule,
-            ("standard", "exact-fractions"),
-            (True, False),
-        ),
-    }
-
-    if rule_id in _RULESINFO:
-        return _RULESINFO[rule_id]
+            algorithms=("gurobi", "ortools_cp", "brute-force", "mip_gurobi", "mip_cbc"),
+            resolute_values=(True, False),
+        )
+    if rule_id == "lexminimaxav":
+        return Rule(
+            rule_id=rule_id,
+            shortname="lex-MAV",
+            longname="Lexicographic Minimax Approval Voting (lex-MAV)",
+            compute_fct=compute_lexminimaxav,
+            algorithms=("brute-force",),
+            resolute_values=(True, False),
+        )
+    if rule_id == "rule-x":
+        return Rule(
+            rule_id=rule_id,
+            shortname="Rule X",
+            longname="Rule X",
+            compute_fct=compute_rule_x,
+            algorithms=("standard", "exact-fractions"),
+            resolute_values=(True, False),
+        )
+    if rule_id == "rule-x-without-phragmen-phase":
+        return Rule(
+            rule_id=rule_id,
+            shortname="Rule X without Phragmén phase",
+            longname="Rule X without the Phragmén phase (second phase)",
+            compute_fct=compute_rule_x_without_phragmen_phase,
+            algorithms=("standard", "exact-fractions"),
+            resolute_values=(True, False),
+        )
+    if rule_id == "phragmen-enestroem":
+        return Rule(
+            rule_id=rule_id,
+            shortname="Phragmén-Eneström",
+            longname="Method of Phragmén-Eneström",
+            compute_fct=compute_phragmen_enestroem,
+            algorithms=("standard", "exact-fractions"),
+            resolute_values=(True, False),
+        )
+    if rule_id == "consensus-rule":
+        return Rule(
+            rule_id=rule_id,
+            shortname="Consensus Rule",
+            longname="Consensus Rule",
+            compute_fct=compute_consensus_rule,
+            algorithms=("standard", "exact-fractions"),
+            resolute_values=(True, False),
+        )
 
     if rule_id.startswith("geom"):
         parameter = rule_id[4:]
-        return RuleInfo(
-            f"{parameter}-Geometric",
-            f"{parameter}-Geometric Rule",
-            functools.partial(compute_thiele_method, scorefct_id=rule_id),
-            _THIELE_ALGORITHMS,
-            (True, False),
+        return Rule(
+            rule_id=rule_id,
+            shortname=f"{parameter}-Geometric",
+            longname=f"{parameter}-Geometric Rule",
+            compute_fct=functools.partial(compute_thiele_method, scorefct_id=rule_id),
+            algorithms=_THIELE_ALGORITHMS,
+            resolute_values=(True, False),
         )
 
     # handle sequential and reverse sequential Thiele methods
@@ -274,68 +354,28 @@ def get_ruleinfo(rule_id):
 
         # sequential Thiele methods
         if rule_id.startswith("seq"):
-            return RuleInfo(
-                f"seq-{get_shortname(scorefct_id)}",
-                f"Sequential {get_longname(scorefct_id)}",
-                functools.partial(compute_seq_thiele_method, scorefct_id=scorefct_id),
-                ("standard",),
-                (True, False),
+            return Rule(
+                rule_id=rule_id,
+                shortname=f"seq-{get_rule(scorefct_id).shortname}",
+                longname=f"Sequential {get_rule(scorefct_id).longname}",
+                compute_fct=functools.partial(compute_seq_thiele_method, scorefct_id=scorefct_id),
+                algorithms=("standard",),
+                resolute_values=(True, False),
             )
         # reverse sequential Thiele methods
         if rule_id.startswith("revseq"):
-            return RuleInfo(
-                f"revseq-{get_shortname(scorefct_id)}",
-                f"Reverse Sequential {get_longname(scorefct_id)}",
-                functools.partial(compute_revseq_thiele_method, scorefct_id=scorefct_id),
-                ("standard",),
-                (True, False),
+            return Rule(
+                rule_id=rule_id,
+                shortname=f"revseq-{get_rule(scorefct_id).shortname}",
+                longname=f"Reverse Sequential {get_rule(scorefct_id).longname}",
+                compute_fct=functools.partial(
+                    compute_revseq_thiele_method, scorefct_id=scorefct_id
+                ),
+                algorithms=("standard",),
+                resolute_values=(True, False),
             )
 
     raise UnknownRuleIDError(rule_id)
-
-
-def get_shortname(rule_id):
-    return get_ruleinfo(rule_id).shortname
-
-
-def get_longname(rule_id):
-    return get_ruleinfo(rule_id).longname
-
-
-def get_algorithms(rule_id):
-    return get_ruleinfo(rule_id).algorithms
-
-
-def get_available_algorithms(rule_id):
-    return [
-        algorithm for algorithm in get_algorithms(rule_id) if is_algorithm_available(algorithm)
-    ]
-
-
-def get_resolute_values(rule_id):
-    return get_ruleinfo(rule_id).resolute_values
-
-
-def _algorithm_fullnames(algorithm):
-    msg = "Algorithm: "
-    fullnames = {
-        "gurobi": "Gurobi ILP solver",
-        "branch-and-bound": "branch-and-bound",
-        "brute-force": "brute-force",
-        "mip_cbc": "CBC ILP solver via Python MIP library",
-        "mip_gurobi": "Gurobi ILP solver via Python MIP library",
-        "cvxpy_gurobi": "Gurobi ILP solver via CVXPY library",
-        "cvxpy_scip": "SCIP ILP solver via CVXPY library",
-        "cvxpy_glpk_mi": "GLPK ILP solver via CVXPY library",
-        "cvxpy_cbc": "CBC ILP solver via CVXPY library",
-        "standard": "Standard algorithm",
-        "exact-fractions": "Standard algorithm with exact fractions",
-        "ortools_cp": "OR-Tools CP-SAT solver",
-    }
-    try:
-        return msg + fullnames[algorithm]
-    except KeyError:
-        raise ValueError(f"Algorithm {algorithm} not known.")
 
 
 ########################################################################
@@ -343,7 +383,7 @@ def _algorithm_fullnames(algorithm):
 
 def compute(rule_id, profile, committeesize, **kwargs):
     """Compute rule given by `rule_id`."""
-    return get_ruleinfo(rule_id).function(profile, committeesize, **kwargs)
+    return get_rule(rule_id).compute(profile, committeesize, **kwargs)
 
 
 def compute_thiele_method(
@@ -361,14 +401,15 @@ def compute_thiele_method(
     check_enough_approved_candidates(profile, committeesize)
     scorefct = scores.get_scorefct(scorefct_id, committeesize)
 
+    rule = get_rule(scorefct_id)
+
     if algorithm == "fastest":
-        algorithm = fastest_algo(scorefct_id)
+        algorithm = rule.fastest_available_algorithm
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_thiele_methods(
             profile, committeesize, scorefct, resolute
         )
-        committees = sorted_committees(committees)
     elif algorithm == "branch-and-bound":
         committees, detailed_info = _thiele_methods_branchandbound(
             profile, committeesize, scorefct_id, resolute
@@ -401,10 +442,10 @@ def compute_thiele_method(
         )
 
     # optional output
-    output.info(header(get_longname(scorefct_id)))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     output.details(
         f"Optimal {scorefct_id.upper()}-score: "
@@ -510,8 +551,11 @@ def compute_seq_thiele_method(
     check_enough_approved_candidates(profile, committeesize)
     scores.get_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
 
+    rule_id = "seq" + scorefct_id
+    rule = get_rule(rule_id)
+
     if algorithm == "fastest":
-        algorithm = fastest_algo("seq" + scorefct_id)
+        algorithm = rule.fastest_available_algorithm
     if algorithm != "standard":
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_seq_thiele_method"
@@ -523,10 +567,10 @@ def compute_seq_thiele_method(
         committees, detailed_info = _seq_thiele_irresolute(profile, committeesize, scorefct_id)
 
     # optional output
-    output.info(header(get_longname("seq" + scorefct_id)))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.details(
         f"starting with the empty committee (score = "
         f"{scores.thiele_score(scorefct_id, profile, [])})\n"
@@ -646,8 +690,11 @@ def compute_revseq_thiele_method(
     check_enough_approved_candidates(profile, committeesize)
     scores.get_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
 
+    rule_id = "revseq" + scorefct_id
+    rule = get_rule(rule_id)
+
     if algorithm == "fastest":
-        algorithm = fastest_algo("revseq" + scorefct_id)
+        algorithm = rule.fastest_available_algorithm
     if algorithm != "standard":
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for compute_revseq_thiele_method"
@@ -659,10 +706,10 @@ def compute_revseq_thiele_method(
         committees, detailed_info = _revseq_thiele_irresolute(profile, committeesize, scorefct_id)
 
     # optional output
-    output.info(header(get_longname("revseq" + scorefct_id)))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     if resolute:
         committee = set(profile.candidates)
@@ -775,12 +822,14 @@ def compute_revseqpav(profile, committeesize, algorithm="standard", resolute=Tru
     )
 
 
-def compute_separable_rule(profile, committeesize, rule_id, algorithm, resolute=True):
+def compute_separable_rule(rule_id, profile, committeesize, algorithm, resolute=True):
     """Separable rules (such as AV and SAV)."""
     check_enough_approved_candidates(profile, committeesize)
 
+    rule = get_rule(rule_id)
+
     if algorithm == "fastest":
-        algorithm = fastest_algo("av")
+        algorithm = rule.fastest_available_algorithm
     if algorithm == "standard":
         pass
     else:
@@ -793,10 +842,10 @@ def compute_separable_rule(profile, committeesize, rule_id, algorithm, resolute=
     )
 
     # optional output
-    output.info(header(get_longname(rule_id)))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     score = detailed_info["score"]
     msg = "Scores of candidates:\n"
@@ -882,31 +931,30 @@ def _separable_rule_algorithm(profile, committeesize, rule_id, resolute):
 
 def compute_sav(profile, committeesize, algorithm="standard", resolute=False):
     """Satisfaction Approval Voting (SAV)."""
-    return compute_separable_rule(profile, committeesize, "sav", algorithm, resolute)
+    return compute_separable_rule("sav", profile, committeesize, algorithm, resolute)
 
 
 def compute_av(profile, committeesize, algorithm="standard", resolute=False):
     """Approval Voting (AV)."""
-    return compute_separable_rule(profile, committeesize, "av", algorithm, resolute)
+    return compute_separable_rule("av", profile, committeesize, algorithm, resolute)
 
 
 def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=False):
     """Minimax Approval Voting (MAV)."""
     check_enough_approved_candidates(profile, committeesize)
 
+    rule = get_rule("minimaxav")
+
     if algorithm == "fastest":
-        algorithm = fastest_algo("minimaxav")
+        algorithm = rule.fastest_available_algorithm
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_minimaxav(profile, committeesize, resolute)
-        committees = sorted_committees(committees)
     elif algorithm == "ortools_cp":
         committees = abcrules_ortools._ortools_minimaxav(profile, committeesize, resolute)
-        committees = sorted_committees(committees)
     elif algorithm.startswith("mip_"):
         solver_id = algorithm[4:]
         committees = abcrules_mip._mip_minimaxav(profile, committeesize, resolute, solver_id)
-        committees = sorted_committees(committees)
     elif algorithm == "brute-force":
         committees, detailed_info = _minimaxav_bruteforce(profile, committeesize, resolute)
     else:
@@ -915,10 +963,10 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
         )
 
     # optional output
-    output.info(header(get_longname("minimaxav")))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     opt_minimaxav_score = scores.mavscore(profile, committees[0])
     output.info(str_committees_header(committees, winning=True))
@@ -956,13 +1004,13 @@ def compute_lexminimaxav(profile, committeesize, algorithm="brute-force", resolu
     """Lexicographic Minimax AV (lex-MAV)."""
     check_enough_approved_candidates(profile, committeesize)
 
+    rule = get_rule("lexminimaxav")
+
     if not profile.has_unit_weights():
-        raise ValueError(
-            get_shortname("lexminimaxav") + " is only defined for unit weights (weight=1)"
-        )
+        raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
     if algorithm == "fastest":
-        algorithm = fastest_algo("lexminimaxav")
+        algorithm = rule.fastest_available_algorithm
 
     if algorithm == "brute-force":
         committees, detailed_info = _lexminimaxav_bruteforce(profile, committeesize, resolute)
@@ -973,10 +1021,10 @@ def compute_lexminimaxav(profile, committeesize, algorithm="brute-force", resolu
 
     # optional output
     opt_distances = detailed_info["opt_distances"]
-    output.info(header(get_longname("lexminimaxav")))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     output.details("Minimum maximal distance: " + str(max(opt_distances)))
@@ -1015,18 +1063,18 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
     """Monroe's rule."""
     check_enough_approved_candidates(profile, committeesize)
 
+    rule = get_rule("monroe")
+
     if not profile.has_unit_weights():
-        raise ValueError(get_shortname("monroe") + " is only defined for unit weights (weight=1)")
+        raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
     if algorithm == "fastest":
-        algorithm = fastest_algo("monroe")
+        algorithm = rule.fastest_available_algorithm
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_monroe(profile, committeesize, resolute)
-        committees = sorted_committees(committees)
     elif algorithm == "ortools_cp":
         committees = abcrules_ortools._ortools_monroe(profile, committeesize, resolute)
-        committees = sorted_committees(committees)
     elif algorithm.startswith("mip_"):
         committees = abcrules_mip._mip_monroe(
             profile,
@@ -1042,10 +1090,10 @@ def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=Fal
         )
 
     # optional output
-    output.info(header(get_longname("monroe")))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.info("Optimal Monroe score: " + str(scores.monroescore(profile, committees[0])) + "\n")
 
     output.info(str_committees_header(committees, winning=True))
@@ -1078,16 +1126,17 @@ def _monroe_bruteforce(profile, committeesize, resolute):
 def compute_greedy_monroe(profile, committeesize, algorithm="standard", resolute=True):
     """Greedy Monroe."""
     check_enough_approved_candidates(profile, committeesize)
+
+    rule = get_rule("greedy-monroe")
+
     if not profile.has_unit_weights():
-        raise ValueError(
-            get_shortname("greedy-monroe") + " is only defined for unit weights (weight=1)"
-        )
+        raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
     if not resolute:
         raise NotImplementedError("compute_greedy_monroe does not support resolute=False.")
 
     if algorithm == "fastest":
-        algorithm = fastest_algo("greedy-monroe")
+        algorithm = rule.fastest_available_algorithm
 
     if algorithm != "standard":
         raise NotImplementedError(
@@ -1097,8 +1146,8 @@ def compute_greedy_monroe(profile, committeesize, algorithm="standard", resolute
     committees, detailed_info = _greedy_monroe_algorithm(profile, committeesize)
 
     # optional output
-    output.info(header(get_longname("greedy-monroe")))
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.info(header(rule.longname))
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     remaining_voters = detailed_info["remaining_voters"]
     assignment = detailed_info["assignment"]
 
@@ -1191,8 +1240,10 @@ def compute_seqphragmen(profile, committeesize, algorithm="standard", resolute=T
     """Phragmen's sequential rule (seq-Phragmen)."""
     check_enough_approved_candidates(profile, committeesize)
 
+    rule = get_rule("seqphragmen")
+
     if algorithm == "fastest":
-        algorithm = fastest_algo("seqphragmen")
+        algorithm = rule.fastest_available_algorithm
 
     if algorithm == "standard":
         division = lambda x, y: x / y  # standard float division
@@ -1213,10 +1264,10 @@ def compute_seqphragmen(profile, committeesize, algorithm="standard", resolute=T
         committees, detailed_info = _seqphragmen_irresolute(profile, committeesize, division)
 
     # optional output
-    output.info(header(get_longname("seqphragmen")))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     if resolute:
         committee = []
@@ -1388,14 +1439,21 @@ def compute_rule_x(
 
     skip_phragmen_phase : bool, optional
         omit the second phase (that uses seq-Phragmen)
-        may result in a committee that is too small
+        may result in a committee that is too small (length smaller than `committeesize`)
     """
     check_enough_approved_candidates(profile, committeesize)
+
+    if skip_phragmen_phase:
+        rule_id = "rule-x-without-phragmen-phase"
+    else:
+        rule_id = "rule-x"
+    rule = get_rule(rule_id)
+
     if not profile.has_unit_weights():
-        raise ValueError(get_shortname("rule-x") + " is only defined for unit weights (weight=1)")
+        raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
     if algorithm == "fastest":
-        algorithm = fastest_algo("rule-x")
+        algorithm = algorithm = rule.fastest_available_algorithm
 
     if algorithm == "standard":
         division = lambda x, y: x / y  # standard float division
@@ -1411,13 +1469,10 @@ def compute_rule_x(
     )
 
     # optional output
-    if skip_phragmen_phase:
-        output.info(header(get_longname("rule-x-without-2nd-phase")))
-    else:
-        output.info(header(get_longname("rule-x")))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     if resolute:
         start_budget = detailed_info["start_budget"]
@@ -1591,7 +1646,9 @@ def _rule_x_algorithm(profile, committeesize, resolute, division, skip_phragmen_
     return committees, detailed_info
 
 
-def compute_rule_x_without_2nd_phase(profile, committeesize, algorithm="standard", resolute=True):
+def compute_rule_x_without_phragmen_phase(
+    profile, committeesize, algorithm="standard", resolute=True
+):
     """Rule X with skip_phragmen_phase=True.
 
     May return committees with fewer than `committeesize` candidates.
@@ -1619,8 +1676,10 @@ def compute_minimaxphragmen(profile, committeesize, algorithm="gurobi", resolute
     """
     check_enough_approved_candidates(profile, committeesize)
 
+    rule = get_rule("minimaxphragmen")
+
     if algorithm == "fastest":
-        algorithm = fastest_algo("minimaxphragmen")
+        algorithm = rule.fastest_available_algorithm
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_minimaxphragmen(
@@ -1639,10 +1698,10 @@ def compute_minimaxphragmen(profile, committeesize, algorithm="gurobi", resolute
         )
 
     # optional output
-    output.info(header(get_longname("minimaxphragmen")))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
@@ -1659,13 +1718,14 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="standard", res
     https://arxiv.org/pdf/1611.08826.pdf (Section 18.5, Page 59)
     """
     check_enough_approved_candidates(profile, committeesize)
+
+    rule = get_rule("phragmen-enestroem")
+
     if not profile.has_unit_weights():
-        raise ValueError(
-            get_shortname("phragmen-enestroem") + " is only defined for unit weights (weight=1)"
-        )
+        raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
     if algorithm == "fastest":
-        algorithm = fastest_algo("phragmen-enestroem")
+        algorithm = rule.fastest_available_algorithm
 
     if algorithm == "standard":
         division = lambda x, y: x / y  # standard float division
@@ -1680,10 +1740,10 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="standard", res
     )
 
     # optional output
-    output.info(header(get_longname("phragmen-enestroem")))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output
@@ -1751,8 +1811,10 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard", resolut
     """
     check_enough_approved_candidates(profile, committeesize)
 
+    rule = get_rule("consensus-rule")
+
     if algorithm == "fastest":
-        algorithm = fastest_algo("consensus-rule")
+        algorithm = rule.fastest_available_algorithm
 
     if algorithm == "standard":
         division = lambda x, y: x / y  # standard float division
@@ -1767,10 +1829,10 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard", resolut
     )
 
     # optional output
-    output.info(header(get_longname("consensus-rule")))
+    output.info(header(rule.longname))
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
-    output.details(_algorithm_fullnames(algorithm) + "\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     # end of optional output

@@ -94,9 +94,9 @@ winning committees after the modification:
 
 Rule X fails support monotonicity without additional voters
 
-------------------------------------------
-Rule X without the second (Phragmén) phase
-------------------------------------------
+------------------------------------------------
+Rule X without the Phragmén phase (second phase)
+------------------------------------------------
 
 profile with 12 votes and 8 candidates:
  2 x {a, b, c},
@@ -120,7 +120,7 @@ winning committees after the modification:
  {a, b, e}
  {a, d, h}
 
-Rule X (without 2nd phase) fails candidate monotonicity with additional voters
+Rule X without Phragmén phase fails candidate monotonicity with additional voters
 
 ------------------------------------------------------------
 Reverse Sequential Proportional Approval Voting (revseq-PAV)

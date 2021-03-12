@@ -17,7 +17,7 @@ committeesize = 4
 
 """Prints the winning committees for the main ABC rules"""
 for rule_id in abcrules.MAIN_RULE_IDS:
-    print(abcrules.get_longname(rule_id) + ":")
+    print(abcrules.get_rule(rule_id).longname + ":")
     committees = abcrules.compute(
         rule_id,
         profile,

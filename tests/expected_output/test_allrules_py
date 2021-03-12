@@ -49,9 +49,6 @@ Lexicographic Minimax Approval Voting (lex-MAV):
 Rule X:
  {0, 1, 4, 5}
 
-Rule X without the second (Phragmén) phase:
- {4, 5}
-
 Method of Phragmén-Eneström:
  {0, 1, 4, 5}
 
