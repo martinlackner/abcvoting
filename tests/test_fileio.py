@@ -18,7 +18,7 @@ def test_readfile(filename):
 
 def test_readfromdir():
     currdir = os.path.dirname(os.path.abspath(__file__))
-    profiles = fileio.load_preflib_files_from_dir(currdir + "/data/", setsize=2)
+    profiles = fileio.read_preflib_files_from_dir(currdir + "/data/", setsize=2)
     assert len(profiles) == 5
     for filename, profile in profiles.items():
         assert isinstance(filename, str)

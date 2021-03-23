@@ -256,8 +256,7 @@ def __generate_2d_points(agents, mode, sigma):
         for a in agents:
             points[a] = (random.uniform(-1, 1), random.uniform(-1, 1))
     else:
-        print("mode", mode, "not known")
-        quit()
+        raise ValueError("mode", mode, "not known")
     return points
 
 

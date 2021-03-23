@@ -84,12 +84,12 @@ def hamming(set1, set2):
 
 
 def header(text, symbol="-"):
-    """Print a header for the string `text`"""
+    """Returns a header string for `text`."""
     border = symbol[0] * len(text) + "\n"
     return border + text + "\n" + border
 
 
-def check_equal_list_of_committees(list1, list2):
+def compare_list_of_committees(list1, list2):
     """Check whether two lists of committees are equal when the order (and multiplicities)
     in these lists are ignored.
     To be precise, two lists are equal if every committee in list1 is contained in list2 and
@@ -99,6 +99,8 @@ def check_equal_list_of_committees(list1, list2):
     Parameters
     ----------
     list1, list2 : iterable of sets"""
+    for committee in list1 + list2:
+        assert isinstance(committee, set)
     return all(committee in list1 for committee in list2) and all(
         committee in list2 for committee in list1
     )

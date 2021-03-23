@@ -15,7 +15,7 @@ fileio.write_profile_to_preflib_toi_file(profile, currdir + "/toi-files/new_exam
 
 
 # Read a directory of preflib files (using parameter relative_setsize)
-profiles = fileio.load_preflib_files_from_dir(currdir + "/toi-files/", relative_setsize=0.7)
+profiles = fileio.read_preflib_files_from_dir(currdir + "/toi-files/", relative_setsize=0.7)
 # Compute PAV for each profile
 committeesize = 2
 for profile in profiles.values():

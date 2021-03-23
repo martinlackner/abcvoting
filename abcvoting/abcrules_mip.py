@@ -103,7 +103,6 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
             cand for cand in profile.candidates if in_committee[cand].x >= 1 - ACCURACY
         )
         if len(committee) != committeesize:
-            print([in_committee[cand].x for cand in profile.candidates])
             raise RuntimeError(
                 "_optimize_rule_mip produced a committee with "
                 "fewer than `committeesize` members."

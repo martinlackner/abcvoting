@@ -7,13 +7,16 @@ import os
 from abcvoting.preferences import Profile, Voter
 from math import ceil
 from abcvoting import misc
+import ruamel.yaml
+import sys
+from abcvoting.output import output
 
 
 class PreflibException(Exception):
     pass
 
 
-def load_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
+def read_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
     """Loads all election files (soi, toi, soc or toc) from the given dir.
 
     Parameters:
@@ -68,7 +71,7 @@ def get_file_names(dir_name):
     return file_dir, files
 
 
-def get_approval_set(num_appr, ranking, candidate_map):
+def _approval_set_from_preflib_datastructures(num_appr, ranking, candidate_map):
     # if num_appr = 1 and the ranking starts with empty set, interpret as empty ballot and
     # return set()
     if (
@@ -100,9 +103,7 @@ def get_approval_set(num_appr, ranking, candidate_map):
             try:
                 cand = int(rank)
             except ValueError:
-                raise PreflibException(
-                    "Expected candidate number but encountered " + str(cand) + ""
-                )
+                raise PreflibException(f"Expected candidate number but encountered {cand}")
             approval_set.add(cand)
         if len(approval_set) >= num_appr and not tied:
             break
@@ -188,7 +189,7 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
             num_appr = int(ceil(len(ranking) * relative_setsize))
         else:
             num_appr = setsize
-        approval_set = get_approval_set(num_appr, ranking, candidate_map)
+        approval_set = _approval_set_from_preflib_datastructures(num_appr, ranking, candidate_map)
         approval_sets.append((count, approval_set))
 
     # normalize candidates to 0, 1, 2, ...

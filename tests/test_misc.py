@@ -22,13 +22,13 @@ def test_hamming(a, b, dist):
 def test_compare_list_of_committees():
     committees1 = [{1, 2}, {3, 4}, {0, 3}]
     committees2 = [{3, 4}, {3, 0}, {2, 1}]
-    assert misc.check_equal_list_of_committees(committees1, committees2)
+    assert misc.compare_list_of_committees(committees1, committees2)
     committees1[0].update([1])
-    assert misc.check_equal_list_of_committees(committees1, committees2)
+    assert misc.compare_list_of_committees(committees1, committees2)
     committees1.append({1, 2, 3})
-    assert not misc.check_equal_list_of_committees(committees1, committees2)
+    assert not misc.compare_list_of_committees(committees1, committees2)
     committees1 = [{1, 2}, {3}, {0, 3}]
-    assert not misc.check_equal_list_of_committees(committees1, committees2)
+    assert not misc.compare_list_of_committees(committees1, committees2)
 
 
 def test_str_committees_header():
