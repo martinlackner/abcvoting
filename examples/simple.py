@@ -2,16 +2,13 @@
 Very simple example (compute PAV)
 """
 
-from abcvoting.output import INFO
-from abcvoting.output import output
 from abcvoting.preferences import Profile
 from abcvoting import abcrules
-
+from abcvoting.output import output, INFO
 
 output.set_verbosity(INFO)
 
-num_cand = 5
-profile = Profile(num_cand)
+profile = Profile(num_cand=5)
 profile.add_voters([{0, 1, 2}, {0, 1}, {0, 1}, {1, 2}, {3, 4}, {3, 4}])
 committeesize = 3
 print(
