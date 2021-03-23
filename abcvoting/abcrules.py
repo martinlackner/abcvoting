@@ -10,7 +10,7 @@ from abcvoting.misc import hamming
 from abcvoting.misc import check_enough_approved_candidates
 from abcvoting.misc import str_committees_header, header
 from abcvoting.misc import str_set_of_candidates, str_sets_of_candidates
-from abcvoting.misc import check_equal_list_of_committees
+from abcvoting.misc import compare_list_of_committees
 from abcvoting import scores
 
 try:
@@ -405,7 +405,7 @@ def check_expected_committees_equals_actual_committees(
                 f"{shortname} returns {actual_committees}, expected {expected_committees}"
             )
     else:
-        if not check_equal_list_of_committees(actual_committees, expected_committees):
+        if not compare_list_of_committees(actual_committees, expected_committees):
             raise ValueError(
                 f"{shortname} returns {actual_committees}, expected {expected_committees}"
             )
@@ -1326,10 +1326,10 @@ def compute_seqphragmen(profile, committeesize, algorithm="standard", resolute=T
         output.details("corresponding load distribution:")
     else:
         output.details("corresponding load distributions:")
-    for committee in committees:
-        msg = "("
+    for committee, comm_loads in detailed_info["comm_loads"]:
+        msg = f"{committee}: ("
         for v, _ in enumerate(profile):
-            msg += str(detailed_info["comm_loads"][tuple(sorted(committee))][v]) + ", "
+            msg += str(comm_loads[v]) + ", "
         output.details(msg[:-2] + ")")
     # end of optional output
 
@@ -1370,10 +1370,9 @@ def _seqphragmen_resolute(
             for cand in profile.candidates
         ]
         # exclude committees already in the committee
-        large = max(new_maxload) + 1
         for cand in profile.candidates:
             if cand in committee:
-                new_maxload[cand] = large
+                new_maxload[cand] = committeesize + 1  # that's larger than any possible value
         # find smallest maxload
         opt = min(new_maxload)
         next_cand = new_maxload.index(opt)
@@ -1391,7 +1390,7 @@ def _seqphragmen_resolute(
         detailed_info["load"].append(list(load))  # create copy of `load`
         detailed_info["max_load"].append(opt)
 
-    comm_loads = {tuple(committee): load}
+    comm_loads = [(tuple(committee), load)]
     detailed_info["comm_loads"] = comm_loads
     return [committee], detailed_info
 
@@ -1409,12 +1408,14 @@ def _seqphragmen_irresolute(
         load = {v: 0 for v, _ in enumerate(profile)}
 
     if partial_committee is None:
-        partial_committee = []  # build committees starting with the empty set
-    comm_loads = {tuple(sorted(partial_committee)): load}
+        partial_committee = ()  # build committees starting with the empty set
+    else:
+        partial_committee = tuple(partial_committee)
+    comm_loads = [(partial_committee, load)]
 
     for _ in range(len(partial_committee), committeesize):
-        comm_loads_next = {}
-        for committee, load in comm_loads.items():
+        comm_loads_next = []
+        for (committee, load) in comm_loads:
             approvers_load = {}
             for cand in profile.candidates:
                 approvers_load[cand] = sum(
@@ -1433,20 +1434,20 @@ def _seqphragmen_irresolute(
                 if cand in committee:
                     new_maxload[cand] = committeesize + 1  # that's larger than any possible value
             # compute new loads
-            # and add new committees
             for cand in profile.candidates:
-                if new_maxload[cand] <= min(new_maxload) + 1e-6:  # TODO: remove 1e-6
+                if new_maxload[cand] <= min(new_maxload):
                     new_load = {}
                     for v, voter in enumerate(profile):
                         if cand in voter.approved:
                             new_load[v] = new_maxload[cand]
                         else:
                             new_load[v] = load[v]
-                    new_comm = tuple(sorted(committee + (cand,)))
-                    comm_loads_next[new_comm] = new_load
+                    new_comm = committee + (cand,)
+                    comm_loads_next.append((new_comm, new_load))
         comm_loads = comm_loads_next
 
-    committees = sorted_committees(list(comm_loads.keys()))
+    # final list of committees (sort and remove duplicates)
+    committees = sorted_committees(set(tuple(sorted(committee)) for (committee, _) in comm_loads))
     detailed_info = {"comm_loads": comm_loads}
     return committees, detailed_info
 
@@ -1803,7 +1804,6 @@ def _phragmen_enestroem_algorithm(profile, committeesize, resolute, division):
             for cand in winners:
                 new_budget = dict(budget)  # copy of budget
                 if max_support > price:  # supporters can afford it
-                    # (voting_power - price) / voting_power
                     multiplier = division(max_support - price, max_support)
                 else:  # supporters can't afford it, set budget to 0
                     multiplier = 0
