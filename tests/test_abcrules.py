@@ -1,19 +1,17 @@
 """
 Unit tests for: abcrules.py, abcrules_gurobi.py, abcrules_mip.py and abcrules_cvxpy.py
 """
-
-import re
-
 import pytest
-
+import os
+import re
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
 from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, DEBUG, output
 from abcvoting.preferences import Profile, Voter
-from abcvoting import abcrules, misc, scores
+from abcvoting import abcrules, misc, scores, fileio
 
 MARKS = {
-    "gurobi": pytest.mark.gurobi,
+    "gurobi": [pytest.mark.gurobi],
     "cvxpy_scip": [pytest.mark.cvxpy, pytest.mark.scip],
     "cvxpy_glpk_mi": [pytest.mark.cvxpy, pytest.mark.glpk_mi],
     "cvxpy_cbc": [pytest.mark.cvxpy, pytest.mark.cbc],
@@ -471,8 +469,43 @@ class CollectInstances:
         self.instances.append((profile, tests, committeesize))
 
 
+def _list_abc_yaml_compute_instances():
+    _abc_yaml_instances = []
+    currdir = os.path.dirname(os.path.abspath(__file__))
+    filenames = [
+        currdir + "/test_instances/" + filename
+        for filename in os.listdir(currdir + "/test_instances/")
+        if filename.endswith(".abc.yaml")
+    ]
+    for filename in filenames:
+        for rule_id in abcrules.MAIN_RULE_IDS:
+            rule = abcrules.get_rule(rule_id)
+            for algorithm in rule.algorithms:
+                if "instanceS" in filename:
+                    marks = []  # small instances, rather fast
+                elif rule_id == "monroe" and algorithm in ["mip_cbc"]:
+                    marks = [pytest.mark.slow, pytest.mark.veryslow]
+                else:
+                    marks = [pytest.mark.slow]
+                _abc_yaml_instances.append(
+                    pytest.param(filename, rule_id, algorithm, marks=marks + MARKS[algorithm])
+                )
+    return filenames, _abc_yaml_instances
+
+
+def id_function(val):
+    if isinstance(val, dict):
+        return "|".join(str(x for x in val.values()))
+    if isinstance(val, tuple):
+        return "/".join(map(str, val))
+    if isinstance(val, abcrules.Rule):
+        return val.rule_id
+    return str(val)
+
+
 testinsts = CollectInstances()
 testrules = CollectRules()
+abc_yaml_filenames, abc_yaml_compute_instances = _list_abc_yaml_compute_instances()
 
 
 def remove_solver_output(out):
@@ -815,6 +848,7 @@ def test_consensus_fails_lower_quota():
     # are contained in a winning committee.
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     "rule_id, algorithm",
     [
@@ -910,7 +944,8 @@ def test_revseqpav_fails_EJR(sizemultiplier):
     assert abcrules.compute_revseqpav(profile, 5) == [{y1, y2, y3, y4, y5}]
 
 
-def test_seqphragmen_fails_EJR():
+def test_seqphragmen_fails_ejr():
+    # seq-Phragmen fails Extended Justified Representation
     # from "Phragmén's Voting Methods and Justified Representation"
     # by Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner
 
@@ -928,6 +963,27 @@ def test_seqphragmen_fails_EJR():
     assert abcrules.compute_seqphragmen(profile, 12) == [
         {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12}
     ]
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("filename", abc_yaml_filenames)
+def test_abc_yaml_instances_use_only_main_rule_ids(filename):
+    profile, committeesize, compute_instances, _ = fileio.read_abcvoting_yaml_file(filename)
+    for compute_instance in compute_instances:
+        # If this assertation fails, _load_abc_yaml_compute_instances() has to be adapted
+        # so that it actually loads the .abc.yaml files and extracts the rule_id's.
+        # However, this would be rather slow.
+        assert compute_instance["rule_id"] in abcrules.MAIN_RULE_IDS
+
+
+@pytest.mark.parametrize(
+    "filename, rule_id, algorithm", abc_yaml_compute_instances, ids=id_function
+)
+def test_selection_of_abc_yaml_instances(filename, rule_id, algorithm):
+    profile, committeesize, compute_instances, _ = fileio.read_abcvoting_yaml_file(filename)
+    for compute_instance in compute_instances:
+        if compute_instance["rule_id"] == rule_id:
+            abcrules.compute(**compute_instance, algorithm=algorithm)
 
 
 @pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)

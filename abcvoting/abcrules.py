@@ -10,6 +10,7 @@ from abcvoting.misc import hamming
 from abcvoting.misc import check_enough_approved_candidates
 from abcvoting.misc import str_committees_header, header
 from abcvoting.misc import str_set_of_candidates, str_sets_of_candidates
+from abcvoting.misc import check_equal_list_of_committees
 from abcvoting import scores
 
 try:
@@ -81,12 +82,6 @@ class Rule:
         for algorithm in algorithms:
             if algorithm in AVAILABLE_ALGORITHMS:
                 self.available_algorithms.append(algorithm)
-        # if not self.available_algorithms:
-        #     raise RuntimeError(
-        #         f"No algorithm available for {self.rule_id} "
-        #         f"that is supported on this machine. "
-        #         f"({', '.join(self.algorithms)} not supported)",
-        #     )
 
         if self.available_algorithms:
             # This rests on the assumption that ``self.algorithms`` are sorted by speed.
@@ -381,9 +376,39 @@ def get_rule(rule_id):
 ########################################################################
 
 
-def compute(rule_id, profile, committeesize, **kwargs):
+def compute(rule_id, profile, committeesize, expected_committees=None, **kwargs):
     """Compute rule given by `rule_id`."""
-    return get_rule(rule_id).compute(profile, committeesize, **kwargs)
+    rule = get_rule(rule_id)
+    committees = rule.compute(profile, committeesize, **kwargs)
+    if expected_committees is not None:
+        resolute = kwargs.get("resolute", False)
+        check_expected_committees_equals_actual_committees(
+            actual_committees=committees,
+            expected_committees=expected_committees,
+            resolute=resolute,
+            shortname=rule.shortname,
+        )
+    return committees
+
+
+def check_expected_committees_equals_actual_committees(
+    actual_committees, expected_committees, resolute=False, shortname="Rule"
+):
+    if resolute:
+        if len(actual_committees) != 1:
+            raise RuntimeError(
+                f"Did not return exactly one committee (but {len(actual_committees)}) "
+                f"for resolute=True."
+            )
+        if actual_committees[0] not in expected_committees:
+            raise ValueError(
+                f"{shortname} returns {actual_committees}, expected {expected_committees}"
+            )
+    else:
+        if not check_equal_list_of_committees(actual_committees, expected_committees):
+            raise ValueError(
+                f"{shortname} returns {actual_committees}, expected {expected_committees}"
+            )
 
 
 def compute_thiele_method(
@@ -1304,7 +1329,7 @@ def compute_seqphragmen(profile, committeesize, algorithm="standard", resolute=T
     for committee in committees:
         msg = "("
         for v, _ in enumerate(profile):
-            msg += str(detailed_info["comm_loads"][tuple(committee)][v]) + ", "
+            msg += str(detailed_info["comm_loads"][tuple(sorted(committee))][v]) + ", "
         output.details(msg[:-2] + ")")
     # end of optional output
 
@@ -1385,7 +1410,7 @@ def _seqphragmen_irresolute(
 
     if partial_committee is None:
         partial_committee = []  # build committees starting with the empty set
-    comm_loads = {tuple(partial_committee): load}
+    comm_loads = {tuple(sorted(partial_committee)): load}
 
     for _ in range(len(partial_committee), committeesize):
         comm_loads_next = {}
@@ -1410,7 +1435,7 @@ def _seqphragmen_irresolute(
             # compute new loads
             # and add new committees
             for cand in profile.candidates:
-                if new_maxload[cand] <= min(new_maxload):
+                if new_maxload[cand] <= min(new_maxload) + 1e-6:  # TODO: remove 1e-6
                     new_load = {}
                     for v, voter in enumerate(profile):
                         if cand in voter.approved:
@@ -1604,7 +1629,7 @@ def _rule_x_algorithm(profile, committeesize, resolute, division, skip_phragmen_
 
             else:  # no affordable candidates remain
                 if skip_phragmen_phase:
-                    final_committees.add(tuple(committee))
+                    final_committees.add(tuple(sorted(committee)))
                 else:
                     # fill committee via seq-Phragmen
 
@@ -1631,14 +1656,14 @@ def _rule_x_algorithm(profile, committeesize, resolute, division, skip_phragmen_
                             partial_committee=list(committee),
                             start_load=start_load,
                         )
-                    final_committees.update([tuple(committee) for committee in committees])
+                    final_committees.update([tuple(sorted(committee)) for committee in committees])
                     detailed_info["phragmen_phase"] = detailed_info_phragmen
                     # after filling the remaining spots these committees
                     # have size committeesize
 
             commbugdets = next_commbudgets
 
-    final_committees.update([tuple(committee) for committee, _ in commbugdets])
+    final_committees.update([tuple(sorted(committee)) for committee, _ in commbugdets])
 
     committees = sorted_committees(final_committees)
     if resolute:

@@ -31,6 +31,8 @@ markers = [
     "ortools: a test that requires ortools",
     "mip: a test that requires mip",
     "gmpy2: a test that requires gmpy2",
+    "slow: a test with a rather long runtime",
+    "veryslow: a test with a VERY long runtime"
 ]
 
 

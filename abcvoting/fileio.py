@@ -246,3 +246,89 @@ def write_profile_to_preflib_toi_file(profile, filename):
                 voter.approved, cand_names=list(range(1, profile.num_cand + 1))
             )
             f.write(f"{voter.weight}, {str_approval_set}\n")
+
+
+def _yaml_flow_style_list(x):
+    yamllist = ruamel.yaml.comments.CommentedSeq(x)
+    yamllist.fa.set_flow_style()
+    return yamllist
+
+
+VALID_KEYS = ["profile", "num_cand", "committeesize", "abcrules", "description"]
+
+
+def write_abcvoting_instance_to_yaml_file(
+    filename, profile, committeesize=None, rule_instances=None, description=None
+):
+    """Writes abcvoting instance to a yaml file."""
+    if not profile.has_unit_weights():
+        raise NotImplementedError(
+            "write_abcvoting_instance_to_yaml_file() cannot handle " "profiles with weights yet."
+        )  # TODO: implement!
+    data = {}
+    if description is not None:
+        data["description"] = description
+    data["profile"] = _yaml_flow_style_list([list(voter.approved) for voter in profile])
+    data["num_cand"] = profile.num_cand
+    if committeesize is not None:
+        data["committeesize"] = committeesize
+    for rule_instance in rule_instances:
+        if "rule_id" not in rule_instance.keys():
+            raise ValueError('Each rule instance (dict) requires key "rule_id".')
+        if "expected_committees" in rule_instance.keys():
+            rule_instance["expected_committees"] = _yaml_flow_style_list(
+                [list(committee) for committee in rule_instance["expected_committees"]]
+            )  # TODO: would be nicer to store committees as sets in set notation (curly braces)
+    if rule_instances is not None:
+        data["abcrules"] = rule_instances
+
+    if not filename.endswith(".abc.yaml"):
+        raise ValueError('ABCVoting yaml files should have ".abc.yaml" as filename extension.')
+
+    yaml = ruamel.yaml.YAML()
+    yaml.width = 120
+    with open(filename, "w") as outfile:
+
+        yaml.dump(data, outfile)
+
+
+def read_abcvoting_yaml_file(filename):
+    """Reads contents of abcvoting yaml file (ending with .abc.yaml)."""
+    with open(filename) as inputfile:
+        data = ruamel.yaml.safe_load(inputfile)
+    if "profile" not in data.keys():
+        raise ValueError(f"{filename} does not contain a profile")
+    if "num_cand" in data.keys():
+        num_cand = int(data["num_cand"])
+    else:
+        num_cand = max(cand for approval_set in data["profile"] for cand in approval_set) + 1
+    profile = Profile(num_cand)
+    profile.add_voters(data["profile"])
+
+    if "committeesize" in data.keys():
+        committeesize = int(data["committeesize"])
+    else:
+        committeesize = None
+
+    if "abcrules" in data.keys():
+        compute_instances = data["abcrules"]
+    else:
+        compute_instances = None
+    for compute_instance in compute_instances:
+        if "rule_id" not in compute_instance.keys():
+            raise ValueError('Each rule instance (dict) requires key "rule_id".')
+        compute_instance["profile"] = profile
+        compute_instance["committeesize"] = committeesize
+        if "expected_committees" in compute_instance.keys():
+            compute_instance["expected_committees"] = [
+                set(committee) for committee in compute_instance["expected_committees"]
+            ]
+            # expected_committees should be a list of committees (sets)
+
+    for key in data.keys():
+        if key not in VALID_KEYS:
+            output.warning(
+                f'Reading {filename}: key "{key}" is not valid and consequently ignored.'
+            )
+
+    return profile, committeesize, compute_instances, data
