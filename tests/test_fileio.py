@@ -3,7 +3,7 @@ Unit tests for fileio.py
 """
 
 import pytest
-from abcvoting import fileio
+from abcvoting import fileio, abcrules
 import os
 from abcvoting.preferences import Profile
 
@@ -93,3 +93,61 @@ def test_read_and_write_preflib_file():
         for i, voter in enumerate(profile1):
             assert voter.weight == profile2[i].weight
             assert voter.approved == set(profile2[i].approved)
+
+
+def test_read_and_write_abc_yaml_file():
+    currdir = os.path.dirname(os.path.abspath(__file__))
+    filename = currdir + "/data/test6.abc.yaml"
+    profile1 = Profile(6)
+    profile1.add_voters([[3], [4, 1, 5], [0, 2], [], [0, 1, 2, 3, 4, 5], [5], [1], [1]])
+    committeesize1 = 3
+    compute_instances1 = [
+        {"rule_id": "pav", "resolute": "True"},
+        {"rule_id": "seqphragmen", "algorithm": "float-fractions"},
+    ]
+    fileio.write_abcvoting_instance_to_yaml_file(
+        filename, profile1, committeesize=committeesize1, compute_instances=compute_instances1
+    )
+
+    profile2, committeesize2, compute_instances2, _ = fileio.read_abcvoting_yaml_file(filename)
+    assert committeesize1 == committeesize2
+    assert len(profile1) == len(profile2)
+    for i, voter in enumerate(profile1):
+        assert voter.weight == profile2[i].weight
+        assert voter.approved == set(profile2[i].approved)
+    for i in range(len(compute_instances1)):
+        assert abcrules.compute(
+            profile=profile1, committeesize=committeesize1, **compute_instances1[i]
+        ) == abcrules.compute(**compute_instances2[i])
+    for compute_instance in compute_instances2:
+        compute_instance.pop("profile")
+        compute_instance.pop("committeesize")
+    assert compute_instances1 == compute_instances2
+
+
+def test_read_special_abc_yaml_file1():
+    currdir = os.path.dirname(os.path.abspath(__file__))
+    filename = currdir + "/data/test7.abc.yaml"
+
+    profile1 = Profile(6)
+    profile1.add_voters([[3], [4, 1, 5], [0, 2], [], [0, 1, 2, 3, 4, 5], [5], [1], [1]])
+    fileio.write_abcvoting_instance_to_yaml_file(filename, profile1, description="just a profile")
+
+    profile2, committeesize, compute_instances2, data2 = fileio.read_abcvoting_yaml_file(filename)
+    assert str(profile1) == str(profile2)
+    assert committeesize is None
+    assert compute_instances2 == []
+
+
+def test_read_special_abc_yaml_file2():
+    currdir = os.path.dirname(os.path.abspath(__file__))
+    filename = currdir + "/data/test8.abc.yaml"
+
+    profile1 = Profile(6)
+    profile1.add_voters([{3}, {1, 4, 5}, {0, 2}, {}, {0, 1, 2, 3, 4, 5}, {1, 3}, {1}, {1}])
+
+    profile2, committeesize, compute_instances, data = fileio.read_abcvoting_yaml_file(filename)
+    assert str(profile1) == str(profile2)
+    assert committeesize == 2
+    assert len(compute_instances) == 1
+    assert abcrules.compute(**compute_instances[0]) == [{1, 3}]
