@@ -2,7 +2,7 @@ description: profile generated via prob_distribution=IC-party, num_voters=12, nu
 profile: [[2], [0, 1, 4], [0, 1, 4], [3], [0, 1, 4], [2], [2], [0, 1, 4], [3], [0, 1, 4], [2], [0, 1, 4]]
 num_cand: 5
 committeesize: 3
-abcrules:
+compute:
 - rule_id: av
   resolute: true
   expected_committees: [[0, 1, 4]]
@@ -100,10 +100,10 @@ abcrules:
   expected_committees: [[0, 1, 2], [0, 2, 4], [1, 2, 4]]
 - rule_id: phragmen-enestroem
   resolute: true
-  expected_committees: [[0, 2, 3], [1, 2, 3], [2, 3, 4]]
+  expected_committees: [[0, 1, 2], [0, 2, 3], [0, 2, 4], [1, 2, 3], [1, 2, 4], [2, 3, 4]]
 - rule_id: phragmen-enestroem
   resolute: false
-  expected_committees: [[0, 2, 3], [1, 2, 3], [2, 3, 4]]
+  expected_committees: [[0, 1, 2], [0, 2, 3], [0, 2, 4], [1, 2, 3], [1, 2, 4], [2, 3, 4]]
 - rule_id: consensus-rule
   resolute: true
   expected_committees: [[0, 1, 2], [0, 2, 3], [0, 2, 4], [1, 2, 3], [1, 2, 4], [2, 3, 4]]

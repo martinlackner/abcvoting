@@ -213,31 +213,31 @@ Rule X
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: Standard algorithm
+Algorithm: Standard algorithm (using standard Python fractions)
 
 Phase 1:
 
 starting budget:
-  (0.75, 0.75, 0.75, 0.75)
+  (3/4, 3/4, 3/4, 3/4)
 
 adding candidate number 1: a
- with maxmimum cost per voter q = 0.5
+ with maxmimum cost per voter q = 1/2
  remaining budget:
-  (0.25, 0.25, 0.75, 0.75)
+  (1/4, 1/4, 3/4, 3/4)
  tie broken in favor of a,
- candidates {c, d, e} are tied
+ candidates {c, d, e} are tied.
 
 adding candidate number 2: c
- with maxmimum cost per voter q = 0.75
+ with maxmimum cost per voter q = 3/4
  remaining budget:
-  (0.25, 0.0, 0.75, 0.0)
+  (1/4, 0, 3/4, 0)
  tie broken in favor of c,
- candidates {d, e} are tied
+ candidates {d, e} are tied.
 
 adding candidate number 3: e
- with maxmimum cost per voter q = 0.75
+ with maxmimum cost per voter q = 3/4
  remaining budget:
-  (0.0, 0.0, 0.0, 0.0)
+  (0, 0, 0, 0)
 
 1 winning committee:
  {a, c, e}
@@ -248,40 +248,40 @@ Rule X
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: Standard algorithm
+Algorithm: Standard algorithm (using standard Python fractions)
 
 Phase 1:
 
 starting budget:
-  (1.0, 1.0, 1.0, 1.0)
+  (1, 1, 1, 1)
 
 adding candidate number 1: a
- with maxmimum cost per voter q = 0.5
+ with maxmimum cost per voter q = 1/2
  remaining budget:
-  (0.5, 0.5, 1.0, 1.0)
+  (1/2, 1/2, 1, 1)
  tie broken in favor of a,
- candidates {c, d, e} are tied
+ candidates {c, d, e} are tied.
 
 adding candidate number 2: c
- with maxmimum cost per voter q = 0.5
+ with maxmimum cost per voter q = 1/2
  remaining budget:
-  (0.5, 0.0, 1.0, 0.5)
+  (1/2, 0, 1, 1/2)
  tie broken in favor of c,
- candidates {d, e} are tied
+ candidates {d, e} are tied.
 
 adding candidate number 3: d
- with maxmimum cost per voter q = 0.5
+ with maxmimum cost per voter q = 1/2
  remaining budget:
-  (0.0, 0.0, 1.0, 0.0)
+  (0, 0, 1, 0)
  tie broken in favor of d,
- candidates {e} are tied
+ candidates {e} are tied.
 
 adding candidate number 4: b
- with maxmimum cost per voter q = 1.0
+ with maxmimum cost per voter q = 1
  remaining budget:
-  (0.0, 0.0, 0.0, 0.0)
+  (0, 0, 0, 0)
  tie broken in favor of b,
- candidates {e} are tied
+ candidates {e} are tied.
 
 1 winning committee:
  {a, b, c, d}
@@ -296,31 +296,31 @@ Rule X
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: Standard algorithm
+Algorithm: Standard algorithm (using standard Python fractions)
 
 Phase 1:
 
 starting budget:
-  (0.75, 0.75, 0.75, 0.75)
+  (3/4, 3/4, 3/4, 3/4)
 
 adding candidate number 1: a
- with maxmimum cost per voter q = 0.5
+ with maxmimum cost per voter q = 1/2
  remaining budget:
-  (0.25, 0.25, 0.75, 0.75)
+  (1/4, 1/4, 3/4, 3/4)
  tie broken in favor of a,
- candidates {c, d, e} are tied
+ candidates {c, d, e} are tied.
 
 adding candidate number 2: c
- with maxmimum cost per voter q = 0.75
+ with maxmimum cost per voter q = 3/4
  remaining budget:
-  (0.25, 0.0, 0.75, 0.0)
+  (1/4, 0, 3/4, 0)
  tie broken in favor of c,
- candidates {d, e} are tied
+ candidates {d, e} are tied.
 
 adding candidate number 3: e
- with maxmimum cost per voter q = 0.75
+ with maxmimum cost per voter q = 3/4
  remaining budget:
-  (0.0, 0.0, 0.0, 0.0)
+  (0, 0, 0, 0)
 
 1 winning committee:
  {a, c, e}
@@ -331,40 +331,40 @@ Rule X
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: Standard algorithm
+Algorithm: Standard algorithm (using standard Python fractions)
 
 Phase 1:
 
 starting budget:
-  (1.0, 1.0, 1.0, 1.0)
+  (1, 1, 1, 1)
 
 adding candidate number 1: a
- with maxmimum cost per voter q = 0.5
+ with maxmimum cost per voter q = 1/2
  remaining budget:
-  (0.5, 0.5, 1.0, 1.0)
+  (1/2, 1/2, 1, 1)
  tie broken in favor of a,
- candidates {c, d, e} are tied
+ candidates {c, d, e} are tied.
 
 adding candidate number 2: c
- with maxmimum cost per voter q = 0.5
+ with maxmimum cost per voter q = 1/2
  remaining budget:
-  (0.5, 0.0, 1.0, 0.5)
+  (1/2, 0, 1, 1/2)
  tie broken in favor of c,
- candidates {d, e} are tied
+ candidates {d, e} are tied.
 
 adding candidate number 3: d
- with maxmimum cost per voter q = 0.5
+ with maxmimum cost per voter q = 1/2
  remaining budget:
-  (0.0, 0.0, 1.0, 0.0)
+  (0, 0, 1, 0)
  tie broken in favor of d,
- candidates {e} are tied
+ candidates {e} are tied.
 
 adding candidate number 4: b
- with maxmimum cost per voter q = 1.0
+ with maxmimum cost per voter q = 1
  remaining budget:
-  (0.0, 0.0, 0.0, 0.0)
+  (0, 0, 0, 0)
  tie broken in favor of b,
- candidates {e} are tied
+ candidates {e} are tied.
 
 1 winning committee:
  {a, b, c, d}

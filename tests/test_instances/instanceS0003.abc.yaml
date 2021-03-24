@@ -2,7 +2,7 @@ description: profile generated via prob_distribution=IC, num_voters=9, num_cand=
 profile: [[2, 3, 4], [3, 4, 5], [2, 3, 5], [0, 1, 4], [3, 4, 5], [0, 1, 2], [1, 2, 4], [0, 1, 5], [2, 3, 5]]
 num_cand: 6
 committeesize: 4
-abcrules:
+compute:
 - rule_id: av
   resolute: true
   expected_committees: [[2, 3, 4, 5]]
@@ -69,10 +69,10 @@ abcrules:
     [0, 2, 3, 5], [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]]
 - rule_id: seqphragmen
   resolute: true
-  expected_committees: [[1, 2, 3, 5], [1, 2, 4, 5], [2, 3, 4, 5]]
+  expected_committees: [[1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]]
 - rule_id: seqphragmen
   resolute: false
-  expected_committees: [[1, 2, 3, 5], [1, 2, 4, 5], [2, 3, 4, 5]]
+  expected_committees: [[1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]]
 - rule_id: monroe
   resolute: true
   expected_committees: [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4],
@@ -98,10 +98,10 @@ abcrules:
   expected_committees: [[1, 2, 4, 5]]
 - rule_id: rule-x
   resolute: true
-  expected_committees: [[1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5]]
+  expected_committees: [[1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5]]
 - rule_id: rule-x
   resolute: false
-  expected_committees: [[1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5]]
+  expected_committees: [[1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5]]
 - rule_id: phragmen-enestroem
   resolute: true
   expected_committees: [[1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5]]

@@ -3,7 +3,7 @@ profile: [[1, 5, 7], [0, 4, 7], [4, 5, 7], [2, 5, 7], [1, 2, 4], [8, 5, 7], [1, 
     2, 5, 7], [1, 4, 7], [8, 1, 4], [0, 2, 7], [2, 4, 5]]
 num_cand: 9
 committeesize: 5
-abcrules:
+compute:
 - rule_id: av
   resolute: true
   expected_committees: [[1, 2, 4, 5, 7]]

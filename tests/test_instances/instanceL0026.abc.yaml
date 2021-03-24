@@ -2,7 +2,7 @@ description: profile generated via prob_distribution=Mallows0.8, num_voters=12, 
 profile: [[2, 4], [0, 5], [1, 2], [2, 3], [1, 2], [2, 5], [0, 3], [2, 4], [2, 3], [3, 5], [0, 2], [1, 2]]
 num_cand: 6
 committeesize: 4
-abcrules:
+compute:
 - rule_id: av
   resolute: true
   expected_committees: [[0, 1, 2, 3], [0, 2, 3, 5], [1, 2, 3, 5]]
@@ -98,10 +98,10 @@ abcrules:
   expected_committees: [[0, 1, 2, 3], [1, 2, 3, 5]]
 - rule_id: phragmen-enestroem
   resolute: true
-  expected_committees: [[0, 1, 2, 3]]
+  expected_committees: [[0, 1, 2, 3], [1, 2, 3, 5]]
 - rule_id: phragmen-enestroem
   resolute: false
-  expected_committees: [[0, 1, 2, 3]]
+  expected_committees: [[0, 1, 2, 3], [1, 2, 3, 5]]
 - rule_id: consensus-rule
   resolute: true
   expected_committees: [[0, 1, 2, 3], [1, 2, 3, 5]]

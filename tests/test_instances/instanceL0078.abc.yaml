@@ -2,7 +2,7 @@ description: profile generated via prob_distribution=IC, num_voters=12, num_cand
 profile: [[5, 6], [4, 6], [3, 7], [0, 5], [2, 3], [0, 3], [3, 5], [1, 5], [1, 5], [2, 3], [2, 4], [2, 5]]
 num_cand: 8
 committeesize: 4
-abcrules:
+compute:
 - rule_id: av
   resolute: true
   expected_committees: [[0, 2, 3, 5], [1, 2, 3, 5], [2, 3, 4, 5], [2, 3, 5, 6]]

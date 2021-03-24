@@ -255,11 +255,11 @@ def _yaml_flow_style_list(x):
     return yamllist
 
 
-VALID_KEYS = ["profile", "num_cand", "committeesize", "abcrules", "description"]
+VALID_KEYS = ["profile", "num_cand", "committeesize", "compute", "description"]
 
 
 def write_abcvoting_instance_to_yaml_file(
-    filename, profile, committeesize=None, rule_instances=None, description=None
+    filename, profile, committeesize=None, compute_instances=None, description=None
 ):
     """Writes abcvoting instance to a yaml file."""
     if not profile.has_unit_weights():
@@ -273,15 +273,15 @@ def write_abcvoting_instance_to_yaml_file(
     data["num_cand"] = profile.num_cand
     if committeesize is not None:
         data["committeesize"] = committeesize
-    for rule_instance in rule_instances:
-        if "rule_id" not in rule_instance.keys():
-            raise ValueError('Each rule instance (dict) requires key "rule_id".')
-        if "expected_committees" in rule_instance.keys():
-            rule_instance["expected_committees"] = _yaml_flow_style_list(
-                [list(committee) for committee in rule_instance["expected_committees"]]
-            )  # TODO: would be nicer to store committees as sets in set notation (curly braces)
-    if rule_instances is not None:
-        data["abcrules"] = rule_instances
+    if compute_instances is not None:
+        for compute_instance in compute_instances:
+            if "rule_id" not in compute_instance.keys():
+                raise ValueError('Each compute instance (dict) requires key "rule_id".')
+            if "expected_committees" in compute_instance.keys():
+                compute_instance["expected_committees"] = _yaml_flow_style_list(
+                    [list(committee) for committee in compute_instance["expected_committees"]]
+                )  # TODO: would be nicer to store committees in set notation (curly braces)
+        data["compute"] = compute_instances
 
     if not filename.endswith(".abc.yaml"):
         raise ValueError('ABCVoting yaml files should have ".abc.yaml" as filename extension.')
@@ -311,10 +311,10 @@ def read_abcvoting_yaml_file(filename):
     else:
         committeesize = None
 
-    if "abcrules" in data.keys():
-        compute_instances = data["abcrules"]
+    if "compute" in data.keys():
+        compute_instances = data["compute"]
     else:
-        compute_instances = None
+        compute_instances = []
     for compute_instance in compute_instances:
         if "rule_id" not in compute_instance.keys():
             raise ValueError('Each rule instance (dict) requires key "rule_id".')

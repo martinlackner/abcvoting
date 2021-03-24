@@ -2,7 +2,7 @@ description: profile generated via prob_distribution=Mallows0.8, num_voters=8, n
 profile: [[0, 5, 7], [0, 2, 7], [0, 3, 6], [2, 5, 7], [3, 4, 6], [2, 5, 7], [4, 6, 7], [1, 5, 7]]
 num_cand: 8
 committeesize: 6
-abcrules:
+compute:
 - rule_id: av
   resolute: true
   expected_committees: [[0, 2, 3, 5, 6, 7], [0, 2, 4, 5, 6, 7]]

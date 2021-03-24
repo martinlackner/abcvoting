@@ -110,7 +110,7 @@ def generate_abc_yaml_testinstances(
                 f"num_cand={num_cand}, "
                 f"setsize={setsize}"
             ),
-            rule_instances=rule_instances,
+            compute_instances=rule_instances,
         )
 
     print("Done.")
