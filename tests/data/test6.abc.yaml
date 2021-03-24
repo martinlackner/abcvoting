@@ -1,0 +1,8 @@
+profile: [[3], [1, 4, 5], [0, 2], [], [0, 1, 2, 3, 4, 5], [5], [1], [1]]
+num_cand: 6
+committeesize: 3
+compute:
+- rule_id: pav
+  resolute: 'True'
+- rule_id: seqphragmen
+  algorithm: float-fractions
