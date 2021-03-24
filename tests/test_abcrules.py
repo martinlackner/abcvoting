@@ -25,7 +25,9 @@ MARKS = {
     "brute-force": [],
     "branch-and-bound": [],
     "standard": [],
-    "exact-fractions": [],
+    "standard-fractions": [],
+    "gmpy2-fractions": [pytest.mark.gmpy2],
+    "float-fractions": [],
     "fastest": [],
 }
 
@@ -640,6 +642,10 @@ def test_abcrules_correct_simple(rule_id, algorithm, resolute):
         algorithm=algorithm,
         resolute=resolute,
     )
+    simple_checks(committees)
+
+    # using the default algorithm
+    committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)
     simple_checks(committees)
 
 

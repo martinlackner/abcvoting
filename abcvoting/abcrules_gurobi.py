@@ -8,9 +8,9 @@ from abcvoting.misc import sorted_committees
 try:
     import gurobipy as gb
 
-    available = True
+    gurobipy_available = True
 except ImportError:
-    available = False
+    gurobipy_available = False
 
 GUROBI_ACCURACY = 1e-9
 
@@ -38,7 +38,7 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct, 
 
     """
 
-    if not available:
+    if not gurobipy_available:
         raise ImportError("Gurobi (gurobipy) not available.")
 
     maxscore = None

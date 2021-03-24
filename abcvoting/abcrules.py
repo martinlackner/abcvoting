@@ -4,20 +4,20 @@
 import functools
 from itertools import combinations
 from abcvoting.output import output
-from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_cvxpy, abcrules_mip
+from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_cvxpy, abcrules_mip, misc
 from abcvoting.misc import sorted_committees
-from abcvoting.misc import hamming
 from abcvoting.misc import check_enough_approved_candidates
 from abcvoting.misc import str_committees_header, header
 from abcvoting.misc import str_set_of_candidates, str_sets_of_candidates
-from abcvoting.misc import compare_list_of_committees
 from abcvoting import scores
+from fractions import Fraction
+import math
 
+gmpy2_available = True
 try:
-    from gmpy2 import mpq as Fraction
+    from gmpy2 import mpq
 except ImportError:
-    output.warning("Warning: module gmpy2 not found, resorting to Python's fractions.Fraction")
-    from fractions import Fraction
+    gmpy2_available = False
 
 ########################################################################
 
@@ -55,9 +55,13 @@ ALGORITHM_NAMES = {
     "cvxpy_glpk_mi": "GLPK ILP solver via CVXPY library",
     "cvxpy_cbc": "CBC ILP solver via CVXPY library",
     "standard": "Standard algorithm",
-    "exact-fractions": "Standard algorithm with exact fractions",
+    "standard-fractions": "Standard algorithm (using standard Python fractions)",
+    "gmpy2-fractions": "Standard algorithm (using gmpy2 fractions)",
+    "float-fractions": "Standard algorithm (using floats instead of fractions)",
     "ortools_cp": "OR-Tools CP-SAT solver",
 }
+
+FLOAT_ISCLOSE_REL_TOL = 1e-12
 
 
 class Rule:
@@ -110,7 +114,7 @@ def _available_algorithms():
 
     for algorithm in ALGORITHM_NAMES.keys():
 
-        if "gurobi" in algorithm and not abcrules_gurobi.available:
+        if "gurobi" in algorithm and not abcrules_gurobi.gurobipy_available:
             continue
 
         if algorithm.startswith("cvxpy"):
@@ -125,8 +129,11 @@ def _available_algorithms():
                 continue
             elif algorithm == "cvxpy_scip" and cvxpy.SCIP not in cvxpy.installed_solvers():
                 continue
-            elif algorithm == "cvxpy_gurobi" and not abcrules_gurobi.available:
+            elif algorithm == "cvxpy_gurobi" and not abcrules_gurobi.gurobipy_available:
                 continue
+
+        if algorithm == "gmpy2-fractions" and not gmpy2_available:
+            continue
 
         available_algorithms.append(algorithm)
 
@@ -234,7 +241,7 @@ def get_rule(rule_id):
             shortname="seq-Phragmén",
             longname="Phragmén's Sequential Rule (seq-Phragmén)",
             compute_fct=compute_seqphragmen,
-            algorithms=("standard", "exact-fractions"),
+            algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
             resolute_values=(True, False),
         )
     if rule_id == "minimaxphragmen":
@@ -289,7 +296,7 @@ def get_rule(rule_id):
             shortname="Rule X",
             longname="Rule X",
             compute_fct=compute_rule_x,
-            algorithms=("standard", "exact-fractions"),
+            algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
             resolute_values=(True, False),
         )
     if rule_id == "rule-x-without-phragmen-phase":
@@ -298,7 +305,7 @@ def get_rule(rule_id):
             shortname="Rule X without Phragmén phase",
             longname="Rule X without the Phragmén phase (second phase)",
             compute_fct=compute_rule_x_without_phragmen_phase,
-            algorithms=("standard", "exact-fractions"),
+            algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
             resolute_values=(True, False),
         )
     if rule_id == "phragmen-enestroem":
@@ -307,7 +314,7 @@ def get_rule(rule_id):
             shortname="Phragmén-Eneström",
             longname="Method of Phragmén-Eneström",
             compute_fct=compute_phragmen_enestroem,
-            algorithms=("standard", "exact-fractions"),
+            algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
             resolute_values=(True, False),
         )
     if rule_id == "consensus-rule":
@@ -316,7 +323,7 @@ def get_rule(rule_id):
             shortname="Consensus Rule",
             longname="Consensus Rule",
             compute_fct=compute_consensus_rule,
-            algorithms=("standard", "exact-fractions"),
+            algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
             resolute_values=(True, False),
         )
 
@@ -405,7 +412,7 @@ def check_expected_committees_equals_actual_committees(
                 f"{shortname} returns {actual_committees}, expected {expected_committees}"
             )
     else:
-        if not compare_list_of_committees(actual_committees, expected_committees):
+        if not misc.compare_list_of_committees(actual_committees, expected_committees):
             raise ValueError(
                 f"{shortname} returns {actual_committees}, expected {expected_committees}"
             )
@@ -999,7 +1006,7 @@ def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=
     output.details("Minimum maximal distance: " + str(opt_minimaxav_score))
     msg = "Corresponding distances to voters:\n"
     for committee in committees:
-        msg += str([hamming(voter.approved, committee) for voter in profile]) + "\n"
+        msg += str([misc.hamming(voter.approved, committee) for voter in profile]) + "\n"
     output.details(msg)
     # end of optional output
 
@@ -1055,7 +1062,7 @@ def compute_lexminimaxav(profile, committeesize, algorithm="brute-force", resolu
     output.details("Minimum maximal distance: " + str(max(opt_distances)))
     msg = "Corresponding distances to voters:\n"
     for committee in committees:
-        msg += str([hamming(voter.approved, committee) for voter in profile])
+        msg += str([misc.hamming(voter.approved, committee) for voter in profile])
     output.details(msg + "\n")
     # end of optional output
 
@@ -1066,7 +1073,9 @@ def _lexminimaxav_bruteforce(profile, committeesize, resolute):
     opt_committees = []
     opt_distances = [profile.num_cand + 1] * len(profile)
     for committee in combinations(profile.candidates, committeesize):
-        distances = sorted([hamming(voter.approved, committee) for voter in profile], reverse=True)
+        distances = sorted(
+            [misc.hamming(voter.approved, committee) for voter in profile], reverse=True
+        )
         for i in range(len(distances)):
             if opt_distances[i] < distances[i]:
                 break
@@ -1261,7 +1270,7 @@ def _greedy_monroe_algorithm(profile, committeesize):
     return sorted_committees([committee]), detailed_info
 
 
-def compute_seqphragmen(profile, committeesize, algorithm="standard", resolute=True):
+def compute_seqphragmen(profile, committeesize, algorithm="standard-fractions", resolute=True):
     """Phragmen's sequential rule (seq-Phragmen)."""
     check_enough_approved_candidates(profile, committeesize)
 
@@ -1269,24 +1278,13 @@ def compute_seqphragmen(profile, committeesize, algorithm="standard", resolute=T
 
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
-
-    if algorithm == "standard":
-        division = lambda x, y: x / y  # standard float division
-    elif algorithm == "exact-fractions":
-        division = Fraction  # using exact fractions
-    else:
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_seqphragmen"
-        )
+    if algorithm not in rule.algorithms:
+        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_seqphragmen")
 
     if resolute:
-        committees, detailed_info = _seqphragmen_resolute(
-            profile,
-            committeesize,
-            division,
-        )
+        committees, detailed_info = _seqphragmen_resolute(profile, committeesize, algorithm)
     else:
-        committees, detailed_info = _seqphragmen_irresolute(profile, committeesize, division)
+        committees, detailed_info = _seqphragmen_irresolute(profile, committeesize, algorithm)
 
     # optional output
     output.info(header(rule.longname))
@@ -1315,7 +1313,7 @@ def compute_seqphragmen(profile, committeesize, algorithm="standard", resolute=T
                 msg += ",\n candidates " + str_set_of_candidates(
                     tied_cands, cand_names=profile.cand_names
                 )
-                msg += f" would increase the load to the same amount ({max_load})"
+                msg += f" are tied (for all those new maximum load = {max_load})."
                 output.details(msg)
             output.details("")
 
@@ -1337,9 +1335,18 @@ def compute_seqphragmen(profile, committeesize, algorithm="standard", resolute=T
 
 
 def _seqphragmen_resolute(
-    profile, committeesize, division, start_load=None, partial_committee=None
+    profile, committeesize, algorithm, start_load=None, partial_committee=None
 ):
     """Algorithm for computing resolute seq-Phragmen (1 winning committee)."""
+    if algorithm == "float-fractions":
+        division = lambda x, y: x / y  # standard float division
+    elif algorithm == "standard-fractions":
+        division = Fraction  # using Python built-in fractions
+    elif algorithm == "gmpy2-fractions":
+        division = mpq  # using Python built-in fractions
+    else:
+        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_seqphragmen")
+
     approvers_weight = {}
     for cand in profile.candidates:
         approvers_weight[cand] = sum(voter.weight for voter in profile if cand in voter.approved)
@@ -1375,10 +1382,15 @@ def _seqphragmen_resolute(
                 new_maxload[cand] = committeesize + 1  # that's larger than any possible value
         # find smallest maxload
         opt = min(new_maxload)
-        next_cand = new_maxload.index(opt)
-        tied_cands = [
-            cand for cand in profile.candidates if cand > next_cand and new_maxload[cand] == opt
-        ]
+        if algorithm == "float-fractions":
+            tied_cands = [
+                cand
+                for cand in profile.candidates
+                if math.isclose(new_maxload[cand], opt, rel_tol=FLOAT_ISCLOSE_REL_TOL)
+            ]
+        else:
+            tied_cands = [cand for cand in profile.candidates if new_maxload[cand] == opt]
+        next_cand = tied_cands[0]
         # compute new loads and add new candidate
         for v, voter in enumerate(profile):
             if next_cand in voter.approved:
@@ -1396,9 +1408,18 @@ def _seqphragmen_resolute(
 
 
 def _seqphragmen_irresolute(
-    profile, committeesize, division, start_load=None, partial_committee=None
+    profile, committeesize, algorithm, start_load=None, partial_committee=None
 ):
     """Algorithm for computing irresolute seq-Phragmen (all winning committees)."""
+    if algorithm == "float-fractions":
+        division = lambda x, y: x / y  # standard float division
+    elif algorithm == "standard-fractions":
+        division = Fraction  # using Python built-in fractions
+    elif algorithm == "gmpy2-fractions":
+        division = mpq  # using Python built-in fractions
+    else:
+        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_seqphragmen")
+
     approvers_weight = {}
     for cand in profile.candidates:
         approvers_weight[cand] = sum(voter.weight for voter in profile if cand in voter.approved)
@@ -1435,7 +1456,13 @@ def _seqphragmen_irresolute(
                     new_maxload[cand] = committeesize + 1  # that's larger than any possible value
             # compute new loads
             for cand in profile.candidates:
-                if new_maxload[cand] <= min(new_maxload):
+                if algorithm == "float-fractions":
+                    select_cand = math.isclose(
+                        new_maxload[cand], min(new_maxload), rel_tol=FLOAT_ISCLOSE_REL_TOL
+                    )
+                else:
+                    select_cand = new_maxload[cand] <= min(new_maxload)
+                if select_cand:
                     new_load = {}
                     for v, voter in enumerate(profile):
                         if cand in voter.approved:
@@ -1455,7 +1482,7 @@ def _seqphragmen_irresolute(
 def compute_rule_x(
     profile,
     committeesize,
-    algorithm="standard",
+    algorithm="standard-fractions",
     resolute=True,
     skip_phragmen_phase=False,
 ):
@@ -1480,18 +1507,11 @@ def compute_rule_x(
 
     if algorithm == "fastest":
         algorithm = algorithm = rule.fastest_available_algorithm
-
-    if algorithm == "standard":
-        division = lambda x, y: x / y  # standard float division
-    elif algorithm == "exact-fractions":
-        division = Fraction  # using exact fractions
-    else:
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_rule_x"
-        )
+    if algorithm not in rule.algorithms:
+        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_rule_x")
 
     committees, detailed_info = _rule_x_algorithm(
-        profile, committeesize, resolute, division, skip_phragmen_phase
+        profile, committeesize, resolute, algorithm, skip_phragmen_phase
     )
 
     # optional output
@@ -1528,7 +1548,7 @@ def compute_rule_x(
                 msg += profile.cand_names[next_cand] + ","
                 msg += "\n candidates "
                 msg += str_set_of_candidates(tied_cands, cand_names=profile.cand_names)
-                msg += " are tied"
+                msg += " are tied."
                 output.details(msg)
             output.details("")
 
@@ -1560,7 +1580,7 @@ def compute_rule_x(
                     msg += ",\n candidates " + str_set_of_candidates(
                         tied_cands, cand_names=profile.cand_names
                     )
-                    msg += f" would increase the load to the same amount ({max_load})"
+                    msg += f" are tied (for all those new maximum load = {max_load})."
                     output.details(msg)
                 output.details("")
 
@@ -1571,7 +1591,7 @@ def compute_rule_x(
     return sorted_committees(committees)
 
 
-def _rule_x_algorithm(profile, committeesize, resolute, division, skip_phragmen_phase=False):
+def _rule_x_algorithm(profile, committeesize, resolute, algorithm, skip_phragmen_phase=False):
     """Algorithm for Rule X."""
 
     def _rule_x_get_min_q(profile, budget, cand, division):
@@ -1586,6 +1606,15 @@ def _rule_x_algorithm(profile, committeesize, resolute, division, skip_phragmen_
             rich -= new_poor
             poor.update(new_poor)
         return None  # not sufficient budget available
+
+    if algorithm == "float-fractions":
+        division = lambda x, y: x / y  # standard float division
+    elif algorithm == "standard-fractions":
+        division = Fraction  # using Python built-in fractions
+    elif algorithm == "gmpy2-fractions":
+        division = mpq  # using Python built-in fractions
+    else:
+        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_rule_x")
 
     start_budget = {v: division(committeesize, len(profile)) for v, _ in enumerate(profile)}
     commbugdets = [(set(), start_budget)]
@@ -1611,7 +1640,18 @@ def _rule_x_algorithm(profile, committeesize, resolute, division, skip_phragmen_
                     min_q[cand] = q
 
             if len(min_q) > 0:  # one or more candidates are affordable
-                tied_cands = [cand for cand in min_q.keys() if min_q[cand] == min(min_q.values())]
+                if algorithm == "float-fractions":
+                    tied_cands = [
+                        cand
+                        for cand in min_q.keys()
+                        if math.isclose(
+                            min_q[cand], min(min_q.values()), rel_tol=FLOAT_ISCLOSE_REL_TOL
+                        )
+                    ]
+                else:
+                    tied_cands = [
+                        cand for cand in min_q.keys() if min_q[cand] == min(min_q.values())
+                    ]
                 for next_cand in tied_cands:
                     new_budget = dict(budget)
                     for v, voter in enumerate(profile):
@@ -1645,7 +1685,7 @@ def _rule_x_algorithm(profile, committeesize, resolute, division, skip_phragmen_
                         committees, detailed_info_phragmen = _seqphragmen_resolute(
                             profile,
                             committeesize,
-                            division,
+                            algorithm,
                             partial_committee=list(committee),
                             start_load=start_load,
                         )
@@ -1653,14 +1693,14 @@ def _rule_x_algorithm(profile, committeesize, resolute, division, skip_phragmen_
                         committees, detailed_info_phragmen = _seqphragmen_irresolute(
                             profile,
                             committeesize,
-                            division,
+                            algorithm,
                             partial_committee=list(committee),
                             start_load=start_load,
                         )
                     final_committees.update([tuple(sorted(committee)) for committee in committees])
                     detailed_info["phragmen_phase"] = detailed_info_phragmen
                     # after filling the remaining spots these committees
-                    # have size committeesize
+                    # have size `committeesize`
 
             commbugdets = next_commbudgets
 
@@ -1673,7 +1713,7 @@ def _rule_x_algorithm(profile, committeesize, resolute, division, skip_phragmen_
 
 
 def compute_rule_x_without_phragmen_phase(
-    profile, committeesize, algorithm="standard", resolute=True
+    profile, committeesize, algorithm="standard-fractions", resolute=True
 ):
     """Rule X with skip_phragmen_phase=True.
 
@@ -1735,7 +1775,9 @@ def compute_minimaxphragmen(profile, committeesize, algorithm="gurobi", resolute
     return committees
 
 
-def compute_phragmen_enestroem(profile, committeesize, algorithm="standard", resolute=True):
+def compute_phragmen_enestroem(
+    profile, committeesize, algorithm="standard-fractions", resolute=True
+):
     """Phragmen-Enestroem (aka Phragmen's first method, Enestroem's method).
 
     In every round the candidate with the highest combined budget of
@@ -1752,17 +1794,12 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="standard", res
 
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
-
-    if algorithm == "standard":
-        division = lambda x, y: x / y  # standard float division
-    elif algorithm == "exact-fractions":
-        division = Fraction  # using exact fractions
-    else:
+    if algorithm not in rule.algorithms:
         raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_phragmen_enestroem"
+            f"Algorithm {algorithm} not specified for compute_phragmen_enestroem"
         )
     committees, detailed_info = _phragmen_enestroem_algorithm(
-        profile, committeesize, resolute, division
+        profile, committeesize, resolute, algorithm
     )
 
     # optional output
@@ -1777,9 +1814,19 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="standard", res
     return committees
 
 
-def _phragmen_enestroem_algorithm(profile, committeesize, resolute, division):
-    num_voters = len(profile)
+def _phragmen_enestroem_algorithm(profile, committeesize, resolute, algorithm):
+    if algorithm == "float-fractions":
+        division = lambda x, y: x / y  # standard float division
+    elif algorithm == "standard-fractions":
+        division = Fraction  # using Python built-in fractions
+    elif algorithm == "gmpy2-fractions":
+        division = mpq  # using Python built-in fractions
+    else:
+        raise NotImplementedError(
+            f"Algorithm {algorithm} not specified for compute_phragmen_enestroem"
+        )
 
+    num_voters = len(profile)
     initial_voter_budget = {i: profile[i].weight for i in range(num_voters)}
 
     # price for adding a candidate to the committee
@@ -1800,8 +1847,15 @@ def _phragmen_enestroem_algorithm(profile, committeesize, resolute, division):
                     if cand in curr_cands:
                         support[cand] += voting_power
             max_support = max(support.values())
-            winners = [c for c, s in support.items() if s == max_support]
-            for cand in winners:
+            if algorithm == "float-fractions":
+                tied_cands = [
+                    cand
+                    for cand, supp in support.items()
+                    if math.isclose(supp, max_support, rel_tol=FLOAT_ISCLOSE_REL_TOL)
+                ]
+            else:
+                tied_cands = [cand for cand, supp in support.items() if supp == max_support]
+            for cand in tied_cands:
                 new_budget = dict(budget)  # copy of budget
                 if max_support > price:  # supporters can afford it
                     multiplier = division(max_support - price, max_support)
@@ -1827,7 +1881,7 @@ def _phragmen_enestroem_algorithm(profile, committeesize, resolute, division):
     return committees, detailed_info
 
 
-def compute_consensus_rule(profile, committeesize, algorithm="standard", resolute=True):
+def compute_consensus_rule(profile, committeesize, algorithm="standard-fractions", resolute=True):
     """Consensus rule.
 
     Based on Perpetual Consensus from
@@ -1840,17 +1894,15 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard", resolut
 
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
-
-    if algorithm == "standard":
-        division = lambda x, y: x / y  # standard float division
-    elif algorithm == "exact-fractions":
-        division = Fraction  # using exact fractions
-    else:
+    if algorithm == "fastest":
+        algorithm = algorithm = rule.fastest_available_algorithm
+    if algorithm not in rule.algorithms:
         raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_consensus_rule"
+            f"Algorithm {algorithm} not specified for compute_consensus_rule"
         )
+
     committees, detailed_info = _consensus_rule_algorithm(
-        profile, committeesize, resolute, division
+        profile, committeesize, resolute, algorithm
     )
 
     # optional output
@@ -1865,10 +1917,20 @@ def compute_consensus_rule(profile, committeesize, algorithm="standard", resolut
     return committees
 
 
-def _consensus_rule_algorithm(profile, committeesize, resolute, division):
+def _consensus_rule_algorithm(profile, committeesize, resolute, algorithm):
     """Algorithm for the consensus rule."""
-    num_voters = len(profile)
+    if algorithm == "float-fractions":
+        division = lambda x, y: x / y  # standard float division
+    elif algorithm == "standard-fractions":
+        division = Fraction  # using Python built-in fractions
+    elif algorithm == "gmpy2-fractions":
+        division = mpq  # using Python built-in fractions
+    else:
+        raise NotImplementedError(
+            f"Algorithm {algorithm} not specified for compute_consensus_rule"
+        )
 
+    num_voters = len(profile)
     initial_voter_budget = {i: 0 for i in range(num_voters)}
 
     voter_budgets_for_partial_committee = [(initial_voter_budget, set())]
@@ -1888,8 +1950,15 @@ def _consensus_rule_algorithm(profile, committeesize, resolute, division):
                         support[cand] += budget[i]
                         supporters[cand].append(i)
             max_support = max(support.values())
-            winners = [c for c, s in support.items() if s == max_support]
-            for cand in winners:
+            if algorithm == "float-fractions":
+                tied_cands = [
+                    cand
+                    for cand, supp in support.items()
+                    if math.isclose(supp, max_support, rel_tol=FLOAT_ISCLOSE_REL_TOL)
+                ]
+            else:
+                tied_cands = [cand for cand, supp in support.items() if supp == max_support]
+            for cand in tied_cands:
                 new_budget = dict(budget)  # copy of budget
                 for i in supporters[cand]:
                     new_budget[i] -= division(num_voters, len(supporters[cand]))
