@@ -1543,7 +1543,7 @@ def compute_rule_x(
             for v, _ in enumerate(profile):
                 msg += str(budget[v]) + ", "
             output.details(msg[:-2] + ")")
-            if tied_cands:
+            if len(tied_cands) > 1:
                 msg = " tie broken in favor of "
                 msg += profile.cand_names[next_cand] + ","
                 msg += "\n candidates "
@@ -1575,13 +1575,14 @@ def compute_rule_x(
                 for v, _ in enumerate(profile):
                     msg += str(load[v]) + ", "
                 output.details(msg[:-2] + ")")
-                if tied_cands:
-                    msg = " tie broken in favor of " + profile.cand_names[next_cand]
-                    msg += ",\n candidates " + str_set_of_candidates(
-                        tied_cands, cand_names=profile.cand_names
+                if len(tied_cands) > 1:
+                    output.details(
+                        f" tie broken in favor of {profile.cand_names[next_cand]},\n"
+                        f" candidates "
+                        f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
+                        f" are tied\n"
+                        f" (for any of those, the new maximum load would be {max_load})."
                     )
-                    msg += f" are tied (for all those new maximum load = {max_load})."
-                    output.details(msg)
                 output.details("")
 
     output.info(str_committees_header(committees, winning=True))
@@ -1663,7 +1664,7 @@ def _rule_x_algorithm(profile, committeesize, resolute, algorithm, skip_phragmen
 
                     if resolute:
                         detailed_info["next_cand"].append(next_cand)
-                        detailed_info["tied_cands"].append(tied_cands[1:])
+                        detailed_info["tied_cands"].append(tied_cands)
                         detailed_info["cost"].append(min(min_q.values()))
                         detailed_info["budget"].append(new_budget)
                         break

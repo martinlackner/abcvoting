@@ -6,21 +6,20 @@ Example 11
 Input:
 ------
 
-profile with 15 votes and 5 candidates:
- 6 x {a, b, c},
- 4 x {a, b, c, d, e},
- 2 x {a, b, d, e},
- 3 x {d, e}
+profile with 8 votes and 4 candidates:
+ 3 x {c, d},
+ 2 x {a, b},
+ 2 x {a, c},
+ 1 x {b, d}
 
 ------
 Rule X
 ------
 
-Algorithm: Standard algorithm with exact fractions
+Algorithm: Standard algorithm (using standard Python fractions)
 
-2 winning committees:
- {a, b, c, d}
- {a, b, c, e}
+1 winning committee:
+ {a, c, d}
 
 ------
 Rule X
@@ -28,48 +27,44 @@ Rule X
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: Standard algorithm with exact fractions
+Algorithm: Standard algorithm (using standard Python fractions)
 
 Phase 1:
 
 starting budget:
-  (4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15, 4/15)
+  (3/8, 3/8, 3/8, 3/8, 3/8, 3/8, 3/8, 3/8)
 
-adding candidate number 1: a
- with maxmimum cost per voter q = 1/12
+adding candidate number 1: c
+ with maxmimum cost per voter q = 1/5
  remaining budget:
-  (11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 11/60, 4/15, 4/15, 4/15)
- tie broken in favor of a,
- candidates {b} are tied
+  (7/40, 7/40, 7/40, 3/8, 3/8, 7/40, 7/40, 3/8)
 
-adding candidate number 2: b
- with maxmimum cost per voter q = 1/12
+adding candidate number 2: a
+ with maxmimum cost per voter q = 13/40
  remaining budget:
-  (1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 1/10, 4/15, 4/15, 4/15)
+  (7/40, 7/40, 7/40, 1/20, 1/20, 0, 0, 3/8)
 
-adding candidate number 3: c
- with maxmimum cost per voter q = 1/10
- remaining budget:
-  (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1/10, 1/10, 4/15, 4/15, 4/15)
+Phase 2 (seq-Phragmén):
 
-adding candidate number 4: d
- with maxmimum cost per voter q = 4/15
- remaining budget:
-  (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
- tie broken in favor of d,
- candidates {e} are tied
+starting loads (= budget spent):
+  (1/5, 1/5, 1/5, 13/40, 13/40, 3/8, 3/8, 0)
+
+adding candidate number 3: d
+ maximum load increased to 2/5
+ load distribution:
+  (2/5, 2/5, 2/5, 13/40, 13/40, 3/8, 3/8, 2/5)
 
 1 winning committee:
- {a, b, c, d}
+ {a, c, d}
 
 -----------------------------------------
 Phragmén's Sequential Rule (seq-Phragmén)
 -----------------------------------------
 
-Algorithm: Standard algorithm with exact fractions
+Algorithm: Standard algorithm (using standard Python fractions)
 
 1 winning committee:
- {a, b, d, e}
+ {b, c, d}
 
 corresponding load distribution:
-(5/24, 5/24, 5/24, 5/24, 5/24, 5/24, 11/36, 11/36, 11/36, 11/36, 11/36, 11/36, 11/36, 11/36, 11/36)
+(2, 1, 3): (29/60, 29/60, 29/60, 1/3, 1/3, 1/5, 1/5, 29/60)

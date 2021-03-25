@@ -15,10 +15,10 @@ output.set_verbosity(DETAILS)
 print(misc.header("Example 11", "*"))
 
 # Approval profile
-num_cand = 5
-a, b, c, d, e = range(5)
-approval_sets = [[a, b, c]] * 6 + [[a, b, c, d, e]] * 4 + [[a, b, d, e]] * 2 + [[d, e]] * 3
-cand_names = "abcde"
+num_cand = 4
+a, b, c, d = range(4)
+approval_sets = [{c, d}, {c, d}, {c, d}, {a, b}, {a, b}, {a, c}, {a, c}, {b, d}]
+cand_names = "abcd"
 
 profile = Profile(num_cand, cand_names=cand_names)
 profile.add_voters(approval_sets)
@@ -26,13 +26,13 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees_rule_x = abcrules.compute_rule_x(profile, 4, resolute=False)
+committees_rule_x = abcrules.compute_rule_x(profile, 3, resolute=False)
 
 # detailed output is only available if resolute=True:
-abcrules.compute_rule_x(profile, 4, resolute=True)
+abcrules.compute_rule_x(profile, 3, resolute=True)
 
-committees_seqphragmen = abcrules.compute_seqphragmen(profile, 4, resolute=False)
+committees_seqphragmen = abcrules.compute_seqphragmen(profile, 3, resolute=False)
 
 # verify correctness
-assert committees_rule_x == [{a, b, c, d}, {a, b, c, e}]
-assert committees_seqphragmen == [{a, b, d, e}]
+assert committees_rule_x == [{a, c, d}]
+assert committees_seqphragmen == [{b, c, d}]
