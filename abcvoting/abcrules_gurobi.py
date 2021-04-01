@@ -12,7 +12,7 @@ try:
 except ImportError:
     gurobipy_available = False
 
-GUROBI_ACCURACY = 1e-9
+GUROBI_ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
 
 
 def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct, resolute):
@@ -57,6 +57,7 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct, 
         model.setParam("OutputFlag", False)
         model.setParam("FeasibilityTol", GUROBI_ACCURACY)
         model.setParam("PoolSearchMode", 0)
+        model.setParam("MIPFocus", 2)  # focus more attention on proving optimality
 
         model.optimize()
 
@@ -251,8 +252,8 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute):
     ):
         load = {}
         for cand in profile.candidates:
-            for voter in profile:
-                load[(voter, cand)] = model.addVar(ub=1.0, lb=0.0)
+            for i, voter in enumerate(profile):
+                load[(voter, cand)] = model.addVar(ub=1.0, lb=0.0, name=f"load{i}-{cand}")
 
         # constraint: the committee has the required size
         model.addConstr(
