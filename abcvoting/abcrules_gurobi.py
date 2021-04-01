@@ -15,7 +15,7 @@ except ImportError:
 GUROBI_ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
 
 
-def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct, resolute):
+def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute):
     """Compute rules, which are given in the form of an optimization problem, using Gurobi.
 
     Parameters
@@ -27,7 +27,6 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct, 
         approval sets of voters
     committeesize : int
         number of chosen alternatives
-    scorefct : callable
     resolute : bool
 
     Returns
@@ -52,7 +51,13 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct, 
         # `in_committee` is a binary variable indicating whether `cand` is in the committee
         in_committee = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_committee")
 
-        set_opt_model_func(model, profile, in_committee, committeesize, committees, scorefct)
+        set_opt_model_func(model, in_committee)
+
+        # find a new committee that has not been found yet by excluding previously found committees
+        for committee in committees:
+            model.addConstr(
+                gb.quicksum(in_committee[cand] for cand in committee) <= committeesize - 1
+            )
 
         model.setParam("OutputFlag", False)
         model.setParam("FeasibilityTol", GUROBI_ACCURACY)
@@ -105,9 +110,7 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, scorefct, 
 
 
 def _gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
-    def set_opt_model_func(
-        model, profile, in_committee, committeesize, previously_found_committees, scorefct
-    ):
+    def set_opt_model_func(model, in_committee):
         # utility[(voter, l)] contains (intended binary) variables counting the number of approved
         # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
         # exactly the number of candidates in the committee approved by `voter` for all
@@ -137,12 +140,6 @@ def _gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
                 == gb.quicksum(in_committee[cand] for cand in voter.approved)
             )
 
-        # find a new committee that has not been found yet by excluding previously found committees
-        for committee in previously_found_committees:
-            model.addConstr(
-                gb.quicksum(in_committee[cand] for cand in committee) <= committeesize - 1
-            )
-
         # objective: the PAV score of the committee
         model.setObjective(
             gb.quicksum(
@@ -160,16 +157,12 @@ def _gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
     ):
         raise ValueError("scorefct must be monotonic decreasing")
 
-    committees = _optimize_rule_gurobi(
-        set_opt_model_func, profile, committeesize, scorefct, resolute
-    )
+    committees = _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute)
     return sorted_committees(committees)
 
 
 def _gurobi_monroe(profile, committeesize, resolute):
-    def set_opt_model_func(
-        model, profile, in_committee, committeesize, previously_found_committees, scorefct
-    ):
+    def set_opt_model_func(model, in_committee):
         num_voters = len(profile)
 
         # optimization goal: variable "satisfaction"
@@ -219,17 +212,11 @@ def _gurobi_monroe(profile, committeesize, resolute):
             >= satisfaction
         )
 
-        # find a new committee that has not been found before
-        for committee in previously_found_committees:
-            model.addConstr(
-                gb.quicksum(in_committee[cand] for cand in committee) <= committeesize - 1
-            )
-
         # optimization objective
         model.setObjective(satisfaction, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func, profile, committeesize, scorefct=None, resolute=resolute
+        set_opt_model_func, profile, committeesize, resolute=resolute
     )
     return sorted_committees(committees)
 
@@ -247,9 +234,7 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute):
              second-, third-, ...-largest load
     """
 
-    def set_opt_model_func(
-        model, profile, in_committee, committeesize, previously_found_committees, scorefct
-    ):
+    def set_opt_model_func(model, in_committee):
         load = {}
         for cand in profile.candidates:
             for i, voter in enumerate(profile):
@@ -276,12 +261,6 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute):
                 == in_committee[cand]
             )
 
-        # find a new committee that has not been found before
-        for committee in previously_found_committees:
-            model.addConstr(
-                gb.quicksum(in_committee[cand] for cand in committee) <= committeesize - 1
-            )
-
         loadbound = model.addVar(lb=0, ub=committeesize, name="loadbound")
         for voter in profile:
             model.addConstr(
@@ -292,15 +271,13 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute):
         model.setObjective(-loadbound, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func, profile, committeesize, scorefct=None, resolute=resolute
+        set_opt_model_func, profile, committeesize, resolute=resolute
     )
     return sorted_committees(committees)
 
 
 def _gurobi_minimaxav(profile, committeesize, resolute):
-    def set_opt_model_func(
-        model, profile, in_committee, committeesize, previously_found_committees, scorefct
-    ):
+    def set_opt_model_func(model, in_committee):
         max_hamming_distance = model.addVar(
             lb=0,
             ub=profile.num_cand,
@@ -322,16 +299,10 @@ def _gurobi_minimaxav(profile, committeesize, resolute):
                 + gb.quicksum(in_committee[cand] for cand in not_approved)
             )
 
-        # find a new committee that has not been found before
-        for committee in previously_found_committees:
-            model.addConstr(
-                gb.quicksum(in_committee[cand] for cand in committee) <= committeesize - 1
-            )
-
         # maximizing the negative distance makes code more similar to the other methods here
         model.setObjective(-max_hamming_distance, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func, profile, committeesize, scorefct=None, resolute=resolute
+        set_opt_model_func, profile, committeesize, resolute=resolute
     )
     return sorted_committees(committees)
