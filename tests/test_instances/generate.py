@@ -81,11 +81,14 @@ def generate_abc_yaml_testinstances(
             )
             if not intersection:
                 break
+
         rule_instances = []
         for rule_id in abcrules.MAIN_RULE_IDS:
             rule = abcrules.get_rule(rule_id)
-            if rule_id == "minimaxphragmen":
-                continue  # TODO: doesnt work, fix bug and remove this continue
+            # if rule_id == "minimaxphragmen":
+            #     algorithm = "mip_gurobi"
+            # else:
+            #     algorithm = "fastest"
 
             # if irresolute (resolute = False) is supported, then "expected_committees" should be
             # the list of committees returned for resolute=False.
@@ -165,6 +168,22 @@ if __name__ == "__main__":
         av_neq_pav=False,
     )
 
+    batch = "Mallow"
+    committeesizes = [5, 6]
+    num_voters_values = [13, 16]
+    num_cand_values = [8, 9]
+    prob_distributions = ["Mallows0.2", "Mallows0.5", "Mallows0.8"]
+    approval_setsizes = [2, 3, 4]
+    generate_abc_yaml_testinstances(
+        batch,
+        committeesizes,
+        num_voters_values,
+        num_cand_values,
+        prob_distributions,
+        approval_setsizes,
+        av_neq_pav=False,
+    )
+
     batch = "P"
     committeesizes = [3, 4, 5]
     num_voters_values = [12, 15]
@@ -187,12 +206,12 @@ if __name__ == "__main__":
     num_cand_values = [8, 9]
     prob_distributions = ["IC", "Mallows0.5", "Mallows0.8", "Urn0.5"]
     approval_setsizes = [2, 3, 5]
-    # generate_abc_yaml_testinstances(
-    #     batch,
-    #     committeesizes,
-    #     num_voters_values,
-    #     num_cand_values,
-    #     prob_distributions,
-    #     approval_setsizes,
-    #     av_neq_pav=False,
-    # )
+    generate_abc_yaml_testinstances(
+        batch,
+        committeesizes,
+        num_voters_values,
+        num_cand_values,
+        prob_distributions,
+        approval_setsizes,
+        av_neq_pav=False,
+    )

@@ -75,6 +75,12 @@ compute:
 - rule_id: seqphragmen
   resolute: false
   expected_committees: [[0, 4, 5]]
+- rule_id: minimaxphragmen
+  resolute: true
+  expected_committees: [[0, 2, 5], [0, 4, 5], [2, 5, 7], [4, 5, 7]]
+- rule_id: minimaxphragmen
+  resolute: false
+  expected_committees: [[0, 2, 5], [0, 4, 5], [2, 5, 7], [4, 5, 7]]
 - rule_id: monroe
   resolute: true
   expected_committees: [[0, 2, 5], [0, 4, 5], [0, 4, 7], [0, 8, 5], [2, 5, 7], [4, 5, 7], [8, 5, 7]]
