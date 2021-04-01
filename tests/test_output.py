@@ -24,7 +24,7 @@ def test_verbosity(capfd, verbosity):
             assert verbosity_name.lower() not in stdout
 
 
-def test_verbosity(capfd):
+def test_verbosity2(capfd):
     output = Output(verbosity=INFO)
     output.details("details")
     output.info("info")

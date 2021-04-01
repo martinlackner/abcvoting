@@ -8,7 +8,6 @@ from abcvoting.preferences import Profile, Voter
 from math import ceil
 from abcvoting import misc
 import ruamel.yaml
-import sys
 from abcvoting.output import output
 
 
@@ -62,6 +61,7 @@ def read_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
 
 def get_file_names(dir_name):
     files = []
+    file_dir = None
     for (dir_path, _, filenames) in os.walk(dir_name):
         file_dir = dir_path
         files = filenames
@@ -103,7 +103,7 @@ def _approval_set_from_preflib_datastructures(num_appr, ranking, candidate_map):
             try:
                 cand = int(rank)
             except ValueError:
-                raise PreflibException(f"Expected candidate number but encountered {cand}")
+                raise PreflibException(f"Expected candidate number but encountered {rank}")
             approval_set.add(cand)
         if len(approval_set) >= num_appr and not tied:
             break
