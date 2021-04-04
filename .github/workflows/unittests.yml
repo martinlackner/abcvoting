@@ -51,7 +51,7 @@ jobs:
       run: |
         pip install pytest
         # note that some tests are skipped because Gurobi is not available on Github
-        PYTHONPATH=$PYTHONPATH:$PWD coverage run --source=. -m pytest -m "not gurobi and not scip and not cbc and not glpk_mi and not cvxpy and not gmpy2 and not slow" -ra tests/
+        PYTHONPATH=$PYTHONPATH:$PWD coverage run --source=. -m pytest -v --tb=long -m "not gurobi and not scip and not cbc and not glpk_mi and not cvxpy and not gmpy2 and not slow" -ra tests/
 
     - name: Generate coverage report
       run: coverage xml
