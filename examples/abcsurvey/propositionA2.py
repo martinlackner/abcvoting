@@ -82,18 +82,15 @@ print(misc.header("3rd profile:"))
 print(profile.str_compact())
 
 print("winning committees for k=3 and k=4:")
-comm1 = abcrules.compute("rule-x", profile, 3, resolute=True)[0]
-comm2 = abcrules.compute("rule-x", profile, 4, resolute=True)[0]
+comm1 = abcrules.compute("rule-x", profile, 3, resolute=True, algorithm="standard-fractions")[0]
+comm2 = abcrules.compute("rule-x", profile, 4, resolute=True, algorithm="standard-fractions")[0]
 print(
-    " "
-    + abcrules.get_rule("rule-x").shortname
-    + ": "
-    + misc.str_set_of_candidates(comm1, cand_names)
-    + " vs "
-    + misc.str_set_of_candidates(comm2, cand_names)
+    f" {abcrules.get_rule('rule-x').shortname}: "
+    f"{misc.str_set_of_candidates(comm1, cand_names)} vs "
+    f"{misc.str_set_of_candidates(comm2, cand_names)}"
 )
 assert not all(cand in comm1 for cand in comm2)
 
 print("\n\nDetailed calculations:")
-abcrules.compute("rule-x", profile, 3, resolute=True)
-abcrules.compute("rule-x", profile, 4, resolute=True)
+abcrules.compute("rule-x", profile, 3, resolute=True, algorithm="standard-fractions")
+abcrules.compute("rule-x", profile, 4, resolute=True, algorithm="standard-fractions")

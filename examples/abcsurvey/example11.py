@@ -26,12 +26,16 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees_rule_x = abcrules.compute_rule_x(profile, 3, resolute=False)
+committees_rule_x = abcrules.compute_rule_x(
+    profile, 3, resolute=False, algorithm="standard-fractions"
+)
 
 # detailed output is only available if resolute=True:
-abcrules.compute_rule_x(profile, 3, resolute=True)
+abcrules.compute_rule_x(profile, 3, resolute=True, algorithm="standard-fractions")
 
-committees_seqphragmen = abcrules.compute_seqphragmen(profile, 3, resolute=False)
+committees_seqphragmen = abcrules.compute_seqphragmen(
+    profile, 3, resolute=False, algorithm="standard-fractions"
+)
 
 # verify correctness
 assert committees_rule_x == [{a, c, d}]

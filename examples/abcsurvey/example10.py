@@ -17,7 +17,7 @@ print(misc.header("Example 10", "*"))
 print(misc.header("Input (election instance from Example 1):"))
 print(ex1.profile.str_compact())
 
-committees = abcrules.compute_rule_x(ex1.profile, 4)
+committees = abcrules.compute_rule_x(ex1.profile, 4, algorithm="standard-fractions")
 
 # verify correctness
 a, b, c, d, e, f, g = range(7)  # a = 0, b = 1, c = 2, ...

@@ -18,7 +18,7 @@ print(misc.header("Example 8", "*"))
 print(misc.header("Input (election instance from Example 1):"))
 print(ex1.profile.str_compact())
 
-committees = abcrules.compute_seqphragmen(ex1.profile, 4)
+committees = abcrules.compute_seqphragmen(ex1.profile, 4, algorithm="standard-fractions")
 
 
 # verify correctness

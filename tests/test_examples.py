@@ -7,6 +7,17 @@ from pathlib import Path
 from abcvoting.output import WARNING
 from abcvoting.output import output
 from test_abcrules import remove_solver_output
+import re
+
+
+def remove_algorithm_info(out):
+    """Remove information about algorithms which may differ from system to system."""
+    filter_patterns = ("Algorithm: .*\n",)
+
+    for filter_pattern in filter_patterns:
+        out = re.sub(filter_pattern, "", out)
+
+    return out
 
 
 @pytest.fixture
@@ -31,10 +42,12 @@ def check_output(capfd, request):
     try:
         with open(fname, "r", encoding="utf8") as file:
             expected_output = file.read()
+        expected_output = remove_algorithm_info(str(expected_output))
     except FileNotFoundError:
         expected_output = None
 
     stdout = remove_solver_output(str(stdout))
+    stdout = remove_algorithm_info(stdout)
 
     if expected_output != stdout:
         with open(f"{fname}.new", "w", encoding="utf8") as file:

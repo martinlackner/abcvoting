@@ -419,7 +419,7 @@ def check_expected_committees_equals_actual_committees(
 
 
 def compute_thiele_method(
-    profile, committeesize, scorefct_id, algorithm="branch-and-bound", resolute=False
+    profile, committeesize, scorefct_id, algorithm="fastest", resolute=False
 ):
     """Thiele methods.
 
@@ -555,21 +555,21 @@ def _thiele_methods_branchandbound(profile, committeesize, scorefct_id, resolute
     return committees, detailed_info
 
 
-def compute_pav(profile, committeesize, algorithm="branch-and-bound", resolute=False):
+def compute_pav(profile, committeesize, algorithm="fastest", resolute=False):
     """Proportional Approval Voting (PAV)."""
     return compute_thiele_method(
         profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
     )
 
 
-def compute_slav(profile, committeesize, algorithm="branch-and-bound", resolute=False):
+def compute_slav(profile, committeesize, algorithm="fastest", resolute=False):
     """Sainte-Lague Approval Voting (SLAV)."""
     return compute_thiele_method(
         profile, committeesize, "slav", algorithm=algorithm, resolute=resolute
     )
 
 
-def compute_cc(profile, committeesize, algorithm="branch-and-bound", resolute=False):
+def compute_cc(profile, committeesize, algorithm="fastest", resolute=False):
     """Approval Chamberlin-Courant (CC)."""
     return compute_thiele_method(
         profile, committeesize, "cc", algorithm=algorithm, resolute=resolute
@@ -577,7 +577,7 @@ def compute_cc(profile, committeesize, algorithm="branch-and-bound", resolute=Fa
 
 
 def compute_seq_thiele_method(
-    profile, committeesize, scorefct_id, algorithm="standard", resolute=True
+    profile, committeesize, scorefct_id, algorithm="fastest", resolute=True
 ):
     """Sequential Thiele methods."""
     check_enough_approved_candidates(profile, committeesize)
@@ -694,21 +694,21 @@ def _seq_thiele_irresolute(profile, committeesize, scorefct_id):
 
 
 # Sequential PAV
-def compute_seqpav(profile, committeesize, algorithm="standard", resolute=True):
+def compute_seqpav(profile, committeesize, algorithm="fastest", resolute=True):
     """Sequential PAV (seq-PAV)."""
     return compute_seq_thiele_method(
         profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
     )
 
 
-def compute_seqslav(profile, committeesize, algorithm="standard", resolute=True):
+def compute_seqslav(profile, committeesize, algorithm="fastest", resolute=True):
     """Sequential Sainte-Lague Approval Voting (SLAV)."""
     return compute_seq_thiele_method(
         profile, committeesize, "slav", algorithm=algorithm, resolute=resolute
     )
 
 
-def compute_seqcc(profile, committeesize, algorithm="standard", resolute=True):
+def compute_seqcc(profile, committeesize, algorithm="fastest", resolute=True):
     """Sequential Chamberlin-Courant (seq-CC)."""
     return compute_seq_thiele_method(
         profile, committeesize, "cc", algorithm=algorithm, resolute=resolute
@@ -716,7 +716,7 @@ def compute_seqcc(profile, committeesize, algorithm="standard", resolute=True):
 
 
 def compute_revseq_thiele_method(
-    profile, committeesize, scorefct_id, algorithm="standard", resolute=True
+    profile, committeesize, scorefct_id, algorithm="fastest", resolute=True
 ):
     """Reverse sequential Thiele methods."""
     check_enough_approved_candidates(profile, committeesize)
@@ -847,7 +847,7 @@ def _revseq_thiele_irresolute(profile, committeesize, scorefct_id):
 
 
 # Reverse Sequential PAV
-def compute_revseqpav(profile, committeesize, algorithm="standard", resolute=True):
+def compute_revseqpav(profile, committeesize, algorithm="fastest", resolute=True):
     """Reverse sequential PAV (revseq-PAV)."""
     return compute_revseq_thiele_method(
         profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
@@ -961,17 +961,17 @@ def _separable_rule_algorithm(profile, committeesize, rule_id, resolute):
     return committees, detailed_info
 
 
-def compute_sav(profile, committeesize, algorithm="standard", resolute=False):
+def compute_sav(profile, committeesize, algorithm="fastest", resolute=False):
     """Satisfaction Approval Voting (SAV)."""
     return compute_separable_rule("sav", profile, committeesize, algorithm, resolute)
 
 
-def compute_av(profile, committeesize, algorithm="standard", resolute=False):
+def compute_av(profile, committeesize, algorithm="fastest", resolute=False):
     """Approval Voting (AV)."""
     return compute_separable_rule("av", profile, committeesize, algorithm, resolute)
 
 
-def compute_minimaxav(profile, committeesize, algorithm="brute-force", resolute=False):
+def compute_minimaxav(profile, committeesize, algorithm="fastest", resolute=False):
     """Minimax Approval Voting (MAV)."""
     check_enough_approved_candidates(profile, committeesize)
 
@@ -1032,7 +1032,7 @@ def _minimaxav_bruteforce(profile, committeesize, resolute):
     return committees, detailed_info
 
 
-def compute_lexminimaxav(profile, committeesize, algorithm="brute-force", resolute=False):
+def compute_lexminimaxav(profile, committeesize, algorithm="fastest", resolute=False):
     """Lexicographic Minimax AV (lex-MAV)."""
     check_enough_approved_candidates(profile, committeesize)
 
@@ -1093,7 +1093,7 @@ def _lexminimaxav_bruteforce(profile, committeesize, resolute):
     return committees, detailed_info
 
 
-def compute_monroe(profile, committeesize, algorithm="brute-force", resolute=False):
+def compute_monroe(profile, committeesize, algorithm="fastest", resolute=False):
     """Monroe's rule."""
     check_enough_approved_candidates(profile, committeesize)
 
@@ -1157,7 +1157,7 @@ def _monroe_bruteforce(profile, committeesize, resolute):
     return committees, detailed_info
 
 
-def compute_greedy_monroe(profile, committeesize, algorithm="standard", resolute=True):
+def compute_greedy_monroe(profile, committeesize, algorithm="fastest", resolute=True):
     """Greedy Monroe."""
     check_enough_approved_candidates(profile, committeesize)
 
@@ -1270,7 +1270,7 @@ def _greedy_monroe_algorithm(profile, committeesize):
     return sorted_committees([committee]), detailed_info
 
 
-def compute_seqphragmen(profile, committeesize, algorithm="standard-fractions", resolute=True):
+def compute_seqphragmen(profile, committeesize, algorithm="fastest", resolute=True):
     """Phragmen's sequential rule (seq-Phragmen)."""
     check_enough_approved_candidates(profile, committeesize)
 
@@ -1482,7 +1482,7 @@ def _seqphragmen_irresolute(
 def compute_rule_x(
     profile,
     committeesize,
-    algorithm="standard-fractions",
+    algorithm="fastest",
     resolute=True,
     skip_phragmen_phase=False,
 ):
@@ -1714,7 +1714,7 @@ def _rule_x_algorithm(profile, committeesize, resolute, algorithm, skip_phragmen
 
 
 def compute_rule_x_without_phragmen_phase(
-    profile, committeesize, algorithm="standard-fractions", resolute=True
+    profile, committeesize, algorithm="fastest", resolute=True
 ):
     """Rule X with skip_phragmen_phase=True.
 
@@ -1729,7 +1729,7 @@ def compute_rule_x_without_phragmen_phase(
     )
 
 
-def compute_minimaxphragmen(profile, committeesize, algorithm="gurobi", resolute=False):
+def compute_minimaxphragmen(profile, committeesize, algorithm="fastest", resolute=False):
     """Phragmen's minimax rule (minimax-Phragmen).
 
     Minimizes the maximum load.
@@ -1776,9 +1776,7 @@ def compute_minimaxphragmen(profile, committeesize, algorithm="gurobi", resolute
     return committees
 
 
-def compute_phragmen_enestroem(
-    profile, committeesize, algorithm="standard-fractions", resolute=True
-):
+def compute_phragmen_enestroem(profile, committeesize, algorithm="fastest", resolute=True):
     """Phragmen-Enestroem (aka Phragmen's first method, Enestroem's method).
 
     In every round the candidate with the highest combined budget of
@@ -1882,7 +1880,7 @@ def _phragmen_enestroem_algorithm(profile, committeesize, resolute, algorithm):
     return committees, detailed_info
 
 
-def compute_consensus_rule(profile, committeesize, algorithm="standard-fractions", resolute=True):
+def compute_consensus_rule(profile, committeesize, algorithm="fastest", resolute=True):
     """Consensus rule.
 
     Based on Perpetual Consensus from
