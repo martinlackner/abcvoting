@@ -295,8 +295,9 @@ def write_abcvoting_instance_to_yaml_file(
 
 def read_abcvoting_yaml_file(filename):
     """Reads contents of abcvoting yaml file (ending with .abc.yaml)."""
+    yaml = ruamel.yaml.YAML(typ="safe", pure=True)
     with open(filename) as inputfile:
-        data = ruamel.yaml.safe_load(inputfile)
+        data = yaml.load(inputfile)
     if "profile" not in data.keys():
         raise ValueError(f"{filename} does not contain a profile")
     if "num_cand" in data.keys():
