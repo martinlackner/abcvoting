@@ -1343,7 +1343,11 @@ def _seqphragmen_resolute(
     elif algorithm == "standard-fractions":
         division = Fraction  # using Python built-in fractions
     elif algorithm == "gmpy2-fractions":
-        division = mpq  # using Python built-in fractions
+        if not gmpy2_available:
+            raise ImportError(
+                'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
+            )
+        division = mpq  # using gmpy2 fractions
     else:
         raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_seqphragmen")
 
@@ -1416,7 +1420,11 @@ def _seqphragmen_irresolute(
     elif algorithm == "standard-fractions":
         division = Fraction  # using Python built-in fractions
     elif algorithm == "gmpy2-fractions":
-        division = mpq  # using Python built-in fractions
+        if not gmpy2_available:
+            raise ImportError(
+                'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
+            )
+        division = mpq  # using gmpy2 fractions
     else:
         raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_seqphragmen")
 
@@ -1613,7 +1621,11 @@ def _rule_x_algorithm(profile, committeesize, resolute, algorithm, skip_phragmen
     elif algorithm == "standard-fractions":
         division = Fraction  # using Python built-in fractions
     elif algorithm == "gmpy2-fractions":
-        division = mpq  # using Python built-in fractions
+        if not gmpy2_available:
+            raise ImportError(
+                'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
+            )
+        division = mpq  # using gmpy2 fractions
     else:
         raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_rule_x")
 
@@ -1819,7 +1831,11 @@ def _phragmen_enestroem_algorithm(profile, committeesize, resolute, algorithm):
     elif algorithm == "standard-fractions":
         division = Fraction  # using Python built-in fractions
     elif algorithm == "gmpy2-fractions":
-        division = mpq  # using Python built-in fractions
+        if not gmpy2_available:
+            raise ImportError(
+                'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
+            )
+        division = mpq  # using gmpy2 fractions
     else:
         raise NotImplementedError(
             f"Algorithm {algorithm} not specified for compute_phragmen_enestroem"
@@ -1923,7 +1939,11 @@ def _consensus_rule_algorithm(profile, committeesize, resolute, algorithm):
     elif algorithm == "standard-fractions":
         division = Fraction  # using Python built-in fractions
     elif algorithm == "gmpy2-fractions":
-        division = mpq  # using Python built-in fractions
+        if not gmpy2_available:
+            raise ImportError(
+                'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
+            )
+        division = mpq  # using gmpy2 fractions
     else:
         raise NotImplementedError(
             f"Algorithm {algorithm} not specified for compute_consensus_rule"
