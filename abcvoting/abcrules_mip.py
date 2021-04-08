@@ -45,10 +45,10 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
     #  cases to avoid endless hanging computations, e.g. when CI runs the tests
     while True:
         model = mip.Model(solver_name=solver_id)
-        if output.verbosity <= DEBUG:
-            model.verbose = 1
-        else:
-            model.verbose = 0
+
+        # note: verbose = 1 causes issues with unittests, seems as if output is printed too late
+        # and anyway the output does not seem to be very helpful
+        model.verbose = 0
 
         # `in_committee` is a binary variable indicating whether `cand` is in the committee
         in_committee = [
