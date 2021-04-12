@@ -1,5 +1,5 @@
 import setuptools
-from subprocess import run
+import subprocess
 
 
 def read_readme():
@@ -10,11 +10,13 @@ def read_readme():
 
 def read_version():
     # this is not guaranteed to be a valid version string, but should work well enough
-    git_version = (
-        run(["git", "describe", "--tags"], capture_output=True, check=True)
-        .stdout.strip()
-        .decode("utf-8")
-    )
+    git_describe = subprocess.run(["git", "describe", "--tags"], stdout=subprocess.PIPE)
+
+    if git_describe.returncode == 0:
+        git_version = git_describe.stdout.strip().decode("utf-8")
+    else:
+        # per default no tags available in Github actions, but also no real need for a version
+        git_version = "0.0.0"
 
     if git_version[0] == "v":
         git_version = git_version[1:]
@@ -54,7 +56,13 @@ setuptools.setup(
         "mip>=1.13.0",
         "ruamel.yaml >= 0.16.13",
     ],
-    extras_require={"dev": ["pytest>=6", "coverage>=5.3" "black==20.8b1"]},
+    extras_require={
+        "dev": [
+            "pytest>=6",
+            "coverage>=5.3",
+            "black==20.8b1",
+        ]
+    },
 )
 
 # TODO Add optional requirements?
