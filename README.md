@@ -127,14 +127,15 @@ Install all dependencies including development requirements and the abcvoting pa
 pip install -e .[dev]
 ```
 
-Basic unit tests can be run by excluding tests which require additional dependencies: 
+Basic unit tests can be run by excluding tests which require additional dependencies:
 
 ```bash
 pytest  -m "not gurobi and not scip and not cbc and not glpk_mi and not cvxpy and not gmpy2 and not slow" tests/
 ```
 
 For development, configure the black formatter and pre-commit hooks - see below. Also installing
-all optional dependencies is recommended.  
+all optional dependencies is recommended.
+
 
 ### Black formatting
 
