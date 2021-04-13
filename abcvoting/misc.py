@@ -123,7 +123,7 @@ def verify_expected_committees_equals_actual_committees(
                 f"{shortname} returns {actual_committees}, expected {expected_committees}"
             )
     else:
-        if not misc.compare_list_of_committees(actual_committees, expected_committees):
+        if not compare_list_of_committees(actual_committees, expected_committees):
             raise ValueError(
                 f"{shortname} returns {actual_committees}, expected {expected_committees}"
             )
