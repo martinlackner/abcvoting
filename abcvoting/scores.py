@@ -1,7 +1,4 @@
-"""
-Calculating all kinds of scores
-"""
-
+"""Calculate all kinds of scores."""
 
 try:
     from gmpy2 import mpq as Fraction
@@ -13,11 +10,8 @@ import networkx as nx
 from abcvoting.misc import hamming
 
 
-THIELE_SCOREFCTS_STRINGS = ["pav", "slav", "cc", "av"] + [f"geom{param}" for param in [1.5, 2, 5]]
-
-
 class UnknownScoreFunctionError(ValueError):
-    """Exception raised if unknown rule id is used"""
+    """Exception raised if unknown rule id is used."""
 
     def __init__(self, scorefct_id):
         message = 'Thiele score function "' + str(scorefct_id) + '" is not known.'
@@ -25,10 +19,7 @@ class UnknownScoreFunctionError(ValueError):
 
 
 def get_scorefct(scorefct_id, committeesize=None):
-    """returns score function (for a Thiele method) given its name"""
-    if scorefct_id not in THIELE_SCOREFCTS_STRINGS and not scorefct_id.startswith("geom"):
-        raise UnknownScoreFunctionError(scorefct_id)
-
+    """Return score function (for a Thiele method) given its name."""
     if scorefct_id == "pav":
         return pav_score_fct
     elif scorefct_id == "slav":
@@ -40,16 +31,12 @@ def get_scorefct(scorefct_id, committeesize=None):
     elif scorefct_id[:4] == "geom":
         base = Fraction(scorefct_id[4:])
         return functools.partial(geometric_score_fct, base=base)
-
-    raise RuntimeError(
-        f"Score function {scorefct_id} is valid but not handled correctly in get_scorefct()."
-    )
+    else:
+        raise UnknownScoreFunctionError(scorefct_id)
 
 
 def thiele_score(scorefct_id, profile, committee):
-    """computes the Thiele score of a committee subject to
-    a given score function (scorefct_id)
-    """
+    """Compute Thiele score of a committee subject to a given score function (`scorefct_id`)."""
     scorefct = get_scorefct(scorefct_id, len(committee))
     score = 0
     for vote in profile:
@@ -60,8 +47,20 @@ def thiele_score(scorefct_id, profile, committee):
     return score
 
 
-### Thiele score functions
+"""
+Thiele score functions:
+"""
+
+
 def geometric_score_fct(i, base):
+    """Geometric score functions.
+
+    For a mathematical description of Geomtric score functions, see e.g.
+    Martin Lackner and Piotr Skowron
+    Utilitarian Welfare and Representation Guarantees of Approval-Based Multiwinner Rules
+    In Artificial Intelligence, 288: 103366, 2020.
+    https://arxiv.org/abs/1801.01527
+    """
     if i == 0:
         return 0
     else:
@@ -69,6 +68,7 @@ def geometric_score_fct(i, base):
 
 
 def pav_score_fct(i):
+    """PAV score function."""
     if i == 0:
         return 0
     else:
@@ -76,6 +76,14 @@ def pav_score_fct(i):
 
 
 def slav_score_fct(i):
+    """SLAV (Sainte-Lague Approval Voting) score function.
+
+    For a mathematical description of this score function, see e.g.
+    Martin Lackner and Piotr Skowron
+    Utilitarian Welfare and Representation Guarantees of Approval-Based Multiwinner Rules
+    In Artificial Intelligence, 288: 103366, 2020.
+    https://arxiv.org/abs/1801.01527
+    """
     if i == 0:
         return 0
     else:
@@ -83,8 +91,11 @@ def slav_score_fct(i):
 
 
 def av_score_fct(i):
-    # note: this is used only for unit tests atm, because AV is separable anyway and therefore not
-    # implemented as optimization problem
+    """AV score function.
+
+    Note: this is used only for unit tests atm, because AV is separable anyway and therefore not
+    implemented as optimization problem
+    """
     if i >= 1:
         return 1
     else:
@@ -92,23 +103,35 @@ def av_score_fct(i):
 
 
 def cc_score_fct(i):
+    """CC (Chamberlin-Courant) score function."""
     if i == 1:
         return 1
     else:
         return 0
 
 
-### end of Thiele score functions
+"""
+end of Thiele score functions
+"""
 
 
 def cumulative_score_fct(scorefct, cand_in_com):
+    """Return cumulative score function for score function `scorefct`.
+
+    A cumulative score function f(i) returns the total score for having
+    i candidates in the committee (as opposed to score functions that return the score increase
+    when adding the i-th candidate).
+    """
     return sum(scorefct(i + 1) for i in range(cand_in_com))
 
 
-# returns a list of length num_cand
-# the i-th entry contains the marginal score increase
-#  gained by adding candidate i
 def marginal_thiele_scores_add(scorefct, profile, committee):
+    """Return possible marginal score increases from adding one candidate to the committe.
+
+    The function returns a list of length `num_cand` where the i-th entry contains the
+    marginal score increase when adding candidate i.
+    Candidates that are already in the committee receive a small value (-1).
+    """
     marg = [0] * profile.num_cand
     for voter in profile:
         for cand in voter.approved:
@@ -122,6 +145,12 @@ def marginal_thiele_scores_add(scorefct, profile, committee):
 
 
 def marginal_thiele_scores_remove(scorefct, profile, committee):
+    """Return possible marginal score decreases from removing one candidate from the committe.
+
+    The function returns a list of length `num_cand` where the i-th entry contains the
+    marginal score decrease when removing candidate i.
+    Candidates that are not in the committee receive a large value (max(marg_util_cand) + 1).
+    """
     marg_util_cand = [0] * profile.num_cand
     #  marginal utility gained by adding candidate to the committee
     for voter in profile:
@@ -136,7 +165,7 @@ def marginal_thiele_scores_remove(scorefct, profile, committee):
 
 
 def monroescore(profile, committee):
-    """Returns Monroe score of a given committee."""
+    """Return Monroe score of a given committee."""
     if len(profile) % len(committee) == 0:
         # faster
         return monroescore_matching(profile, committee)
@@ -145,9 +174,11 @@ def monroescore(profile, committee):
 
 
 def monroescore_matching(profile, committee):
-    """Returns Monroe score of a given committee.
+    """Return Monroe score of a given committee.
+
     Uses a matching-based algorithm that works only if
-    the committee size divides the number of voters"""
+    the committee size divides the number of voters.
+    """
     if len(profile) % len(committee) != 0:
         raise ValueError(
             "monroescore_matching() works only if "
@@ -167,9 +198,12 @@ def monroescore_matching(profile, committee):
 
 
 def monroescore_flowbased(profile, committee):
-    """Returns Monroe score of a given committee.
+    """Return Monroe score of a given committee.
+
     Uses a flow-based algorithm that works even if
-    committeesize does not divide the number of voters"""
+    `committeesize` does not divide the number of voters.
+    Slower than monroescore_matching().
+    """
     graph = nx.DiGraph()
     committeesize = len(committee)
     # the lower bound of the size of districts
@@ -197,7 +231,7 @@ def monroescore_flowbased(profile, committee):
 
 
 def mavscore(profile, committee):
-    """Returns the Minimax AV (MAV) score of a committee."""
+    """Return the Minimax AV (MAV) score of a committee."""
     score = 0
     for voter in profile:
         hamdistance = hamming(voter.approved, committee)
