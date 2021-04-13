@@ -536,9 +536,6 @@ def test_resolute_parameter(rule_id):
     for algorithm in rule.algorithms:
         resolute_values = rule.resolute_values
         assert len(resolute_values) in [1, 2]
-        # resolute=True should be default
-        if len(resolute_values) == 2:
-            assert resolute_values[0]
         # raise NotImplementedError if value for resolute is not implemented
         for resolute in [False, True]:
             if resolute not in resolute_values:
@@ -1035,9 +1032,15 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
             assert len(out) > 0
             rule = abcrules.get_rule(rule_id)
             start_output = misc.header(rule.longname) + "\n"
-            if resolute and False in rule.resolute_values:
-                # only if irresolute is available but resolute is chosen
+            if resolute and rule.resolute_values[0] == False:
+                # only if irresolute is default but resolute is chosen
                 start_output += "Computing only one winning committee (resolute=True)\n\n"
+            if not resolute and rule.resolute_values[0] == True:
+                # only if resolute is default but resolute=False is chosen
+                start_output += (
+                    "Computing all possible winning committees for any tiebreaking order\n"
+                    " (aka parallel universes tiebreaking) (resolute=False)\n\n"
+                )
             if verbosity <= DETAILS:
                 start_output += "Algorithm: " + abcrules.ALGORITHM_NAMES[algorithm] + "\n"
             if verbosity <= DEBUG:

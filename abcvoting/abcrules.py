@@ -72,7 +72,9 @@ class Rule:
         longname,
         compute_fct,
         algorithms,
-        resolute_values,
+        resolute_values,  # A list containing True, False, or both.
+        # The value at position 0 is the default.
+        # (e.g., False for optimization-based rules, True for sequential rules.)
     ):
         self.rule_id = rule_id
         self.shortname = shortname
@@ -152,6 +154,8 @@ def get_rule(rule_id):
         "mip_gurobi",
         "brute-force",
     )
+    _RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES = [False, True]
+    _RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES = [True, False]
     if rule_id == "av":
         return Rule(
             rule_id=rule_id,
@@ -159,7 +163,7 @@ def get_rule(rule_id):
             longname="Approval Voting (AV)",
             compute_fct=compute_av,
             algorithms=("standard",),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "sav":
         return Rule(
@@ -168,7 +172,7 @@ def get_rule(rule_id):
             longname="Satisfaction Approval Voting (SAV)",
             compute_fct=compute_sav,
             algorithms=("standard",),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "pav":
         return Rule(
@@ -178,7 +182,7 @@ def get_rule(rule_id):
             compute_fct=compute_pav,
             # TODO sort by speed, requires testing
             algorithms=_THIELE_ALGORITHMS + ("cvxpy_glpk_mi", "cvxpy_cbc", "cvxpy_scip"),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "slav":
         return Rule(
@@ -187,7 +191,7 @@ def get_rule(rule_id):
             longname="Sainte-Laguë Approval Voting (SLAV)",
             compute_fct=compute_slav,
             algorithms=_THIELE_ALGORITHMS,
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "cc":
         return Rule(
@@ -197,7 +201,7 @@ def get_rule(rule_id):
             compute_fct=compute_cc,
             # TODO sort by speed, requires testing
             algorithms=_THIELE_ALGORITHMS + ("ortools_cp",),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "seqpav":
         return Rule(
@@ -206,7 +210,7 @@ def get_rule(rule_id):
             longname="Sequential Proportional Approval Voting (seq-PAV)",
             compute_fct=compute_seqpav,
             algorithms=("standard",),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
         )
     if rule_id == "revseqpav":
         return Rule(
@@ -215,7 +219,7 @@ def get_rule(rule_id):
             longname="Reverse Sequential Proportional Approval Voting (revseq-PAV)",
             compute_fct=compute_revseqpav,
             algorithms=("standard",),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
         )
     if rule_id == "seqslav":
         return Rule(
@@ -224,7 +228,7 @@ def get_rule(rule_id):
             longname="Sequential Sainte-Laguë Approval Voting (seq-SLAV)",
             compute_fct=compute_seqslav,
             algorithms=("standard",),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
         )
     if rule_id == "seqcc":
         return Rule(
@@ -233,7 +237,7 @@ def get_rule(rule_id):
             longname="Sequential Approval Chamberlin-Courant (seq-CC)",
             compute_fct=compute_seqcc,
             algorithms=("standard",),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
         )
     if rule_id == "seqphragmen":
         return Rule(
@@ -242,7 +246,7 @@ def get_rule(rule_id):
             longname="Phragmén's Sequential Rule (seq-Phragmén)",
             compute_fct=compute_seqphragmen,
             algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
         )
     if rule_id == "minimaxphragmen":
         return Rule(
@@ -251,7 +255,7 @@ def get_rule(rule_id):
             longname="Phragmén's Minimax Rule (minimax-Phragmén)",
             compute_fct=compute_minimaxphragmen,
             algorithms=("gurobi", "mip_gurobi", "mip_cbc"),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "monroe":
         return Rule(
@@ -260,7 +264,7 @@ def get_rule(rule_id):
             longname="Monroe's Approval Rule (Monroe)",
             compute_fct=compute_monroe,
             algorithms=("gurobi", "mip_gurobi", "mip_cbc", "ortools_cp", "brute-force"),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "greedy-monroe":
         return Rule(
@@ -279,7 +283,7 @@ def get_rule(rule_id):
             compute_fct=compute_minimaxav,
             # TODO sort by speed, requires testing
             algorithms=("gurobi", "ortools_cp", "brute-force", "mip_gurobi", "mip_cbc"),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "lexminimaxav":
         return Rule(
@@ -288,7 +292,7 @@ def get_rule(rule_id):
             longname="Lexicographic Minimax Approval Voting (lex-MAV)",
             compute_fct=compute_lexminimaxav,
             algorithms=("brute-force",),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "rule-x":
         return Rule(
@@ -297,7 +301,7 @@ def get_rule(rule_id):
             longname="Rule X",
             compute_fct=compute_rule_x,
             algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
         )
     if rule_id == "rule-x-without-phragmen-phase":
         return Rule(
@@ -306,7 +310,7 @@ def get_rule(rule_id):
             longname="Rule X without the Phragmén phase (second phase)",
             compute_fct=compute_rule_x_without_phragmen_phase,
             algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
         )
     if rule_id == "phragmen-enestroem":
         return Rule(
@@ -315,7 +319,7 @@ def get_rule(rule_id):
             longname="Method of Phragmén-Eneström",
             compute_fct=compute_phragmen_enestroem,
             algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
         )
     if rule_id == "consensus-rule":
         return Rule(
@@ -324,7 +328,7 @@ def get_rule(rule_id):
             longname="Consensus Rule",
             compute_fct=compute_consensus_rule,
             algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
         )
 
     if rule_id.startswith("geom"):
@@ -335,7 +339,7 @@ def get_rule(rule_id):
             longname=f"{parameter}-Geometric Rule",
             compute_fct=functools.partial(compute_thiele_method, scorefct_id=rule_id),
             algorithms=_THIELE_ALGORITHMS,
-            resolute_values=(True, False),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
 
     # handle sequential and reverse sequential Thiele methods
@@ -362,7 +366,7 @@ def get_rule(rule_id):
                 longname=f"Sequential {get_rule(scorefct_id).longname}",
                 compute_fct=functools.partial(compute_seq_thiele_method, scorefct_id=scorefct_id),
                 algorithms=("standard",),
-                resolute_values=(True, False),
+                resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
             )
         # reverse sequential Thiele methods
         if rule_id.startswith("revseq"):
@@ -374,7 +378,7 @@ def get_rule(rule_id):
                     compute_revseq_thiele_method, scorefct_id=scorefct_id
                 ),
                 algorithms=("standard",),
-                resolute_values=(True, False),
+                resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
             )
 
     raise UnknownRuleIDError(rule_id)
@@ -600,8 +604,11 @@ def compute_seq_thiele_method(
 
     # optional output
     output.info(header(rule.longname))
-    if resolute:
-        output.info("Computing only one winning committee (resolute=True)\n")
+    if not resolute:
+        output.info(
+            "Computing all possible winning committees for any tiebreaking order\n"
+            " (aka parallel universes tiebreaking) (resolute=False)\n"
+        )
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.details(
         f"starting with the empty committee (score = "
@@ -739,8 +746,11 @@ def compute_revseq_thiele_method(
 
     # optional output
     output.info(header(rule.longname))
-    if resolute:
-        output.info("Computing only one winning committee (resolute=True)\n")
+    if not resolute:
+        output.info(
+            "Computing all possible winning committees for any tiebreaking order\n"
+            " (aka parallel universes tiebreaking) (resolute=False)\n"
+        )
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     if resolute:
@@ -1128,7 +1138,9 @@ def compute_monroe(profile, committeesize, algorithm="fastest", resolute=False):
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-    output.info("Optimal Monroe score: " + str(scores.monroescore(profile, committees[0])) + "\n")
+    output.details(
+        "Optimal Monroe score: " + str(scores.monroescore(profile, committees[0])) + "\n"
+    )
 
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
@@ -1288,8 +1300,11 @@ def compute_seqphragmen(profile, committeesize, algorithm="fastest", resolute=Tr
 
     # optional output
     output.info(header(rule.longname))
-    if resolute:
-        output.info("Computing only one winning committee (resolute=True)\n")
+    if not resolute:
+        output.info(
+            "Computing all possible winning committees for any tiebreaking order\n"
+            " (aka parallel universes tiebreaking) (resolute=False)\n"
+        )
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     if resolute:
@@ -1524,8 +1539,11 @@ def compute_rule_x(
 
     # optional output
     output.info(header(rule.longname))
-    if resolute:
-        output.info("Computing only one winning committee (resolute=True)\n")
+    if not resolute:
+        output.info(
+            "Computing all possible winning committees for any tiebreaking order\n"
+            " (aka parallel universes tiebreaking) (resolute=False)\n"
+        )
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     if resolute:
@@ -1815,8 +1833,11 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="fastest", reso
 
     # optional output
     output.info(header(rule.longname))
-    if resolute:
-        output.info("Computing only one winning committee (resolute=True)\n")
+    if not resolute:
+        output.info(
+            "Computing all possible winning committees for any tiebreaking order\n"
+            " (aka parallel universes tiebreaking) (resolute=False)\n"
+        )
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
@@ -1922,8 +1943,11 @@ def compute_consensus_rule(profile, committeesize, algorithm="fastest", resolute
 
     # optional output
     output.info(header(rule.longname))
-    if resolute:
-        output.info("Computing only one winning committee (resolute=True)\n")
+    if not resolute:
+        output.info(
+            "Computing all possible winning committees for any tiebreaking order\n"
+            " (aka parallel universes tiebreaking) (resolute=False)\n"
+        )
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))

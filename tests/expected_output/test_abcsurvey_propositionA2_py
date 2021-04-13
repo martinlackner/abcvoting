@@ -19,7 +19,6 @@ Proportional Approval Voting (PAV)
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: branch-and-bound
 
 Optimal PAV-score: 6
 
@@ -32,7 +31,6 @@ Proportional Approval Voting (PAV)
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: branch-and-bound
 
 Optimal PAV-score: 10
 
@@ -46,7 +44,6 @@ Approval Chamberlin-Courant (CC)
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: branch-and-bound
 
 Optimal CC-score: 6
 
@@ -59,7 +56,6 @@ Approval Chamberlin-Courant (CC)
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: branch-and-bound
 
 Optimal CC-score: 10
 
@@ -73,7 +69,6 @@ Monroe's Approval Rule (Monroe)
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: brute-force
 
 Optimal Monroe score: 6
 
@@ -86,7 +81,6 @@ Monroe's Approval Rule (Monroe)
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: brute-force
 
 Optimal Monroe score: 10
 
@@ -100,7 +94,6 @@ Phragmén's Minimax Rule (minimax-Phragmén)
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: Gurobi ILP solver
 
 1 winning committee:
  {c}
@@ -111,7 +104,6 @@ Phragmén's Minimax Rule (minimax-Phragmén)
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: Gurobi ILP solver
 
 1 winning committee:
  {a, b}
@@ -123,7 +115,6 @@ Minimax Approval Voting (MAV)
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: brute-force
 
 1 winning committee:
  {c}
@@ -138,7 +129,6 @@ Minimax Approval Voting (MAV)
 
 Computing only one winning committee (resolute=True)
 
-Algorithm: brute-force
 
 1 winning committee:
  {a, b}
@@ -165,7 +155,6 @@ winning committees for k=2 and k=3:
 Greedy Monroe
 -------------
 
-Algorithm: Standard algorithm
 
 The Monroe assignment computed by Greedy Monroe
 has a Monroe score of 14.
@@ -181,7 +170,6 @@ Assignment (unsatisfatied voters marked with *):
 Greedy Monroe
 -------------
 
-Algorithm: Standard algorithm
 
 The Monroe assignment computed by Greedy Monroe
 has a Monroe score of 16.
@@ -211,9 +199,6 @@ winning committees for k=3 and k=4:
 Rule X
 ------
 
-Computing only one winning committee (resolute=True)
-
-Algorithm: Standard algorithm (using standard Python fractions)
 
 Phase 1:
 
@@ -246,9 +231,6 @@ adding candidate number 3: e
 Rule X
 ------
 
-Computing only one winning committee (resolute=True)
-
-Algorithm: Standard algorithm (using standard Python fractions)
 
 Phase 1:
 
@@ -287,85 +269,3 @@ adding candidate number 4: b
  {a, b, c, d}
 
  Rule X: {a, c, e} vs {a, b, c, d}
-
-
-Detailed calculations:
-------
-Rule X
-------
-
-Computing only one winning committee (resolute=True)
-
-Algorithm: Standard algorithm (using standard Python fractions)
-
-Phase 1:
-
-starting budget:
-  (3/4, 3/4, 3/4, 3/4)
-
-adding candidate number 1: a
- with maxmimum cost per voter q = 1/2
- remaining budget:
-  (1/4, 1/4, 3/4, 3/4)
- tie broken in favor of a,
- candidates {a, c, d, e} are tied.
-
-adding candidate number 2: c
- with maxmimum cost per voter q = 3/4
- remaining budget:
-  (1/4, 0, 3/4, 0)
- tie broken in favor of c,
- candidates {c, d, e} are tied.
-
-adding candidate number 3: e
- with maxmimum cost per voter q = 3/4
- remaining budget:
-  (0, 0, 0, 0)
-
-1 winning committee:
- {a, c, e}
-
-------
-Rule X
-------
-
-Computing only one winning committee (resolute=True)
-
-Algorithm: Standard algorithm (using standard Python fractions)
-
-Phase 1:
-
-starting budget:
-  (1, 1, 1, 1)
-
-adding candidate number 1: a
- with maxmimum cost per voter q = 1/2
- remaining budget:
-  (1/2, 1/2, 1, 1)
- tie broken in favor of a,
- candidates {a, c, d, e} are tied.
-
-adding candidate number 2: c
- with maxmimum cost per voter q = 1/2
- remaining budget:
-  (1/2, 0, 1, 1/2)
- tie broken in favor of c,
- candidates {c, d, e} are tied.
-
-adding candidate number 3: d
- with maxmimum cost per voter q = 1/2
- remaining budget:
-  (0, 0, 1, 0)
- tie broken in favor of d,
- candidates {d, e} are tied.
-
-adding candidate number 4: b
- with maxmimum cost per voter q = 1
- remaining budget:
-  (0, 0, 0, 0)
- tie broken in favor of b,
- candidates {b, e} are tied.
-
-1 winning committee:
- {a, b, c, d}
-

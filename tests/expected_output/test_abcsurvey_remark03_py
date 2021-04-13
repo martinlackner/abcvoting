@@ -18,6 +18,9 @@ profile with 8 votes and 4 candidates:
 Reverse Sequential Proportional Approval Voting (revseq-PAV)
 ------------------------------------------------------------
 
+Computing all possible winning committees for any tiebreaking order
+ (aka parallel universes tiebreaking) (resolute=False)
+
 3 winning committees:
  {b}
  {c}

@@ -19,9 +19,6 @@ profile with 12 votes and 8 candidates:
 Rule X
 ------
 
-Computing only one winning committee (resolute=True)
-
-Algorithm: Standard algorithm (using standard Python fractions)
 
 Phase 1:
 

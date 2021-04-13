@@ -19,9 +19,6 @@ profile with 12 votes and 8 candidates:
 Phragmén's Sequential Rule (seq-Phragmén)
 -----------------------------------------
 
-Computing only one winning committee (resolute=True)
-
-Algorithm: Standard algorithm (using standard Python fractions)
 
 adding candidate number 1: a
  maximum load increased to 1/8

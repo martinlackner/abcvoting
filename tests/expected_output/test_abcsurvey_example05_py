@@ -17,7 +17,6 @@ profile with 23 votes and 4 candidates:
 Proportional Approval Voting (PAV)
 ----------------------------------
 
-Algorithm: branch-and-bound
 
 Optimal PAV-score: 19
 
@@ -28,9 +27,6 @@ Optimal PAV-score: 19
 Sequential Proportional Approval Voting (seq-PAV)
 -------------------------------------------------
 
-Computing only one winning committee (resolute=True)
-
-Algorithm: Standard algorithm
 
 starting with the empty committee (score = 0)
 
@@ -51,9 +47,6 @@ PAV-score of winning committee(s):
 Reverse Sequential Proportional Approval Voting (revseq-PAV)
 ------------------------------------------------------------
 
-Computing only one winning committee (resolute=True)
-
-Algorithm: Standard algorithm
 
 full committee (4 candidates) has a total score of 30
 
@@ -95,7 +88,6 @@ total weight: 9321
 Proportional Approval Voting (PAV)
 ----------------------------------
 
-Algorithm: branch-and-bound
 
 Optimal PAV-score: 9651
 
@@ -106,9 +98,6 @@ Optimal PAV-score: 9651
 Sequential Proportional Approval Voting (seq-PAV)
 -------------------------------------------------
 
-Computing only one winning committee (resolute=True)
-
-Algorithm: Standard algorithm
 
 starting with the empty committee (score = 0)
 
@@ -129,9 +118,6 @@ PAV-score of winning committee(s):
 Reverse Sequential Proportional Approval Voting (revseq-PAV)
 ------------------------------------------------------------
 
-Computing only one winning committee (resolute=True)
-
-Algorithm: Standard algorithm
 
 full committee (4 candidates) has a total score of 30063/2
 

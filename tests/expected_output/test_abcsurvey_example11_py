@@ -16,7 +16,9 @@ profile with 8 votes and 4 candidates:
 Rule X
 ------
 
-Algorithm: Standard algorithm (using standard Python fractions)
+Computing all possible winning committees for any tiebreaking order
+ (aka parallel universes tiebreaking) (resolute=False)
+
 
 1 winning committee:
  {a, c, d}
@@ -25,9 +27,6 @@ Algorithm: Standard algorithm (using standard Python fractions)
 Rule X
 ------
 
-Computing only one winning committee (resolute=True)
-
-Algorithm: Standard algorithm (using standard Python fractions)
 
 Phase 1:
 
@@ -61,7 +60,9 @@ adding candidate number 3: d
 Phragmén's Sequential Rule (seq-Phragmén)
 -----------------------------------------
 
-Algorithm: Standard algorithm (using standard Python fractions)
+Computing all possible winning committees for any tiebreaking order
+ (aka parallel universes tiebreaking) (resolute=False)
+
 
 1 winning committee:
  {b, c, d}
