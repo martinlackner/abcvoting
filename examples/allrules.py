@@ -22,7 +22,6 @@ for rule_id in abcrules.MAIN_RULE_IDS:
         rule_id,
         profile,
         committeesize,
-        algorithm="fastest",  # use the fastest algorithm that is available (usually Gurobi)
         resolute=True,  # only compute one winning committee
     )
     print(str_sets_of_candidates(committees))

@@ -98,7 +98,6 @@ def test_abcsurvey_example08_py(check_output):
 
 
 # noinspection PyUnresolvedReferences
-@pytest.mark.gurobi
 def test_abcsurvey_example09_py(check_output):
     from examples.abcsurvey import example09
 
@@ -134,13 +133,11 @@ def test_abcsurvey_remark03_py(check_output):
 
 
 # noinspection PyUnresolvedReferences
-@pytest.mark.gurobi
 def test_abcsurvey_propositionA2_py(check_output):
     from examples.abcsurvey import propositionA2
 
 
 # noinspection PyUnresolvedReferences
-@pytest.mark.gurobi
 def test_abcsurvey_propositionA3_py(check_output):
     from examples.abcsurvey import propositionA3
 
@@ -156,7 +153,6 @@ def test_simple_py(check_output):
 
 
 # noinspection PyUnresolvedReferences
-@pytest.mark.gurobi
 def test_allrules_py(check_output):
     from examples import allrules
 
