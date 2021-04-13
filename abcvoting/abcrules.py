@@ -65,6 +65,8 @@ FLOAT_ISCLOSE_REL_TOL = 1e-12
 
 
 class Rule:
+    """Class containing main information about an ABC rule."""
+
     def __init__(
         self,
         rule_id,
@@ -96,6 +98,7 @@ class Rule:
             self.fastest_available_algorithm = None
 
     def compute(self, profile, committeesize, **kwargs):
+        """Compute rule using self._compute_fct."""
         return self._compute_fct(profile, committeesize, **kwargs)
 
 
@@ -146,6 +149,7 @@ AVAILABLE_ALGORITHMS = _available_algorithms()
 
 
 def get_rule(rule_id):
+    """Get instance of Rule for ABC rule specified by `rule_id`."""
     _THIELE_ALGORITHMS = (
         # TODO sort by speed, requires testing
         "gurobi",
@@ -393,33 +397,13 @@ def compute(rule_id, profile, committeesize, expected_committees=None, **kwargs)
     committees = rule.compute(profile, committeesize, **kwargs)
     if expected_committees is not None:
         resolute = kwargs.get("resolute", False)
-        check_expected_committees_equals_actual_committees(
+        misc.verify_expected_committees_equals_actual_committees(
             actual_committees=committees,
             expected_committees=expected_committees,
             resolute=resolute,
             shortname=rule.shortname,
         )
     return committees
-
-
-def check_expected_committees_equals_actual_committees(
-    actual_committees, expected_committees, resolute=False, shortname="Rule"
-):
-    if resolute:
-        if len(actual_committees) != 1:
-            raise RuntimeError(
-                f"Did not return exactly one committee (but {len(actual_committees)}) "
-                f"for resolute=True."
-            )
-        if actual_committees[0] not in expected_committees:
-            raise ValueError(
-                f"{shortname} returns {actual_committees}, expected {expected_committees}"
-            )
-    else:
-        if not misc.compare_list_of_committees(actual_committees, expected_committees):
-            raise ValueError(
-                f"{shortname} returns {actual_committees}, expected {expected_committees}"
-            )
 
 
 def compute_thiele_method(
@@ -433,6 +417,11 @@ def compute_thiele_method(
     An exception is Approval Voting (AV), which should be computed using
     compute_av(). (AV is polynomial-time computable (separable) and can thus be
     computed much faster.)
+
+    For a mathematical description of Thiele methods, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
     """
     check_enough_approved_candidates(profile, committeesize)
     scorefct = scores.get_scorefct(scorefct_id, committeesize)
@@ -560,21 +549,46 @@ def _thiele_methods_branchandbound(profile, committeesize, scorefct_id, resolute
 
 
 def compute_pav(profile, committeesize, algorithm="fastest", resolute=False):
-    """Proportional Approval Voting (PAV)."""
+    """Proportional Approval Voting (PAV).
+
+    This ABC rule belongs to the class of Thiele methods.
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     return compute_thiele_method(
         profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
     )
 
 
 def compute_slav(profile, committeesize, algorithm="fastest", resolute=False):
-    """Sainte-Lague Approval Voting (SLAV)."""
+    """Sainte-Lague Approval Voting (SLAV).
+
+    This ABC rule belongs to the class of Thiele methods.
+
+    For a mathematical description of this rule, see e.g.
+    Martin Lackner and Piotr Skowron
+    Utilitarian Welfare and Representation Guarantees of Approval-Based Multiwinner Rules
+    In Artificial Intelligence, 288: 103366, 2020.
+    https://arxiv.org/abs/1801.01527
+    """
     return compute_thiele_method(
         profile, committeesize, "slav", algorithm=algorithm, resolute=resolute
     )
 
 
 def compute_cc(profile, committeesize, algorithm="fastest", resolute=False):
-    """Approval Chamberlin-Courant (CC)."""
+    """Approval Chamberlin-Courant (CC).
+
+    This ABC rule belongs to the class of Thiele methods.
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     return compute_thiele_method(
         profile, committeesize, "cc", algorithm=algorithm, resolute=resolute
     )
@@ -583,7 +597,13 @@ def compute_cc(profile, committeesize, algorithm="fastest", resolute=False):
 def compute_seq_thiele_method(
     profile, committeesize, scorefct_id, algorithm="fastest", resolute=True
 ):
-    """Sequential Thiele methods."""
+    """Sequential Thiele methods.
+
+    For a mathematical description of these rules, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     check_enough_approved_candidates(profile, committeesize)
     scores.get_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
 
@@ -702,21 +722,40 @@ def _seq_thiele_irresolute(profile, committeesize, scorefct_id):
 
 # Sequential PAV
 def compute_seqpav(profile, committeesize, algorithm="fastest", resolute=True):
-    """Sequential PAV (seq-PAV)."""
+    """Sequential PAV (seq-PAV).
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     return compute_seq_thiele_method(
         profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
     )
 
 
 def compute_seqslav(profile, committeesize, algorithm="fastest", resolute=True):
-    """Sequential Sainte-Lague Approval Voting (SLAV)."""
+    """Sequential Sainte-Lague Approval Voting (SLAV).
+
+    For a mathematical description of SLAV, see e.g.
+    Martin Lackner and Piotr Skowron
+    Utilitarian Welfare and Representation Guarantees of Approval-Based Multiwinner Rules
+    In Artificial Intelligence, 288: 103366, 2020.
+    https://arxiv.org/abs/1801.01527
+    """
     return compute_seq_thiele_method(
         profile, committeesize, "slav", algorithm=algorithm, resolute=resolute
     )
 
 
 def compute_seqcc(profile, committeesize, algorithm="fastest", resolute=True):
-    """Sequential Chamberlin-Courant (seq-CC)."""
+    """Sequential Chamberlin-Courant (seq-CC).
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     return compute_seq_thiele_method(
         profile, committeesize, "cc", algorithm=algorithm, resolute=resolute
     )
@@ -725,7 +764,13 @@ def compute_seqcc(profile, committeesize, algorithm="fastest", resolute=True):
 def compute_revseq_thiele_method(
     profile, committeesize, scorefct_id, algorithm="fastest", resolute=True
 ):
-    """Reverse sequential Thiele methods."""
+    """Reverse sequential Thiele methods.
+
+    For a mathematical description of these rules, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     check_enough_approved_candidates(profile, committeesize)
     scores.get_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
 
@@ -858,14 +903,27 @@ def _revseq_thiele_irresolute(profile, committeesize, scorefct_id):
 
 # Reverse Sequential PAV
 def compute_revseqpav(profile, committeesize, algorithm="fastest", resolute=True):
-    """Reverse sequential PAV (revseq-PAV)."""
+    """Reverse sequential PAV (revseq-PAV).
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     return compute_revseq_thiele_method(
         profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
     )
 
 
 def compute_separable_rule(rule_id, profile, committeesize, algorithm, resolute=True):
-    """Separable rules (such as AV and SAV)."""
+    """Separable rules (such as AV and SAV).
+
+    For a mathematical description of separable rules (for ranking-based rules), see
+    E. Elkind, P. Faliszewski, P. Skowron, and A. Slinko.
+    Properties of multiwinner voting rules.
+    Social Choice and Welfare, 48(3):599–632, 2017.
+    https://link.springer.com/article/10.1007/s00355-017-1026-z
+    """
     check_enough_approved_candidates(profile, committeesize)
 
     rule = get_rule(rule_id)
@@ -972,17 +1030,39 @@ def _separable_rule_algorithm(profile, committeesize, rule_id, resolute):
 
 
 def compute_sav(profile, committeesize, algorithm="fastest", resolute=False):
-    """Satisfaction Approval Voting (SAV)."""
+    """Satisfaction Approval Voting (SAV).
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     return compute_separable_rule("sav", profile, committeesize, algorithm, resolute)
 
 
 def compute_av(profile, committeesize, algorithm="fastest", resolute=False):
-    """Approval Voting (AV)."""
+    """Approval Voting (AV).
+
+    AV is both a Thiele method and a separable rule. Seperable rules can be computed much
+    faster than Thiele methods (in general), thus `compute_separable_rule` is used
+    to compute AV.
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     return compute_separable_rule("av", profile, committeesize, algorithm, resolute)
 
 
 def compute_minimaxav(profile, committeesize, algorithm="fastest", resolute=False):
-    """Minimax Approval Voting (MAV)."""
+    """Minimax Approval Voting (MAV).
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     check_enough_approved_candidates(profile, committeesize)
 
     rule = get_rule("minimaxav")
@@ -1043,7 +1123,14 @@ def _minimaxav_bruteforce(profile, committeesize, resolute):
 
 
 def compute_lexminimaxav(profile, committeesize, algorithm="fastest", resolute=False):
-    """Lexicographic Minimax AV (lex-MAV)."""
+    """Lexicographic Minimax AV (lex-MAV).
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    (Remark 2)
+    """
     check_enough_approved_candidates(profile, committeesize)
 
     rule = get_rule("lexminimaxav")
@@ -1104,7 +1191,13 @@ def _lexminimaxav_bruteforce(profile, committeesize, resolute):
 
 
 def compute_monroe(profile, committeesize, algorithm="fastest", resolute=False):
-    """Monroe's rule."""
+    """Monroe's rule.
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     check_enough_approved_candidates(profile, committeesize)
 
     rule = get_rule("monroe")
@@ -1170,7 +1263,13 @@ def _monroe_bruteforce(profile, committeesize, resolute):
 
 
 def compute_greedy_monroe(profile, committeesize, algorithm="fastest", resolute=True):
-    """Greedy Monroe."""
+    """Greedy Monroe.
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     check_enough_approved_candidates(profile, committeesize)
 
     rule = get_rule("greedy-monroe")
@@ -1246,6 +1345,7 @@ def compute_greedy_monroe(profile, committeesize, algorithm="fastest", resolute=
 
 
 def _greedy_monroe_algorithm(profile, committeesize):
+    """Algorithm for Greedy Monroe."""
     num_voters = len(profile)
     committee = []
 
@@ -1283,7 +1383,13 @@ def _greedy_monroe_algorithm(profile, committeesize):
 
 
 def compute_seqphragmen(profile, committeesize, algorithm="fastest", resolute=True):
-    """Phragmen's sequential rule (seq-Phragmen)."""
+    """Phragmen's sequential rule (seq-Phragmen).
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    """
     check_enough_approved_candidates(profile, committeesize)
 
     rule = get_rule("seqphragmen")
@@ -1511,7 +1617,11 @@ def compute_rule_x(
 ):
     """Rule X.
 
-    See https://arxiv.org/pdf/1911.11747.pdf, page 7
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+    See also https://arxiv.org/pdf/1911.11747.pdf, page 7
 
     skip_phragmen_phase : bool, optional
         omit the second phase (that uses seq-Phragmen)
@@ -1770,6 +1880,12 @@ def compute_minimaxphragmen(profile, committeesize, algorithm="fastest", resolut
     https://arxiv.org/abs/2102.12305
     Instead: minimizes the maximum load (without consideration of the
              second-, third-, ...-largest load
+
+    For a mathematical description of this rule, see e.g. the survey by
+    Martin Lackner and Piotr Skowron
+    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    https://arxiv.org/abs/2007.01795
+
     """
     check_enough_approved_candidates(profile, committeesize)
 
@@ -1812,6 +1928,8 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="fastest", reso
     In every round the candidate with the highest combined budget of
     their supporters is put in the committee.
     Method described in:
+    Svante Janson
+    Phragmén's and Thiele's election methods
     https://arxiv.org/pdf/1611.08826.pdf (Section 18.5, Page 59)
     """
     check_enough_approved_candidates(profile, committeesize)
@@ -1847,6 +1965,7 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="fastest", reso
 
 
 def _phragmen_enestroem_algorithm(profile, committeesize, resolute, algorithm):
+    """Algorithm for Phragmen-Enestroem."""
     if algorithm == "float-fractions":
         division = lambda x, y: x / y  # standard float division
     elif algorithm == "standard-fractions":

@@ -104,3 +104,26 @@ def compare_list_of_committees(list1, list2):
     return all(committee in list1 for committee in list2) and all(
         committee in list2 for committee in list1
     )
+
+
+def verify_expected_committees_equals_actual_committees(
+    actual_committees, expected_committees, resolute=False, shortname="Rule"
+):
+    """Check that two lists of committees are equivalent.
+
+    Raise RuntimeError if not."""
+    if resolute:
+        if len(actual_committees) != 1:
+            raise RuntimeError(
+                f"Did not return exactly one committee (but {len(actual_committees)}) "
+                f"for resolute=True."
+            )
+        if actual_committees[0] not in expected_committees:
+            raise ValueError(
+                f"{shortname} returns {actual_committees}, expected {expected_committees}"
+            )
+    else:
+        if not misc.compare_list_of_committees(actual_committees, expected_committees):
+            raise ValueError(
+                f"{shortname} returns {actual_committees}, expected {expected_committees}"
+            )
