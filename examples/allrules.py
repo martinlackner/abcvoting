@@ -1,27 +1,21 @@
 """
-Compute all implemented ABC rules for a profile
+Compute all major implemented ABC rules for a profile
 """
 
 from abcvoting.preferences import Profile
 from abcvoting import abcrules
-from abcvoting.misc import str_sets_of_candidates
+from abcvoting.output import output, INFO
 
 
-# Compute all implemented ABC rules with the default algorithms
-# and resolute=True
+output.set_verbosity(INFO)
+
 
 num_cand = 6
 profile = Profile(num_cand)
 profile.add_voters([{0, 4, 5}, {0}, {1, 4, 5}, {1}, {2, 4, 5}, {2}, {3, 4, 5}, {3}])
 committeesize = 4
+print(f"Input: {profile}\n")
 
-"""Prints the winning committees for the main ABC rules"""
+# Compute all major implemented ABC rules
 for rule_id in abcrules.MAIN_RULE_IDS:
-    print(abcrules.get_rule(rule_id).longname + ":")
-    committees = abcrules.compute(
-        rule_id,
-        profile,
-        committeesize,
-        resolute=True,  # only compute one winning committee
-    )
-    print(str_sets_of_candidates(committees))
+    abcrules.compute(rule_id, profile, committeesize)
