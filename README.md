@@ -1,5 +1,8 @@
 [![DOI](https://zenodo.org/badge/192713860.svg)](https://zenodo.org/badge/latestdoi/192713860)
 [![MIT License](https://badgen.net/github/license/martinlackner/abcvoting)](https://choosealicense.com/licenses/mit/)
+[![PyPi](https://badgen.net/pypi/v/abcvoting)](https://pypi.org/project/abcvoting/)
+![Python versions](https://badgen.net/pypi/python/abcvoting)
+[![Build badge](https://github.com/martinlackner/abcvoting/workflows/Build/badge.svg)](https://github.com/martinlackner/abcvoting/actions)
 [![Unittests badge](https://github.com/martinlackner/abcvoting/workflows/Unittests/badge.svg)](https://github.com/martinlackner/abcvoting/actions)
 [![codecov](https://codecov.io/gh/martinlackner/abcvoting/branch/master/graph/badge.svg)](https://codecov.io/gh/martinlackner/abcvoting)
 
@@ -57,11 +60,13 @@ from abcvoting import abcrules
 
 # a preference profile with 5 candidates (0, 1, 2, 3, 4)
 profile = Profile(5)
+
 # add six voters, specified by the candidates that they approve;
 # the first voter approves candidates 0, 1, and 2,
 # the second voter approves candidates 0 and 1, etc.
 profile.add_voters([{0,1,2}, {0,1}, {0,1}, {1,2}, {3,4}, {3,4}])
 committeesize = 3
+
 # find winning committees for this profile according to PAV
 print(abcrules.compute_pav(profile, committeesize))
 ```
@@ -72,14 +77,65 @@ The output is
 which corresponds to the two winning committees {0,1,3} and {0,1,4}. Further examples can be found in the directory [examples/](examples).
 In [examples/survey/](examples/abcsurvey), all examples from the survey on ABC rules [8] are implemented. 
 
-## Comments
+## Usage
 
-* This module requires Python 3.6+. Required modules are listed in [requirements.txt](requirements.txt).
+At the moment there is no command line interface. The package can be used only as Python model as
+shown in the example above.
+
+Notes:
+
 * Most computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). The corresponding functions require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
 * Some functions use fractions (e.g., `compute_seqphragmen`). These compute significantly faster if the module [gmpy2](https://gmpy2.readthedocs.io/) is available. If gmpy2 is not available, the much slower Python module [fractions](https://docs.python.org/2/library/fractions.html) is used.
 * All voting methods have a parameter `resolute`. If it is set to true, only one winning committee is computed. In most cases, `resolute=True` speeds up the computation. 
 
+## Installation
+
+Using pip:
+
+```bash
+pip install abcvoting
+```
+
+Latest development version from source:
+
+```bash
+git clone https://github.com/martinlackner/abcvoting/
+python setup.py install
+```
+
+Requirements:
+* Python 3.6+
+* see [setup.py](setup.py) for 3rd party dependencies
+
+Optional requirements:
+* gmpy2
+* cvxpy
+* solvers:
+  * Gurobi
+  * GLPK_MI
+  * CBC
+  * Scip
+
+<!-- TODO: add instructions for installation of solvers -->
+
 ## Development
+
+Install all dependencies including development requirements and the abcvoting package in
+[development mode](https://setuptools.readthedocs.io/en/latest/userguide/development_mode.html):
+
+```bash
+pip install -e .[dev]
+```
+
+Basic unit tests can be run by excluding tests which require additional dependencies:
+
+```bash
+pytest  -m "not gurobi and not scip and not cbc and not glpk_mi and not cvxpy and not gmpy2 and not slow" tests/
+```
+
+For development, configure the black formatter and pre-commit hooks - see below. Also installing
+all optional dependencies is recommended.
+
 
 ### Black formatting
 

@@ -1,0 +1,48 @@
+name: Build
+
+on:
+    # TODO Can we make this workflow depend on unittests to avoid building broken packages?
+    # As it seems: no, we cannot. At least not really. Jobs can depend on other jobs, but workflows
+    # cannot depend on other workflows. But jobs cannot be triggered by events, only workflows are
+    # triggered by events. That means we would need to run the build/upload job for every commit
+    # and every Python version and then check if it is the right Python version and if there is a
+    # new tag and only then really upload a package.
+    # The only additional advantage of this approach might be that we could test the package
+    # building process for every commit and every Python version comfortably.
+    #
+    # https://github.community/t/how-do-i-specify-job-dependency-running-in-another-workflow/16482/2
+    # https://docs.github.com/en/actions/learn-github-actions/managing-complex-workflows#creating-dependent-jobs
+    push:
+      tags:
+        - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+
+    - name: Upgrade pip
+      run: python -m pip install --upgrade pip
+
+    - name: Build a binary wheel and a source tarball
+      run: python setup.py bdist_wheel
+
+    # TODO do we want to push test packages to test.pypi.org for every commit?
+    - name: Publish distribution package to Test PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        repository_url: https://test.pypi.org/legacy/
+
+    #- name: Publish distribution package to PyPI
+    #  if: startsWith(github.ref, 'refs/tags')
+    #  uses: pypa/gh-action-pypi-publish@master
+    #  with:
+    #    password: ${{ secrets.PYPI_API_TOKEN }}

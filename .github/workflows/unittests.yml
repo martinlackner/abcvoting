@@ -7,7 +7,7 @@ name: Unittests
 on: [push, pull_request]
 
 jobs:
-  build:
+  unittests:
 
     runs-on: ubuntu-latest
     strategy:
@@ -25,9 +25,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-      # these are optional requirements, but we want GLPK_MI to be installed to run more unitests
-      # TODO: cvxpy pip install is not working currently
+        pip install -e .[dev]
+
+        # these are optional requirements, but we want GLPK_MI to be installed to run more unitests
+        # TODO: cvxpy pip install is not working currently
         # pip install cvxpy
         # pip install cvxopt
 
@@ -49,9 +50,8 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pip install pytest
         # note that some tests are skipped because Gurobi is not available on Github
-        PYTHONPATH=$PYTHONPATH:$PWD coverage run --source=. -m pytest -v --tb=long -m "not gurobi and not scip and not cbc and not glpk_mi and not cvxpy and not gmpy2 and not slow" -ra tests/
+        coverage run --source=. -m pytest -v --tb=long -m "not gurobi and not scip and not cbc and not glpk_mi and not cvxpy and not gmpy2 and not slow" -ra tests/
 
     - name: Generate coverage report
       run: coverage xml
