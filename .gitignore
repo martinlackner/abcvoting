@@ -77,6 +77,6 @@ gurobi.log
 # Other
 excluded
 *.cache
-venv
-venv-p2.7
+venv*
 /coverage.sh
+scratchpad
