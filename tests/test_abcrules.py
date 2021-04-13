@@ -485,7 +485,7 @@ def _list_abc_yaml_compute_instances():
             for algorithm in rule.algorithms:
                 if "instanceS" in filename:
                     marks = []  # small instances, rather fast
-                if "instanceVL" in filename:
+                elif "instanceVL" in filename:
                     marks = [pytest.mark.slow, pytest.mark.veryslow]  # very large instances
                 elif rule_id == "monroe" and algorithm in ["mip_cbc"]:
                     marks = [pytest.mark.slow, pytest.mark.veryslow]
