@@ -24,8 +24,6 @@ adding candidate number 1: a
  maximum load increased to 1/8
  load distribution:
   (1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 0, 0, 0, 0)
- tie broken in favor of a,
- candidates {a} are tied (for all those new maximum load = 1/8).
 
 adding candidate number 2: b
  maximum load increased to 11/32
@@ -38,15 +36,11 @@ adding candidate number 3: c
  maximum load increased to 55/128
  load distribution:
   (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 1/8, 1/8, 55/128, 0, 0, 0)
- tie broken in favor of c,
- candidates {c} are tied (for all those new maximum load = 55/128).
 
 adding candidate number 4: d
  maximum load increased to 5/8
  load distribution:
   (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 5/8, 5/8, 55/128, 0, 0, 0)
- tie broken in favor of d,
- candidates {d} are tied (for all those new maximum load = 5/8).
 
 1 winning committee:
  {a, b, c, d}

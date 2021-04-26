@@ -645,12 +645,12 @@ def compute_seq_thiele_method(
                 f" score increases by {delta_score} to"
                 f" a total of {scores.thiele_score(scorefct_id, profile, committee)}"
             )
-            if tied_cands:
-                output.details(f" tie broken in favor of {next_cand}")
+            if len(tied_cands) > 1:
+                output.details(f" tie broken in favor of {next_cand},\n")
                 output.details(
                     f" candidates "
                     f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
-                    f" would increase the score by the same amount {delta_score})"
+                    f" are tied (all would increase the score by the same amount {delta_score})"
                 )
             output.details("")
 
@@ -687,7 +687,7 @@ def _seq_thiele_resolute(profile, committeesize, scorefct_id):
         tied_cands = [
             cand
             for cand in range(len(additional_score_cand))
-            if (cand > next_cand and additional_score_cand[cand] == max(additional_score_cand))
+            if additional_score_cand[cand] == max(additional_score_cand)
         ]
         detailed_info["next_cand"].append(next_cand)
         detailed_info["tied_cands"].append(tied_cands)
@@ -816,16 +816,12 @@ def compute_revseq_thiele_method(
                 f" score decreases by {delta_score} to a total of "
                 f"{scores.thiele_score(scorefct_id, profile, committee)}"
             )
-            if tied_cands:
-                output.details(
-                    f" (tie between candidates "
-                    f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
-                )
-                output.details(f" tie broken to the disadvantage of {next_cand}")
+            if len(tied_cands) > 1:
+                output.details(f" tie broken to the disadvantage of {next_cand},\n")
                 output.details(
                     f" candidates "
                     f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
-                    f" would decrease the score by the same amount {delta_score})"
+                    f" are tied (all would decrease the score by the same amount {delta_score})"
                 )
             output.details("")
 
@@ -1429,7 +1425,7 @@ def compute_seqphragmen(profile, committeesize, algorithm="fastest", resolute=Tr
             for v, _ in enumerate(profile):
                 msg += str(load[v]) + ", "
             output.details(msg[:-2] + ")")
-            if tied_cands:
+            if len(tied_cands) > 1:
                 msg = " tie broken in favor of " + profile.cand_names[next_cand]
                 msg += ",\n candidates " + str_set_of_candidates(
                     tied_cands, cand_names=profile.cand_names
@@ -1684,7 +1680,7 @@ def compute_rule_x(
                 msg += profile.cand_names[next_cand] + ","
                 msg += "\n candidates "
                 msg += str_set_of_candidates(tied_cands, cand_names=profile.cand_names)
-                msg += " are tied."
+                msg += f" are tied (all would impose a maximum cost of {cost})."
                 output.details(msg)
             output.details("")
 
@@ -1716,7 +1712,7 @@ def compute_rule_x(
                         f" tie broken in favor of {profile.cand_names[next_cand]},\n"
                         f" candidates "
                         f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
-                        f" are tied\n"
+                        f" are tied"
                         f" (for any of those, the new maximum load would be {max_load})."
                     )
                 output.details("")

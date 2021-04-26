@@ -40,8 +40,7 @@ adding candidate number 2: b
  load distribution:
   (11/32, 11/32, 11/32, 1/8, 1/8, 1/8, 1/8, 1/8, 11/32, 0, 0, 0)
  tie broken in favor of b,
- candidates {b, c} are tied
- (for any of those, the new maximum load would be 11/32).
+ candidates {b, c} are tied (for any of those, the new maximum load would be 11/32).
 
 adding candidate number 3: c
  maximum load increased to 55/128

@@ -210,14 +210,14 @@ adding candidate number 1: a
  remaining budget:
   (1/4, 1/4, 3/4, 3/4)
  tie broken in favor of a,
- candidates {a, c, d, e} are tied.
+ candidates {a, c, d, e} are tied (all would impose a maximum cost of 1/2).
 
 adding candidate number 2: c
  with maxmimum cost per voter q = 3/4
  remaining budget:
   (1/4, 0, 3/4, 0)
  tie broken in favor of c,
- candidates {c, d, e} are tied.
+ candidates {c, d, e} are tied (all would impose a maximum cost of 3/4).
 
 adding candidate number 3: e
  with maxmimum cost per voter q = 3/4
@@ -242,28 +242,28 @@ adding candidate number 1: a
  remaining budget:
   (1/2, 1/2, 1, 1)
  tie broken in favor of a,
- candidates {a, c, d, e} are tied.
+ candidates {a, c, d, e} are tied (all would impose a maximum cost of 1/2).
 
 adding candidate number 2: c
  with maxmimum cost per voter q = 1/2
  remaining budget:
   (1/2, 0, 1, 1/2)
  tie broken in favor of c,
- candidates {c, d, e} are tied.
+ candidates {c, d, e} are tied (all would impose a maximum cost of 1/2).
 
 adding candidate number 3: d
  with maxmimum cost per voter q = 1/2
  remaining budget:
   (0, 0, 1, 0)
  tie broken in favor of d,
- candidates {d, e} are tied.
+ candidates {d, e} are tied (all would impose a maximum cost of 1/2).
 
 adding candidate number 4: b
  with maxmimum cost per voter q = 1
  remaining budget:
   (0, 0, 0, 0)
  tie broken in favor of b,
- candidates {b, e} are tied.
+ candidates {b, e} are tied (all would impose a maximum cost of 1).
 
 1 winning committee:
  {a, b, c, d}

@@ -37,6 +37,11 @@ committees_seqphragmen = abcrules.compute_seqphragmen(
     profile, 3, resolute=False, algorithm="standard-fractions"
 )
 
+# detailed output is only available if resolute=True:
+committees_seqphragmen = abcrules.compute_seqphragmen(
+    profile, 3, resolute=True, algorithm="standard-fractions"
+)
+
 # verify correctness
 assert committees_rule_x == [{a, c, d}]
 assert committees_seqphragmen == [{b, c, d}]
