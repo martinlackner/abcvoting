@@ -25,8 +25,7 @@ def read_version():
 
 
 setuptools.setup(
-    # FIXME test_ prefix just to make sure that this is just a test run
-    name="test_abcvoting",
+    name="abcvoting",
     version=read_version(),
     author="Martin Lackner",
     author_email="unexpected@sent.at",
@@ -66,5 +65,3 @@ setuptools.setup(
 )
 
 # TODO Add optional requirements?
-# TODO How about examples? Do we want to install them?
-# TODO Add the test dir and test dependencies? Probably not?
