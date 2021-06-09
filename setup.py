@@ -65,5 +65,3 @@ setuptools.setup(
 )
 
 # TODO Add optional requirements?
-# TODO How about examples? Do we want to install them?
-# TODO Add the test dir and test dependencies? Probably not?
