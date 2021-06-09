@@ -58,3 +58,17 @@ jobs:
 
     - name: Upload coverage metrics to codecov
       uses: codecov/codecov-action@v1
+
+    # tests the package, the release is done in build.yml
+    - name: Build a binary wheel and a source tarball
+      run: python setup.py bdist_wheel
+
+    # tests uploading the package to the test repo, but only if API_KEY is defined
+    - name: Publish distribution package to Test PyPI
+      env:
+        TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+      if: (env.TEST_PYPI_API_TOKEN != null) && (matrix.python-version == '3.8')
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        repository_url: https://test.pypi.org/legacy/
