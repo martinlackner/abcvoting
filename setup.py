@@ -20,8 +20,8 @@ def read_version():
     v2.0.0-beta
 
     Version strings need to comply with PEP 440. Git tags are used, but for development versions
-    the Git Sha1 is appended. To comply with PEP 440 everything after the first dash is removed
-    before appending the Sha1.
+    the build number is appended. To comply with PEP 440 everything after the first dash is removed
+    before appending the build number.
 
     """
 
@@ -37,7 +37,7 @@ def read_version():
         # to fetch tags in Github actions use "fetch-depth: 0"
         raise RuntimeError("Git describe failed: did you fetch at least one tag?")
 
-    # git_version contains the latest tag, if this is not identical with HEAD need to append hash
+    # git_version contains the latest tag, if it is not identical with HEAD need to postifx
     head_is_tag = (
         subprocess.run(
             ["git", "describe", "--tags", "--exact-match", "HEAD"], stderr=subprocess.PIPE
@@ -45,17 +45,17 @@ def read_version():
         == 0
     )
     if not head_is_tag:
-        head_sha1 = subprocess.run(["git", "rev-parse", "--short", "HEAD"], stdout=subprocess.PIPE)
-        head_sha1 = head_sha1.stdout.strip().decode("utf-8")
-
         try:
-            # set by Github actions, but we don't really care if missing due to Sha1 in name
+            # set by Github actions, necessary for unique file names for PyPI
             build_nr = os.environ["BUILD_NUMBER"]
         except KeyError:
             build_nr = 0
 
+        # +something is disallowed on PyPI even if allowed in PEP 440... :-/
+        # https://github.com/pypa/pypi-legacy/issues/731#issuecomment-345461596
+
         next_stable = git_version.split("-")[0]
-        git_version = f"{next_stable}.dev{build_nr}+git{head_sha1}"
+        git_version = f"{next_stable}.dev{build_nr}"
 
     if git_version[0] == "v":
         git_version = git_version[1:]
