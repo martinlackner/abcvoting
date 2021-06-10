@@ -15,7 +15,8 @@ def read_version():
     if git_describe.returncode == 0:
         git_version = git_describe.stdout.strip().decode("utf-8")
     else:
-        # per default no tags available in Github actions, but also no real need for a version
+        # per default no old commit are fetched in Github actions, that means, that git describe
+        # fails if the latest commit is not a tag, because old tags can't be found.
         git_version = "0.0.0"
 
     if git_version[0] == "v":
