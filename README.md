@@ -13,7 +13,7 @@
 Approval-based committee rules (ABC rules) are voting methods for selecting a committee, i.e., a fixed-size subset of candidates.
 ABC rules are also known as approval-based multi-winner rules.
 The input of such rules are [approval ballots](https://en.wikipedia.org/wiki/Approval_voting#/media/File:Approval_ballot.svg).
-We recommend [''Approval-Based Committee Voting''](https://arxiv.org/abs/2007.01795) by Lackner and Skowron as a detailed introduction to ABC rules and related research directions [8].
+We recommend [''Approval-Based Committee Voting''](https://arxiv.org/abs/2007.01795) by Lackner and Skowron as a detailed introduction to ABC rules and related research directions [2].
 In addition, the [survey by Faliszewski et al.](http://research.illc.uva.nl/COST-IC1205/BookDocs/Chapters/TrendsCOMSOC-02.pdf) [1] is useful as a more general introduction to committee voting (not limited to approval ballots).
 
 The following ABC rules are implemented:
@@ -28,27 +28,21 @@ The following ABC rules are implemented:
 
 * Reverse Sequential Proportional Approval Voting (revseq-PAV)
 
-* Sainte-Lagu&euml; Approval Voting (SLAV) [4]
-
-* Sequential Sainte-Lagu&euml; Approval Voting [4]
-
 * Approval Chamberlin-Courant (CC)
 
-* Sequential Chamberlin-Courant
-
-* Reverse Sequential Chamberlin-Courant
-
-* Phragmén's sequential rule (see [2])
+* Phragmén's sequential rule
   
 * Monroe's rule
 
-* Minimax Approval Voting (see [3])
+* Minimax Approval Voting (MAV)
 
-* Greedy Monroe (see [5])
+* Greedy Monroe
 
-* Rule X (see [6])
+* Rule X
 
-* Phragmén's First Method (Enestr&ouml;m's Method) (see [7])
+* Phragmén's First Method (Enestr&ouml;m's Method)
+
+* and many more ...
 
 ## Example
 
@@ -75,7 +69,7 @@ The output is
 [{0, 1, 3}, {0, 1, 4}]
 ```
 which corresponds to the two winning committees {0,1,3} and {0,1,4}. Further examples can be found in the directory [examples/](examples).
-In [examples/survey/](examples/abcsurvey), all examples from the survey on ABC rules [8] are implemented. 
+In [examples/survey/](examples/abcsurvey), all examples from the survey on ABC rules [2] are implemented. 
 
 ## Usage
 
@@ -117,6 +111,37 @@ Optional requirements:
   * Scip
 
 <!-- TODO: add instructions for installation of solvers -->
+
+## How to Cite
+
+If you would like to cite abcvoting in a research paper or text,
+please use the following (or a similar) citation:
+
+```
+M. Lackner, P. Regner, B. Krenn, and S. S. Forster.
+abcvoting: A Python library of approval-based committee voting rules, 2021.
+URL https://doi.org/10.5281/zenodo.3904466.
+Current version: https://github.com/martinlackner/abcvoting.
+```
+
+Bibtex:
+
+```
+@misc{abcvoting,
+  author       = {Martin Lackner and
+                  Peter Regner and
+                  Benjamin Krenn and
+                  Stefan Schlomo Forster},
+  title        = {{abcvoting: A Python library of approval-based 
+                   committee voting rules}},
+  year         = 2021,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.3904466},
+  url          = {https://doi.org/10.5281/zenodo.3904466},
+  note         = {Current version: \url{https://github.com/martinlackner/abcvoting}}
+}
+```
+
 
 ## Development
 
@@ -171,7 +196,11 @@ The development of this module has been supported by the Austrian Science Fund F
 new challenge for social choice theory. In Ulle Endriss, editor, Trends in Computational Social
 Choice, chapter 2, pages 27–47. AI Access, 2017. http://research.illc.uva.nl/COST-IC1205/BookDocs/Chapters/TrendsCOMSOC-02.pdf
 
-[2] Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner. Phragmén's Voting Methods and Justified Representation. In Proceedings of the 31st AAAI Conference on Artificial Intelligence (AAAI 2017), pages 406-413, AAAI Press, 2017. http://martin.lackner.xyz/publications/phragmen.pdf
+[2] Lackner, Martin, and Piotr Skowron. "Approval-Based Committee Voting: Axioms, Algorithms, and Applications." arXiv preprint arXiv:2007.01795. 2020. https://arxiv.org/abs/2007.01795
+
+
+<!--
+[2] Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner. Phragmén's Voting Methods and Justified Representation. In Proceedings of the 31st AAAI Conference on Artificial Intelligence (AAAI 2017), pages 406-413, AAAI Press, 2017. https://arxiv.org/abs/2102.12305
 
 [3] Steven J Brams, D Marc Kilgour, and M Remzi Sanver. A minimax procedure for electing committees. Public Choice, 132(3-4):401–420, 2007.
 
@@ -185,7 +214,4 @@ Social Choice and Welfare volume 48, pages 599–632. 2017. https://link.springe
 [6] Peters, Dominik, and Piotr Skowron. 
 Proportionality and the Limits of Welfarism. arXiv preprint arXiv:1911.11747. 2019. https://arxiv.org/abs/1911.11747
 
-[7] Janson, Svante.
-Phragmén's and Thiele's election methods. arXiv preprint arXiv:1611.08826. 2016. https://arxiv.org/pdf/1611.08826.pdf
-
-[8] Lackner, Martin, and Piotr Skowron. "Approval-Based Committee Voting: Axioms, Algorithms, and Applications." arXiv preprint arXiv:2007.01795. 2020. https://arxiv.org/abs/2007.01795
+-->
