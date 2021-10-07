@@ -86,7 +86,7 @@ def test_read_and_write_preflib_file():
     currdir = os.path.dirname(os.path.abspath(__file__))
     profile1 = Profile(6)
     profile1.add_voters([[3], [4, 1, 5], [0, 2], [], [0, 1, 2, 3, 4, 5], [5], [1], [1]])
-    fileio.write_profile_to_preflib_toi_file(profile1, currdir + "/data/test5.toi")
+    fileio.write_profile_to_preflib_toi_file(currdir + "/data/test5.toi", profile1)
     for use_weights in [True, False]:
         profile2 = fileio.read_preflib_file(currdir + "/data/test5.toi", use_weights=use_weights)
         assert len(profile1) == len(profile2)

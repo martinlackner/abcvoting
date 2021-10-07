@@ -218,16 +218,16 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
     return profile
 
 
-def write_profile_to_preflib_toi_file(profile, filename):
+def write_profile_to_preflib_toi_file(filename, profile):
     """Writes profile in a preflib toi file
 
     Parameters:
 
-        profile: Profile
-            Profile to be written in preflib file.
-
         filename: str
             File name of the preflib file to be written.
+
+        profile: Profile
+            Profile to be written in preflib file.
 
     Returns:
         None

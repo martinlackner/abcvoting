@@ -11,7 +11,7 @@ currdir = os.path.dirname(os.path.abspath(__file__))
 # Write a profile to toi file
 profile = Profile(5, "ABCDE")
 profile.add_voters([{0, 1}, {1, 3, 4}, {2}, {3}, {3}])
-fileio.write_profile_to_preflib_toi_file(profile, currdir + "/toi-files/new_example.toi")
+fileio.write_profile_to_preflib_toi_file(currdir + "/toi-files/new_example.toi", profile)
 
 
 # Read a directory of preflib files (using parameter relative_setsize)
