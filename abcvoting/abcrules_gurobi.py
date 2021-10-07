@@ -258,7 +258,7 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute):
                     for voter in profile
                     if cand in profile.candidates
                 )
-                == in_committee[cand]
+                >= in_committee[cand]
             )
 
         loadbound = model.addVar(lb=0, ub=committeesize, name="loadbound")
