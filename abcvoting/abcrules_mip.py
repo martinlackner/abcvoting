@@ -260,8 +260,10 @@ def _mip_minimaxphragmen(profile, committeesize, resolute, solver_id):
     ):
         load = {}
         for cand in profile.candidates:
-            for voter in profile:
-                load[(voter, cand)] = model.add_var(lb=0.0, ub=1.0, var_type=mip.CONTINUOUS)
+            for i, voter in enumerate(profile):
+                load[(voter, cand)] = model.add_var(
+                    lb=0.0, ub=1.0, var_type=mip.CONTINUOUS, name=f"load{i}-{cand}"
+                )
 
         # constraint: the committee has the required size
         model += mip.xsum(in_committee[cand] for cand in profile.candidates) == committeesize
