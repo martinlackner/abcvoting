@@ -39,36 +39,43 @@ def read_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
         profiles: dict of str: Profile
             The key is the filename.
     """
-    file_dir, files = get_file_names(dir_name)
+    files = get_file_names(dir_name, filename_extensions=[".soi", ".toi", ".soc", ".toc"])
 
     profiles = {}
-    if file_dir is not None:
-        files = sorted(files)
-        for f in files:
-            if (
-                f.endswith(".soi")
-                or f.endswith(".toi")
-                or f.endswith(".soc")
-                or f.endswith(".toc")
-            ):
-                profile = read_preflib_file(
-                    file_dir + f, setsize=setsize, relative_setsize=relative_setsize
-                )
-                profiles[f] = profile
-
+    for f in files:
+        profile = read_preflib_file(
+            os.path.join(dir_name, f), setsize=setsize, relative_setsize=relative_setsize
+        )
+        profiles[f] = profile
     return profiles
 
 
-def get_file_names(dir_name):
+def get_file_names(dir_name, filename_extensions=None):
+    """List all file names in a directory that fit the specified filename extensions.
+    Does not look into sub-directories.
+
+    Parameters:
+        dir_name: str
+            path of directory to be searched for files.
+
+        filename_extensions: list of str or None
+            file names must match one of these extensions
+
+    Returns:
+        files: list of str
+            list of file names contained in the directory
+    """
     files = []
-    file_dir = None
-    for (dir_path, _, filenames) in os.walk(dir_name):
-        file_dir = dir_path
+    for (_, _, filenames) in os.walk(dir_name):
         files = filenames
-        break  # do not consider subdirs
+        break  # do not consider sub-directories
     if len(files) == 0:
-        raise PreflibException("No files found in", dir_name)
-    return file_dir, files
+        raise FileNotFoundError(f"No files found in {dir_name}")
+    if filename_extensions:
+        files = [
+            f for f in filenames if any(f.endswith(extension) for extension in filename_extensions)
+        ]
+    return sorted(files)
 
 
 def _approval_set_from_preflib_datastructures(num_appr, ranking, candidate_map):
