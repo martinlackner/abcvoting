@@ -703,6 +703,59 @@ def test_monroe_indivisible(algorithm):
     ) == [{0, 1, 2}, {0, 1, 3}, {0, 2, 3}]
 
 
+@pytest.mark.parametrize("rule_id", ["geom1.5"] + [f"geom{i}" for i in range(2, 13)])
+@pytest.mark.parametrize(
+    "algorithm",
+    [
+        pytest.param(algorithm, marks=MARKS[algorithm])
+        for algorithm in abcrules.get_rule("geom2").algorithms
+    ],
+)
+def test_geom_rules_special_instance(rule_id, algorithm):
+    # this instance failed for geom10 at some point with gurobi
+    # in general, geom-p with large p will not work well because very small numbers
+    # arise in the calculations --> numerical problems
+    # in this instance, problems start with p >= 16.
+    profile = Profile(8)
+    committeesize = 6
+    profile.add_voters(
+        [
+            [1, 3, 4, 5],
+            [0, 1, 6, 7],
+            [2, 4, 5, 7],
+            [0, 2, 4, 6],
+            [0, 3, 4, 7],
+            [0, 1, 4, 5],
+            [0, 4, 5, 7],
+            [1, 2, 3, 6],
+            [2, 5, 6, 7],
+            [3, 4, 5, 6],
+            [2, 3, 4, 6],
+            [2, 4, 6, 7],
+            [0, 3, 5, 6],
+            [3, 5, 6, 7],
+            [0, 5, 6, 7],
+            [0, 2, 3, 7],
+            [1, 3, 4, 6],
+            [0, 4, 6, 7],
+            [2, 5, 6, 7],
+            [0, 3, 6, 7],
+            [1, 3, 6, 7],
+            [0, 2, 4, 6],
+            [1, 2, 3, 6],
+            [1, 2, 3, 7],
+            [0, 5, 6, 7],
+        ]
+    )
+    # parameter = float(rule_id[len("geom") :])
+    # if parameter < 18:
+    expected_output = [{0, 2, 3, 4, 6, 7}]
+    committees = abcrules.compute(
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=False
+    )
+    assert committees == expected_output
+
+
 @pytest.mark.parametrize(
     "algorithm",
     [

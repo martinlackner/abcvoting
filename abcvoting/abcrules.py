@@ -153,9 +153,9 @@ def get_rule(rule_id):
     _THIELE_ALGORITHMS = (
         # TODO sort by speed, requires testing
         "gurobi",
-        "branch-and-bound",
-        "mip_cbc",
         "mip_gurobi",
+        "mip_cbc",
+        "branch-and-bound",
         "brute-force",
     )
     _RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES = [False, True]

@@ -131,19 +131,20 @@ def _mip_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
         # committee (this is the case for scorefct "pav", "slav" or "geom").
         utility = {}
 
+        max_in_committee = {}
         for i, voter in enumerate(profile):
-            for l in range(1, committeesize + 1):
+            max_in_committee[voter] = min(len(voter.approved), committeesize)
+            for l in range(1, max_in_committee[voter] + 1):
                 utility[(voter, l)] = model.add_var(var_type=mip.BINARY, name=f"utility-v{i}-l{l}")
-                # TODO: could be faster with lb=0.0, ub=1.0, var_type=mip.CONTINUOUS
 
         # constraint: the committee has the required size
         model += mip.xsum(in_committee) == committeesize
 
         # constraint: utilities are consistent with actual committee
         for voter in profile:
-            model += mip.xsum(utility[voter, l] for l in range(1, committeesize + 1)) == mip.xsum(
-                in_committee[cand] for cand in voter.approved
-            )
+            model += mip.xsum(
+                utility[voter, l] for l in range(1, max_in_committee[voter] + 1)
+            ) == mip.xsum(in_committee[cand] for cand in voter.approved)
 
         # find a new committee that has not been found yet by excluding previously found committees
         for committee in previously_found_committees:
@@ -154,7 +155,7 @@ def _mip_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
             mip.xsum(
                 float(scorefct(l)) * voter.weight * utility[(voter, l)]
                 for voter in profile
-                for l in range(1, committeesize + 1)
+                for l in range(1, max_in_committee[voter] + 1)
             )
         )
 

@@ -121,14 +121,15 @@ def _gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
         # valid:
         # utility[(voter, l)] indicates whether `voter` approves at least l candidates in the
         # committee (this is the case for scorefct "pav", "slav" or "geom").
+
         utility = {}
 
-        for voter in profile:
-            for l in range(1, committeesize + 1):
-                utility[(voter, l)] = model.addVar(ub=1.0)
-                # should be binary. this is guaranteed since the objective
-                # is maximal if all utilitity-values are either 0 or 1.
-                # using vtype=gb.GRB.BINARY does not change result, but makes things slower a bit
+        max_in_committee = {}
+        for i, voter in enumerate(profile):
+            # maximum number of approved candidates that this voter can have in a committee
+            max_in_committee[voter] = min(len(voter.approved), committeesize)
+            for l in range(1, max_in_committee[voter] + 1):
+                utility[(voter, l)] = model.addVar(vtype=gb.GRB.BINARY, name=f"utility({i,l})")
 
         # constraint: the committee has the required size
         model.addConstr(gb.quicksum(in_committee) == committeesize)
@@ -136,7 +137,7 @@ def _gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
         # constraint: utilities are consistent with actual committee
         for voter in profile:
             model.addConstr(
-                gb.quicksum(utility[voter, l] for l in range(1, committeesize + 1))
+                gb.quicksum(utility[voter, l] for l in range(1, max_in_committee[voter] + 1))
                 == gb.quicksum(in_committee[cand] for cand in voter.approved)
             )
 
@@ -145,7 +146,7 @@ def _gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
             gb.quicksum(
                 float(scorefct(l)) * voter.weight * utility[(voter, l)]
                 for voter in profile
-                for l in range(1, committeesize + 1)
+                for l in range(1, max_in_committee[voter] + 1)
             ),
             gb.GRB.MAXIMIZE,
         )
