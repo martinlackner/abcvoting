@@ -280,15 +280,38 @@ def write_abcvoting_instance_to_yaml_file(
     data["num_cand"] = profile.num_cand
     if committeesize is not None:
         data["committeesize"] = committeesize
+    modified_computed_instances = []
     if compute_instances is not None:
         for compute_instance in compute_instances:
             if "rule_id" not in compute_instance.keys():
                 raise ValueError('Each compute instance (dict) requires key "rule_id".')
+            mod_compute_instance = {"rule_id": compute_instance["rule_id"]}
             if "expected_committees" in compute_instance.keys():
-                compute_instance["expected_committees"] = _yaml_flow_style_list(
+                mod_compute_instance["expected_committees"] = _yaml_flow_style_list(
                     [list(committee) for committee in compute_instance["expected_committees"]]
                 )  # TODO: would be nicer to store committees in set notation (curly braces)
-        data["compute"] = compute_instances
+            if "profile" in compute_instance.keys():  # this is superfluous information
+                # check that the profile is the same as the main profile
+                if str(compute_instance["profile"]) != str(profile):
+                    raise ValueError(
+                        f"Compute instance contained a profile different from"
+                        f"the main profile passed to write_abcvoting_instance_to_yaml_file()."
+                    )
+            if "committeesize" in compute_instance.keys():  # this is superfluous information
+                # check that the profile is the same as the main profile
+                if int(compute_instance["committeesize"]) != committeesize:
+                    raise ValueError(
+                        f"Compute instance contained a committee size different from"
+                        f"the committee size passed to write_abcvoting_instance_to_yaml_file()."
+                    )
+            for key in compute_instance.keys():
+                # add other parameters to dictionary
+                if key in ["rule_id", "expected_committees", "profile", "committeesize"]:
+                    continue
+                mod_compute_instance[key] = compute_instance[key]
+            modified_computed_instances.append(mod_compute_instance)
+
+        data["compute"] = modified_computed_instances
 
     if not filename.endswith(".abc.yaml"):
         raise ValueError('ABCVoting yaml files should have ".abc.yaml" as filename extension.')
@@ -296,7 +319,6 @@ def write_abcvoting_instance_to_yaml_file(
     yaml = ruamel.yaml.YAML()
     yaml.width = 120
     with open(filename, "w") as outfile:
-
         yaml.dump(data, outfile)
 
 
