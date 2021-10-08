@@ -61,6 +61,7 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute):
 
         model.setParam("OutputFlag", False)
         model.setParam("FeasibilityTol", GUROBI_ACCURACY)
+        model.setParam("IntFeasTol", GUROBI_ACCURACY)
         model.setParam("PoolSearchMode", 0)
         model.setParam("MIPFocus", 2)  # focus more attention on proving optimality
 
@@ -99,7 +100,10 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute):
         if len(committee) != committeesize:
             raise RuntimeError(
                 "_optimize_rule_gurobi produced a committee with "
-                "fewer than `committeesize` members."
+                "fewer than `committeesize` members.\n"
+                + "\n".join(
+                    f"({v.varName}, {v.x})" for v in model.getVars() if "in_committee" in v.varName
+                )
             )
         committees.append(committee)
 
