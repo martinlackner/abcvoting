@@ -19,7 +19,7 @@ def check_enough_approved_candidates(profile, committeesize):
         approved_candidates.update(voter.approved)
     if len(approved_candidates) < committeesize:
         raise ValueError(
-            f"committeesize = {committeesize} is larger than"
+            f"committeesize = {committeesize} is larger than the "
             f"number of approved candidates ({len(approved_candidates)})"
         )
 
