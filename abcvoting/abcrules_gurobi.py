@@ -4,6 +4,7 @@ programs (ILPs) with Gurobi (https://www.gurobi.com/)
 """
 
 from abcvoting.misc import sorted_committees
+from abcvoting import scores
 
 try:
     import gurobipy as gb
@@ -15,7 +16,7 @@ except ImportError:
 GUROBI_ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
 
 
-def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute):
+def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute, name="None"):
     """Compute rules, which are given in the form of an optimization problem, using Gurobi.
 
     Parameters
@@ -61,9 +62,12 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute):
 
         model.setParam("OutputFlag", False)
         model.setParam("FeasibilityTol", GUROBI_ACCURACY)
+        model.setParam("OptimalityTol", GUROBI_ACCURACY)
         model.setParam("IntFeasTol", GUROBI_ACCURACY)
+        model.setParam("MIPGap", GUROBI_ACCURACY)
         model.setParam("PoolSearchMode", 0)
         model.setParam("MIPFocus", 2)  # focus more attention on proving optimality
+        model.setParam("IntegralityFocus", 1)
 
         model.optimize()
 
@@ -73,22 +77,30 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute):
             # otherwise ...
             raise RuntimeError(
                 f"Gurobi returned an unexpected status code: {model.Status}"
-                "Warning: solutions may be incomplete or not optimal."
+                f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
         elif model.Status != 2:
             if len(committees) == 0:
                 # we are in the first round of searching for committees
                 # and Gurobi didn't find any
-                raise RuntimeError("Gurobi found no solution")
+                raise RuntimeError(f"Gurobi found no solution (model {name})")
             break
 
         if maxscore is None:
             maxscore = model.objVal
         elif model.objVal > maxscore + GUROBI_ACCURACY:
+            # TODO remove
+            committee = set(
+                cand for cand in profile.candidates if in_committee[cand].Xn >= 1 - GUROBI_ACCURACY
+            )
+            print(profile)
+            print(committees, committee)
+            print(scores.thiele_score("geom10", profile, committees[0]))
+            print(scores.thiele_score("geom10", profile, committee))
             raise RuntimeError(
                 "Gurobi found a solution better than a previous optimum. This "
                 f"should not happen (previous optimal score: {maxscore}, "
-                f"new optimal score: {model.objVal})."
+                f"new optimal score: {model.objVal}, model {name})."
             )
         elif model.objVal < maxscore - GUROBI_ACCURACY:
             # no longer optimal
@@ -99,8 +111,8 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute):
         )
         if len(committee) != committeesize:
             raise RuntimeError(
-                "_optimize_rule_gurobi produced a committee with "
-                "fewer than `committeesize` members.\n"
+                "_optimize_rule_gurobi() produced a committee with "
+                f"fewer than `committeesize` members (model {name}).\n"
                 + "\n".join(
                     f"({v.varName}, {v.x})" for v in model.getVars() if "in_committee" in v.varName
                 )
@@ -113,7 +125,7 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute):
     return committees
 
 
-def _gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
+def _gurobi_thiele_methods(profile, committeesize, scorefct_id, resolute):
     def set_opt_model_func(model, in_committee):
         # utility[(voter, l)] contains (intended binary) variables counting the number of approved
         # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
@@ -155,14 +167,24 @@ def _gurobi_thiele_methods(profile, committeesize, scorefct, resolute):
             gb.GRB.MAXIMIZE,
         )
 
+    scorefct = scores.get_scorefct(scorefct_id, committeesize)
+
     score_values = [scorefct(l) for l in range(1, committeesize + 1)]
     if not all(
         first > second or first == second == 0
         for first, second in zip(score_values, score_values[1:])
     ):
         raise ValueError("scorefct must be monotonic decreasing")
+    min_score_value = min(val for val in score_values if val > 0)
+    if min_score_value < GUROBI_ACCURACY:
+        raise ValueError(
+            f"Thiele scoring function {scorefct_id} can take smaller values "
+            f"(min={min_score_value}) than Gurobi accuracy ({GUROBI_ACCURACY})."
+        )
 
-    committees = _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute)
+    committees = _optimize_rule_gurobi(
+        set_opt_model_func, profile, committeesize, resolute, name=scorefct_id
+    )
     return sorted_committees(committees)
 
 
@@ -221,7 +243,7 @@ def _gurobi_monroe(profile, committeesize, resolute):
         model.setObjective(satisfaction, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func, profile, committeesize, resolute=resolute
+        set_opt_model_func, profile, committeesize, resolute=resolute, name="Monroe"
     )
     return sorted_committees(committees)
 
@@ -276,7 +298,7 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute):
         model.setObjective(-loadbound, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func, profile, committeesize, resolute=resolute
+        set_opt_model_func, profile, committeesize, resolute=resolute, name="minimax-Phragmen"
     )
     return sorted_committees(committees)
 
@@ -308,6 +330,6 @@ def _gurobi_minimaxav(profile, committeesize, resolute):
         model.setObjective(-max_hamming_distance, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func, profile, committeesize, resolute=resolute
+        set_opt_model_func, profile, committeesize, resolute=resolute, name="Minimax AV"
     )
     return sorted_committees(committees)

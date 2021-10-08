@@ -5,6 +5,7 @@ Approval-based committee (ABC) rules implemented as (mixed) integer linear progr
 
 import mip
 from abcvoting.misc import sorted_committees
+from abcvoting import scores
 from abcvoting.output import output, DEBUG
 
 
@@ -115,7 +116,7 @@ def _optimize_rule_mip(set_opt_model_func, profile, committeesize, scorefct, res
     return committees
 
 
-def _mip_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
+def _mip_thiele_methods(profile, committeesize, scorefct_id, resolute, solver_id):
     def set_opt_model_func(
         model, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):
@@ -158,6 +159,8 @@ def _mip_thiele_methods(profile, committeesize, scorefct, resolute, solver_id):
                 for l in range(1, max_in_committee[voter] + 1)
             )
         )
+
+    scorefct = scores.get_scorefct(scorefct_id, committeesize)
 
     score_values = [scorefct(l) for l in range(1, committeesize + 1)]
     if not all(

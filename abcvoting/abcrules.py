@@ -424,7 +424,6 @@ def compute_thiele_method(
     https://arxiv.org/abs/2007.01795
     """
     check_enough_approved_candidates(profile, committeesize)
-    scorefct = scores.get_scorefct(scorefct_id, committeesize)
 
     rule = get_rule(scorefct_id)
 
@@ -433,7 +432,7 @@ def compute_thiele_method(
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_thiele_methods(
-            profile, committeesize, scorefct, resolute
+            profile, committeesize, scorefct_id, resolute
         )
     elif algorithm == "branch-and-bound":
         committees, detailed_info = _thiele_methods_branchandbound(
@@ -445,18 +444,18 @@ def compute_thiele_method(
         )
     elif algorithm.startswith("cvxpy_"):
         committees = abcrules_cvxpy.cvxpy_thiele_methods(
-            profile=profile,
-            committeesize=committeesize,
-            scorefct_id=scorefct_id,
-            resolute=resolute,
+            profile,
+            committeesize,
+            scorefct_id,
+            resolute,
             solver_id=algorithm[6:],
         )
     elif algorithm.startswith("mip_"):
         committees = abcrules_mip._mip_thiele_methods(
             profile,
             committeesize,
-            scorefct=scorefct,
-            resolute=resolute,
+            scorefct_id,
+            resolute,
             solver_id=algorithm[4:],
         )
     elif algorithm == "ortools_cp" and scorefct_id == "cc":
