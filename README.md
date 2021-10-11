@@ -161,6 +161,13 @@ pytest  -m "not gurobi and not scip and not cbc and not glpk_mi and not cvxpy an
 For development, configure the black formatter and pre-commit hooks - see below. Also installing
 all optional dependencies is recommended.
 
+A development package is build for every commit on the master branch and uploaded to the test
+instance of PyPI. It can be installed using the following command:
+
+```bash
+python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple abcvoting
+```
+
 
 ### Black formatting
 
