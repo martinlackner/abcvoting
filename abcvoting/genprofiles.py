@@ -247,7 +247,8 @@ def __distribute_candidates_to_parties(num_cand, parties, uniform):
         party_size = int(num_cand / len(parties))
         cands = set(range(num_cand))
         for i, party in enumerate(parties):
-            appr = random.sample(cands, party_size)
+            # note: there is no guaranty about reproducibility because cands is a set
+            appr = random.sample(tuple(cands), party_size)
             party_cands[party] = appr
             cands = cands - set(appr)
         return party_cands
