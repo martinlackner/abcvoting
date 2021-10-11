@@ -97,7 +97,7 @@ setuptools.setup(
     extras_require={
         "dev": [
             "pytest>=6",
-            "coverage[toml]>=5.5",
+            "coverage[toml]>=5.3",
             "black==20.8b1",
         ]
     },
