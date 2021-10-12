@@ -10,8 +10,6 @@ from test_abcrules import remove_solver_output
 import re
 import random
 
-random.seed(24121838)
-
 
 def remove_algorithm_info(out):
     """Remove information about algorithms which may differ from system to system."""
@@ -157,6 +155,7 @@ def test_simple_py(check_output):
 
 # noinspection PyUnresolvedReferences
 def test_allrules_py(check_output):
+    random.seed(24121838)
     from examples import allrules
 
 

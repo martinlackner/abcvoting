@@ -3,5 +3,5 @@ committeesize: 2
 compute:
 - rule_id: av
   resolute: 'False'
-  expected_committees: [{3, 1}]
+  result: [{3, 1}]
 

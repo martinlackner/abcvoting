@@ -411,15 +411,16 @@ def get_rule(rule_id):
 ########################################################################
 
 
-def compute(rule_id, profile, committeesize, expected_committees=None, **kwargs):
+def compute(rule_id, profile, committeesize, result=None, **kwargs):
     """Compute rule given by `rule_id`."""
     rule = get_rule(rule_id)
     committees = rule.compute(profile, committeesize, **kwargs)
-    if expected_committees is not None:
+    if result is not None:
+        # verify that the parameter `result` is indeed the result of computing the ABC rule
         resolute = kwargs.get("resolute", False)
         misc.verify_expected_committees_equals_actual_committees(
             actual_committees=committees,
-            expected_committees=expected_committees,
+            expected_committees=result,
             resolute=resolute,
             shortname=rule.shortname,
         )

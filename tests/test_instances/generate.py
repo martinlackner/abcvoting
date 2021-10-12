@@ -90,7 +90,7 @@ def generate_abc_yaml_testinstances(
             # else:
             #     algorithm = "fastest"
 
-            # if irresolute (resolute = False) is supported, then "expected_committees" should be
+            # if irresolute (resolute = False) is supported, then "result" should be
             # the list of committees returned for resolute=False.
             if False in rule.resolute_values:
                 resolute = False
@@ -100,7 +100,7 @@ def generate_abc_yaml_testinstances(
 
             for resolute in rule.resolute_values:
                 rule_instances.append(
-                    {"rule_id": rule_id, "resolute": resolute, "expected_committees": committees}
+                    {"rule_id": rule_id, "resolute": resolute, "result": committees}
                 )
 
         fileio.write_abcvoting_instance_to_yaml_file(

@@ -286,9 +286,9 @@ def write_abcvoting_instance_to_yaml_file(
             if "rule_id" not in compute_instance.keys():
                 raise ValueError('Each compute instance (dict) requires key "rule_id".')
             mod_compute_instance = {"rule_id": compute_instance["rule_id"]}
-            if "expected_committees" in compute_instance.keys():
-                mod_compute_instance["expected_committees"] = _yaml_flow_style_list(
-                    [list(committee) for committee in compute_instance["expected_committees"]]
+            if "result" in compute_instance.keys():
+                mod_compute_instance["result"] = _yaml_flow_style_list(
+                    [list(committee) for committee in compute_instance["result"]]
                 )  # TODO: would be nicer to store committees in set notation (curly braces)
             if "profile" in compute_instance.keys():  # this is superfluous information
                 # check that the profile is the same as the main profile
@@ -306,7 +306,7 @@ def write_abcvoting_instance_to_yaml_file(
                     )
             for key in compute_instance.keys():
                 # add other parameters to dictionary
-                if key in ["rule_id", "expected_committees", "profile", "committeesize"]:
+                if key in ["rule_id", "result", "profile", "committeesize"]:
                     continue
                 mod_compute_instance[key] = compute_instance[key]
             modified_computed_instances.append(mod_compute_instance)
@@ -350,11 +350,11 @@ def read_abcvoting_yaml_file(filename):
             raise ValueError('Each rule instance (dict) requires key "rule_id".')
         compute_instance["profile"] = profile
         compute_instance["committeesize"] = committeesize
-        if "expected_committees" in compute_instance.keys():
-            compute_instance["expected_committees"] = [
-                set(committee) for committee in compute_instance["expected_committees"]
+        if "result" in compute_instance.keys():
+            # compute_instance["result"] should be a list of committees (sets)
+            compute_instance["result"] = [
+                set(committee) for committee in compute_instance["result"]
             ]
-            # expected_committees should be a list of committees (sets)
 
     for key in data.keys():
         if key not in VALID_KEYS:
