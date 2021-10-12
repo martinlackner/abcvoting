@@ -4,11 +4,13 @@ Unit tests for: abcrules.py, abcrules_gurobi.py, abcrules_mip.py and abcrules_cv
 import pytest
 import os
 import re
+import random
 from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
 from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, DEBUG, output
 from abcvoting.preferences import Profile, Voter
 from abcvoting import abcrules, misc, scores, fileio
+from itertools import combinations
 
 MARKS = {
     "gurobi": [pytest.mark.gurobi],
@@ -30,6 +32,7 @@ MARKS = {
     "float-fractions": [],
     "fastest": [],
 }
+random.seed(24121838)
 
 
 class CollectRules:
@@ -264,6 +267,9 @@ class CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
+            "trivial": [
+                set(committee) for committee in combinations(profile.candidates, committeesize)
+            ],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -316,6 +322,9 @@ class CollectInstances:
             "rule-x-without-phragmen-phase": [{0, 1, 3}],
             "phragmen-enestroem": [{0, 1, 3}],
             "consensus-rule": [{0, 1, 3}],
+            "trivial": [
+                set(committee) for committee in combinations(profile.candidates, committeesize)
+            ],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -403,6 +412,9 @@ class CollectInstances:
             "rule-x-without-phragmen-phase": [{0, 2}],
             "phragmen-enestroem": [{0, 1, 2, 4}],
             "consensus-rule": [{0, 1, 2, 4}],
+            "trivial": [
+                set(committee) for committee in combinations(profile.candidates, committeesize)
+            ],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -434,6 +446,9 @@ class CollectInstances:
             "rule-x-without-phragmen-phase": [{0}],
             "phragmen-enestroem": [{0, 3}],
             "consensus-rule": [{0, 3}],
+            "trivial": [
+                set(committee) for committee in combinations(profile.candidates, committeesize)
+            ],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -467,6 +482,9 @@ class CollectInstances:
             "rule-x-without-phragmen-phase": one_each,
             "phragmen-enestroem": one_each,
             "consensus-rule": one_each,
+            "trivial": [
+                set(committee) for committee in combinations(profile.candidates, committeesize)
+            ],
         }
         self.instances.append((profile, tests, committeesize))
 
@@ -589,11 +607,14 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute):
     profile.add_voter(Voter([0]))
     committeesize = 1
 
-    if "monroe" in rule_id or rule_id in [
+    if rule_id in [
         "lexminimaxav",
         "rule-x",
         "rule-x-without-phragmen-phase",
         "phragmen-enestroem",
+        "rsd",
+        "monroe",
+        "greedy-monroe",
     ]:
         with pytest.raises(ValueError):
             abcrules.compute(rule_id, profile, committeesize, algorithm=algorithm)
@@ -607,6 +628,12 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute):
         # Minimax AV ignores weights by definition
         if resolute:
             assert result == [{0}] or result == [{1}] or result == [{2}]
+        else:
+            assert result == [{0}, {1}, {2}]
+    elif rule_id == "trivial":
+        # the trivial rule ignores weights by definition
+        if resolute:
+            assert result == [{0}]
         else:
             assert result == [{0}, {1}, {2}]
     else:
@@ -649,6 +676,19 @@ def test_abcrules_correct_simple(rule_id, algorithm, resolute):
 
 
 @pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)
+def test_abcrules_correct_simple2(rule_id, algorithm, resolute):
+    profile = Profile(6)
+    profile.add_voters([{0, 1, 2}, {1, 3}])
+    committeesize = 4
+
+    committees = abcrules.compute(
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
+    )
+    if rule_id not in ["monroe", "trivial", "cc", "seqcc"]:
+        assert committees == [{0, 1, 2, 3}]
+
+
+@pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)
 def test_abcrules_return_lists_of_sets(rule_id, algorithm, resolute):
     profile = Profile(4)
     profile.add_voters([{0}, [1], [2], {3}])
@@ -672,7 +712,10 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute):
         rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
     )
 
-    assert committees == [{0, 1, 2}]
+    if rule_id == "trivial" and not resolute:
+        assert committees == [{0, 1, 2}, {0, 1, 3}, {0, 2, 3}, {1, 2, 3}]
+    else:
+        assert committees == [{0, 1, 2}]
 
     profile.add_voters([[]])
 
@@ -682,6 +725,8 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute):
 
     if rule_id == "rule-x-without-phragmen-phase":
         assert committees == [set()]
+    elif rule_id == "trivial" and not resolute:
+        assert committees == [{0, 1, 2}, {0, 1, 3}, {0, 2, 3}, {1, 2, 3}]
     else:
         assert committees == [{0, 1, 2}]
 
@@ -792,6 +837,8 @@ def test_abcrules_correct(rule_id, algorithm, resolute, profile, exp_results, co
         return  # correctness tests only for selected sequential rules
     if rule_id.startswith("revseq") and rule_id != "revseqpav":
         return  # correctness tests only for selected reverse sequential rules (only for revseqpav)
+    if rule_id == "rsd":
+        return  # correctness tests do not have much sense due to random nature of RSD
     print(profile)
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
@@ -868,10 +915,8 @@ def test_gurobi_cant_compute_av():
     profile.add_voters([[0, 1], [1, 2]])
     committeesize = 2
 
-    scorefct = scores.get_scorefct("av", committeesize)
-
     with pytest.raises(ValueError):
-        _gurobi_thiele_methods(profile, committeesize, scorefct, resolute=False)
+        _gurobi_thiele_methods(profile, committeesize, "av", resolute=False)
 
 
 @pytest.mark.cvxpy

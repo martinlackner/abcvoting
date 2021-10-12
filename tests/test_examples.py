@@ -8,6 +8,9 @@ from abcvoting.output import WARNING
 from abcvoting.output import output
 from test_abcrules import remove_solver_output
 import re
+import random
+
+random.seed(24121838)
 
 
 def remove_algorithm_info(out):

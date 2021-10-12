@@ -12,6 +12,7 @@ from abcvoting.misc import str_set_of_candidates, str_sets_of_candidates
 from abcvoting import scores
 from fractions import Fraction
 import math
+import random
 
 gmpy2_available = True
 try:
@@ -42,6 +43,8 @@ MAIN_RULE_IDS = [
     "rule-x",
     "phragmen-enestroem",
     "consensus-rule",
+    "trivial",
+    "rsd",
 ]
 
 ALGORITHM_NAMES = {
@@ -334,7 +337,24 @@ def get_rule(rule_id):
             algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
             resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
         )
-
+    if rule_id == "trivial":
+        return Rule(
+            rule_id=rule_id,
+            shortname="Trivial Rule",
+            longname="Trivial Rule",
+            compute_fct=compute_trivial_rule,
+            algorithms=("standard",),
+            resolute_values=[False, True],
+        )
+    if rule_id == "rsd":
+        return Rule(
+            rule_id=rule_id,
+            shortname="Random Serial Dictator",
+            longname="Random Serial Dictator",
+            compute_fct=compute_rsd,
+            algorithms=("standard",),
+            resolute_values=[True],
+        )
     if rule_id.startswith("geom"):
         parameter = rule_id[4:]
         return Rule(
@@ -2136,3 +2156,75 @@ def _consensus_rule_algorithm(profile, committeesize, resolute, algorithm):
         committees = [committees[0]]
     detailed_info = {}
     return committees, detailed_info
+
+
+def compute_trivial_rule(profile, committeesize, algorithm="standard", resolute=False):
+    """The trivial rule (all committees are winning)."""
+    check_enough_approved_candidates(profile, committeesize)
+
+    rule = get_rule("trivial")
+
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm
+    if algorithm not in rule.algorithms:
+        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_trivial_rule")
+
+    if resolute:
+        committees = [list(range(committeesize))]
+    else:
+        committees = list(combinations(profile.candidates, committeesize))
+
+    # optional output
+    output.info(header(rule.longname))
+    if resolute:
+        output.info("Computing only one winning committee (resolute=True)\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
+    output.info(str_committees_header(committees, winning=True))
+    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    # end of optional output
+
+    return sorted_committees(committees)
+
+
+def compute_rsd(profile, committeesize, algorithm="standard", resolute=True):
+    """The Random Serial Dictator rule."""
+    if not resolute:
+        raise NotImplementedError("compute_rsd does not support resolute=False.")
+
+    check_enough_approved_candidates(profile, committeesize)
+
+    rule = get_rule("rsd")
+
+    if not profile.has_unit_weights():
+        raise ValueError(f"{rule.shortname} is only implemented for unit weights (weight=1).")
+
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm
+    if algorithm not in rule.algorithms:
+        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_rsd")
+
+    approval_sets = [sorted(voter.approved) for voter in profile]
+    # random order of dictators
+    random.shuffle(approval_sets)
+    committee = set()
+    for approved in approval_sets:
+        if len(committee | set(approved)) <= committeesize:
+            committee.update(approved)
+        else:
+            missing = committeesize - len(committee)
+            committee.update(approved[:missing])
+        if len(committee) == committeesize:
+            break
+    else:
+        raise RuntimeError(f"{rule.longname} produced a too small committee. This should happen.")
+
+    committees = [committee]
+
+    # optional output
+    output.info(header(rule.longname))
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
+    output.info(str_committees_header(committees, winning=True))
+    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    # end of optional output
+
+    return sorted_committees(committees)
