@@ -75,6 +75,13 @@ Approval Chamberlin-Courant (CC)
 1 winning committee:
  {0, 1, 2, 3}
 
+--------------------------------------------------
+Lexicographic Approval Chamberlin-Courant (lex-CC)
+--------------------------------------------------
+
+1 winning committee:
+ {0, 1, 2, 3}
+
 ----------------
 2-Geometric Rule
 ----------------
@@ -226,10 +233,5 @@ Trivial Rule
  {1, 3, 4, 5}
  {2, 3, 4, 5}
 
-----------------------
-Random Serial Dictator
-----------------------
 
-1 winning committee:
- {2, 3, 4, 5}
 

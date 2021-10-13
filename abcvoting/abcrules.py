@@ -29,6 +29,7 @@ MAIN_RULE_IDS = [
     "pav",
     "slav",
     "cc",
+    "lexcc",
     "geom2",
     "seqpav",
     "revseqpav",
@@ -208,6 +209,15 @@ def get_rule(rule_id):
             compute_fct=compute_cc,
             # TODO sort by speed, requires testing
             algorithms=_THIELE_ALGORITHMS + ("ortools_cp",),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
+        )
+    if rule_id == "lexcc":
+        return Rule(
+            rule_id=rule_id,
+            shortname="lex-CC",
+            longname="Lexicographic Approval Chamberlin-Courant (lex-CC)",
+            compute_fct=compute_lexcc,
+            algorithms=("brute-force",),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "seqpav":
@@ -612,6 +622,78 @@ def compute_cc(profile, committeesize, algorithm="fastest", resolute=False):
     return compute_thiele_method(
         profile, committeesize, "cc", algorithm=algorithm, resolute=resolute
     )
+
+
+def compute_lexcc(profile, committeesize, algorithm="fastest", resolute=False):
+    """A lexicographic variant of Approval Chamberlin-Courant (CC).
+
+    This ABC rule maximizes the CC score, i.e., the number of voters with at least one approved
+    candidate in the winning committee. If there is more than one such committee, it chooses the
+    committee with most voters having at least two approved candidates in the committee. This
+    tie-breaking continues with values of 3, 4, .., k if necessary.
+
+    This rule can be seen as an analogue to the leximin social welfare ordering for utility
+    functions.
+    """
+    check_enough_approved_candidates(profile, committeesize)
+
+    rule = get_rule("lexcc")
+
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm
+
+    if algorithm == "gurobi":
+        committees = []  # abcrules_gurobi._gurobi_lexcc(profile, committeesize, resolute)
+    elif algorithm == "brute-force":
+        committees, detailed_info = _lexcc_bruteforce(profile, committeesize, resolute)
+    else:
+        raise NotImplementedError(
+            "Algorithm " + str(algorithm) + " not specified for compute_lexcc"
+        )
+
+    # optional output
+    output.info(header(rule.longname))
+    if resolute:
+        output.info("Computing only one winning committee (resolute=True)\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
+    output.details(f"At-least-ell scores:")
+    output.details(
+        "\n".join(
+            f" at-least-{ell}: {detailed_info['opt_score_vector'][ell-1]}"
+            for ell in range(1, committeesize + 1)
+        )
+        + "\n"
+    )
+    output.info(str_committees_header(committees, winning=True))
+    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    # end of optional output
+
+    return committees
+
+
+def _lexcc_bruteforce(profile, committeesize, resolute):
+    opt_committees = []
+    opt_score_vector = [0] * committeesize
+    for committee in combinations(profile.candidates, committeesize):
+        score_vector = [
+            scores.thiele_score(f"atleast{ell}", profile, committee)
+            for ell in range(1, committeesize + 1)
+        ]
+        for i in range(committeesize):
+            if opt_score_vector[i] > score_vector[i]:
+                break
+            if opt_score_vector[i] < score_vector[i]:
+                opt_score_vector = score_vector
+                opt_committees = [committee]
+                break
+        else:
+            opt_committees.append(committee)
+
+    committees = sorted_committees(opt_committees)
+    detailed_info = {"opt_score_vector": opt_score_vector}
+    if resolute:
+        committees = [committees[0]]
+    return committees, detailed_info
 
 
 def compute_seq_thiele_method(

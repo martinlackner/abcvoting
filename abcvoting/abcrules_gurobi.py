@@ -89,14 +89,6 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute, 
         if maxscore is None:
             maxscore = model.objVal
         elif model.objVal > maxscore + GUROBI_ACCURACY:
-            # TODO remove
-            committee = set(
-                cand for cand in profile.candidates if in_committee[cand].Xn >= 1 - GUROBI_ACCURACY
-            )
-            print(profile)
-            print(committees, committee)
-            print(scores.thiele_score("geom10", profile, committees[0]))
-            print(scores.thiele_score("geom10", profile, committee))
             raise RuntimeError(
                 "Gurobi found a solution better than a previous optimum. This "
                 f"should not happen (previous optimal score: {maxscore}, "
@@ -186,6 +178,11 @@ def _gurobi_thiele_methods(profile, committeesize, scorefct_id, resolute):
         set_opt_model_func, profile, committeesize, resolute, name=scorefct_id
     )
     return sorted_committees(committees)
+
+
+def _gurobi_lexcc(profile, committeesize, resolute):
+    pass
+    # TODO: write
 
 
 def _gurobi_monroe(profile, committeesize, resolute):

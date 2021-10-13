@@ -31,6 +31,9 @@ def get_scorefct(scorefct_id, committeesize=None):
     elif scorefct_id[:4] == "geom":
         base = Fraction(scorefct_id[4:])
         return functools.partial(geometric_score_fct, base=base)
+    elif scorefct_id[:7] == "atleast":
+        param = int(scorefct_id[7:])
+        return functools.partial(at_least_ell_fct, ell=param)
     else:
         raise UnknownScoreFunctionError(scorefct_id)
 
@@ -105,6 +108,17 @@ def av_score_fct(i):
 def cc_score_fct(i):
     """CC (Chamberlin-Courant) score function."""
     if i == 1:
+        return 1
+    else:
+        return 0
+
+
+def at_least_ell_fct(i, ell):
+    """At-least-ell score function.
+
+    Gives a score of 1 if ell approved candidates are in the committee.
+    The CC score function is equivalent to the At-least-1 score function."""
+    if i == ell:
         return 1
     else:
         return 0
