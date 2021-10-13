@@ -6,8 +6,10 @@ Approval-based committee (ABC) rules implemented as constraint
 from ortools.sat.python import cp_model
 from abcvoting.misc import sorted_committees
 
+MAX_ITERATIONS_DEFAULT = 1000
 
-def _optimize_rule_ortools(set_opt_model_func, profile, committeesize, resolute):
+
+def _optimize_rule_ortools(set_opt_model_func, profile, committeesize, resolute, max_iterations):
     """Compute ABC rules, which are given in the form of an integer optimization problem,
     using the OR-Tools CP-SAT Solver.
 
@@ -32,8 +34,7 @@ def _optimize_rule_ortools(set_opt_model_func, profile, committeesize, resolute)
     maxscore = None
     committees = []
 
-    # TODO add a max iterations parameter with fancy default value which works in almost all
-    #  cases to avoid endless hanging computations, e.g. when CI runs the tests
+    num_iterations = 0
     while True:
         model = cp_model.CpModel()
 
@@ -91,6 +92,13 @@ def _optimize_rule_ortools(set_opt_model_func, profile, committeesize, resolute)
         if resolute:
             break
 
+        num_iterations += 1
+        if num_iterations >= max_iterations:
+            raise RuntimeError(
+                f"maximum number of iterations did not suffice"
+                f" (more than {max_iterations} committees).\n"
+                "Easy fix: change value of MAX_ITERATIONS_DEFAULT."
+            )
     return committees
 
 
@@ -141,8 +149,14 @@ def _ortools_cc(profile, committeesize, resolute):
         profile,
         committeesize,
         resolute=resolute,
+        max_iterations=MAX_ITERATIONS_DEFAULT,
     )
     return sorted_committees(committees)
+
+
+def _ortools_lexcc(profile, committeesize, resolute):
+    pass
+    # TODO: write
 
 
 def _ortools_monroe(profile, committeesize, resolute):
@@ -215,6 +229,7 @@ def _ortools_monroe(profile, committeesize, resolute):
         profile,
         committeesize,
         resolute=resolute,
+        max_iterations=MAX_ITERATIONS_DEFAULT,
     )
     return sorted_committees(committees)
 
@@ -254,5 +269,6 @@ def _ortools_minimaxav(profile, committeesize, resolute):
         profile,
         committeesize,
         resolute=resolute,
+        max_iterations=MAX_ITERATIONS_DEFAULT,
     )
     return sorted_committees(committees)

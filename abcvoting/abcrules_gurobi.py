@@ -14,9 +14,12 @@ except ImportError:
     gurobipy_available = False
 
 GUROBI_ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
+MAX_ITERATIONS_DEFAULT = 1000
 
 
-def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute, name="None"):
+def _optimize_rule_gurobi(
+    set_opt_model_func, profile, committeesize, resolute, max_iterations, name="None"
+):
     """Compute rules, which are given in the form of an optimization problem, using Gurobi.
 
     Parameters
@@ -44,8 +47,7 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute, 
     maxscore = None
     committees = []
 
-    # TODO add a max iterations parameter with fancy default value which works in almost all
-    #  cases to avoid endless hanging computations, e.g. when CI runs the tests
+    num_iterations = 0
     while True:
         model = gb.Model()
 
@@ -114,6 +116,13 @@ def _optimize_rule_gurobi(set_opt_model_func, profile, committeesize, resolute, 
         if resolute:
             break
 
+        num_iterations += 1
+        if num_iterations >= max_iterations:
+            raise RuntimeError(
+                f"maximum number of iterations did not suffice"
+                f" (more than {max_iterations} committees).\n"
+                "Easy fix: change value of MAX_ITERATIONS_DEFAULT."
+            )
     return committees
 
 
@@ -175,7 +184,12 @@ def _gurobi_thiele_methods(profile, committeesize, scorefct_id, resolute):
         )
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func, profile, committeesize, resolute, name=scorefct_id
+        set_opt_model_func,
+        profile,
+        committeesize,
+        resolute,
+        max_iterations=MAX_ITERATIONS_DEFAULT,
+        name=scorefct_id,
     )
     return sorted_committees(committees)
 
@@ -240,7 +254,12 @@ def _gurobi_monroe(profile, committeesize, resolute):
         model.setObjective(satisfaction, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func, profile, committeesize, resolute=resolute, name="Monroe"
+        set_opt_model_func,
+        profile,
+        committeesize,
+        resolute=resolute,
+        max_iterations=MAX_ITERATIONS_DEFAULT,
+        name="Monroe",
     )
     return sorted_committees(committees)
 
@@ -295,7 +314,12 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute):
         model.setObjective(-loadbound, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func, profile, committeesize, resolute=resolute, name="minimax-Phragmen"
+        set_opt_model_func,
+        profile,
+        committeesize,
+        resolute=resolute,
+        max_iterations=MAX_ITERATIONS_DEFAULT,
+        name="minimax-Phragmen",
     )
     return sorted_committees(committees)
 
@@ -327,6 +351,11 @@ def _gurobi_minimaxav(profile, committeesize, resolute):
         model.setObjective(-max_hamming_distance, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func, profile, committeesize, resolute=resolute, name="Minimax AV"
+        set_opt_model_func,
+        profile,
+        committeesize,
+        resolute=resolute,
+        max_iterations=MAX_ITERATIONS_DEFAULT,
+        name="Minimax AV",
     )
     return sorted_committees(committees)

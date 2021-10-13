@@ -642,9 +642,7 @@ def compute_lexcc(profile, committeesize, algorithm="fastest", resolute=False):
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
 
-    if algorithm == "gurobi":
-        committees = []  # abcrules_gurobi._gurobi_lexcc(profile, committeesize, resolute)
-    elif algorithm == "brute-force":
+    if algorithm == "brute-force":
         committees, detailed_info = _lexcc_bruteforce(profile, committeesize, resolute)
     else:
         raise NotImplementedError(
