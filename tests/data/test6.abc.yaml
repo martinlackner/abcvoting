@@ -3,6 +3,9 @@ num_cand: 6
 committeesize: 3
 compute:
 - rule_id: pav
-  resolute: 'True'
+  resolute: true
 - rule_id: seqphragmen
   algorithm: float-fractions
+- rule_id: rule-x
+  algorithm: gmpy2-fractions
+  skip_phragmen_phase: true

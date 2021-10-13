@@ -102,7 +102,7 @@ def test_read_and_write_abc_yaml_file():
     profile1.add_voters([[3], [4, 1, 5], [0, 2], [], [0, 1, 2, 3, 4, 5], [5], [1], [1]])
     committeesize1 = 3
     compute_instances1 = [
-        {"rule_id": "pav", "resolute": "True"},
+        {"rule_id": "pav", "resolute": True},
         {"rule_id": "seqphragmen", "algorithm": "float-fractions"},
         {"rule_id": "rule-x", "algorithm": "gmpy2-fractions", "skip_phragmen_phase": True},
     ]
