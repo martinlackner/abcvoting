@@ -12,12 +12,17 @@ import random
 
 
 def remove_algorithm_info(out):
-    """Remove information about algorithms which may differ from system to system."""
-    filter_patterns = ("Algorithm: .*\n",)
+    """Remove information about algorithms which may differ from system to system or are random."""
+    filter_patterns = (
+        "Algorithm: .*\n",
+        "----------------------\nRandom Serial Dictator\n----------------------"
+        + "\n\n1 winning committee:\n {., ., ., .}",
+    )
 
     for filter_pattern in filter_patterns:
         out = re.sub(filter_pattern, "", out)
 
+    assert "Random Serial Dictator" not in out
     return out
 
 
@@ -155,7 +160,6 @@ def test_simple_py(check_output):
 
 # noinspection PyUnresolvedReferences
 def test_allrules_py(check_output):
-    random.seed(24121838)
     from examples import allrules
 
 
