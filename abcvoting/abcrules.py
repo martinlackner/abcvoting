@@ -2289,15 +2289,17 @@ def compute_rsd(profile, committeesize, algorithm="standard", resolute=True):
     random.shuffle(approval_sets)
     committee = set()
     for approved in approval_sets:
-        if len(committee | set(approved)) <= committeesize:
+        if len(committee) + len(approved) <= committeesize:
             committee.update(approved)
         else:
-            missing = committeesize - len(committee)
-            committee.update(approved[:missing])
+            for cand in approved:
+                committee.add(cand)
+                if len(committee) == committeesize:
+                    break
         if len(committee) == committeesize:
             break
     else:
-        raise RuntimeError(f"{rule.longname} produced a too small committee. This should happen.")
+        raise RuntimeError(f"{rule.longname} produced too small a committee. This should happen.")
 
     committees = [committee]
 
