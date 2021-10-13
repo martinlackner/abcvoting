@@ -84,11 +84,9 @@ def generate_abc_yaml_testinstances(
 
         rule_instances = []
         for rule_id in abcrules.MAIN_RULE_IDS:
+            if rule_id == "rsd":
+                continue  # result is random, not sensible for unit tests
             rule = abcrules.get_rule(rule_id)
-            # if rule_id == "minimaxphragmen":
-            #     algorithm = "mip_gurobi"
-            # else:
-            #     algorithm = "fastest"
 
             # if irresolute (resolute = False) is supported, then "result" should be
             # the list of committees returned for resolute=False.
