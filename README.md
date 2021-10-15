@@ -31,7 +31,7 @@ The following ABC rules are implemented:
 * Approval Chamberlin-Courant (CC)
 
 * Phragmén's sequential rule
-  
+
 * Monroe's rule
 
 * Minimax Approval Voting (MAV)
@@ -64,12 +64,12 @@ committeesize = 3
 # find winning committees for this profile according to PAV
 print(abcrules.compute_pav(profile, committeesize))
 ```
-The output is 
+The output is
 ```
 [{0, 1, 3}, {0, 1, 4}]
 ```
 which corresponds to the two winning committees {0,1,3} and {0,1,4}. Further examples can be found in the directory [examples/](examples).
-In [examples/abcsurvey/](examples/abcsurvey), all examples from the survey on ABC rules [2] are implemented. 
+In [examples/abcsurvey/](examples/abcsurvey), all examples from the survey on ABC rules [2] are implemented.
 
 ## Usage
 
@@ -80,7 +80,7 @@ Notes:
 
 * Most computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). The corresponding functions require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
 * Some functions use fractions (e.g., `compute_seqphragmen`). These compute significantly faster if the module [gmpy2](https://gmpy2.readthedocs.io/) is available. If gmpy2 is not available, the much slower Python module [fractions](https://docs.python.org/2/library/fractions.html) is used.
-* All voting methods have a parameter `resolute`. If it is set to true, only one winning committee is computed. In most cases, `resolute=True` speeds up the computation. 
+* All voting methods have a parameter `resolute`. If it is set to true, only one winning committee is computed. In most cases, `resolute=True` speeds up the computation.
 
 ## Installation
 
@@ -132,7 +132,7 @@ Bibtex:
                   Peter Regner and
                   Benjamin Krenn and
                   Stefan Schlomo Forster},
-  title        = {{abcvoting: A Python library of approval-based 
+  title        = {{abcvoting: A Python library of approval-based
                    committee voting rules}},
   year         = 2021,
   publisher    = {Zenodo},
@@ -161,6 +161,13 @@ pytest  -m "not gurobi and not scip and not cbc and not glpk_mi and not cvxpy an
 For development, configure the black formatter and pre-commit hooks - see below. Also installing
 all optional dependencies is recommended.
 
+A development package is build for every commit on the master branch and uploaded to the test
+instance of PyPI. It can be installed using the following command:
+
+```bash
+python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple abcvoting
+```
+
 
 ### Black formatting
 
@@ -169,11 +176,13 @@ checked by Github actions.
 [Configure your editor](https://black.readthedocs.io/en/latest/editor_integration.html), to run the
 black formatter.
 
+
 ### Pre-commit hooks
 
 Pre-commit hooks are not required, but they are recommended for development.
 [Pre-commit](https://pre-commit.com/) is used to manage and maintain pre-commit hooks. Install
 pre-commit (e.g. via apt, conda or pip) and then run`$ pre-commit install` to install the hooks.
+
 
 ## Acknowledgements
 
@@ -185,10 +194,11 @@ The following people have contributed code to this package or provided help with
 [Martin Lackner](http://martin.lackner.xyz/),
 [Pawel Batko](https://github.com/pbatko),
 [Dominik Peters](http://dominik-peters.de/),
-[Peter Regner](https://github.com/lumbric), 
+[Peter Regner](https://github.com/lumbric),
 [Piotr Skowron](https://www.mimuw.edu.pl/~ps219737/).
 
 The development of this module has been supported by the Austrian Science Fund FWF, grant P31890.
+
 
 ## References
 
@@ -208,10 +218,10 @@ Choice, chapter 2, pages 27–47. AI Access, 2017. http://research.illc.uva.nl/C
 A Quantitative Analysis of Multi-Winner Rules. arXiv preprint arXiv:1801.01527. 2018. https://arxiv.org/abs/1801.01527
 
 [5] Properties of multiwinner voting rules.
-Edith Elkind, Piotr Faliszewski, Piotr Skowron, and Arkadii Slinko. 
+Edith Elkind, Piotr Faliszewski, Piotr Skowron, and Arkadii Slinko.
 Social Choice and Welfare volume 48, pages 599–632. 2017. https://link.springer.com/article/10.1007/s00355-017-1026-z
 
-[6] Peters, Dominik, and Piotr Skowron. 
+[6] Peters, Dominik, and Piotr Skowron.
 Proportionality and the Limits of Welfarism. arXiv preprint arXiv:1911.11747. 2019. https://arxiv.org/abs/1911.11747
 
 -->
