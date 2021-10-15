@@ -9,7 +9,7 @@ from abcvoting import scores
 from abcvoting.output import output, DEBUG
 
 
-ACCURACY = 1e-9
+ACCURACY = 1e-8
 MAX_ITERATIONS_DEFAULT = 1000
 
 
@@ -73,6 +73,7 @@ def _optimize_rule_mip(
         # tree even if the production of the first feasible solutions is delayed.
         model.emphasis = 2
         model.opt_tol = ACCURACY
+        model.max_mip_gap = ACCURACY
         model.integer_tol = ACCURACY
 
         status = model.optimize()
