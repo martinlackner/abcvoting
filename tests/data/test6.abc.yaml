@@ -7,5 +7,5 @@ compute:
 - rule_id: seqphragmen
   algorithm: float-fractions
 - rule_id: rule-x
-  algorithm: gmpy2-fractions
+  algorithm: standard-fractions
   skip_phragmen_phase: true

@@ -104,7 +104,7 @@ def test_read_and_write_abc_yaml_file():
     compute_instances1 = [
         {"rule_id": "pav", "resolute": True},
         {"rule_id": "seqphragmen", "algorithm": "float-fractions"},
-        {"rule_id": "rule-x", "algorithm": "gmpy2-fractions", "skip_phragmen_phase": True},
+        {"rule_id": "rule-x", "algorithm": "standard-fractions", "skip_phragmen_phase": True},
     ]
 
     fileio.write_abcvoting_instance_to_yaml_file(
