@@ -1,3 +1,4 @@
+import os
 import setuptools
 import subprocess
 
@@ -9,14 +10,52 @@ def read_readme():
 
 
 def read_version():
-    # this is not guaranteed to be a valid version string, but should work well enough
-    git_describe = subprocess.run(["git", "describe", "--tags"], stdout=subprocess.PIPE)
+    """This is not guaranteed to be a valid version string, but should work well enough.
+
+    Tested with version strings as tag names of the following formats:
+
+    2.0.0
+    2.0.0-beta
+    v2.0.0
+    v2.0.0-beta
+
+    Version strings need to comply with PEP 440. Git tags are used, but for development versions
+    the build number is appended. To comply with PEP 440 everything after the first dash is removed
+    before appending the build number.
+
+    """
+
+    git_describe = subprocess.run(
+        ["git", "describe", "--tags", "--abbrev=0"], stdout=subprocess.PIPE
+    )
 
     if git_describe.returncode == 0:
         git_version = git_describe.stdout.strip().decode("utf-8")
     else:
-        # per default no tags available in Github actions, but also no real need for a version
-        git_version = "0.0.0"
+        # per default no old commit are fetched in Github actions, that means, that git describe
+        # fails if the latest commit is not a tag, because old tags can't be found.
+        # to fetch tags in Github actions use "fetch-depth: 0"
+        raise RuntimeError("Git describe failed: did you fetch at least one tag?")
+
+    # git_version contains the latest tag, if it is not identical with HEAD need to postifx
+    head_is_tag = (
+        subprocess.run(
+            ["git", "describe", "--tags", "--exact-match", "HEAD"], stderr=subprocess.PIPE
+        ).returncode
+        == 0
+    )
+    if not head_is_tag:
+        try:
+            # set by Github actions, necessary for unique file names for PyPI
+            build_nr = os.environ["BUILD_NUMBER"]
+        except KeyError:
+            build_nr = 0
+
+        # +something is disallowed on PyPI even if allowed in PEP 440... :-/
+        # https://github.com/pypa/pypi-legacy/issues/731#issuecomment-345461596
+
+        next_stable = git_version.split("-")[0]
+        git_version = f"{next_stable}.dev{build_nr}"
 
     if git_version[0] == "v":
         git_version = git_version[1:]

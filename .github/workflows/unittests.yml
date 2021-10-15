@@ -16,6 +16,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        # fetch all tags to be able to generate a version number for test packages
+        fetch-depth: 0
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
@@ -62,6 +65,11 @@ jobs:
     # tests the package, the release is done in build.yml
     - name: Build a binary wheel and a source tarball
       run: python setup.py bdist_wheel
+      env:
+        # does not increment on re-run... :(
+        # this means this will fail in the last step, when uploading the same package again to PyPI
+        # because PyPI requires unique file names for uploaded packages
+        BUILD_NUMBER: ${{ github.run_number }}
 
     # tests uploading the package to the test repo, but only if API_KEY is defined
     - name: Publish distribution package to Test PyPI
