@@ -263,8 +263,6 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
             solver_id=solver_id,
             name=f"lexcc-atleast{round}",
         )
-        print(satisfaction_constraints)
-        print(committees)
         satisfaction_constraints.append(
             scores.thiele_score(f"atleast{round}", profile, committees[0])
         )

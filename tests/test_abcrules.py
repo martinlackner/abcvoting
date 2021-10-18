@@ -1120,8 +1120,8 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
 
     try:
         profile = Profile(2)
-        profile.add_voters([[0]])
-        committeesize = 1
+        profile.add_voters([[0], [1]])
+        committeesize = 2
 
         committees = abcrules.compute(
             rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
@@ -1151,6 +1151,7 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
             if verbosity <= DEBUG:
                 assert start_output in out
             else:
+                print(out, start_output)
                 assert out.startswith(start_output)
             end_output = (
                 f"{misc.str_committees_header(committees, winning=True)}\n"
