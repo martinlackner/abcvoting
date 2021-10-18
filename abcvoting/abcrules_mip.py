@@ -10,11 +10,11 @@ from abcvoting.output import output, DEBUG
 
 
 ACCURACY = 1e-8
-MAX_ITERATIONS_DEFAULT = 1000
+MAX_NUM_OF_COMMITTEES_DEFAULT = 1000
 
 
 def _optimize_rule_mip(
-    set_opt_model_func, profile, committeesize, scorefct, resolute, solver_id, max_iterations
+    set_opt_model_func, profile, committeesize, scorefct, resolute, solver_id, max_num_of_committes
 ):
     """Compute rules, which are given in the form of an optimization problem, using Python MIP.
 
@@ -45,7 +45,6 @@ def _optimize_rule_mip(
     if solver_id not in ["gurobi", "cbc"]:
         raise ValueError(f"Solver {solver_id} not known in Python MIP.")
 
-    num_iterations = 0
     while True:
         model = mip.Model(solver_name=solver_id)
 
@@ -115,18 +114,20 @@ def _optimize_rule_mip(
 
         if resolute:
             break
+        if len(committees) >= max_num_of_committes:
+            return committees
 
-        num_iterations += 1
-        if num_iterations >= max_iterations:
-            raise RuntimeError(
-                f"maximum number of iterations did not suffice"
-                f" (more than {max_iterations} committees).\n"
-                "Easy fix: change value of MAX_ITERATIONS_DEFAULT."
-            )
     return committees
 
 
-def _mip_thiele_methods(profile, committeesize, scorefct_id, resolute, solver_id):
+def _mip_thiele_methods(
+    profile,
+    committeesize,
+    scorefct_id,
+    resolute,
+    solver_id,
+    max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     def set_opt_model_func(
         model, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):
@@ -185,18 +186,22 @@ def _mip_thiele_methods(profile, committeesize, scorefct_id, resolute, solver_id
         committeesize,
         scorefct=scorefct,
         resolute=resolute,
-        max_iterations=MAX_ITERATIONS_DEFAULT,
+        max_num_of_committes=max_num_of_committes,
         solver_id=solver_id,
     )
     return sorted_committees(committees)
 
 
-def _mip_lexcc(profile, committeesize, resolute):
+def _mip_lexcc(
+    profile, committeesize, resolute, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
+):
     pass
     # TODO: write
 
 
-def _mip_monroe(profile, committeesize, resolute, solver_id):
+def _mip_monroe(
+    profile, committeesize, resolute, solver_id, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
+):
     def set_opt_model_func(
         model, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):
@@ -257,13 +262,15 @@ def _mip_monroe(profile, committeesize, resolute, solver_id):
         committeesize,
         scorefct=None,
         resolute=resolute,
-        max_iterations=MAX_ITERATIONS_DEFAULT,
+        max_num_of_committes=max_num_of_committes,
         solver_id=solver_id,
     )
     return sorted_committees(committees)
 
 
-def _mip_minimaxphragmen(profile, committeesize, resolute, solver_id):
+def _mip_minimaxphragmen(
+    profile, committeesize, resolute, solver_id, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
+):
     """ILP for Phragmen's minimax rule (minimax-Phragmen), using Python MIP.
 
     Minimizes the maximum load.
@@ -324,13 +331,15 @@ def _mip_minimaxphragmen(profile, committeesize, resolute, solver_id):
         committeesize,
         scorefct=None,
         resolute=resolute,
-        max_iterations=MAX_ITERATIONS_DEFAULT,
+        max_num_of_committes=max_num_of_committes,
         solver_id=solver_id,
     )
     return sorted_committees(committees)
 
 
-def _mip_minimaxav(profile, committeesize, resolute, solver_id):
+def _mip_minimaxav(
+    profile, committeesize, resolute, solver_id, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
+):
     def set_opt_model_func(
         model, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):
@@ -364,7 +373,7 @@ def _mip_minimaxav(profile, committeesize, resolute, solver_id):
         committeesize,
         scorefct=None,
         resolute=resolute,
-        max_iterations=MAX_ITERATIONS_DEFAULT,
+        max_num_of_committes=max_num_of_committes,
         solver_id=solver_id,
     )
     return sorted_committees(committees)
