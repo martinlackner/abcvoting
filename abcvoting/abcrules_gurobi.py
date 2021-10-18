@@ -14,11 +14,10 @@ except ImportError:
     gurobipy_available = False
 
 GUROBI_ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
-MAX_NUM_OF_COMMITTEES_DEFAULT = 1000
 
 
 def _optimize_rule_gurobi(
-    set_opt_model_func, profile, committeesize, resolute, max_num_of_committes, name="None"
+    set_opt_model_func, profile, committeesize, resolute, max_num_of_committees, name="None"
 ):
     """Compute rules, which are given in the form of an optimization problem, using Gurobi.
 
@@ -32,6 +31,10 @@ def _optimize_rule_gurobi(
     committeesize : int
         number of chosen alternatives
     resolute : bool
+    max_num_of_committees : int
+        maximum number of committees this method returns, value can be None
+    name : str
+        name of the model, used for error messages
 
     Returns
     -------
@@ -114,18 +117,18 @@ def _optimize_rule_gurobi(
 
         if resolute:
             break
-        if len(committees) >= max_num_of_committes:
+        if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
             return committees
 
     return committees
 
 
 def _gurobi_thiele_methods(
+    scorefct_id,
     profile,
     committeesize,
-    scorefct_id,
     resolute,
-    max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    max_num_of_committees,
 ):
     def set_opt_model_func(model, in_committee):
         # utility[(voter, l)] contains (intended binary) variables counting the number of approved
@@ -188,22 +191,18 @@ def _gurobi_thiele_methods(
         profile,
         committeesize,
         resolute,
-        max_num_of_committes=max_num_of_committes,
+        max_num_of_committees=max_num_of_committees,
         name=scorefct_id,
     )
     return sorted_committees(committees)
 
 
-def _gurobi_lexcc(
-    profile, committeesize, resolute, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
     pass
     # TODO: write
 
 
-def _gurobi_monroe(
-    profile, committeesize, resolute, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _gurobi_monroe(profile, committeesize, resolute, max_num_of_committees):
     def set_opt_model_func(model, in_committee):
         num_voters = len(profile)
 
@@ -262,15 +261,13 @@ def _gurobi_monroe(
         profile,
         committeesize,
         resolute=resolute,
-        max_num_of_committes=max_num_of_committes,
+        max_num_of_committees=max_num_of_committees,
         name="Monroe",
     )
     return sorted_committees(committees)
 
 
-def _gurobi_minimaxphragmen(
-    profile, committeesize, resolute, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _gurobi_minimaxphragmen(profile, committeesize, resolute, max_num_of_committees):
     """ILP for Phragmen's minimax rule (minimax-Phragmen), using Gurobi.
 
     Minimizes the maximum load.
@@ -324,15 +321,13 @@ def _gurobi_minimaxphragmen(
         profile,
         committeesize,
         resolute=resolute,
-        max_num_of_committes=max_num_of_committes,
+        max_num_of_committees=max_num_of_committees,
         name="minimax-Phragmen",
     )
     return sorted_committees(committees)
 
 
-def _gurobi_minimaxav(
-    profile, committeesize, resolute, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _gurobi_minimaxav(profile, committeesize, resolute, max_num_of_committees):
     def set_opt_model_func(model, in_committee):
         max_hamming_distance = model.addVar(
             lb=0,
@@ -363,7 +358,7 @@ def _gurobi_minimaxav(
         profile,
         committeesize,
         resolute=resolute,
-        max_num_of_committes=max_num_of_committes,
+        max_num_of_committees=max_num_of_committees,
         name="Minimax AV",
     )
     return sorted_committees(committees)

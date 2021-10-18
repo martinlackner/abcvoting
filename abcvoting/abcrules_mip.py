@@ -10,11 +10,16 @@ from abcvoting.output import output, DEBUG
 
 
 ACCURACY = 1e-8
-MAX_NUM_OF_COMMITTEES_DEFAULT = 1000
 
 
 def _optimize_rule_mip(
-    set_opt_model_func, profile, committeesize, scorefct, resolute, solver_id, max_num_of_committes
+    set_opt_model_func,
+    profile,
+    committeesize,
+    scorefct,
+    resolute,
+    max_num_of_committees,
+    solver_id,
 ):
     """Compute rules, which are given in the form of an optimization problem, using Python MIP.
 
@@ -29,6 +34,8 @@ def _optimize_rule_mip(
         number of chosen alternatives
     scorefct : callable
     resolute : bool
+    max_num_of_committees : int
+        maximum number of committees this method returns, value can be None
     solver_id : str
 
     Returns
@@ -114,19 +121,19 @@ def _optimize_rule_mip(
 
         if resolute:
             break
-        if len(committees) >= max_num_of_committes:
+        if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
             return committees
 
     return committees
 
 
 def _mip_thiele_methods(
+    scorefct_id,
     profile,
     committeesize,
-    scorefct_id,
     resolute,
+    max_num_of_committees,
     solver_id,
-    max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
     def set_opt_model_func(
         model, profile, in_committee, committeesize, previously_found_committees, scorefct
@@ -186,22 +193,18 @@ def _mip_thiele_methods(
         committeesize,
         scorefct=scorefct,
         resolute=resolute,
-        max_num_of_committes=max_num_of_committes,
+        max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
     )
     return sorted_committees(committees)
 
 
-def _mip_lexcc(
-    profile, committeesize, resolute, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_id):
     pass
     # TODO: write
 
 
-def _mip_monroe(
-    profile, committeesize, resolute, solver_id, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _mip_monroe(profile, committeesize, resolute, max_num_of_committees, solver_id):
     def set_opt_model_func(
         model, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):
@@ -262,15 +265,13 @@ def _mip_monroe(
         committeesize,
         scorefct=None,
         resolute=resolute,
-        max_num_of_committes=max_num_of_committes,
+        max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
     )
     return sorted_committees(committees)
 
 
-def _mip_minimaxphragmen(
-    profile, committeesize, resolute, solver_id, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _mip_minimaxphragmen(profile, committeesize, resolute, max_num_of_committees, solver_id):
     """ILP for Phragmen's minimax rule (minimax-Phragmen), using Python MIP.
 
     Minimizes the maximum load.
@@ -331,15 +332,13 @@ def _mip_minimaxphragmen(
         committeesize,
         scorefct=None,
         resolute=resolute,
-        max_num_of_committes=max_num_of_committes,
+        max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
     )
     return sorted_committees(committees)
 
 
-def _mip_minimaxav(
-    profile, committeesize, resolute, solver_id, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _mip_minimaxav(profile, committeesize, resolute, max_num_of_committees, solver_id):
     def set_opt_model_func(
         model, profile, in_committee, committeesize, previously_found_committees, scorefct
     ):
@@ -373,7 +372,7 @@ def _mip_minimaxav(
         committeesize,
         scorefct=None,
         resolute=resolute,
-        max_num_of_committes=max_num_of_committes,
+        max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
     )
     return sorted_committees(committees)

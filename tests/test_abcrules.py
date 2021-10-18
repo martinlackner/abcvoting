@@ -921,7 +921,9 @@ def test_gurobi_cant_compute_av():
     committeesize = 2
 
     with pytest.raises(ValueError):
-        _gurobi_thiele_methods(profile, committeesize, "av", resolute=False)
+        _gurobi_thiele_methods(
+            profile, committeesize, "av", resolute=False, max_num_of_committees=None
+        )
 
 
 @pytest.mark.cvxpy
@@ -995,7 +997,7 @@ def test_unspecified_algorithms(rule_id, resolute):
     profile = Profile(3)
     profile.add_voters([[0, 1], [1, 2]])
     committeesize = 2
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(abcrules.UnknownAlgorithm):
         rule.compute(
             profile,
             committeesize,
@@ -1161,3 +1163,51 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
 
     finally:
         output.set_verbosity(verbosity=WARNING)
+
+
+@pytest.mark.parametrize("rule_id, algorithm", testrules.rule_algorithm_onlyresolute)
+@pytest.mark.parametrize("max_num_of_committees", [-1, 0, 1, "None"])
+def test_resolute_and_max_num_of_committees(rule_id, algorithm, max_num_of_committees):
+    num_cand = 6
+    profile = Profile(num_cand)
+    profile.add_voters([[cand] for cand in range(num_cand)])
+    committeesize = 2
+    committees = abcrules.compute(
+        rule_id,
+        profile,
+        committeesize,
+        resolute=True,
+        algorithm=algorithm,
+    )
+    assert len(committees) == 1
+    with pytest.raises(ValueError):
+        committees = abcrules.compute(
+            rule_id,
+            profile,
+            committeesize,
+            resolute=True,
+            algorithm=algorithm,
+            max_num_of_committees=max_num_of_committees,
+        )
+
+
+@pytest.mark.parametrize("rule_id, algorithm", testrules.rule_algorithm_onlyirresolute)
+@pytest.mark.parametrize("max_num_of_committees", [1, 3, 5, 7])
+def test_resolute_and_max_num_of_committees(rule_id, algorithm, max_num_of_committees):
+    num_cand = 5
+    profile = Profile(num_cand)
+    profile.add_voters([[cand] for cand in range(num_cand)])
+    committeesize = 1
+    TOTAL_NUM_OF_COMMITTEES = 5
+    committees = abcrules.compute(
+        rule_id,
+        profile,
+        committeesize,
+        resolute=False,
+        algorithm=algorithm,
+        max_num_of_committees=max_num_of_committees,
+    )
+    if max_num_of_committees <= TOTAL_NUM_OF_COMMITTEES:
+        assert len(committees) == max_num_of_committees
+    else:
+        assert len(committees) == TOTAL_NUM_OF_COMMITTEES

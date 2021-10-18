@@ -2,11 +2,10 @@
 """Approval-based committee (ABC) voting rules."""
 
 import functools
-from itertools import combinations
+import itertools
 from abcvoting.output import output
 from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_cvxpy, abcrules_mip, misc
 from abcvoting.misc import sorted_committees
-from abcvoting.misc import check_enough_approved_candidates
 from abcvoting.misc import str_committees_header, header
 from abcvoting.misc import str_set_of_candidates, str_sets_of_candidates
 from abcvoting import scores
@@ -67,6 +66,10 @@ ALGORITHM_NAMES = {
 
 FLOAT_ISCLOSE_REL_TOL = 1e-12
 
+# MAX_NUM_OF_COMMITTEES_DEFAULT can be set to None for no constraint on the maximum number
+# of committees.
+MAX_NUM_OF_COMMITTEES_DEFAULT = None
+
 
 class Rule:
     """Class containing main information about an ABC rule."""
@@ -105,12 +108,54 @@ class Rule:
         """Compute rule using self._compute_fct."""
         return self._compute_fct(profile, committeesize, **kwargs)
 
+    def verify_compute_parameters(
+        self,
+        profile,
+        committeesize,
+        algorithm,
+        resolute,
+        max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    ):
+        """Basic verifications that the parameter values for computing the ABC rule
+        are sensible."""
+        if committeesize < 1:
+            raise ValueError(f"Parameter `committeesize` must be a positive integer.")
+
+        misc.check_enough_approved_candidates(profile, committeesize)
+
+        if algorithm not in self.algorithms:
+            raise UnknownAlgorithm(self.rule_id, algorithm)
+
+        if resolute not in self.resolute_values:
+            raise NotImplementedError(
+                f"ABC rule {self.rule_id} does not support resolute={resolute}."
+            )
+
+        if resolute and not (max_num_of_committees is None or max_num_of_committees == 1):
+            raise ValueError(
+                f"Parameter `max_num_of_committees` can only be used in combination with "
+                f"resolute=False, must be 1 or None otherwise."
+            )
+
+        if max_num_of_committees is not None and max_num_of_committees < 1:
+            raise ValueError(
+                "Parameter `max_num_of_committees` must be None or a positive integer."
+            )
+
 
 class UnknownRuleIDError(ValueError):
-    """UnknownRuleIDError exception raised if an unknown rule id is used."""
+    """Unknown rule id."""
 
     def __init__(self, rule_id):
         message = 'Rule ID "' + str(rule_id) + '" is not known.'
+        super(ValueError, self).__init__(message)
+
+
+class UnknownAlgorithm(ValueError):
+    """Unknown algorithm for a given ABC rule."""
+
+    def __init__(self, rule_id, algorithm):
+        message = f"Algorithm {algorithm} not specified for ABC rule {rule_id}."
         super(ValueError, self).__init__(message)
 
 
@@ -371,7 +416,7 @@ def get_rule(rule_id):
             rule_id=rule_id,
             shortname=f"{parameter}-Geometric",
             longname=f"{parameter}-Geometric Rule",
-            compute_fct=functools.partial(compute_thiele_method, scorefct_id=rule_id),
+            compute_fct=functools.partial(compute_thiele_method, rule_id),
             algorithms=_THIELE_ALGORITHMS,
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
@@ -398,7 +443,7 @@ def get_rule(rule_id):
                 rule_id=rule_id,
                 shortname=f"seq-{get_rule(scorefct_id).shortname}",
                 longname=f"Sequential {get_rule(scorefct_id).longname}",
-                compute_fct=functools.partial(compute_seq_thiele_method, scorefct_id=scorefct_id),
+                compute_fct=functools.partial(compute_seq_thiele_method, scorefct_id),
                 algorithms=("standard",),
                 resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
             )
@@ -408,9 +453,7 @@ def get_rule(rule_id):
                 rule_id=rule_id,
                 shortname=f"revseq-{get_rule(scorefct_id).shortname}",
                 longname=f"Reverse Sequential {get_rule(scorefct_id).longname}",
-                compute_fct=functools.partial(
-                    compute_revseq_thiele_method, scorefct_id=scorefct_id
-                ),
+                compute_fct=functools.partial(compute_revseq_thiele_method, scorefct_id),
                 algorithms=("standard",),
                 resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
             )
@@ -424,10 +467,10 @@ def get_rule(rule_id):
 def compute(rule_id, profile, committeesize, result=None, **kwargs):
     """Compute rule given by `rule_id`."""
     rule = get_rule(rule_id)
-    committees = rule.compute(profile, committeesize, **kwargs)
+    committees = rule.compute(profile=profile, committeesize=committeesize, **kwargs)
     if result is not None:
         # verify that the parameter `result` is indeed the result of computing the ABC rule
-        resolute = kwargs.get("resolute", False)
+        resolute = kwargs.get("resolute", rule.resolute_values[0])
         misc.verify_expected_committees_equals_actual_committees(
             actual_committees=committees,
             expected_committees=result,
@@ -438,7 +481,12 @@ def compute(rule_id, profile, committeesize, result=None, **kwargs):
 
 
 def compute_thiele_method(
-    profile, committeesize, scorefct_id, algorithm="fastest", resolute=False
+    scorefct_id,
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
     """Thiele methods.
 
@@ -454,47 +502,68 @@ def compute_thiele_method(
     "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
     https://arxiv.org/abs/2007.01795
     """
-    check_enough_approved_candidates(profile, committeesize)
-
     rule = get_rule(scorefct_id)
-
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_thiele_methods(
-            profile, committeesize, scorefct_id, resolute
+            scorefct_id=scorefct_id,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
         )
     elif algorithm == "branch-and-bound":
         committees, detailed_info = _thiele_methods_branchandbound(
-            profile, committeesize, scorefct_id, resolute
+            scorefct_id=scorefct_id,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
         )
     elif algorithm == "brute-force":
         committees, detailed_info = _thiele_methods_bruteforce(
-            profile, committeesize, scorefct_id, resolute
+            scorefct_id=scorefct_id,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
         )
     elif algorithm.startswith("cvxpy_"):
         committees = abcrules_cvxpy.cvxpy_thiele_methods(
-            profile,
-            committeesize,
-            scorefct_id,
-            resolute,
+            scorefct_id=scorefct_id,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
             solver_id=algorithm[6:],
         )
     elif algorithm.startswith("mip_"):
         committees = abcrules_mip._mip_thiele_methods(
-            profile,
-            committeesize,
-            scorefct_id,
-            resolute,
+            scorefct_id=scorefct_id,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
             solver_id=algorithm[4:],
         )
     elif algorithm == "ortools_cp" and scorefct_id == "cc":
-        committees = abcrules_ortools._ortools_cc(profile, committeesize, resolute)
-    else:
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_thiele_method"
+        committees = abcrules_ortools._ortools_cc(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
         )
+    else:
+        raise UnknownAlgorithm(scorefct_id, algorithm)
 
     # optional output
     output.info(header(rule.longname))
@@ -514,14 +583,20 @@ def compute_thiele_method(
     return committees
 
 
-def _thiele_methods_bruteforce(profile, committeesize, scorefct_id, resolute):
+def _thiele_methods_bruteforce(
+    scorefct_id,
+    profile,
+    committeesize,
+    resolute,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Brute-force algorithm for Thiele methods (PAV, CC, etc.).
 
     Only intended for comparison, much slower than _thiele_methods_branchandbound()
     """
     opt_committees = []
     opt_thiele_score = -1
-    for committee in combinations(profile.candidates, committeesize):
+    for committee in itertools.combinations(profile.candidates, committeesize):
         score = scores.thiele_score(scorefct_id, profile, committee)
         if score > opt_thiele_score:
             opt_committees = [committee]
@@ -530,18 +605,26 @@ def _thiele_methods_bruteforce(profile, committeesize, scorefct_id, resolute):
             opt_committees.append(committee)
 
     committees = sorted_committees(opt_committees)
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     detailed_info = {}
     if resolute:
         committees = [committees[0]]
     return committees, detailed_info
 
 
-def _thiele_methods_branchandbound(profile, committeesize, scorefct_id, resolute):
+def _thiele_methods_branchandbound(
+    scorefct_id,
+    profile,
+    committeesize,
+    resolute,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Branch-and-bound algorithm for Thiele methods."""
     scorefct = scores.get_scorefct(scorefct_id, committeesize)
 
     best_committees = []
-    init_com, _ = _seq_thiele_resolute(profile, committeesize, scorefct_id)
+    init_com, _ = _seq_thiele_resolute(scorefct_id, profile, committeesize)
     init_com = init_com[0]
     best_score = scores.thiele_score(scorefct_id, profile, init_com)
     part_coms = [[]]
@@ -571,6 +654,8 @@ def _thiele_methods_branchandbound(profile, committeesize, scorefct_id, resolute
                     part_coms.insert(0, part_com + [cand])
 
     committees = sorted_committees(best_committees)
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     if resolute:
         committees = [committees[0]]
 
@@ -578,7 +663,13 @@ def _thiele_methods_branchandbound(profile, committeesize, scorefct_id, resolute
     return committees, detailed_info
 
 
-def compute_pav(profile, committeesize, algorithm="fastest", resolute=False):
+def compute_pav(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Proportional Approval Voting (PAV).
 
     This ABC rule belongs to the class of Thiele methods.
@@ -589,11 +680,22 @@ def compute_pav(profile, committeesize, algorithm="fastest", resolute=False):
     https://arxiv.org/abs/2007.01795
     """
     return compute_thiele_method(
-        profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
+        scorefct_id="pav",
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
     )
 
 
-def compute_slav(profile, committeesize, algorithm="fastest", resolute=False):
+def compute_slav(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Sainte-Lague Approval Voting (SLAV).
 
     This ABC rule belongs to the class of Thiele methods.
@@ -605,11 +707,22 @@ def compute_slav(profile, committeesize, algorithm="fastest", resolute=False):
     https://arxiv.org/abs/1801.01527
     """
     return compute_thiele_method(
-        profile, committeesize, "slav", algorithm=algorithm, resolute=resolute
+        scorefct_id="slav",
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
     )
 
 
-def compute_cc(profile, committeesize, algorithm="fastest", resolute=False):
+def compute_cc(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Approval Chamberlin-Courant (CC).
 
     This ABC rule belongs to the class of Thiele methods.
@@ -620,11 +733,22 @@ def compute_cc(profile, committeesize, algorithm="fastest", resolute=False):
     https://arxiv.org/abs/2007.01795
     """
     return compute_thiele_method(
-        profile, committeesize, "cc", algorithm=algorithm, resolute=resolute
+        scorefct_id="cc",
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
     )
 
 
-def compute_lexcc(profile, committeesize, algorithm="fastest", resolute=False):
+def compute_lexcc(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """A lexicographic variant of Approval Chamberlin-Courant (CC).
 
     This ABC rule maximizes the CC score, i.e., the number of voters with at least one approved
@@ -635,19 +759,27 @@ def compute_lexcc(profile, committeesize, algorithm="fastest", resolute=False):
     This rule can be seen as an analogue to the leximin social welfare ordering for utility
     functions.
     """
-    check_enough_approved_candidates(profile, committeesize)
-
-    rule = get_rule("lexcc")
-
+    rule_id = "lexcc"
+    rule = get_rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
     if algorithm == "brute-force":
-        committees, detailed_info = _lexcc_bruteforce(profile, committeesize, resolute)
-    else:
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_lexcc"
+        committees, detailed_info = _lexcc_bruteforce(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
         )
+    else:
+        raise rule.UnknownAlgorithm(algorithm)
 
     # optional output
     output.info(header(rule.longname))
@@ -669,10 +801,10 @@ def compute_lexcc(profile, committeesize, algorithm="fastest", resolute=False):
     return committees
 
 
-def _lexcc_bruteforce(profile, committeesize, resolute):
+def _lexcc_bruteforce(profile, committeesize, resolute, max_num_of_committees):
     opt_committees = []
     opt_score_vector = [0] * committeesize
-    for committee in combinations(profile.candidates, committeesize):
+    for committee in itertools.combinations(profile.candidates, committeesize):
         score_vector = [
             scores.thiele_score(f"atleast{ell}", profile, committee)
             for ell in range(1, committeesize + 1)
@@ -691,11 +823,18 @@ def _lexcc_bruteforce(profile, committeesize, resolute):
     detailed_info = {"opt_score_vector": opt_score_vector}
     if resolute:
         committees = [committees[0]]
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     return committees, detailed_info
 
 
 def compute_seq_thiele_method(
-    profile, committeesize, scorefct_id, algorithm="fastest", resolute=True
+    scorefct_id,
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
     """Sequential Thiele methods.
 
@@ -704,23 +843,28 @@ def compute_seq_thiele_method(
     "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
     https://arxiv.org/abs/2007.01795
     """
-    check_enough_approved_candidates(profile, committeesize)
     scores.get_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
-
     rule_id = "seq" + scorefct_id
     rule = get_rule(rule_id)
-
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
-    if algorithm != "standard":
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_seq_thiele_method"
-        )
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
-    if resolute:
-        committees, detailed_info = _seq_thiele_resolute(profile, committeesize, scorefct_id)
+    if algorithm == "standard":
+        if resolute:
+            committees, detailed_info = _seq_thiele_resolute(scorefct_id, profile, committeesize)
+        else:
+            committees, detailed_info = _seq_thiele_irresolute(
+                scorefct_id, profile, committeesize, max_num_of_committees
+            )
     else:
-        committees, detailed_info = _seq_thiele_irresolute(profile, committeesize, scorefct_id)
+        raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
     output.info(header(rule.longname))
@@ -769,7 +913,7 @@ def compute_seq_thiele_method(
     return sorted_committees(committees)
 
 
-def _seq_thiele_resolute(profile, committeesize, scorefct_id):
+def _seq_thiele_resolute(scorefct_id, profile, committeesize):
     """Compute one winning committee (=resolute) for sequential Thiele methods.
 
     Tiebreaking between candidates in favor of candidate with smaller
@@ -796,7 +940,7 @@ def _seq_thiele_resolute(profile, committeesize, scorefct_id):
     return sorted_committees([committee]), detailed_info
 
 
-def _seq_thiele_irresolute(profile, committeesize, scorefct_id):
+def _seq_thiele_irresolute(scorefct_id, profile, committeesize, max_num_of_committees):
     """Compute all winning committee (=irresolute) for sequential Thiele methods.
 
     Consider all possible ways to break ties between candidates
@@ -816,12 +960,21 @@ def _seq_thiele_irresolute(profile, committeesize, scorefct_id):
                     next_comm = tuple(sorted(committee + (cand,)))
                     comm_scores_next[next_comm] = score + additional_score_cand[cand]
         comm_scores = comm_scores_next
+    committees = sorted_committees(list(comm_scores.keys()))
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     detailed_info = {}
-    return sorted_committees(list(comm_scores.keys())), detailed_info
+    return committees, detailed_info
 
 
 # Sequential PAV
-def compute_seqpav(profile, committeesize, algorithm="fastest", resolute=True):
+def compute_seqpav(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Sequential PAV (seq-PAV).
 
     For a mathematical description of this rule, see e.g. the survey by
@@ -830,11 +983,22 @@ def compute_seqpav(profile, committeesize, algorithm="fastest", resolute=True):
     https://arxiv.org/abs/2007.01795
     """
     return compute_seq_thiele_method(
-        profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
+        scorefct_id="pav",
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
     )
 
 
-def compute_seqslav(profile, committeesize, algorithm="fastest", resolute=True):
+def compute_seqslav(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Sequential Sainte-Lague Approval Voting (SLAV).
 
     For a mathematical description of SLAV, see e.g.
@@ -844,11 +1008,22 @@ def compute_seqslav(profile, committeesize, algorithm="fastest", resolute=True):
     https://arxiv.org/abs/1801.01527
     """
     return compute_seq_thiele_method(
-        profile, committeesize, "slav", algorithm=algorithm, resolute=resolute
+        scorefct_id="slav",
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
     )
 
 
-def compute_seqcc(profile, committeesize, algorithm="fastest", resolute=True):
+def compute_seqcc(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Sequential Chamberlin-Courant (seq-CC).
 
     For a mathematical description of this rule, see e.g. the survey by
@@ -857,12 +1032,22 @@ def compute_seqcc(profile, committeesize, algorithm="fastest", resolute=True):
     https://arxiv.org/abs/2007.01795
     """
     return compute_seq_thiele_method(
-        profile, committeesize, "cc", algorithm=algorithm, resolute=resolute
+        scorefct_id="cc",
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
     )
 
 
 def compute_revseq_thiele_method(
-    profile, committeesize, scorefct_id, algorithm="fastest", resolute=True
+    scorefct_id,
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
     """Reverse sequential Thiele methods.
 
@@ -871,23 +1056,35 @@ def compute_revseq_thiele_method(
     "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
     https://arxiv.org/abs/2007.01795
     """
-    check_enough_approved_candidates(profile, committeesize)
     scores.get_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
-
     rule_id = "revseq" + scorefct_id
     rule = get_rule(rule_id)
-
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
-    if algorithm != "standard":
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_revseq_thiele_method"
-        )
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
-    if resolute:
-        committees, detailed_info = _revseq_thiele_resolute(profile, committeesize, scorefct_id)
+    if algorithm == "standard":
+        if resolute:
+            committees, detailed_info = _revseq_thiele_resolute(
+                scorefct_id=scorefct_id,
+                profile=profile,
+                committeesize=committeesize,
+            )
+        else:
+            committees, detailed_info = _revseq_thiele_irresolute(
+                scorefct_id=scorefct_id,
+                profile=profile,
+                committeesize=committeesize,
+                max_num_of_committees=max_num_of_committees,
+            )
     else:
-        committees, detailed_info = _revseq_thiele_irresolute(profile, committeesize, scorefct_id)
+        raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
     output.info(header(rule.longname))
@@ -940,7 +1137,7 @@ def compute_revseq_thiele_method(
     return committees
 
 
-def _revseq_thiele_resolute(profile, committeesize, scorefct_id):
+def _revseq_thiele_resolute(scorefct_id, profile, committeesize):
     """Compute one winning committee (=resolute) for reverse sequential Thiele methods.
 
     Tiebreaking between candidates in favor of candidate with smaller
@@ -968,7 +1165,7 @@ def _revseq_thiele_resolute(profile, committeesize, scorefct_id):
     return sorted_committees([committee]), detailed_info
 
 
-def _revseq_thiele_irresolute(profile, committeesize, scorefct_id):
+def _revseq_thiele_irresolute(scorefct_id, profile, committeesize, max_num_of_committees):
     """Compute all winning committee (=irresolute) for reverse sequential Thiele methods.
 
     Consider all possible ways to break ties between candidates
@@ -993,12 +1190,21 @@ def _revseq_thiele_irresolute(profile, committeesize, scorefct_id):
                 comm_scores_next[next_comm] = score - score_reduction
             comm_scores = comm_scores_next
 
+    committees = sorted_committees(list(comm_scores.keys()))
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     detailed_info = {}
-    return sorted_committees(list(comm_scores.keys())), detailed_info
+    return committees, detailed_info
 
 
 # Reverse Sequential PAV
-def compute_revseqpav(profile, committeesize, algorithm="fastest", resolute=True):
+def compute_revseqpav(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Reverse sequential PAV (revseq-PAV).
 
     For a mathematical description of this rule, see e.g. the survey by
@@ -1007,11 +1213,23 @@ def compute_revseqpav(profile, committeesize, algorithm="fastest", resolute=True
     https://arxiv.org/abs/2007.01795
     """
     return compute_revseq_thiele_method(
-        profile, committeesize, "pav", algorithm=algorithm, resolute=resolute
+        scorefct_id="pav",
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
     )
 
 
-def compute_separable_rule(rule_id, profile, committeesize, algorithm, resolute=True):
+def compute_separable_rule(
+    rule_id,
+    profile,
+    committeesize,
+    algorithm,
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Separable rules (such as AV and SAV).
 
     For a mathematical description of separable rules (for ranking-based rules), see
@@ -1020,22 +1238,27 @@ def compute_separable_rule(rule_id, profile, committeesize, algorithm, resolute=
     Social Choice and Welfare, 48(3):599–632, 2017.
     https://link.springer.com/article/10.1007/s00355-017-1026-z
     """
-    check_enough_approved_candidates(profile, committeesize)
-
     rule = get_rule(rule_id)
-
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
-    if algorithm == "standard":
-        pass
-    else:
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_separable_rule"
-        )
-
-    committees, detailed_info = _separable_rule_algorithm(
-        profile, committeesize, rule_id, resolute
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
     )
+
+    if algorithm == "standard":
+        committees, detailed_info = _separable_rule_algorithm(
+            rule_id=rule_id,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+        )
+    else:
+        raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
     output.info(header(rule.longname))
@@ -1078,7 +1301,7 @@ def compute_separable_rule(rule_id, profile, committeesize, algorithm, resolute=
     return committees
 
 
-def _separable_rule_algorithm(profile, committeesize, rule_id, resolute):
+def _separable_rule_algorithm(rule_id, profile, committeesize, resolute, max_num_of_committees):
     """Algorithm for separable rules (such as AV and SAV)."""
     score = [0] * profile.num_cand
     for voter in profile:
@@ -1112,9 +1335,11 @@ def _separable_rule_algorithm(profile, committeesize, rule_id, resolute):
         committees = sorted_committees(
             [
                 (certain_cands + list(selection))
-                for selection in combinations(possible_cands, missing)
+                for selection in itertools.combinations(possible_cands, missing)
             ]
         )
+        if max_num_of_committees is not None:
+            committees = committees[:max_num_of_committees]
     detailed_info = {
         "certain_cands": certain_cands,
         "possible_cands": possible_cands,
@@ -1125,7 +1350,13 @@ def _separable_rule_algorithm(profile, committeesize, rule_id, resolute):
     return committees, detailed_info
 
 
-def compute_sav(profile, committeesize, algorithm="fastest", resolute=False):
+def compute_sav(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Satisfaction Approval Voting (SAV).
 
     For a mathematical description of this rule, see e.g. the survey by
@@ -1133,10 +1364,23 @@ def compute_sav(profile, committeesize, algorithm="fastest", resolute=False):
     "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
     https://arxiv.org/abs/2007.01795
     """
-    return compute_separable_rule("sav", profile, committeesize, algorithm, resolute)
+    return compute_separable_rule(
+        rule_id="sav",
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
 
-def compute_av(profile, committeesize, algorithm="fastest", resolute=False):
+def compute_av(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Approval Voting (AV).
 
     AV is both a Thiele method and a separable rule. Seperable rules can be computed much
@@ -1148,10 +1392,23 @@ def compute_av(profile, committeesize, algorithm="fastest", resolute=False):
     "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
     https://arxiv.org/abs/2007.01795
     """
-    return compute_separable_rule("av", profile, committeesize, algorithm, resolute)
+    return compute_separable_rule(
+        rule_id="av",
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
 
-def compute_minimaxav(profile, committeesize, algorithm="fastest", resolute=False):
+def compute_minimaxav(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Minimax Approval Voting (MAV).
 
     For a mathematical description of this rule, see e.g. the survey by
@@ -1159,26 +1416,50 @@ def compute_minimaxav(profile, committeesize, algorithm="fastest", resolute=Fals
     "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
     https://arxiv.org/abs/2007.01795
     """
-    check_enough_approved_candidates(profile, committeesize)
-
-    rule = get_rule("minimaxav")
-
+    rule_id = "minimaxav"
+    rule = get_rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
     if algorithm == "gurobi":
-        committees = abcrules_gurobi._gurobi_minimaxav(profile, committeesize, resolute)
+        committees = abcrules_gurobi._gurobi_minimaxav(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+        )
     elif algorithm == "ortools_cp":
-        committees = abcrules_ortools._ortools_minimaxav(profile, committeesize, resolute)
+        committees = abcrules_ortools._ortools_minimaxav(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+        )
     elif algorithm.startswith("mip_"):
         solver_id = algorithm[4:]
-        committees = abcrules_mip._mip_minimaxav(profile, committeesize, resolute, solver_id)
-    elif algorithm == "brute-force":
-        committees, detailed_info = _minimaxav_bruteforce(profile, committeesize, resolute)
-    else:
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_minimaxav"
+        committees = abcrules_mip._mip_minimaxav(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            solver_id=solver_id,
         )
+    elif algorithm == "brute-force":
+        committees, detailed_info = _minimaxav_bruteforce(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+        )
+    else:
+        raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
     output.info(header(rule.longname))
@@ -1199,11 +1480,11 @@ def compute_minimaxav(profile, committeesize, algorithm="fastest", resolute=Fals
     return committees
 
 
-def _minimaxav_bruteforce(profile, committeesize, resolute):
+def _minimaxav_bruteforce(profile, committeesize, resolute, max_num_of_committees):
     """Brute-force algorithm for Minimax AV (MAV)."""
     opt_committees = []
     opt_minimaxav_score = profile.num_cand + 1
-    for committee in combinations(profile.candidates, committeesize):
+    for committee in itertools.combinations(profile.candidates, committeesize):
         score = scores.mavscore(profile, committee)
         if score < opt_minimaxav_score:
             opt_committees = [committee]
@@ -1215,10 +1496,18 @@ def _minimaxav_bruteforce(profile, committeesize, resolute):
     detailed_info = {}
     if resolute:
         committees = [committees[0]]
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     return committees, detailed_info
 
 
-def compute_lexminimaxav(profile, committeesize, algorithm="fastest", resolute=False):
+def compute_lexminimaxav(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Lexicographic Minimax AV (lex-MAV).
 
     For a mathematical description of this rule, see e.g. the survey by
@@ -1227,22 +1516,30 @@ def compute_lexminimaxav(profile, committeesize, algorithm="fastest", resolute=F
     https://arxiv.org/abs/2007.01795
     (Remark 2)
     """
-    check_enough_approved_candidates(profile, committeesize)
-
-    rule = get_rule("lexminimaxav")
+    rule_id = "lexminimaxav"
+    rule = get_rule(rule_id)
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
-    if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
-
     if algorithm == "brute-force":
-        committees, detailed_info = _lexminimaxav_bruteforce(profile, committeesize, resolute)
-    else:
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_lexminimaxav"
+        committees, detailed_info = _lexminimaxav_bruteforce(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
         )
+    else:
+        raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
     opt_distances = detailed_info["opt_distances"]
@@ -1262,10 +1559,10 @@ def compute_lexminimaxav(profile, committeesize, algorithm="fastest", resolute=F
     return committees
 
 
-def _lexminimaxav_bruteforce(profile, committeesize, resolute):
+def _lexminimaxav_bruteforce(profile, committeesize, resolute, max_num_of_committees):
     opt_committees = []
     opt_distances = [profile.num_cand + 1] * len(profile)
-    for committee in combinations(profile.candidates, committeesize):
+    for committee in itertools.combinations(profile.candidates, committeesize):
         distances = sorted(
             [misc.hamming(voter.approved, committee) for voter in profile], reverse=True
         )
@@ -1283,10 +1580,18 @@ def _lexminimaxav_bruteforce(profile, committeesize, resolute):
     detailed_info = {"opt_distances": opt_distances}
     if resolute:
         committees = [committees[0]]
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     return committees, detailed_info
 
 
-def compute_monroe(profile, committeesize, algorithm="fastest", resolute=False):
+def compute_monroe(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Monroe's rule.
 
     For a mathematical description of this rule, see e.g. the survey by
@@ -1294,33 +1599,52 @@ def compute_monroe(profile, committeesize, algorithm="fastest", resolute=False):
     "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
     https://arxiv.org/abs/2007.01795
     """
-    check_enough_approved_candidates(profile, committeesize)
-
-    rule = get_rule("monroe")
+    rule_id = "monroe"
+    rule = get_rule(rule_id)
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
-    if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
-
     if algorithm == "gurobi":
-        committees = abcrules_gurobi._gurobi_monroe(profile, committeesize, resolute)
+        committees = abcrules_gurobi._gurobi_monroe(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+        )
     elif algorithm == "ortools_cp":
-        committees = abcrules_ortools._ortools_monroe(profile, committeesize, resolute)
+        committees = abcrules_ortools._ortools_monroe(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+        )
     elif algorithm.startswith("mip_"):
         committees = abcrules_mip._mip_monroe(
-            profile,
-            committeesize,
+            profile=profile,
+            committeesize=committeesize,
             resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
             solver_id=algorithm[4:],
         )
     elif algorithm == "brute-force":
-        committees, detailed_info = _monroe_bruteforce(profile, committeesize, resolute)
-    else:
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_monroe"
+        committees, detailed_info = _monroe_bruteforce(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
         )
+    else:
+        raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
     output.info(header(rule.longname))
@@ -1338,11 +1662,11 @@ def compute_monroe(profile, committeesize, algorithm="fastest", resolute=False):
     return committees
 
 
-def _monroe_bruteforce(profile, committeesize, resolute):
+def _monroe_bruteforce(profile, committeesize, resolute, max_num_of_committees):
     """Brute-force algorithm for Monroe's rule."""
     opt_committees = []
     opt_monroescore = -1
-    for committee in combinations(profile.candidates, committeesize):
+    for committee in itertools.combinations(profile.candidates, committeesize):
         score = scores.monroescore(profile, committee)
         if score > opt_monroescore:
             opt_committees = [committee]
@@ -1351,6 +1675,8 @@ def _monroe_bruteforce(profile, committeesize, resolute):
             opt_committees.append(committee)
 
     committees = sorted_committees(opt_committees)
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     if resolute:
         committees = [committees[0]]
 
@@ -1366,25 +1692,19 @@ def compute_greedy_monroe(profile, committeesize, algorithm="fastest", resolute=
     "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
     https://arxiv.org/abs/2007.01795
     """
-    check_enough_approved_candidates(profile, committeesize)
-
-    rule = get_rule("greedy-monroe")
+    rule_id = "greedy-monroe"
+    rule = get_rule(rule_id)
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm
+    rule.verify_compute_parameters(profile, committeesize, algorithm, resolute)
 
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
-    if not resolute:
-        raise NotImplementedError("compute_greedy_monroe does not support resolute=False.")
-
-    if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
-
-    if algorithm != "standard":
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_greedy_monroe"
-        )
-
-    committees, detailed_info = _greedy_monroe_algorithm(profile, committeesize)
+    if algorithm == "standard":
+        committees, detailed_info = _greedy_monroe_algorithm(profile, committeesize)
+    else:
+        raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
     output.info(header(rule.longname))
@@ -1478,7 +1798,13 @@ def _greedy_monroe_algorithm(profile, committeesize):
     return sorted_committees([committee]), detailed_info
 
 
-def compute_seqphragmen(profile, committeesize, algorithm="fastest", resolute=True):
+def compute_seqphragmen(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Phragmen's sequential rule (seq-Phragmen).
 
     For a mathematical description of this rule, see e.g. the survey by
@@ -1486,19 +1812,31 @@ def compute_seqphragmen(profile, committeesize, algorithm="fastest", resolute=Tr
     "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
     https://arxiv.org/abs/2007.01795
     """
-    check_enough_approved_candidates(profile, committeesize)
-
-    rule = get_rule("seqphragmen")
-
+    rule_id = "seqphragmen"
+    rule = get_rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
-    if algorithm not in rule.algorithms:
-        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_seqphragmen")
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
     if resolute:
-        committees, detailed_info = _seqphragmen_resolute(profile, committeesize, algorithm)
+        committees, detailed_info = _seqphragmen_resolute(
+            profile=profile,
+            committeesize=committeesize,
+            algorithm=algorithm,
+        )
     else:
-        committees, detailed_info = _seqphragmen_irresolute(profile, committeesize, algorithm)
+        committees, detailed_info = _seqphragmen_irresolute(
+            profile=profile,
+            committeesize=committeesize,
+            algorithm=algorithm,
+            max_num_of_committees=max_num_of_committees,
+        )
 
     # optional output
     output.info(header(rule.longname))
@@ -1566,7 +1904,7 @@ def _seqphragmen_resolute(
             )
         division = mpq  # using gmpy2 fractions
     else:
-        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_seqphragmen")
+        raise UnknownAlgorithm("seqphragmen", algorithm)
 
     approvers_weight = {}
     for cand in profile.candidates:
@@ -1629,7 +1967,12 @@ def _seqphragmen_resolute(
 
 
 def _seqphragmen_irresolute(
-    profile, committeesize, algorithm, start_load=None, partial_committee=None
+    profile,
+    committeesize,
+    algorithm,
+    max_num_of_committees,
+    start_load=None,
+    partial_committee=None,
 ):
     """Algorithm for computing irresolute seq-Phragmen (all winning committees)."""
     if algorithm == "float-fractions":
@@ -1643,7 +1986,7 @@ def _seqphragmen_irresolute(
             )
         division = mpq  # using gmpy2 fractions
     else:
-        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_seqphragmen")
+        raise UnknownAlgorithm("seqphragmen", algorithm)
 
     approvers_weight = {}
     for cand in profile.candidates:
@@ -1700,6 +2043,8 @@ def _seqphragmen_irresolute(
 
     # final list of committees (sort and remove duplicates)
     committees = sorted_committees(set(tuple(sorted(committee)) for (committee, _) in comm_loads))
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     detailed_info = {"comm_loads": comm_loads}
     return committees, detailed_info
 
@@ -1709,6 +2054,7 @@ def compute_rule_x(
     committeesize,
     algorithm="fastest",
     resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
     skip_phragmen_phase=False,
 ):
     """Rule X.
@@ -1723,24 +2069,31 @@ def compute_rule_x(
         omit the second phase (that uses seq-Phragmen)
         may result in a committee that is too small (length smaller than `committeesize`)
     """
-    check_enough_approved_candidates(profile, committeesize)
-
     if skip_phragmen_phase:
         rule_id = "rule-x-without-phragmen-phase"
     else:
         rule_id = "rule-x"
     rule = get_rule(rule_id)
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
-    if algorithm == "fastest":
-        algorithm = algorithm = rule.fastest_available_algorithm
-    if algorithm not in rule.algorithms:
-        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_rule_x")
-
     committees, detailed_info = _rule_x_algorithm(
-        profile, committeesize, resolute, algorithm, skip_phragmen_phase
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+        skip_phragmen_phase=skip_phragmen_phase,
     )
 
     # optional output
@@ -1824,7 +2177,9 @@ def compute_rule_x(
     return sorted_committees(committees)
 
 
-def _rule_x_algorithm(profile, committeesize, resolute, algorithm, skip_phragmen_phase=False):
+def _rule_x_algorithm(
+    profile, committeesize, algorithm, resolute, max_num_of_committees, skip_phragmen_phase=False
+):
     """Algorithm for Rule X."""
 
     def _rule_x_get_min_q(profile, budget, cand, division):
@@ -1851,7 +2206,7 @@ def _rule_x_algorithm(profile, committeesize, resolute, algorithm, skip_phragmen
             )
         division = mpq  # using gmpy2 fractions
     else:
-        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_rule_x")
+        raise UnknownAlgorithm("rule-x", algorithm)
 
     start_budget = {v: division(committeesize, len(profile)) for v, _ in enumerate(profile)}
     commbugdets = [(set(), start_budget)]
@@ -1920,17 +2275,20 @@ def _rule_x_algorithm(profile, committeesize, resolute, algorithm, skip_phragmen
 
                     if resolute:
                         committees, detailed_info_phragmen = _seqphragmen_resolute(
-                            profile,
-                            committeesize,
-                            algorithm,
+                            profile=profile,
+                            committeesize=committeesize,
+                            algorithm=algorithm,
                             partial_committee=list(committee),
                             start_load=start_load,
                         )
                     else:
                         committees, detailed_info_phragmen = _seqphragmen_irresolute(
-                            profile,
-                            committeesize,
-                            algorithm,
+                            profile=profile,
+                            committeesize=committeesize,
+                            algorithm=algorithm,
+                            max_num_of_committees=None,
+                            # unclear which committees would be chosen if
+                            # max_num_of_committees=max_num_of_committees was used here.
                             partial_committee=list(committee),
                             start_load=start_load,
                         )
@@ -1944,13 +2302,19 @@ def _rule_x_algorithm(profile, committeesize, resolute, algorithm, skip_phragmen
     final_committees.update([tuple(sorted(committee)) for committee, _ in commbugdets])
 
     committees = sorted_committees(final_committees)
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     if resolute:
         committees = [committees[0]]
     return committees, detailed_info
 
 
 def compute_rule_x_without_phragmen_phase(
-    profile, committeesize, algorithm="fastest", resolute=True
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
     """Rule X with skip_phragmen_phase=True.
 
@@ -1965,7 +2329,13 @@ def compute_rule_x_without_phragmen_phase(
     )
 
 
-def compute_minimaxphragmen(profile, committeesize, algorithm="fastest", resolute=False):
+def compute_minimaxphragmen(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Phragmen's minimax rule (minimax-Phragmen).
 
     Minimizes the maximum load.
@@ -1983,28 +2353,35 @@ def compute_minimaxphragmen(profile, committeesize, algorithm="fastest", resolut
     https://arxiv.org/abs/2007.01795
 
     """
-    check_enough_approved_candidates(profile, committeesize)
-
-    rule = get_rule("minimaxphragmen")
-
+    rule_id = "minimaxphragmen"
+    rule = get_rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_minimaxphragmen(
-            profile, committeesize, resolute=resolute
+            profile,
+            committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
         )
     elif algorithm.startswith("mip_"):
         committees = abcrules_mip._mip_minimaxphragmen(
             profile,
             committeesize,
             resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
             solver_id=algorithm[4:],
         )
     else:
-        raise NotImplementedError(
-            "Algorithm " + str(algorithm) + " not specified for compute_minimaxphragmen"
-        )
+        raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
     output.info(header(rule.longname))
@@ -2018,7 +2395,13 @@ def compute_minimaxphragmen(profile, committeesize, algorithm="fastest", resolut
     return committees
 
 
-def compute_phragmen_enestroem(profile, committeesize, algorithm="fastest", resolute=True):
+def compute_phragmen_enestroem(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Phragmen-Enestroem (aka Phragmen's first method, Enestroem's method).
 
     In every round the candidate with the highest combined budget of
@@ -2028,21 +2411,27 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="fastest", reso
     Phragmén's and Thiele's election methods
     https://arxiv.org/pdf/1611.08826.pdf (Section 18.5, Page 59)
     """
-    check_enough_approved_candidates(profile, committeesize)
-
-    rule = get_rule("phragmen-enestroem")
+    rule_id = "phragmen-enestroem"
+    rule = get_rule(rule_id)
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
-    if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
-    if algorithm not in rule.algorithms:
-        raise NotImplementedError(
-            f"Algorithm {algorithm} not specified for compute_phragmen_enestroem"
-        )
     committees, detailed_info = _phragmen_enestroem_algorithm(
-        profile, committeesize, resolute, algorithm
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
     )
 
     # optional output
@@ -2060,7 +2449,9 @@ def compute_phragmen_enestroem(profile, committeesize, algorithm="fastest", reso
     return committees
 
 
-def _phragmen_enestroem_algorithm(profile, committeesize, resolute, algorithm):
+def _phragmen_enestroem_algorithm(
+    profile, committeesize, algorithm, resolute, max_num_of_committees
+):
     """Algorithm for Phragmen-Enestroem."""
     if algorithm == "float-fractions":
         division = lambda x, y: x / y  # standard float division
@@ -2073,9 +2464,7 @@ def _phragmen_enestroem_algorithm(profile, committeesize, resolute, algorithm):
             )
         division = mpq  # using gmpy2 fractions
     else:
-        raise NotImplementedError(
-            f"Algorithm {algorithm} not specified for compute_phragmen_enestroem"
-        )
+        raise UnknownAlgorithm("phragmen-enestroem", algorithm)
 
     num_voters = len(profile)
     initial_voter_budget = {i: profile[i].weight for i in range(num_voters)}
@@ -2126,34 +2515,45 @@ def _phragmen_enestroem_algorithm(profile, committeesize, resolute, algorithm):
     committees = sorted_committees(
         set([tuple(sorted(committee)) for _, committee in voter_budgets_for_partial_committee])
     )
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     if resolute:
         committees = [committees[0]]
     detailed_info = {}
     return committees, detailed_info
 
 
-def compute_consensus_rule(profile, committeesize, algorithm="fastest", resolute=True):
+def compute_consensus_rule(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """Consensus rule.
 
     Based on Perpetual Consensus from
     Martin Lackner Perpetual Voting: Fairness in Long-Term Decision Making
     In Proceedings of the 34th AAAI Conference on Artificial Intelligence (AAAI 2020)
     """
-    check_enough_approved_candidates(profile, committeesize)
-
-    rule = get_rule("consensus-rule")
-
+    rule_id = "consensus-rule"
+    rule = get_rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
-    if algorithm == "fastest":
-        algorithm = algorithm = rule.fastest_available_algorithm
-    if algorithm not in rule.algorithms:
-        raise NotImplementedError(
-            f"Algorithm {algorithm} not specified for compute_consensus_rule"
-        )
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
     committees, detailed_info = _consensus_rule_algorithm(
-        profile, committeesize, resolute, algorithm
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
     )
 
     # optional output
@@ -2171,7 +2571,7 @@ def compute_consensus_rule(profile, committeesize, algorithm="fastest", resolute
     return committees
 
 
-def _consensus_rule_algorithm(profile, committeesize, resolute, algorithm):
+def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_num_of_committees):
     """Algorithm for the consensus rule."""
     if algorithm == "float-fractions":
         division = lambda x, y: x / y  # standard float division
@@ -2184,9 +2584,7 @@ def _consensus_rule_algorithm(profile, committeesize, resolute, algorithm):
             )
         division = mpq  # using gmpy2 fractions
     else:
-        raise NotImplementedError(
-            f"Algorithm {algorithm} not specified for compute_consensus_rule"
-        )
+        raise UnknownAlgorithm("consensus-rule", algorithm)
 
     num_voters = len(profile)
     initial_voter_budget = {i: 0 for i in range(num_voters)}
@@ -2235,25 +2633,43 @@ def _consensus_rule_algorithm(profile, committeesize, resolute, algorithm):
     committees = sorted_committees(set(committee) for committee in committees)
     if resolute:
         committees = [committees[0]]
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
     detailed_info = {}
     return committees, detailed_info
 
 
-def compute_trivial_rule(profile, committeesize, algorithm="standard", resolute=False):
+def compute_trivial_rule(
+    profile,
+    committeesize,
+    algorithm="standard",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
     """The trivial rule (all committees are winning)."""
-    check_enough_approved_candidates(profile, committeesize)
-
-    rule = get_rule("trivial")
-
+    rule_id = "trivial"
+    rule = get_rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm
-    if algorithm not in rule.algorithms:
-        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_trivial_rule")
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
 
-    if resolute:
-        committees = [list(range(committeesize))]
+    if algorithm == "standard":
+        if resolute:
+            committees = [list(range(committeesize))]
+        else:
+            all_committees = itertools.combinations(profile.candidates, committeesize)
+            if max_num_of_committees is None:
+                committees = list(all_committees)
+            else:
+                committees = list(itertools.islice(all_committees, max_num_of_committees))
     else:
-        committees = list(combinations(profile.candidates, committeesize))
+        raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
     output.info(header(rule.longname))
@@ -2269,37 +2685,36 @@ def compute_trivial_rule(profile, committeesize, algorithm="standard", resolute=
 
 def compute_rsd(profile, committeesize, algorithm="standard", resolute=True):
     """The Random Serial Dictator rule."""
-    if not resolute:
-        raise NotImplementedError("compute_rsd does not support resolute=False.")
-
-    check_enough_approved_candidates(profile, committeesize)
-
-    rule = get_rule("rsd")
+    rule_id = "rsd"
+    rule = get_rule(rule_id)
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm
+    rule.verify_compute_parameters(profile, committeesize, algorithm, resolute)
 
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only implemented for unit weights (weight=1).")
 
-    if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
-    if algorithm not in rule.algorithms:
-        raise NotImplementedError(f"Algorithm {algorithm} not specified for compute_rsd")
-
-    approval_sets = [sorted(voter.approved) for voter in profile]
-    # random order of dictators
-    random.shuffle(approval_sets)
-    committee = set()
-    for approved in approval_sets:
-        if len(committee) + len(approved) <= committeesize:
-            committee.update(approved)
+    if algorithm == "standard":
+        approval_sets = [sorted(voter.approved) for voter in profile]
+        # random order of dictators
+        random.shuffle(approval_sets)
+        committee = set()
+        for approved in approval_sets:
+            if len(committee) + len(approved) <= committeesize:
+                committee.update(approved)
+            else:
+                for cand in approved:
+                    committee.add(cand)
+                    if len(committee) == committeesize:
+                        break
+            if len(committee) == committeesize:
+                break
         else:
-            for cand in approved:
-                committee.add(cand)
-                if len(committee) == committeesize:
-                    break
-        if len(committee) == committeesize:
-            break
+            raise RuntimeError(
+                f"{rule.longname} produced too small a committee. This should happen."
+            )
     else:
-        raise RuntimeError(f"{rule.longname} produced too small a committee. This should happen.")
+        raise UnknownAlgorithm(rule_id, algorithm)
 
     committees = [committee]
 

@@ -6,7 +6,7 @@ Random generation of approval profiles
 import random
 from math import fabs, sqrt
 from abcvoting.preferences import Profile
-from abcvoting.abcrules import check_enough_approved_candidates
+from abcvoting.misc import check_enough_approved_candidates
 
 
 MAX_ITERATIONS = 100

@@ -6,11 +6,9 @@ Approval-based committee (ABC) rules implemented as constraint
 from ortools.sat.python import cp_model
 from abcvoting.misc import sorted_committees
 
-MAX_NUM_OF_COMMITTEES_DEFAULT = 1000
-
 
 def _optimize_rule_ortools(
-    set_opt_model_func, profile, committeesize, resolute, max_num_of_committes
+    set_opt_model_func, profile, committeesize, resolute, max_num_of_committees
 ):
     """Compute ABC rules, which are given in the form of an integer optimization problem,
     using the OR-Tools CP-SAT Solver.
@@ -25,6 +23,8 @@ def _optimize_rule_ortools(
     committeesize : int
         number of chosen alternatives
     resolute : bool
+    max_num_of_committees : int
+        maximum number of committees this method returns, value can be None
 
     Returns
     -------
@@ -92,15 +92,13 @@ def _optimize_rule_ortools(
 
         if resolute:
             break
-        if len(committees) >= max_num_of_committes:
+        if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
             return committees
 
     return committees
 
 
-def _ortools_cc(
-    profile, committeesize, resolute, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _ortools_cc(profile, committeesize, resolute, max_num_of_committees):
     def set_opt_model_func(
         model,
         profile,
@@ -148,21 +146,17 @@ def _ortools_cc(
         profile,
         committeesize,
         resolute=resolute,
-        max_num_of_committes=max_num_of_committes,
+        max_num_of_committees=max_num_of_committees,
     )
     return sorted_committees(committees)
 
 
-def _ortools_lexcc(
-    profile, committeesize, resolute, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _ortools_lexcc(profile, committeesize, resolute, max_num_of_committees):
     pass
     # TODO: write
 
 
-def _ortools_monroe(
-    profile, committeesize, resolute, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _ortools_monroe(profile, committeesize, resolute, max_num_of_committees):
     def set_opt_model_func(
         model,
         profile,
@@ -232,14 +226,12 @@ def _ortools_monroe(
         profile,
         committeesize,
         resolute=resolute,
-        max_num_of_committes=max_num_of_committes,
+        max_num_of_committees=max_num_of_committees,
     )
     return sorted_committees(committees)
 
 
-def _ortools_minimaxav(
-    profile, committeesize, resolute, max_num_of_committes=MAX_NUM_OF_COMMITTEES_DEFAULT
-):
+def _ortools_minimaxav(profile, committeesize, resolute, max_num_of_committees):
     def set_opt_model_func(
         model,
         profile,
@@ -274,6 +266,6 @@ def _ortools_minimaxav(
         profile,
         committeesize,
         resolute=resolute,
-        max_num_of_committes=max_num_of_committes,
+        max_num_of_committees=max_num_of_committees,
     )
     return sorted_committees(committees)
