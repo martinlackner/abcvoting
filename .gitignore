@@ -80,3 +80,4 @@ excluded
 venv*
 /coverage.sh
 scratchpad
+*_py.new
