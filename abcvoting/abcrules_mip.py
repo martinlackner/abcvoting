@@ -16,10 +16,10 @@ def _optimize_rule_mip(
     set_opt_model_func,
     profile,
     committeesize,
-    scorefct,
     resolute,
     max_num_of_committees,
     solver_id,
+    name="None",
 ):
     """Compute rules, which are given in the form of an optimization problem, using Python MIP.
 
@@ -32,11 +32,12 @@ def _optimize_rule_mip(
         approval sets of voters
     committeesize : int
         number of chosen alternatives
-    scorefct : callable
     resolute : bool
     max_num_of_committees : int
         maximum number of committees this method returns, value can be None
     solver_id : str
+    name : str
+        name of the model, used for error messages
 
     Returns
     -------
@@ -70,9 +71,11 @@ def _optimize_rule_mip(
             profile,
             in_committee,
             committeesize,
-            committees,
-            scorefct,
         )
+
+        # find a new committee that has not been found yet by excluding previously found committees
+        for committee in committees:
+            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
 
         # emphasis is optimality:
         # activates procedures that produce improved lower bounds, focusing in pruning the search
@@ -87,13 +90,13 @@ def _optimize_rule_mip(
         if status not in [mip.OptimizationStatus.OPTIMAL, mip.OptimizationStatus.INFEASIBLE]:
             raise RuntimeError(
                 f"Python MIP returned an unexpected status code: {status}"
-                "Warning: solutions may be incomplete or not optimal."
+                f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
         elif status == mip.OptimizationStatus.INFEASIBLE:
             if len(committees) == 0:
                 # we are in the first round of searching for committees
                 # and Gurobi didn't find any
-                raise RuntimeError("Python MIP found no solution (INFEASIBLE)")
+                raise RuntimeError("Python MIP found no solution (INFEASIBLE)  (model {name})")
             break
         objective_value = model.objective_value
 
@@ -103,7 +106,7 @@ def _optimize_rule_mip(
             raise RuntimeError(
                 "Python MIP found a solution better than a previous optimum. This "
                 f"should not happen (previous optimal score: {maxscore}, "
-                f"new optimal score: {objective_value})."
+                f"new optimal score: {objective_value}, model {name})."
             )
         elif objective_value < maxscore - ACCURACY:
             # no longer optimal
@@ -115,7 +118,7 @@ def _optimize_rule_mip(
         if len(committee) != committeesize:
             raise RuntimeError(
                 "_optimize_rule_mip produced a committee with "
-                "fewer than `committeesize` members."
+                "fewer than `committeesize` members  (model {name})."
             )
         committees.append(committee)
 
@@ -135,9 +138,7 @@ def _mip_thiele_methods(
     max_num_of_committees,
     solver_id,
 ):
-    def set_opt_model_func(
-        model, profile, in_committee, committeesize, previously_found_committees, scorefct
-    ):
+    def set_opt_model_func(model, profile, in_committee, committeesize):
         # utility[(voter, l)] contains (intended binary) variables counting the number of approved
         # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
         # exactly the number of candidates in the committee approved by `voter` for all
@@ -165,11 +166,7 @@ def _mip_thiele_methods(
                 utility[voter, l] for l in range(1, max_in_committee[voter] + 1)
             ) == mip.xsum(in_committee[cand] for cand in voter.approved)
 
-        # find a new committee that has not been found yet by excluding previously found committees
-        for committee in previously_found_committees:
-            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
-
-        # objective: the PAV score of the committee
+        # objective: the Thiele score of the committee
         model.objective = mip.maximize(
             mip.xsum(
                 float(scorefct(l)) * voter.weight * utility[(voter, l)]
@@ -191,23 +188,103 @@ def _mip_thiele_methods(
         set_opt_model_func,
         profile,
         committeesize,
-        scorefct=scorefct,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
+        name=scorefct_id,
     )
     return sorted_committees(committees)
 
 
 def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_id):
-    pass
-    # TODO: write
+    def set_opt_model_func(model, profile, in_committee, committeesize):
+        # utility[(voter, l)] contains (intended binary) variables counting the number of approved
+        # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
+        # exactly the number of candidates in the committee approved by `voter` for all
+        # l = 1...committeesize.
+        #
+        # If scorefct(l) > 0 for l >= 1, we assume that scorefct is monotonic decreasing and
+        # therefore in combination with the objective function the following interpreation is
+        # valid:
+        # utility[(voter, l)] indicates whether `voter` approves at least l candidates in the
+        # committee (this is the case for scorefct "pav", "slav" or "geom").
+
+        utility = {}
+        round = len(satisfaction_constraints)
+        scorefcts = [scores.get_scorefct(f"atleast{i+1}") for i in range(round + 1)]
+
+        max_in_committee = {}
+        for i, voter in enumerate(profile):
+            # maximum number of approved candidates that this voter can have in a committee
+            max_in_committee[voter] = min(len(voter.approved), committeesize)
+            for l in range(1, max_in_committee[voter] + 1):
+                utility[(voter, l)] = model.add_var(var_type=mip.BINARY, name=f"utility({i, l})")
+
+        # constraint: the committee has the required size
+        model += mip.xsum(in_committee) == committeesize
+
+        # constraint: utilities are consistent with actual committee
+        for voter in profile:
+            model += mip.xsum(
+                utility[voter, l] for l in range(1, max_in_committee[voter] + 1)
+            ) == mip.xsum(in_committee[cand] for cand in voter.approved)
+
+        # additional constraints from previous rounds
+        for prev_round in range(0, round):
+            model += (
+                mip.xsum(
+                    float(scorefcts[prev_round](l)) * voter.weight * utility[(voter, l)]
+                    for voter in profile
+                    for l in range(1, max_in_committee[voter] + 1)
+                )
+                >= satisfaction_constraints[prev_round] - ACCURACY
+            )
+
+        # objective: the at-least-x score of the committee in round x
+        model.objective = mip.maximize(
+            mip.xsum(
+                float(scorefcts[round](l)) * voter.weight * utility[(voter, l)]
+                for voter in profile
+                for l in range(1, max_in_committee[voter] + 1)
+            )
+        )
+
+    # proceed in `committeesize` many rounds to achieve lexicographic tie-breaking
+    satisfaction_constraints = []
+    for round in range(1, committeesize):
+        # in round x maximize the number of voters that have at least x approved candidates
+        # in the committee
+        committees = _optimize_rule_mip(
+            set_opt_model_func=set_opt_model_func,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            solver_id=solver_id,
+            name=f"lexcc-atleast{round}",
+        )
+        print(satisfaction_constraints)
+        print(committees)
+        satisfaction_constraints.append(
+            scores.thiele_score(f"atleast{round}", profile, committees[0])
+        )
+    round = committeesize
+    committees = _optimize_rule_mip(
+        set_opt_model_func=set_opt_model_func,
+        profile=profile,
+        committeesize=committeesize,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+        solver_id=solver_id,
+        name=f"lexcc-atleast{round}",
+    )
+    satisfaction_constraints.append(scores.thiele_score(f"atleast{round}", profile, committees[0]))
+    detailed_info = {"opt_score_vector": satisfaction_constraints}
+    return sorted_committees(committees), detailed_info
 
 
 def _mip_monroe(profile, committeesize, resolute, max_num_of_committees, solver_id):
-    def set_opt_model_func(
-        model, profile, in_committee, committeesize, previously_found_committees, scorefct
-    ):
+    def set_opt_model_func(model, profile, in_committee, committeesize):
         num_voters = len(profile)
 
         # optimization goal: variable "satisfaction"
@@ -252,10 +329,6 @@ def _mip_monroe(profile, committeesize, resolute, max_num_of_committees, solver_
             >= satisfaction
         )
 
-        # find a new committee that has not been found before
-        for committee in previously_found_committees:
-            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
-
         # optimization objective
         model.objective = mip.maximize(satisfaction)
 
@@ -263,10 +336,10 @@ def _mip_monroe(profile, committeesize, resolute, max_num_of_committees, solver_
         set_opt_model_func,
         profile,
         committeesize,
-        scorefct=None,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
+        name="monroe",
     )
     return sorted_committees(committees)
 
@@ -284,9 +357,7 @@ def _mip_minimaxphragmen(profile, committeesize, resolute, max_num_of_committees
              second-, third-, ...-largest load
     """
 
-    def set_opt_model_func(
-        model, profile, in_committee, committeesize, previously_found_committees, scorefct
-    ):
+    def set_opt_model_func(model, profile, in_committee, committeesize):
         load = {}
         for cand in profile.candidates:
             for i, voter in enumerate(profile):
@@ -313,10 +384,6 @@ def _mip_minimaxphragmen(profile, committeesize, resolute, max_num_of_committees
                 >= in_committee[cand]
             )
 
-        # find a new committee that has not been found before
-        for committee in previously_found_committees:
-            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
-
         loadbound = model.add_var(
             lb=0, ub=committeesize, var_type=mip.CONTINUOUS, name="loadbound"
         )
@@ -330,18 +397,16 @@ def _mip_minimaxphragmen(profile, committeesize, resolute, max_num_of_committees
         set_opt_model_func,
         profile,
         committeesize,
-        scorefct=None,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
+        name="minimaxphragmen",
     )
     return sorted_committees(committees)
 
 
 def _mip_minimaxav(profile, committeesize, resolute, max_num_of_committees, solver_id):
-    def set_opt_model_func(
-        model, profile, in_committee, committeesize, previously_found_committees, scorefct
-    ):
+    def set_opt_model_func(model, profile, in_committee, committeesize):
         max_hamming_distance = model.add_var(
             var_type=mip.INTEGER,
             lb=0,
@@ -359,10 +424,6 @@ def _mip_minimaxav(profile, committeesize, resolute, max_num_of_committees, solv
                 1 - in_committee[cand] for cand in voter.approved
             ) + mip.xsum(in_committee[cand] for cand in not_approved)
 
-        # find a new committee that has not been found before
-        for committee in previously_found_committees:
-            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
-
         # maximizing the negative distance makes code more similar to the other methods here
         model.objective = mip.maximize(-max_hamming_distance)
 
@@ -370,9 +431,9 @@ def _mip_minimaxav(profile, committeesize, resolute, max_num_of_committees, solv
         set_opt_model_func,
         profile,
         committeesize,
-        scorefct=None,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
+        name="minimaxav",
     )
     return sorted_committees(committees)

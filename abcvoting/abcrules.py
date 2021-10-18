@@ -262,7 +262,8 @@ def get_rule(rule_id):
             shortname="lex-CC",
             longname="Lexicographic Approval Chamberlin-Courant (lex-CC)",
             compute_fct=compute_lexcc,
-            algorithms=("brute-force",),
+            # TODO sort by speed, requires testing
+            algorithms=("gurobi", "mip_gurobi", "mip_cbc", "brute-force"),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "seqpav":
@@ -778,8 +779,23 @@ def compute_lexcc(
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
+    elif algorithm == "gurobi":
+        committees, detailed_info = abcrules_gurobi._gurobi_lexcc(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+        )
+    elif algorithm.startswith("mip_"):
+        committees, detailed_info = abcrules_mip._mip_lexcc(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            solver_id=algorithm[4:],
+        )
     else:
-        raise rule.UnknownAlgorithm(algorithm)
+        raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
     output.info(header(rule.longname))

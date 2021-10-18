@@ -161,7 +161,7 @@ def _gurobi_thiele_methods(
                 == gb.quicksum(in_committee[cand] for cand in voter.approved)
             )
 
-        # objective: the PAV score of the committee
+        # objective: the Thiele score of the committee
         model.setObjective(
             gb.quicksum(
                 float(scorefct(l)) * voter.weight * utility[(voter, l)]
@@ -187,10 +187,10 @@ def _gurobi_thiele_methods(
         )
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func,
-        profile,
-        committeesize,
-        resolute,
+        set_opt_model_func=set_opt_model_func,
+        profile=profile,
+        committeesize=committeesize,
+        resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         name=scorefct_id,
     )
@@ -198,8 +198,88 @@ def _gurobi_thiele_methods(
 
 
 def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
-    pass
-    # TODO: write
+    def set_opt_model_func(model, in_committee):
+        # utility[(voter, l)] contains (intended binary) variables counting the number of approved
+        # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
+        # exactly the number of candidates in the committee approved by `voter` for all
+        # l = 1...committeesize.
+        #
+        # If scorefct(l) > 0 for l >= 1, we assume that scorefct is monotonic decreasing and
+        # therefore in combination with the objective function the following interpreation is
+        # valid:
+        # utility[(voter, l)] indicates whether `voter` approves at least l candidates in the
+        # committee (this is the case for scorefct "pav", "slav" or "geom").
+
+        utility = {}
+        round = len(satisfaction_constraints)
+        scorefcts = [scores.get_scorefct(f"atleast{i+1}") for i in range(round + 1)]
+
+        max_in_committee = {}
+        for i, voter in enumerate(profile):
+            # maximum number of approved candidates that this voter can have in a committee
+            max_in_committee[voter] = min(len(voter.approved), committeesize)
+            for l in range(1, max_in_committee[voter] + 1):
+                utility[(voter, l)] = model.addVar(vtype=gb.GRB.BINARY, name=f"utility({i, l})")
+
+        # constraint: the committee has the required size
+        model.addConstr(gb.quicksum(in_committee) == committeesize)
+
+        # constraint: utilities are consistent with actual committee
+        for voter in profile:
+            model.addConstr(
+                gb.quicksum(utility[voter, l] for l in range(1, max_in_committee[voter] + 1))
+                == gb.quicksum(in_committee[cand] for cand in voter.approved)
+            )
+
+        # additional constraints from previous rounds
+        for prev_round in range(0, round):
+            model.addConstr(
+                gb.quicksum(
+                    float(scorefcts[prev_round](l)) * voter.weight * utility[(voter, l)]
+                    for voter in profile
+                    for l in range(1, max_in_committee[voter] + 1)
+                )
+                >= satisfaction_constraints[prev_round] - GUROBI_ACCURACY
+            )
+
+        # objective: the at-least-x score of the committee in round x
+        model.setObjective(
+            gb.quicksum(
+                float(scorefcts[round](l)) * voter.weight * utility[(voter, l)]
+                for voter in profile
+                for l in range(1, max_in_committee[voter] + 1)
+            ),
+            gb.GRB.MAXIMIZE,
+        )
+
+    # proceed in `committeesize` many rounds to achieve lexicographic tie-breaking
+    satisfaction_constraints = []
+    for round in range(1, committeesize):
+        # in round x maximize the number of voters that have at least x approved candidates
+        # in the committee
+        committees = _optimize_rule_gurobi(
+            set_opt_model_func=set_opt_model_func,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            name=f"lexcc-atleast{round}",
+        )
+        satisfaction_constraints.append(
+            scores.thiele_score(f"atleast{round}", profile, committees[0])
+        )
+    round = committeesize
+    committees = _optimize_rule_gurobi(
+        set_opt_model_func=set_opt_model_func,
+        profile=profile,
+        committeesize=committeesize,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+        name=f"lexcc-atleast{round}",
+    )
+    satisfaction_constraints.append(scores.thiele_score(f"atleast{round}", profile, committees[0]))
+    detailed_info = {"opt_score_vector": satisfaction_constraints}
+    return sorted_committees(committees), detailed_info
 
 
 def _gurobi_monroe(profile, committeesize, resolute, max_num_of_committees):
@@ -257,9 +337,9 @@ def _gurobi_monroe(profile, committeesize, resolute, max_num_of_committees):
         model.setObjective(satisfaction, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func,
-        profile,
-        committeesize,
+        set_opt_model_func=set_opt_model_func,
+        profile=profile,
+        committeesize=committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         name="Monroe",
@@ -317,9 +397,9 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute, max_num_of_committ
         model.setObjective(-loadbound, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func,
-        profile,
-        committeesize,
+        set_opt_model_func=set_opt_model_func,
+        profile=profile,
+        committeesize=committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         name="minimax-Phragmen",
@@ -354,9 +434,9 @@ def _gurobi_minimaxav(profile, committeesize, resolute, max_num_of_committees):
         model.setObjective(-max_hamming_distance, gb.GRB.MAXIMIZE)
 
     committees = _optimize_rule_gurobi(
-        set_opt_model_func,
-        profile,
-        committeesize,
+        set_opt_model_func=set_opt_model_func,
+        profile=profile,
+        committeesize=committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         name="Minimax AV",
