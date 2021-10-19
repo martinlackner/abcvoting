@@ -860,6 +860,40 @@ def test_abcrules_correct(rule_id, algorithm, resolute, profile, exp_results, co
         assert committees_ == exp_results_
 
 
+@pytest.mark.parametrize(
+    "rule_id, algorithm",
+    testrules.rule_algorithm_onlyirresolute,
+)
+@pytest.mark.parametrize("profile, exp_results, committeesize", testinsts.instances)
+@pytest.mark.parametrize("max_num_of_committees", [1, 2, 3])
+def test_abcrules_correct_with_max_num_of_committees(
+    rule_id, algorithm, profile, exp_results, committeesize, max_num_of_committees
+):
+    if rule_id.startswith("geom") and rule_id != "geom2":
+        return  # correctness tests only for geom2
+    if rule_id.startswith("seq") and rule_id not in ("seqpav", "seqslav", "seqcc"):
+        return  # correctness tests only for selected sequential rules
+    if rule_id.startswith("revseq") and rule_id != "revseqpav":
+        return  # correctness tests only for selected reverse sequential rules (only for revseqpav)
+    if rule_id == "rsd":
+        return  # correctness tests do not have much sense due to random nature of RSD
+    print(profile)
+    print(f"expected: {exp_results[rule_id]}")
+    for max_num_of_committees in [1, 2, 3]:
+        committees = abcrules.compute(
+            rule_id,
+            profile,
+            committeesize,
+            algorithm=algorithm,
+            resolute=False,
+            max_num_of_committees=max_num_of_committees,
+        )
+        print(f"with max_num_of_committees={max_num_of_committees} output: {committees}")
+        assert len(committees) in (max_num_of_committees, len(exp_results[rule_id]))
+        for comm in committees:
+            assert comm in exp_results[rule_id]
+
+
 def test_seqphragmen_irresolute():
     profile = Profile(3)
     profile.add_voters([[0, 1], [0, 1], [0], [1, 2], [2]])
