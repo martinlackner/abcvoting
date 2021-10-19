@@ -1348,14 +1348,20 @@ def _separable_rule_algorithm(rule_id, profile, committeesize, resolute, max_num
     if resolute:
         committees = sorted_committees([(certain_cands + possible_cands[:missing])])
     else:
-        committees = sorted_committees(
-            [
-                (certain_cands + list(selection))
-                for selection in itertools.combinations(possible_cands, missing)
-            ]
-        )
-        if max_num_of_committees is not None:
-            committees = committees[:max_num_of_committees]
+        if max_num_of_committees is None:
+            committees = sorted_committees(
+                [
+                    (certain_cands + list(selection))
+                    for selection in itertools.combinations(possible_cands, missing)
+                ]
+            )
+        else:
+            committees = []
+            for selection in itertools.combinations(possible_cands, missing):
+                committees.append(certain_cands + list(selection))
+                if len(committees) >= max_num_of_committees:
+                    break
+            committees = sorted_committees(committees)
     detailed_info = {
         "certain_cands": certain_cands,
         "possible_cands": possible_cands,
