@@ -18,4 +18,10 @@ print(f"Input: {profile}\n")
 
 # Compute all major implemented ABC rules
 for rule_id in abcrules.MAIN_RULE_IDS:
-    abcrules.compute(rule_id, profile, committeesize)
+    try:
+        abcrules.compute(rule_id, profile, committeesize)
+    except abcrules.NoAvailableAlgorithm:
+        print(
+            f"Skipping the ABC rule {abcrules.get_rule(rule_id).shortname}, "
+            "since it requires a solver that is not installed on this machine."
+        )
