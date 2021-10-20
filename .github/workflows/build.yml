@@ -40,3 +40,26 @@ jobs:
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
+
+  test_package:
+    # hopefully there is no race condition due to some caching on PyPi or so and we get the newest package...
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: abcvoting
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install package from PyPi
+      # TODO should we check that we got the right package version? But how?
+      run: pip install abcvoting
+
+    - name: Run examples
+      run: python3 abcvoting/examples/abcsurvey/example01.py

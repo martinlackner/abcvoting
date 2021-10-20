@@ -80,3 +80,27 @@ jobs:
       with:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository_url: https://test.pypi.org/legacy/
+
+  test_package:
+    # hopefully there is no race condition due to some caching on PyPi or so and we get the newest package...
+    needs: unittests
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: abcvoting
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install package from PyPi
+      # TODO should we check that we got the right package version? But how?
+      run: pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple abcvoting
+
+    - name: Run examples
+      # TODO this should also run other examples, but import examples does not work here
+      run: python3 abcvoting/examples/abcsurvey/example01.py
