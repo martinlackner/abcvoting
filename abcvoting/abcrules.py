@@ -98,11 +98,12 @@ class Rule:
             if algorithm in AVAILABLE_ALGORITHMS:
                 self.available_algorithms.append(algorithm)
 
+    def fastest_available_algorithm(self):
         if self.available_algorithms:
             # This rests on the assumption that ``self.algorithms`` are sorted by speed.
-            self.fastest_available_algorithm = self.available_algorithms[0]
+            return self.available_algorithms[0]
         else:
-            self.fastest_available_algorithm = None
+            raise NoAvailableAlgorithm(self.rule_id, self.algorithms)
 
     def compute(self, profile, committeesize, **kwargs):
         """Compute rule using self._compute_fct."""
@@ -156,6 +157,18 @@ class UnknownAlgorithm(ValueError):
 
     def __init__(self, rule_id, algorithm):
         message = f"Algorithm {algorithm} not specified for ABC rule {rule_id}."
+        super(ValueError, self).__init__(message)
+
+
+class NoAvailableAlgorithm(ValueError):
+    """None of the implemented algorithms are available (because no solvers are installed)."""
+
+    def __init__(self, rule_id, algorithms):
+        message = (
+            f"None of the implemented algorithms are available for ABC rule {rule_id}\n"
+            f"(because the solvers for the following algorithms are not installed: "
+            f"{algorithms}) "
+        )
         super(ValueError, self).__init__(message)
 
 
@@ -505,7 +518,7 @@ def compute_thiele_method(
     """
     rule = get_rule(scorefct_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -763,7 +776,7 @@ def compute_lexcc(
     rule_id = "lexcc"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -863,7 +876,7 @@ def compute_seq_thiele_method(
     rule_id = "seq" + scorefct_id
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -1076,7 +1089,7 @@ def compute_revseq_thiele_method(
     rule_id = "revseq" + scorefct_id
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -1256,7 +1269,7 @@ def compute_separable_rule(
     """
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -1441,7 +1454,7 @@ def compute_minimaxav(
     rule_id = "minimaxav"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -1541,7 +1554,7 @@ def compute_lexminimaxav(
     rule_id = "lexminimaxav"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -1624,7 +1637,7 @@ def compute_monroe(
     rule_id = "monroe"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -1717,7 +1730,7 @@ def compute_greedy_monroe(profile, committeesize, algorithm="fastest", resolute=
     rule_id = "greedy-monroe"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(profile, committeesize, algorithm, resolute)
 
     if not profile.has_unit_weights():
@@ -1837,7 +1850,7 @@ def compute_seqphragmen(
     rule_id = "seqphragmen"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -2097,7 +2110,7 @@ def compute_rule_x(
         rule_id = "rule-x"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -2378,7 +2391,7 @@ def compute_minimaxphragmen(
     rule_id = "minimaxphragmen"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -2436,7 +2449,7 @@ def compute_phragmen_enestroem(
     rule_id = "phragmen-enestroem"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -2561,7 +2574,7 @@ def compute_consensus_rule(
     rule_id = "consensus-rule"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -2672,7 +2685,7 @@ def compute_trivial_rule(
     rule_id = "trivial"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
         profile=profile,
         committeesize=committeesize,
@@ -2710,7 +2723,7 @@ def compute_rsd(profile, committeesize, algorithm="standard", resolute=True):
     rule_id = "rsd"
     rule = get_rule(rule_id)
     if algorithm == "fastest":
-        algorithm = rule.fastest_available_algorithm
+        algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(profile, committeesize, algorithm, resolute)
 
     if not profile.has_unit_weights():

@@ -8,7 +8,6 @@ from abcvoting.output import WARNING
 from abcvoting.output import output
 from test_abcrules import remove_solver_output
 import re
-import random
 
 
 def remove_algorithm_info(out):
@@ -62,10 +61,9 @@ def check_output(capfd, request):
     assert expected_output == stdout, f"Unexpected output, output written to {fname}.new"
 
 
+# noinspection PyUnresolvedReferences
 def test_abcsurvey_example01_py(check_output):
     from examples.abcsurvey import example01
-
-    example01.print_profile()
 
 
 # noinspection PyUnresolvedReferences

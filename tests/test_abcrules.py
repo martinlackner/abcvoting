@@ -51,7 +51,7 @@ class CollectRules:
                 for resolute in rule.resolute_values:
                     if algorithm in MARKS:
                         if algorithm == "fastest":
-                            actual_algorithm = rule.fastest_available_algorithm
+                            actual_algorithm = rule.fastest_available_algorithm()
                             if actual_algorithm is None:
                                 continue
                         else:
@@ -1045,7 +1045,7 @@ def test_fastest_available_algorithm(rule_id):
     profile = Profile(4)
     profile.add_voters([[0, 1], [1, 2], [0, 2, 3]])
     committeesize = 2
-    algorithm = abcrules.get_rule(rule_id).fastest_available_algorithm
+    algorithm = abcrules.get_rule(rule_id).fastest_available_algorithm()
     if algorithm is None:
         pytest.skip("no supported algorithms for " + abcrules.get_rule(rule_id).shortname)
     for resolute in abcrules.get_rule(rule_id).resolute_values:
