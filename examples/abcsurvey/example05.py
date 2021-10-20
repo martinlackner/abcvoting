@@ -7,8 +7,7 @@ by Martin Lackner and Piotr Skowron
 from abcvoting import abcrules
 from abcvoting.preferences import Profile, Voter
 from abcvoting import misc
-from abcvoting.output import output
-from abcvoting.output import DETAILS
+from abcvoting.output import output, DETAILS
 
 output.set_verbosity(DETAILS)
 
