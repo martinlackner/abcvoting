@@ -85,7 +85,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
     ],
-    packages=["abcvoting"],
+    packages=["abcvoting", "abcvoting.bipartite_matching"],
     python_requires=">=3.6",
     setup_requires=[
         "wheel",
