@@ -210,8 +210,8 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
         # committee (this is the case for scorefct "pav", "slav" or "geom").
 
         utility = {}
-        round = len(satisfaction_constraints)
-        scorefcts = [scores.get_scorefct(f"atleast{i+1}") for i in range(round + 1)]
+        iteration = len(satisfaction_constraints)
+        scorefcts = [scores.get_scorefct(f"atleast{i+1}") for i in range(iteration + 1)]
 
         max_in_committee = {}
         for i, voter in enumerate(profile):
@@ -229,30 +229,30 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
                 utility[voter, l] for l in range(1, max_in_committee[voter] + 1)
             ) == mip.xsum(in_committee[cand] for cand in voter.approved)
 
-        # additional constraints from previous rounds
-        for prev_round in range(0, round):
+        # additional constraints from previous iterations
+        for prev_iteration in range(0, iteration):
             model += (
                 mip.xsum(
-                    float(scorefcts[prev_round](l)) * voter.weight * utility[(voter, l)]
+                    float(scorefcts[prev_iteration](l)) * voter.weight * utility[(voter, l)]
                     for voter in profile
                     for l in range(1, max_in_committee[voter] + 1)
                 )
-                >= satisfaction_constraints[prev_round] - ACCURACY
+                >= satisfaction_constraints[prev_iteration] - ACCURACY
             )
 
-        # objective: the at-least-x score of the committee in round x
+        # objective: the at-least-x score of the committee in iteration x
         model.objective = mip.maximize(
             mip.xsum(
-                float(scorefcts[round](l)) * voter.weight * utility[(voter, l)]
+                float(scorefcts[iteration](l)) * voter.weight * utility[(voter, l)]
                 for voter in profile
                 for l in range(1, max_in_committee[voter] + 1)
             )
         )
 
-    # proceed in `committeesize` many rounds to achieve lexicographic tie-breaking
+    # proceed in `committeesize` many iterations to achieve lexicographic tie-breaking
     satisfaction_constraints = []
-    for round in range(1, committeesize):
-        # in round x maximize the number of voters that have at least x approved candidates
+    for iteration in range(1, committeesize):
+        # in iteration x maximize the number of voters that have at least x approved candidates
         # in the committee
         committees = _optimize_rule_mip(
             set_opt_model_func=set_opt_model_func,
@@ -261,12 +261,12 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
             solver_id=solver_id,
-            name=f"lexcc-atleast{round}",
+            name=f"lexcc-atleast{iteration}",
         )
         satisfaction_constraints.append(
-            scores.thiele_score(f"atleast{round}", profile, committees[0])
+            scores.thiele_score(f"atleast{iteration}", profile, committees[0])
         )
-    round = committeesize
+    iteration = committeesize
     committees = _optimize_rule_mip(
         set_opt_model_func=set_opt_model_func,
         profile=profile,
@@ -274,9 +274,11 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
-        name=f"lexcc-atleast{round}",
+        name=f"lexcc-final",
     )
-    satisfaction_constraints.append(scores.thiele_score(f"atleast{round}", profile, committees[0]))
+    satisfaction_constraints.append(
+        scores.thiele_score(f"atleast{iteration}", profile, committees[0])
+    )
     detailed_info = {"opt_score_vector": satisfaction_constraints}
     return sorted_committees(committees), detailed_info
 
