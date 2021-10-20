@@ -62,4 +62,4 @@ jobs:
       run: pip install abcvoting
 
     - name: Run examples
-      run: python3 abcvoting/examples/abcsurvey/example01.py
+      run: python3 abcvoting/examples/allrules.py
