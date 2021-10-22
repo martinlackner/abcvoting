@@ -213,7 +213,7 @@ AVAILABLE_ALGORITHMS = _available_algorithms()
 def get_rule(rule_id):
     """Get instance of Rule for ABC rule specified by `rule_id`."""
     _THIELE_ALGORITHMS = (
-        # TODO sort by speed, requires testing
+        # algorithms sorted by speed
         "gurobi",
         "mip_gurobi",
         "mip_cbc",
@@ -246,8 +246,9 @@ def get_rule(rule_id):
             shortname="PAV",
             longname="Proportional Approval Voting (PAV)",
             compute_fct=compute_pav,
-            # TODO sort by speed, requires testing
-            algorithms=_THIELE_ALGORITHMS + ("cvxpy_glpk_mi", "cvxpy_cbc", "cvxpy_scip"),
+            algorithms=_THIELE_ALGORITHMS,
+            # TODO: cvxpy does not work at the moment ("cvxpy_glpk_mi", "cvxpy_cbc", "cvxpy_scip")
+            #       DeprecationWarning: `np.bool` is a deprecated alias ...
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "slav":
@@ -265,8 +266,15 @@ def get_rule(rule_id):
             shortname="CC",
             longname="Approval Chamberlin-Courant (CC)",
             compute_fct=compute_cc,
-            # TODO sort by speed, requires testing
-            algorithms=_THIELE_ALGORITHMS + ("ortools_cp",),
+            algorithms=(
+                # algorithms sorted by speed
+                "gurobi",
+                "mip_gurobi",
+                "ortools_cp",
+                "branch-and-bound",
+                "brute-force",
+                "mip_cbc",
+            ),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "lexcc":
@@ -275,8 +283,8 @@ def get_rule(rule_id):
             shortname="lex-CC",
             longname="Lexicographic Approval Chamberlin-Courant (lex-CC)",
             compute_fct=compute_lexcc,
-            # TODO sort by speed, requires testing
-            algorithms=("gurobi", "mip_gurobi", "mip_cbc", "brute-force"),
+            # algorithms sorted by speed
+            algorithms=("gurobi", "mip_gurobi", "brute-force", "mip_cbc"),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "seqpav":
@@ -339,7 +347,14 @@ def get_rule(rule_id):
             shortname="Monroe",
             longname="Monroe's Approval Rule (Monroe)",
             compute_fct=compute_monroe,
-            algorithms=("gurobi", "mip_gurobi", "mip_cbc", "ortools_cp", "brute-force"),
+            algorithms=(
+                # algorithms sorted by speed
+                "gurobi",
+                "mip_gurobi",
+                "mip_cbc",
+                "ortools_cp",
+                "brute-force",
+            ),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "greedy-monroe":
@@ -357,8 +372,9 @@ def get_rule(rule_id):
             shortname="minimaxav",
             longname="Minimax Approval Voting (MAV)",
             compute_fct=compute_minimaxav,
-            # TODO sort by speed, requires testing
-            algorithms=("gurobi", "ortools_cp", "brute-force", "mip_gurobi", "mip_cbc"),
+            algorithms=("gurobi", "mip_gurobi", "ortools_cp", "mip_cbc", "brute-force"),
+            # algorithms sorted by speed. however, for small profiles with a small committee size,
+            # brute-force is often the fastest
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "lexminimaxav":
@@ -616,7 +632,8 @@ def _thiele_methods_bruteforce(
             opt_committees = [committee]
             opt_thiele_score = score
         elif score == opt_thiele_score:
-            opt_committees.append(committee)
+            if not resolute:
+                opt_committees.append(committee)
 
     committees = sorted_committees(opt_committees)
     if max_num_of_committees is not None:
