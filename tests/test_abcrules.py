@@ -967,7 +967,14 @@ def test_cvxpy_cant_compute_av():
     committeesize = 2
 
     with pytest.raises(ValueError):
-        cvxpy_thiele_methods(profile, committeesize, "av", resolute=False, solver_id="glpk_mi")
+        cvxpy_thiele_methods(
+            profile,
+            committeesize,
+            "av",
+            resolute=False,
+            solver_id="glpk_mi",
+            max_num_of_committees=None,
+        )
 
 
 def test_consensus_fails_lower_quota():
@@ -1065,6 +1072,7 @@ def test_cvxpy_wrong_score_fct():
             committeesize=committeesize,
             scorefct_id="non_existing",
             resolute=False,
+            max_num_of_committees=None,
             solver_id="glpk_mi",
         )
 

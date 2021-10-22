@@ -23,7 +23,9 @@ except ImportError:
 CVXPY_ACCURACY = 1e-7
 
 
-def cvxpy_thiele_methods(profile, committeesize, scorefct_id, resolute, solver_id):
+def cvxpy_thiele_methods(
+    profile, committeesize, scorefct_id, resolute, max_num_of_committees, solver_id
+):
     """Compute thiele method using CVXPY. This is similar to `_gurobi_thiele_methods()`,
     where `gurobipy` is used as interface to Gurobi. This method supports Gurobi too, but also
     other solvers.
