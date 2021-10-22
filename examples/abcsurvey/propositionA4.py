@@ -151,14 +151,20 @@ for manip in manipulations:
     profile = Profile(num_cand, cand_names=cand_names)
     profile.add_voters(approval_sets)
 
-    committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)
+    if resolute and rule_id == "cc":
+        algorithm = "brute-force"  # correct tie-breaking between candidates
+    else:
+        algorithm = "fastest"
+    committees = abcrules.compute(
+        rule_id, profile, committeesize, resolute=resolute, algorithm=algorithm
+    )
     print(
         "\nwinning committees after manipulation:\n"
         + misc.str_sets_of_candidates(committees, cand_names)
     )
 
     # verify correctness
-    assert committees == commsafter
+    assert committees == commsafter, f"{committees} != {commsafter}"
 
     # verify that this is a counterexample to inclusion-strategyproofness
     # with the Kelly (cautious) set extension
