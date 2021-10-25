@@ -1519,7 +1519,7 @@ def compute_minimaxav(
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
-    opt_minimaxav_score = scores.mavscore(profile, committees[0])
+    opt_minimaxav_score = scores.minimaxav_score(profile, committees[0])
     output.info(str_committees_header(committees, winning=True))
     output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
     output.details("Minimum maximal distance: " + str(opt_minimaxav_score))
@@ -1537,7 +1537,7 @@ def _minimaxav_bruteforce(profile, committeesize, resolute, max_num_of_committee
     opt_committees = []
     opt_minimaxav_score = profile.num_cand + 1
     for committee in itertools.combinations(profile.candidates, committeesize):
-        score = scores.mavscore(profile, committee)
+        score = scores.minimaxav_score(profile, committee)
         if score < opt_minimaxav_score:
             opt_committees = [committee]
             opt_minimaxav_score = score

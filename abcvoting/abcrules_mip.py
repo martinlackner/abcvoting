@@ -7,9 +7,11 @@ import mip
 from abcvoting.misc import sorted_committees
 from abcvoting import scores
 from abcvoting.output import output, DEBUG
+import functools
 
 
 ACCURACY = 1e-8
+CMP_ACCURACY = 10 * ACCURACY  # when comparing float numbers obtained from a MIP
 
 
 def _optimize_rule_mip(
@@ -20,6 +22,7 @@ def _optimize_rule_mip(
     max_num_of_committees,
     solver_id,
     name="None",
+    committeescorefct=None,
 ):
     """Compute rules, which are given in the form of an optimization problem, using Python MIP.
 
@@ -98,19 +101,6 @@ def _optimize_rule_mip(
                 # and Gurobi didn't find any
                 raise RuntimeError("Python MIP found no solution (INFEASIBLE)  (model {name})")
             break
-        objective_value = model.objective_value
-
-        if maxscore is None:
-            maxscore = objective_value
-        elif objective_value > maxscore + ACCURACY:
-            raise RuntimeError(
-                "Python MIP found a solution better than a previous optimum. This "
-                f"should not happen (previous optimal score: {maxscore}, "
-                f"new optimal score: {objective_value}, model {name})."
-            )
-        elif objective_value < maxscore - ACCURACY:
-            # no longer optimal
-            break
 
         committee = set(
             cand for cand in profile.candidates if in_committee[cand].x >= 1 - ACCURACY
@@ -120,6 +110,28 @@ def _optimize_rule_mip(
                 "_optimize_rule_mip produced a committee with "
                 "fewer than `committeesize` members  (model {name})."
             )
+
+        if committeescorefct is None:
+            objective_value = model.objective_value  # numeric value from MIP
+        else:
+            objective_value = committeescorefct(profile, committee)  # exact value
+
+        if maxscore is None:
+            maxscore = objective_value
+        elif (committeescorefct is not None and objective_value > maxscore) or (
+            committeescorefct is None and objective_value > maxscore + CMP_ACCURACY
+        ):
+            raise RuntimeError(
+                "Python MIP found a solution better than a previous optimum. This "
+                f"should not happen (previous optimal score: {maxscore}, "
+                f"new optimal score: {objective_value}, model {name})."
+            )
+        elif (committeescorefct is not None and objective_value < maxscore) or (
+            committeescorefct is None and objective_value < maxscore - CMP_ACCURACY
+        ):
+            # no longer optimal
+            break
+
         committees.append(committee)
 
         if resolute:
@@ -192,6 +204,7 @@ def _mip_thiele_methods(
         max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
         name=scorefct_id,
+        committeescorefct=functools.partial(scores.thiele_score, scorefct_id),
     )
     return sorted_committees(committees)
 
@@ -262,6 +275,7 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
             max_num_of_committees=max_num_of_committees,
             solver_id=solver_id,
             name=f"lexcc-atleast{iteration}",
+            committeescorefct=functools.partial(scores.thiele_score, f"atleast{iteration}"),
         )
         satisfaction_constraints.append(
             scores.thiele_score(f"atleast{iteration}", profile, committees[0])
@@ -275,6 +289,7 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
         max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
         name=f"lexcc-final",
+        committeescorefct=functools.partial(scores.thiele_score, f"atleast{committeesize}"),
     )
     satisfaction_constraints.append(
         scores.thiele_score(f"atleast{iteration}", profile, committees[0])
@@ -340,6 +355,7 @@ def _mip_monroe(profile, committeesize, resolute, max_num_of_committees, solver_
         max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
         name="monroe",
+        committeescorefct=scores.monroescore,
     )
     return sorted_committees(committees)
 
@@ -435,5 +451,7 @@ def _mip_minimaxav(profile, committeesize, resolute, max_num_of_committees, solv
         max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
         name="minimaxav",
+        committeescorefct=lambda profile, committee: scores.minimaxav_score(profile, committee)
+        * -1,  # negative because _optimize_rule_mip maximizes while minimaxav minimizes
     )
     return sorted_committees(committees)

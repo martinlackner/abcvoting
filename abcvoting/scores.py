@@ -244,7 +244,7 @@ def monroescore_flowbased(profile, committee):
     return len(profile) - nx.capacity_scaling(graph)[0]
 
 
-def mavscore(profile, committee):
+def minimaxav_score(profile, committee):
     """Return the Minimax AV (MAV) score of a committee."""
     score = 0
     for voter in profile:
