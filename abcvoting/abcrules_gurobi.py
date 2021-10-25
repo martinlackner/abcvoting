@@ -100,7 +100,11 @@ def _optimize_rule_gurobi(
             break
 
         committee = set(
-            cand for cand in profile.candidates if in_committee[cand].Xn >= 1 - ACCURACY
+            cand
+            for cand in profile.candidates
+            if in_committee[cand].Xn >= 0.9
+            # this should be >= 1 - ACCURACY, but apparently it is not necessarily the case that
+            # integers are only ACCURACY apart from either 0 or 1
         )
         if len(committee) != committeesize:
             raise RuntimeError(
