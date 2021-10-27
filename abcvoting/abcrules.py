@@ -2658,7 +2658,10 @@ def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_n
             support = {cand: 0 for cand in available_candidates}
             supporters = {cand: [] for cand in available_candidates}
             for i, voter in enumerate(profile):
-                if budget[i] <= 0:
+                if (budget[i] <= 0) or (
+                    algorithm == "float-fractions"
+                    and math.isclose(budget[i], 0, rel_tol=FLOAT_ISCLOSE_REL_TOL)
+                ):
                     continue
                 for cand in voter.approved:
                     if cand in available_candidates:
