@@ -2,35 +2,26 @@ import random
 from itertools import product
 import os.path
 from abcvoting import genprofiles
-from abcvoting.misc import check_enough_approved_candidates
 from operator import itemgetter
 from abcvoting import abcrules
 from abcvoting import fileio
 
 
 def generate_profile(num_voters, num_cand, committeesize, prob_distribution, setsize):
-    while True:
-        if prob_distribution == "IC":
-            profile = genprofiles.random_IC_profile(num_cand, num_voters, setsize)
-        elif prob_distribution.startswith("Mallows"):
-            dispersion = float(prob_distribution[7:])
-            profile = genprofiles.random_mallows_profile(
-                num_cand, num_voters, setsize, dispersion=dispersion
-            )
-        elif prob_distribution.startswith("Urn"):
-            replace = float(prob_distribution[3:])
-            profile = genprofiles.random_urn_profile(
-                num_cand, num_voters, setsize, replace=replace
-            )
-        elif prob_distribution == "IC-party":
-            profile = genprofiles.random_IC_party_list_profile(num_cand, num_voters, num_parties=3)
-        else:
-            raise ValueError
-        try:
-            check_enough_approved_candidates(profile, committeesize)
-            return profile
-        except ValueError:
-            pass
+    if prob_distribution == "IC":
+        return genprofiles.random_IC_profile(num_cand, num_voters, setsize)
+    elif prob_distribution.startswith("Mallows"):
+        dispersion = float(prob_distribution[7:])
+        return genprofiles.random_mallows_profile(
+            num_cand, num_voters, setsize, dispersion=dispersion
+        )
+    elif prob_distribution.startswith("Urn"):
+        replace = float(prob_distribution[3:])
+        return genprofiles.random_urn_profile(num_cand, num_voters, setsize, replace=replace)
+    elif prob_distribution == "IC-party":
+        return genprofiles.random_IC_party_list_profile(num_cand, num_voters, num_parties=3)
+    else:
+        raise ValueError
 
 
 def generate_abc_yaml_testinstances(

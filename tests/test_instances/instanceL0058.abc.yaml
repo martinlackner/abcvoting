@@ -1,124 +1,124 @@
 description: profile generated via prob_distribution=Urn0.5, num_voters=8, num_cand=8, setsize=2
-profile: [[3, 5], [2, 6], [2, 6], [3, 5], [2, 6], [2, 7], [4, 6], [3, 5]]
+profile: [[1, 2], [0, 3], [4, 5], [4, 5], [4, 5], [1, 5], [4, 5], [0, 3]]
 num_cand: 8
 committeesize: 3
 compute:
 - rule_id: av
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [1, 4, 5], [3, 4, 5]]
   resolute: false
 - rule_id: av
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [1, 4, 5], [3, 4, 5]]
   resolute: true
 - rule_id: sav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [1, 4, 5], [3, 4, 5]]
   resolute: false
 - rule_id: sav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [1, 4, 5], [3, 4, 5]]
   resolute: true
 - rule_id: pav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: false
 - rule_id: pav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: true
 - rule_id: slav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 5], [0, 4, 5], [1, 3, 5], [3, 4, 5]]
   resolute: false
 - rule_id: slav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 5], [0, 4, 5], [1, 3, 5], [3, 4, 5]]
   resolute: true
 - rule_id: cc
-  result: [[2, 3, 4], [2, 3, 6], [2, 4, 5], [2, 5, 6], [3, 6, 7], [5, 6, 7]]
+  result: [[0, 1, 4], [0, 1, 5], [0, 2, 5], [1, 3, 4], [1, 3, 5], [2, 3, 5]]
   resolute: false
 - rule_id: cc
-  result: [[2, 3, 4], [2, 3, 6], [2, 4, 5], [2, 5, 6], [3, 6, 7], [5, 6, 7]]
+  result: [[0, 1, 4], [0, 1, 5], [0, 2, 5], [1, 3, 4], [1, 3, 5], [2, 3, 5]]
   resolute: true
 - rule_id: lexcc
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 5], [1, 3, 5]]
   resolute: false
 - rule_id: lexcc
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 5], [1, 3, 5]]
   resolute: true
 - rule_id: geom2
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: false
 - rule_id: geom2
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: true
 - rule_id: seqpav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: true
 - rule_id: seqpav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: false
 - rule_id: revseqpav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: true
 - rule_id: revseqpav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: false
 - rule_id: seqslav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 5], [0, 4, 5], [1, 3, 5], [3, 4, 5]]
   resolute: true
 - rule_id: seqslav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 5], [0, 4, 5], [1, 3, 5], [3, 4, 5]]
   resolute: false
 - rule_id: seqcc
-  result: [[2, 3, 4], [2, 3, 6], [2, 4, 5], [2, 5, 6], [3, 6, 7], [5, 6, 7]]
+  result: [[0, 1, 5], [0, 2, 5], [1, 3, 5], [2, 3, 5]]
   resolute: true
 - rule_id: seqcc
-  result: [[2, 3, 4], [2, 3, 6], [2, 4, 5], [2, 5, 6], [3, 6, 7], [5, 6, 7]]
+  result: [[0, 1, 5], [0, 2, 5], [1, 3, 5], [2, 3, 5]]
   resolute: false
 - rule_id: seqphragmen
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: true
 - rule_id: seqphragmen
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: false
 - rule_id: minimaxphragmen
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 4], [0, 1, 5], [0, 4, 5], [1, 3, 4], [1, 3, 5], [1, 4, 5], [3, 4, 5]]
   resolute: false
 - rule_id: minimaxphragmen
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 4], [0, 1, 5], [0, 4, 5], [1, 3, 4], [1, 3, 5], [1, 4, 5], [3, 4, 5]]
   resolute: true
 - rule_id: monroe
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 4], [0, 1, 5], [0, 4, 5], [1, 3, 4], [1, 3, 5], [3, 4, 5]]
   resolute: false
 - rule_id: monroe
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 4], [0, 1, 5], [0, 4, 5], [1, 3, 4], [1, 3, 5], [3, 4, 5]]
   resolute: true
 - rule_id: greedy-monroe
-  result: [[2, 3, 4]]
+  result: [[0, 1, 5]]
   resolute: true
 - rule_id: minimaxav
-  result: [[2, 3, 4], [2, 3, 6], [2, 4, 5], [2, 5, 6], [3, 6, 7], [5, 6, 7]]
+  result: [[0, 1, 4], [0, 1, 5], [0, 2, 5], [1, 3, 4], [1, 3, 5], [2, 3, 5]]
   resolute: false
 - rule_id: minimaxav
-  result: [[2, 3, 4], [2, 3, 6], [2, 4, 5], [2, 5, 6], [3, 6, 7], [5, 6, 7]]
+  result: [[0, 1, 4], [0, 1, 5], [0, 2, 5], [1, 3, 4], [1, 3, 5], [2, 3, 5]]
   resolute: true
 - rule_id: lexminimaxav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 5], [1, 3, 5]]
   resolute: false
 - rule_id: lexminimaxav
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 1, 5], [1, 3, 5]]
   resolute: true
 - rule_id: rule-x
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: true
 - rule_id: rule-x
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: false
 - rule_id: phragmen-enestroem
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: true
 - rule_id: phragmen-enestroem
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: false
 - rule_id: consensus-rule
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: true
 - rule_id: consensus-rule
-  result: [[2, 3, 6], [2, 5, 6]]
+  result: [[0, 4, 5], [3, 4, 5]]
   resolute: false
 - rule_id: trivial
   result: [[0, 1, 2], [0, 1, 3], [0, 1, 4], [0, 1, 5], [0, 1, 6], [0, 1, 7], [0, 2, 3], [0, 2, 4], [0, 2, 5], [0, 2, 6], [
