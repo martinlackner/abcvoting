@@ -164,8 +164,3 @@ def test_allrules_py(check_output):
 # noinspection PyUnresolvedReferences
 def test_preflib_py(check_output):
     from examples import handling_preflib_files
-
-
-# noinspection PyUnresolvedReferences
-def test_random_profiles_py(check_output):
-    from examples import random_profiles
