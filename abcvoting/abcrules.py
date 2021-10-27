@@ -122,7 +122,14 @@ class Rule:
         if committeesize < 1:
             raise ValueError(f"Parameter `committeesize` must be a positive integer.")
 
-        misc.check_enough_approved_candidates(profile, committeesize)
+        if committeesize > profile.num_cand:
+            raise ValueError(
+                "Parameter `committeesize` must be smaller or equal to"
+                " the total number of candidates."
+            )
+
+        if len(profile) == 0:
+            raise ValueError("The given profile contains no voters (len(profile) == 0).")
 
         if algorithm not in self.algorithms:
             raise UnknownAlgorithm(self.rule_id, algorithm)
@@ -1990,7 +1997,7 @@ def _seqphragmen_resolute(
         # exclude committees already in the committee
         for cand in profile.candidates:
             if cand in committee:
-                new_maxload[cand] = committeesize + 1  # that's larger than any possible value
+                new_maxload[cand] = committeesize + 2  # that's larger than any possible value
         # find smallest maxload
         opt = min(new_maxload)
         if algorithm == "float-fractions":
@@ -2073,7 +2080,7 @@ def _seqphragmen_irresolute(
             # exclude committees already in the committee
             for cand in profile.candidates:
                 if cand in committee:
-                    new_maxload[cand] = committeesize + 1  # that's larger than any possible value
+                    new_maxload[cand] = committeesize + 2  # that's larger than any possible value
             # compute new loads
             for cand in profile.candidates:
                 if algorithm == "float-fractions":
@@ -2762,9 +2769,9 @@ def compute_rsd(profile, committeesize, algorithm="standard", resolute=True):
             if len(committee) == committeesize:
                 break
         else:
-            raise RuntimeError(
-                f"{rule.longname} produced too small a committee. This should happen."
-            )
+            remaining_candidates = [cand for cand in profile.candidates if cand not in committee]
+            num_missing_candidates = committeesize - len(committee)
+            committee.update(random.sample(remaining_candidates, num_missing_candidates))
     else:
         raise UnknownAlgorithm(rule_id, algorithm)
 

@@ -6,6 +6,7 @@ programs (ILPs) with Gurobi (https://www.gurobi.com/)
 from abcvoting.misc import sorted_committees
 from abcvoting import scores
 import functools
+import itertools
 
 try:
     import gurobipy as gb
@@ -424,6 +425,25 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute, max_num_of_committ
 
         # maximizing the negative distance makes code more similar to the other methods here
         model.setObjective(-loadbound, gb.GRB.MAXIMIZE)
+
+    # check if a sufficient number of candidates is approved
+    if len(profile.approved_candidates) < committeesize:
+        # An insufficient number of candidates is approved:
+        # Committees consist of all approved candidates plus
+        #  a correct number of unapproved candidates
+        remaining_candidates = [
+            cand for cand in profile.candidates if cand not in profile.approved_candidates
+        ]
+        num_missing_candidates = committeesize - len(profile.approved_candidates)
+        if resolute:
+            return [
+                profile.approved_candidates | set(remaining_candidates[:num_missing_candidates])
+            ]
+        else:
+            return [
+                profile.approved_candidates | set(extra)
+                for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
+            ]
 
     committees = _optimize_rule_gurobi(
         set_opt_model_func=set_opt_model_func,

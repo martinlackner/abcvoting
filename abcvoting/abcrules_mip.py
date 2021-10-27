@@ -8,6 +8,7 @@ from abcvoting.misc import sorted_committees
 from abcvoting import scores
 from abcvoting.output import output, DEBUG
 import functools
+import itertools
 
 
 ACCURACY = 1e-8
@@ -412,6 +413,25 @@ def _mip_minimaxphragmen(profile, committeesize, resolute, max_num_of_committees
 
         # maximizing the negative distance makes code more similar to the other methods here
         model.objective = mip.maximize(-loadbound)
+
+    # check if a sufficient number of candidates is approved
+    if len(profile.approved_candidates) < committeesize:
+        # An insufficient number of candidates is approved:
+        # Committees consist of all approved candidates plus
+        #  a correct number of unapproved candidates
+        remaining_candidates = [
+            cand for cand in profile.candidates if cand not in profile.approved_candidates
+        ]
+        num_missing_candidates = committeesize - len(profile.approved_candidates)
+        if resolute:
+            return [
+                profile.approved_candidates | set(remaining_candidates[:num_missing_candidates])
+            ]
+        else:
+            return [
+                profile.approved_candidates | set(extra)
+                for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
+            ]
 
     committees = _optimize_rule_mip(
         set_opt_model_func,

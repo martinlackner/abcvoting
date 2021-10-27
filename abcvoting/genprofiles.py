@@ -6,33 +6,16 @@ Random generation of approval profiles
 import random
 from math import fabs, sqrt
 from abcvoting.preferences import Profile
-from abcvoting.misc import check_enough_approved_candidates
-
-
-MAX_ITERATIONS = 100
 
 
 def random_profile(num_voters, num_cand, prob_distribution, committeesize=None, **kwargs):
-    for _ in range(MAX_ITERATIONS):
-        if prob_distribution == "IC":
-            profile = random_IC_profile(num_cand, num_voters, **kwargs)
-        elif prob_distribution.startswith("Mallows"):
-            dispersion = float(prob_distribution[7:])
-            profile = random_mallows_profile(num_cand, num_voters, dispersion=dispersion, **kwargs)
-        else:
-            raise ValueError(f"Probability model {prob_distribution} unknown.")
-        try:
-            if committeesize:
-                check_enough_approved_candidates(profile, committeesize)
-            return profile
-        except ValueError:
-            pass
+    if prob_distribution == "IC":
+        return random_IC_profile(num_cand, num_voters, **kwargs)
+    elif prob_distribution.startswith("Mallows"):
+        dispersion = float(prob_distribution[7:])
+        return random_mallows_profile(num_cand, num_voters, dispersion=dispersion, **kwargs)
     else:
-        raise RuntimeError(
-            f"Did not find profile with enough approved candidates with {MAX_ITERATIONS} tries.\n"
-            f"(num_voters={num_voters}, num_cand={num_cand}, prob_distribution={prob_distribution},"
-            f"committeesize={committeesize}, {kwargs}"
-        )
+        raise ValueError(f"Probability model {prob_distribution} unknown.")
 
 
 def random_urn_profile(num_cand, num_voters, setsize, replace):

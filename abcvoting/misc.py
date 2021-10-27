@@ -10,20 +10,6 @@ def sorted_committees(committees):
     return sorted([set(committee) for committee in committees], key=str)
 
 
-def check_enough_approved_candidates(profile, committeesize):
-    """
-    verifies whether a sufficient number of approved candidates exists
-    """
-    approved_candidates = set()
-    for voter in profile:
-        approved_candidates.update(voter.approved)
-    if len(approved_candidates) < committeesize:
-        raise ValueError(
-            f"committeesize = {committeesize} is larger than the "
-            f"number of approved candidates ({len(approved_candidates)})"
-        )
-
-
 def str_set_of_candidates(candset, cand_names=None):
     """
     nicely format a single committee

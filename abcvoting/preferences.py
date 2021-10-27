@@ -32,6 +32,7 @@ class Profile(object):
             raise ValueError(str(num_cand) + " is not a valid number of candidates")
         self.candidates = list(range(num_cand))
         self._voters = []
+        self._approved_candidates = None
         self.cand_names = [str(cand) for cand in range(num_cand)]
         if cand_names:
             if len(cand_names) < num_cand:
@@ -44,6 +45,14 @@ class Profile(object):
     @property
     def num_cand(self):  # number of candidates
         return len(self.candidates)
+
+    @property
+    def approved_candidates(self):  # candidates approved by at least one voter
+        if self._approved_candidates is None:
+            _approved_candidates = set()
+            for voter in self._voters:
+                _approved_candidates.update(voter.approved)
+        return _approved_candidates
 
     def __len__(self):
         return len(self._voters)
@@ -64,6 +73,10 @@ class Profile(object):
             _voter = voter
         else:
             _voter = Voter(voter)
+
+        # there might be new approved candidates,
+        # but update self._approved_candidates only on demand
+        self._approved_candidates = None
 
         # this check is a bit redundant, but needed to check for consistency with self.num_cand
         _voter.check_valid(self.num_cand)
@@ -148,9 +161,6 @@ class Profile(object):
         output += "\n"
 
         return output
-
-    def aslist(self):
-        return [list(voter.approved) for voter in self._voters]
 
 
 class Voter:

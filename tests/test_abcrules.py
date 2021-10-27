@@ -574,27 +574,52 @@ def test_resolute_parameter(rule_id):
 
 
 @pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)
-def test_abcrules__toofewcandidates(rule_id, algorithm, resolute):
+def test_abcrules_toofewcandidates(rule_id, algorithm, resolute):
     profile = Profile(5)
     committeesize = 4
-    approval_sets = [{0, 1, 2}, {1}, {1, 2}, {0}]
+    approval_sets = [{0, 1, 2}, {1}, {2}, {0}]
     profile.add_voters(approval_sets)
 
-    with pytest.raises(ValueError):
-        abcrules.compute(
-            rule_id,
+    committees = abcrules.get_rule(rule_id).compute(
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+    )
+    if resolute:
+        assert len(committees) == 1
+        if rule_id != "trivial":
+            assert committees[0] in [{0, 1, 2, 3}, {0, 1, 2, 4}]
+    else:
+        if rule_id == "trivial":
+            assert len(committees) == 5
+        else:
+            assert len(committees) == 2
+            assert misc.compare_list_of_committees(committees, [{0, 1, 2, 3}, {0, 1, 2, 4}])
+
+
+@pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)
+def test_abcrules_noapprovedcandidates(rule_id, algorithm, resolute):
+    def _check():
+        committees = abcrules.get_rule(rule_id).compute(
             profile,
             committeesize,
             algorithm=algorithm,
             resolute=resolute,
         )
-    with pytest.raises(ValueError):
-        abcrules.get_rule(rule_id).compute(
-            profile,
-            committeesize,
-            algorithm=algorithm,
-            resolute=resolute,
-        )
+        if resolute:
+            assert len(committees) == 1
+        else:
+            assert len(committees) == 5
+
+    profile = Profile(5)
+    committeesize = 4
+    approval_sets = [{}]
+    profile.add_voters(approval_sets)
+    _check()
+
+    profile.add_voters(approval_sets)
+    _check()
 
 
 def test_abcrules_wrong_rule_id():
@@ -615,7 +640,6 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute):
     if rule_id in [
         "lexminimaxav",
         "rule-x",
-        "rule-x-without-phragmen-phase",
         "phragmen-enestroem",
         "rsd",
         "monroe",
@@ -649,9 +673,6 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute):
 @pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)
 def test_abcrules_correct_simple(rule_id, algorithm, resolute):
     def simple_checks(_committees):
-        if rule_id == "rule-x-without-phragmen-phase":
-            assert _committees == [set()]
-            return
         if resolute:
             assert len(_committees) == 1
         else:
@@ -728,9 +749,7 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute):
         rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
     )
 
-    if rule_id == "rule-x-without-phragmen-phase":
-        assert committees == [set()]
-    elif rule_id == "trivial" and not resolute:
+    if rule_id == "trivial" and not resolute:
         assert committees == [{0, 1, 2}, {0, 1, 3}, {0, 2, 3}, {1, 2, 3}]
     else:
         assert committees == [{0, 1, 2}]
