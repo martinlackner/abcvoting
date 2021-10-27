@@ -45,12 +45,14 @@ def _optimize_rule_gurobi(
         maximum number of committees this method returns, value can be None
     name : str
         name of the model, used for error messages
+    committeescorefct : callable
+        a function used to compute the score of a committee
 
     Returns
     -------
     committees : list of sets
-        a list of chosen committees, each of them represented as list with candidates named from
-        `0` to `num_cand`, profile.cand_names is ignored
+        a list of winning committees,
+        each of them represented as set of integers from `0` to `num_cand`
 
     """
 
@@ -489,7 +491,7 @@ def _gurobi_minimaxav(profile, committeesize, resolute, max_num_of_committees):
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         name="Minimax AV",
-        committeescorefct=lambda profile, committee: scores.minimaxav_score(profile, committee)
-        * -1,  # negative because _optimize_rule_mip maximizes while minimaxav minimizes
+        committeescorefct=lambda profile, committee: -scores.minimaxav_score(profile, committee),
+        # negative because _optimize_rule_mip maximizes while minimaxav minimizes
     )
     return sorted_committees(committees)

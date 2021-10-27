@@ -5,10 +5,18 @@ Approval-based committee (ABC) rules implemented as constraint
 
 from ortools.sat.python import cp_model
 from abcvoting.misc import sorted_committees
+from abcvoting import scores
+import functools
 
 
 def _optimize_rule_ortools(
-    set_opt_model_func, profile, committeesize, resolute, max_num_of_committees
+    set_opt_model_func,
+    profile,
+    committeesize,
+    resolute,
+    max_num_of_committees,
+    name,
+    committeescorefct,
 ):
     """Compute ABC rules, which are given in the form of an integer optimization problem,
     using the OR-Tools CP-SAT Solver.
@@ -25,11 +33,16 @@ def _optimize_rule_ortools(
     resolute : bool
     max_num_of_committees : int
         maximum number of committees this method returns, value can be None
+    name : str
+        name of the model, used for error messages
+    committeescorefct : callable
+        a function used to compute the score of a committee
 
     Returns
     -------
     committees : list of sets
-        a list of winning committees, each of them represented as set of integers
+        a list of winning committees,
+        each of them represented as set of integers from `0` to `num_cand`
 
     """
 
@@ -58,26 +71,13 @@ def _optimize_rule_ortools(
         if status not in [cp_model.OPTIMAL, cp_model.INFEASIBLE]:
             raise RuntimeError(
                 f"OR-Tools returned an unexpected status code: {status}"
-                "Warning: solutions may be incomplete or not optimal."
+                f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
         elif status == cp_model.INFEASIBLE:
             if len(committees) == 0:
                 # we are in the first round of searching for committees
                 # and Gurobi didn't find any
-                raise RuntimeError("OR-Tools found no solution (INFEASIBLE)")
-            break
-        objective_value = solver.ObjectiveValue()
-
-        if maxscore is None:
-            maxscore = objective_value
-        elif objective_value > maxscore:
-            raise RuntimeError(
-                "OR-Tools found a solution better than a previous optimum. This "
-                f"should not happen (previous optimal score: {maxscore}, "
-                f"new optimal score: {objective_value})."
-            )
-        elif objective_value < maxscore:
-            # no longer optimal
+                raise RuntimeError("OR-Tools found no solution (INFEASIBLE)  (model {name})")
             break
 
         committee = set(
@@ -86,8 +86,23 @@ def _optimize_rule_ortools(
         if len(committee) != committeesize:
             raise RuntimeError(
                 "_optimize_rule_ortools produced a committee with "
-                "fewer than `committeesize` members."
+                "fewer than `committeesize` members (model {name})."
             )
+
+        objective_value = committeescorefct(profile, committee)  # exact value
+
+        if maxscore is None:
+            maxscore = objective_value
+        elif objective_value > maxscore:
+            raise RuntimeError(
+                "OR-Tools found a solution better than a previous optimum. This "
+                f"should not happen (previous optimal score: {maxscore}, "
+                f"new optimal score: {objective_value}, model {name}))."
+            )
+        elif objective_value < maxscore:
+            # no longer optimal
+            break
+
         committees.append(committee)
 
         if resolute:
@@ -147,6 +162,8 @@ def _ortools_cc(profile, committeesize, resolute, max_num_of_committees):
         committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
+        name="CC",
+        committeescorefct=functools.partial(scores.thiele_score, "cc"),
     )
     return sorted_committees(committees)
 
@@ -227,6 +244,8 @@ def _ortools_monroe(profile, committeesize, resolute, max_num_of_committees):
         committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
+        name="Monroe",
+        committeescorefct=scores.monroescore,
     )
     return sorted_committees(committees)
 
@@ -267,5 +286,8 @@ def _ortools_minimaxav(profile, committeesize, resolute, max_num_of_committees):
         committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
+        name="Minimax AV",
+        committeescorefct=lambda profile, committee: -scores.minimaxav_score(profile, committee),
+        # negative because _optimize_rule_mip maximizes while minimaxav minimizes
     )
     return sorted_committees(committees)

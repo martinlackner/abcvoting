@@ -42,12 +42,14 @@ def _optimize_rule_mip(
     solver_id : str
     name : str
         name of the model, used for error messages
+    committeescorefct : callable
+        a function used to compute the score of a committee
 
     Returns
     -------
     committees : list of sets
-        a list of chosen committees, each of them represented as list with candidates named from
-        `0` to `num_cand`, profile.cand_names is ignored
+        a list of winning committees,
+        each of them represented as set of integers from `0` to `num_cand`
 
     """
 
