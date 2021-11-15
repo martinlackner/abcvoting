@@ -391,7 +391,7 @@ def get_rule(rule_id):
             shortname="lex-MAV",
             longname="Lexicographic Minimax Approval Voting (lex-MAV)",
             compute_fct=compute_lexminimaxav,
-            algorithms=("brute-force",),
+            algorithms=("gurobi", "brute-force"),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "rule-x":
@@ -1593,6 +1593,13 @@ def compute_lexminimaxav(
 
     if algorithm == "brute-force":
         committees, detailed_info = _lexminimaxav_bruteforce(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+        )
+    elif algorithm == "gurobi":
+        committees, detailed_info = abcrules_gurobi._gurobi_lexminimaxav(
             profile=profile,
             committeesize=committeesize,
             resolute=resolute,

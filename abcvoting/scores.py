@@ -252,3 +252,9 @@ def minimaxav_score(profile, committee):
         if hamdistance > score:
             score = hamdistance
     return score
+
+
+def num_voters_with_upper_bounded_hamming_distance(upperbound, profile, committee):
+    """Return the number of voters that have a Hamming distance of at most `upperbound`
+    to the given committee."""
+    return len([voter for voter in profile if hamming(voter.approved, committee) <= upperbound])

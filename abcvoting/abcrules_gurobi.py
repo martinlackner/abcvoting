@@ -496,3 +496,103 @@ def _gurobi_minimaxav(profile, committeesize, resolute, max_num_of_committees):
         # negative because _optimize_rule_mip maximizes while minimaxav minimizes
     )
     return sorted_committees(committees)
+
+
+def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees):
+    def set_opt_model_func(model, in_committee):
+        # utility[(voter, l)] contains (intended binary) variables counting the number of approved
+        # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
+        # exactly the number of candidates in the committee approved by `voter` for all
+        # l = 1...committeesize.
+        #
+        # If scorefct(l) > 0 for l >= 1, we assume that scorefct is monotonic decreasing and
+        # therefore in combination with the objective function the following interpreation is
+        # valid:
+        # utility[(voter, l)] indicates whether `voter` approves at least l candidates in the
+        # committee (this is the case for scorefct "pav", "slav" or "geom").
+
+        voteratmostdistances = {}
+
+        for i, voter in enumerate(profile):
+            for dist in range(0, profile.num_cand + 1):
+                voteratmostdistances[(i, dist)] = model.addVar(
+                    vtype=gb.GRB.BINARY, name=f"atmostdistance({i, dist})"
+                )
+                if dist >= len(voter.approved) + committeesize:
+                    # distances are always <= len(voter.approved) + committeesize
+                    voteratmostdistances[(i, dist)] = 1
+                if dist < abs(len(voter.approved) - committeesize):
+                    # distancs are never < abs(len(voter.approved) - committeesize)
+                    voteratmostdistances[(i, dist)] = 0
+
+        # constraint: the committee has the required size
+        model.addConstr(gb.quicksum(in_committee) == committeesize)
+
+        # constraint: distances are consistent with actual committee
+        for i, voter in enumerate(profile):
+            not_approved = [cand for cand in profile.candidates if cand not in voter.approved]
+            for dist in range(0, profile.num_cand + 1):
+                if isinstance(voteratmostdistances[(i, dist)], int):
+                    # trivially satisfied
+                    continue
+                model.addConstr(
+                    (voteratmostdistances[(i, dist)] == True)
+                    >> (
+                        gb.quicksum(1 - in_committee[cand] for cand in voter.approved)
+                        + gb.quicksum(in_committee[cand] for cand in not_approved)
+                        <= dist
+                    )
+                )
+
+        # additional constraints from previous iterations
+        for dist, num_voters_achieving_distance in hammingdistance_constraints.items():
+            model.addConstr(
+                gb.quicksum(voteratmostdistances[(i, dist)] for i, _ in enumerate(profile))
+                >= num_voters_achieving_distance - ACCURACY
+            )
+
+        new_distance = min(hammingdistance_constraints.keys()) - 1
+        # objective: maximize number of voters achieving at most distance `new_distance`
+        model.setObjective(
+            gb.quicksum(voteratmostdistances[(i, new_distance)] for i, _ in enumerate(profile)),
+            gb.GRB.MAXIMIZE,
+        )
+
+    # compute minimaxav as baseline and then improve on it
+    committees = _gurobi_minimaxav(
+        profile, committeesize, resolute=True, max_num_of_committees=None
+    )
+    maxdistance = scores.minimaxav_score(profile, committees[0])
+    # all voters have at most this distance
+    hammingdistance_constraints = {maxdistance: len(profile)}
+    for distance in range(maxdistance - 1, -1, -1):
+        # in interation `distance` we maximize the number of voters that have at
+        # most a Hamming distance of `distance` to the committee
+        if distance == 0:
+            # last iteration
+            _resolute = resolute
+            _max_num_of_committees = max_num_of_committees
+        else:
+            _resolute = True
+            _max_num_of_committees = None
+        committees = _optimize_rule_gurobi(
+            set_opt_model_func=set_opt_model_func,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=_resolute,
+            max_num_of_committees=_max_num_of_committees,
+            name=f"lexminimaxav-atmostdistance{distance}",
+            committeescorefct=functools.partial(
+                scores.num_voters_with_upper_bounded_hamming_distance, distance
+            ),
+        )
+        num_voters_achieving_distance = scores.num_voters_with_upper_bounded_hamming_distance(
+            distance, profile, committees[0]
+        )
+        hammingdistance_constraints[distance] = num_voters_achieving_distance
+    committees = sorted_committees(committees)
+    detailed_info = {
+        "hammingdistance_constraints": hammingdistance_constraints,
+        "opt_distances": [hamming(voter.approved, committees[0]) for voter in profile],
+    }
+    return committees, detailed_info
