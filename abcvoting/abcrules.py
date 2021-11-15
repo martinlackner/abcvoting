@@ -65,6 +65,7 @@ ALGORITHM_NAMES = {
 }
 
 FLOAT_ISCLOSE_REL_TOL = 1e-12
+FLOAT_ISCLOSE_ABS_TOL = 1e-12
 
 # MAX_NUM_OF_COMMITTEES_DEFAULT can be set to None for no constraint on the maximum number
 # of committees.
@@ -2004,7 +2005,12 @@ def _seqphragmen_resolute(
             tied_cands = [
                 cand
                 for cand in profile.candidates
-                if math.isclose(new_maxload[cand], opt, rel_tol=FLOAT_ISCLOSE_REL_TOL)
+                if math.isclose(
+                    new_maxload[cand],
+                    opt,
+                    rel_tol=FLOAT_ISCLOSE_REL_TOL,
+                    abs_tol=FLOAT_ISCLOSE_ABS_TOL,
+                )
             ]
         else:
             tied_cands = [cand for cand in profile.candidates if new_maxload[cand] == opt]
@@ -2085,7 +2091,10 @@ def _seqphragmen_irresolute(
             for cand in profile.candidates:
                 if algorithm == "float-fractions":
                     select_cand = math.isclose(
-                        new_maxload[cand], min(new_maxload), rel_tol=FLOAT_ISCLOSE_REL_TOL
+                        new_maxload[cand],
+                        min(new_maxload),
+                        rel_tol=FLOAT_ISCLOSE_REL_TOL,
+                        abs_tol=FLOAT_ISCLOSE_ABS_TOL,
                     )
                 else:
                     select_cand = new_maxload[cand] <= min(new_maxload)
@@ -2296,7 +2305,10 @@ def _rule_x_algorithm(
                         cand
                         for cand in min_q.keys()
                         if math.isclose(
-                            min_q[cand], min(min_q.values()), rel_tol=FLOAT_ISCLOSE_REL_TOL
+                            min_q[cand],
+                            min(min_q.values()),
+                            rel_tol=FLOAT_ISCLOSE_REL_TOL,
+                            abs_tol=FLOAT_ISCLOSE_ABS_TOL,
                         )
                     ]
                 else:
@@ -2550,7 +2562,12 @@ def _phragmen_enestroem_algorithm(
                 tied_cands = [
                     cand
                     for cand, supp in support.items()
-                    if math.isclose(supp, max_support, rel_tol=FLOAT_ISCLOSE_REL_TOL)
+                    if math.isclose(
+                        supp,
+                        max_support,
+                        rel_tol=FLOAT_ISCLOSE_REL_TOL,
+                        abs_tol=FLOAT_ISCLOSE_ABS_TOL,
+                    )
                 ]
             else:
                 tied_cands = [cand for cand, supp in support.items() if supp == max_support]
@@ -2660,7 +2677,12 @@ def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_n
             for i, voter in enumerate(profile):
                 if (budget[i] <= 0) or (
                     algorithm == "float-fractions"
-                    and math.isclose(budget[i], 0, rel_tol=FLOAT_ISCLOSE_REL_TOL)
+                    and math.isclose(
+                        budget[i],
+                        0,
+                        rel_tol=FLOAT_ISCLOSE_REL_TOL,
+                        abs_tol=FLOAT_ISCLOSE_ABS_TOL,
+                    )
                 ):
                     continue
                 for cand in voter.approved:
@@ -2672,7 +2694,12 @@ def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_n
                 tied_cands = [
                     cand
                     for cand, supp in support.items()
-                    if math.isclose(supp, max_support, rel_tol=FLOAT_ISCLOSE_REL_TOL)
+                    if math.isclose(
+                        supp,
+                        max_support,
+                        rel_tol=FLOAT_ISCLOSE_REL_TOL,
+                        abs_tol=FLOAT_ISCLOSE_ABS_TOL,
+                    )
                 ]
             else:
                 tied_cands = [cand for cand, supp in support.items() if supp == max_support]
