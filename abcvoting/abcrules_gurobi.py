@@ -3,7 +3,7 @@ Approval-based committee (ABC) rules implemented as a integer linear
 programs (ILPs) with Gurobi (https://www.gurobi.com/)
 """
 
-from abcvoting.misc import sorted_committees
+from abcvoting.misc import sorted_committees, hamming
 from abcvoting import scores
 import functools
 import itertools
@@ -289,8 +289,8 @@ def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
             set_opt_model_func=set_opt_model_func,
             profile=profile,
             committeesize=committeesize,
-            resolute=resolute,
-            max_num_of_committees=max_num_of_committees,
+            resolute=True,
+            max_num_of_committees=None,
             name=f"lexcc-atleast{iteration}",
             committeescorefct=functools.partial(scores.thiele_score, f"atleast{iteration}"),
         )
