@@ -202,6 +202,12 @@ def _mip_thiele_methods(
         for first, second in zip(score_values, score_values[1:])
     ):
         raise ValueError("scorefct must be monotonic decreasing")
+    min_score_value = min(val for val in score_values if val > 0)
+    if min_score_value < ACCURACY:
+        output.warning(
+            f"Thiele scoring function {scorefct_id} can take smaller values "
+            f"(min={min_score_value}) than mip accuracy ({ACCURACY})."
+        )
 
     committees = _optimize_rule_mip(
         set_opt_model_func,

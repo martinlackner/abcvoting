@@ -7,6 +7,7 @@ from abcvoting.misc import sorted_committees
 from abcvoting import scores
 import functools
 import itertools
+from abcvoting.output import output
 
 try:
     import gurobipy as gb
@@ -207,7 +208,7 @@ def _gurobi_thiele_methods(
         raise ValueError("scorefct must be monotonic decreasing")
     min_score_value = min(val for val in score_values if val > 0)
     if min_score_value < ACCURACY:
-        raise ValueError(
+        output.warning(
             f"Thiele scoring function {scorefct_id} can take smaller values "
             f"(min={min_score_value}) than Gurobi accuracy ({ACCURACY})."
         )
