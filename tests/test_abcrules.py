@@ -588,8 +588,7 @@ def test_abcrules_toofewcandidates(rule_id, algorithm, resolute):
     )
     if resolute:
         assert len(committees) == 1
-        if rule_id != "trivial":
-            assert committees[0] in [{0, 1, 2, 3}, {0, 1, 2, 4}]
+        assert committees[0] in [{0, 1, 2, 3}, {0, 1, 2, 4}]
     else:
         if rule_id == "trivial":
             assert len(committees) == 5
