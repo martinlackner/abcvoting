@@ -146,16 +146,14 @@ def marginal_thiele_scores_add(scorefct, profile, committee):
     marginal score increase when adding candidate i.
     Candidates that are already in the committee receive a small value (-1).
     """
-    marg = [0] * profile.num_cand
+    marginal = [0] * profile.num_cand
     for voter in profile:
+        intersectionsize = len(voter.approved.intersection(committee))
         for cand in voter.approved:
-            if voter.approved & set(committee):
-                marg[cand] += voter.weight * scorefct(len(voter.approved & set(committee)) + 1)
-            else:
-                marg[cand] += voter.weight * scorefct(1)
+            marginal[cand] += voter.weight * scorefct(intersectionsize + 1)
     for cand in committee:
-        marg[cand] = -1
-    return marg
+        marginal[cand] = -1
+    return marginal
 
 
 def marginal_thiele_scores_remove(scorefct, profile, committee):
@@ -168,8 +166,8 @@ def marginal_thiele_scores_remove(scorefct, profile, committee):
     marg_util_cand = [0] * profile.num_cand
     #  marginal utility gained by adding candidate to the committee
     for voter in profile:
+        satisfaction = len(voter.approved.intersection(committee))
         for cand in voter.approved:
-            satisfaction = len(voter.approved.intersection(committee))
             marg_util_cand[cand] += voter.weight * scorefct(satisfaction)
     for cand in profile.candidates:
         if cand not in committee:
