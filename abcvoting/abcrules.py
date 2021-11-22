@@ -2075,7 +2075,7 @@ def _seqphragmen_irresolute(
     comm_loads = [(partial_committee, load)]
 
     for _ in range(len(partial_committee), committeesize):
-        comm_loads_next = []
+        comm_loads_next = set()
         for (committee, load) in comm_loads:
             approvers_load = {}
             for cand in profile.candidates:
@@ -2106,14 +2106,15 @@ def _seqphragmen_irresolute(
                 else:
                     select_cand = new_maxload[cand] <= min(new_maxload)
                 if select_cand:
-                    new_load = {}
+                    new_load = [0] * len(profile)
                     for v, voter in enumerate(profile):
                         if cand in voter.approved:
                             new_load[v] = new_maxload[cand]
                         else:
                             new_load[v] = load[v]
+                    new_load = tuple(new_load)
                     new_comm = committee + (cand,)
-                    comm_loads_next.append((new_comm, new_load))
+                    comm_loads_next.add((new_comm, new_load))
         comm_loads = comm_loads_next
 
     # final list of committees (sort and remove duplicates)
