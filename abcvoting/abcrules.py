@@ -1946,7 +1946,7 @@ def compute_seqphragmen(
         output.details("corresponding load distribution:")
     else:
         output.details("corresponding load distributions:")
-    for committee, comm_loads in detailed_info["comm_loads"]:
+    for committee, comm_loads in detailed_info["comm_loads"].items():
         msg = f"{committee}: ("
         for v, _ in enumerate(profile):
             msg += str(comm_loads[v]) + ", "
@@ -2033,7 +2033,7 @@ def _seqphragmen_resolute(
         detailed_info["load"].append(list(load))  # create copy of `load`
         detailed_info["max_load"].append(opt)
 
-    comm_loads = [(tuple(committee), load)]
+    comm_loads = {tuple(committee): load}
     detailed_info["comm_loads"] = comm_loads
     return [committee], detailed_info
 
@@ -2073,56 +2073,62 @@ def _seqphragmen_irresolute(
     else:
         partial_committee = tuple(partial_committee)
     comm_loads = [(partial_committee, load)]
+    committees = set()
+    detailed_info = {"comm_loads": {}}
 
-    for _ in range(len(partial_committee), committeesize):
-        comm_loads_next = set()
-        for (committee, load) in comm_loads:
-            approvers_load = {}
-            for cand in profile.candidates:
-                approvers_load[cand] = sum(
-                    voter.weight * load[v]
-                    for v, voter in enumerate(profile)
-                    if cand in voter.approved
+    while comm_loads:
+        committee, load = comm_loads.pop()
+        approvers_load = {}
+        for cand in profile.candidates:
+            approvers_load[cand] = sum(
+                voter.weight * load[v] for v, voter in enumerate(profile) if cand in voter.approved
+            )
+        new_maxload = [
+            division(approvers_load[cand] + 1, approvers_weight[cand])
+            if approvers_weight[cand] > 0
+            else committeesize + 1
+            for cand in profile.candidates
+        ]
+        # exclude committees already in the committee
+        for cand in profile.candidates:
+            if cand in committee:
+                new_maxload[cand] = committeesize + 2  # that's larger than any possible value
+        # compute new loads
+        for cand in profile.candidates:
+            if algorithm == "float-fractions":
+                select_cand = math.isclose(
+                    new_maxload[cand],
+                    min(new_maxload),
+                    rel_tol=FLOAT_ISCLOSE_REL_TOL,
+                    abs_tol=FLOAT_ISCLOSE_ABS_TOL,
                 )
-            new_maxload = [
-                division(approvers_load[cand] + 1, approvers_weight[cand])
-                if approvers_weight[cand] > 0
-                else committeesize + 1
-                for cand in profile.candidates
-            ]
-            # exclude committees already in the committee
-            for cand in profile.candidates:
-                if cand in committee:
-                    new_maxload[cand] = committeesize + 2  # that's larger than any possible value
-            # compute new loads
-            for cand in profile.candidates:
-                if algorithm == "float-fractions":
-                    select_cand = math.isclose(
-                        new_maxload[cand],
-                        min(new_maxload),
-                        rel_tol=FLOAT_ISCLOSE_REL_TOL,
-                        abs_tol=FLOAT_ISCLOSE_ABS_TOL,
-                    )
-                else:
-                    select_cand = new_maxload[cand] <= min(new_maxload)
-                if select_cand:
-                    new_load = [0] * len(profile)
-                    for v, voter in enumerate(profile):
-                        if cand in voter.approved:
-                            new_load[v] = new_maxload[cand]
-                        else:
-                            new_load[v] = load[v]
-                    new_load = tuple(new_load)
-                    new_comm = committee + (cand,)
-                    comm_loads_next.add((new_comm, new_load))
-        comm_loads = comm_loads_next
+            else:
+                select_cand = new_maxload[cand] <= min(new_maxload)
 
-    # final list of committees (sort and remove duplicates)
-    committees = sorted_committees(set(tuple(sorted(committee)) for (committee, _) in comm_loads))
-    if max_num_of_committees is not None:
-        committees = committees[:max_num_of_committees]
-    detailed_info = {"comm_loads": comm_loads}
-    return committees, detailed_info
+            if select_cand:
+                new_load = [0] * len(profile)
+                for v, voter in enumerate(profile):
+                    if cand in voter.approved:
+                        new_load[v] = new_maxload[cand]
+                    else:
+                        new_load[v] = load[v]
+                new_comm = committee + (cand,)
+
+                if len(new_comm) == committeesize:
+                    new_comm = tuple(sorted(new_comm))
+                    committees.add(new_comm)  # remove duplicate committees
+                    detailed_info["comm_loads"][new_comm] = new_load
+                    if (
+                        max_num_of_committees is not None
+                        and len(committees) == max_num_of_committees
+                    ):
+                        # sufficiently many winning committees found
+                        return sorted_committees(committees), detailed_info
+                else:
+                    # partial committee
+                    comm_loads.append((new_comm, new_load))
+
+    return sorted_committees(committees), detailed_info
 
 
 def compute_rule_x(

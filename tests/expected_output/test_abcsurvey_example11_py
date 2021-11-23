@@ -68,7 +68,7 @@ Computing all possible winning committees for any tiebreaking order
  {b, c, d}
 
 corresponding load distribution:
-(2, 1, 3): (29/60, 29/60, 29/60, 1/3, 1/3, 1/5, 1/5, 29/60)
+(1, 2, 3): (29/60, 29/60, 29/60, 1/3, 1/3, 1/5, 1/5, 29/60)
 -----------------------------------------
 Phragmén's Sequential Rule (seq-Phragmén)
 -----------------------------------------
