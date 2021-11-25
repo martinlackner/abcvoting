@@ -1926,6 +1926,7 @@ def compute_seqphragmen(
             output.details(
                 f"adding candidate number {i+1}: {profile.cand_names[next_cand]}\n"
                 f" maximum load increased to {max_load}"
+                # f"\n (continuous model: time t_{i+1} = {max_load})"
             )
             output.details(" load distribution:")
             msg = "  ("
@@ -1952,7 +1953,7 @@ def compute_seqphragmen(
         msg = f"{str_set_of_candidates(committee, cand_names=profile.cand_names)}: ("
         for v, _ in enumerate(profile):
             msg += str(load[v]) + ", "
-        output.details(msg[:-2] + ")")
+        output.details(msg[:-2] + ")\n")
     # end of optional output
 
     return sorted_committees(committees)
@@ -1981,6 +1982,7 @@ def _seqphragmen_resolute(
     load = start_load
     if load is None:
         load = [0 for _ in range(len(profile))]
+    max_start_load = max(load)
     committee = partial_committee
     if partial_committee is None:
         committee = []  # build committees starting with the empty set
@@ -2240,6 +2242,7 @@ def compute_rule_x(
                 output.details(
                     f"adding candidate number {len(committee)}: {profile.cand_names[next_cand]}\n"
                     f" maximum load increased to {max_load}"
+                    # f"\n (continuous model: time t_{len(committee)} = {max_load})"
                 )
                 output.details(" load distribution:")
                 msg = "  ("
@@ -2299,9 +2302,7 @@ def _rule_x_algorithm(
 
     def phragmen_phase(_committee, _budget):
         # translate budget to loads
-        start_load = [
-            division(committeesize, len(profile)) - _budget[v] for v in range(len(profile))
-        ]
+        start_load = [-_budget[v] for v in range(len(profile))]
         detailed_info["phragmen_start_load"] = list(start_load)  # make a copy
 
         if resolute:

@@ -47,3 +47,4 @@ adding candidate number 4: d
 
 corresponding load distribution:
 {a, b, c, d}: (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 5/8, 5/8, 55/128, 0, 0, 0)
+

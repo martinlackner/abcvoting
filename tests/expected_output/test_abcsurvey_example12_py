@@ -16,17 +16,6 @@ profile with 8 votes and 4 candidates:
 Rule X
 ------
 
-Computing all possible winning committees for any tiebreaking order
- (aka parallel universes tiebreaking) (resolute=False)
-
-
-1 winning committee:
- {a, c, d}
-
-------
-Rule X
-------
-
 
 Phase 1:
 
@@ -46,29 +35,16 @@ adding candidate number 2: a
 Phase 2 (seq-Phragmén):
 
 starting loads (= budget spent):
-  (1/5, 1/5, 1/5, 13/40, 13/40, 3/8, 3/8, 0)
+  (-7/40, -7/40, -7/40, -1/20, -1/20, 0, 0, -3/8)
 
 adding candidate number 3: d
- maximum load increased to 2/5
+ maximum load increased to 1/40
  load distribution:
-  (2/5, 2/5, 2/5, 13/40, 13/40, 3/8, 3/8, 2/5)
+  (1/40, 1/40, 1/40, -1/20, -1/20, 0, 0, 1/40)
 
 1 winning committee:
  {a, c, d}
 
------------------------------------------
-Phragmén's Sequential Rule (seq-Phragmén)
------------------------------------------
-
-Computing all possible winning committees for any tiebreaking order
- (aka parallel universes tiebreaking) (resolute=False)
-
-
-1 winning committee:
- {b, c, d}
-
-corresponding load distribution:
-{b, c, d}: (29/60, 29/60, 29/60, 1/3, 1/3, 1/5, 1/5, 29/60)
 -----------------------------------------
 Phragmén's Sequential Rule (seq-Phragmén)
 -----------------------------------------
@@ -94,3 +70,4 @@ adding candidate number 3: d
 
 corresponding load distribution:
 {b, c, d}: (29/60, 29/60, 29/60, 1/3, 1/3, 1/5, 1/5, 29/60)
+
