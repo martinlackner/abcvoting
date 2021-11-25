@@ -928,11 +928,11 @@ def compute_seq_thiele_method(
             " (aka parallel universes tiebreaking) (resolute=False)\n"
         )
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-    output.details(
-        f"starting with the empty committee (score = "
-        f"{scores.thiele_score(scorefct_id, profile, [])})\n"
-    )
     if resolute:
+        output.details(
+            f"starting with the empty committee (score = "
+            f"{scores.thiele_score(scorefct_id, profile, [])})\n"
+        )
         committee = []
         for i, next_cand in enumerate(detailed_info["next_cand"]):
             tied_cands = detailed_info["tied_cands"][i]
@@ -1751,7 +1751,9 @@ def _monroe_bruteforce(profile, committeesize, resolute, max_num_of_committees):
     return committees, detailed_info
 
 
-def compute_greedy_monroe(profile, committeesize, algorithm="fastest", resolute=True):
+def compute_greedy_monroe(
+    profile, committeesize, algorithm="fastest", resolute=True, max_num_of_committees=None
+):
     """Greedy Monroe.
 
     For a mathematical description of this rule, see e.g. the survey by
@@ -2816,7 +2818,9 @@ def compute_trivial_rule(
     return sorted_committees(committees)
 
 
-def compute_rsd(profile, committeesize, algorithm="standard", resolute=True):
+def compute_rsd(
+    profile, committeesize, algorithm="standard", resolute=True, max_num_of_committees=None
+):
     """The Random Serial Dictator rule."""
     rule_id = "rsd"
     rule = get_rule(rule_id)

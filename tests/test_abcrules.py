@@ -508,6 +508,8 @@ def _list_abc_yaml_compute_instances():
             for algorithm in rule.algorithms:
                 if "instanceS" in filename:
                     marks = []  # small instances, rather fast
+                    if algorithm in ["mip_cbc"]:
+                        marks = [pytest.mark.slow]
                 elif "instanceVL" in filename:
                     marks = [pytest.mark.slow, pytest.mark.veryslow]  # very large instances
                 elif rule_id == "monroe" and algorithm in ["mip_cbc"]:
@@ -1259,7 +1261,7 @@ def test_resolute_and_max_num_of_committees(rule_id, algorithm, max_num_of_commi
     profile = Profile(num_cand)
     profile.add_voters([[cand] for cand in range(num_cand)])
     committeesize = 1
-    TOTAL_NUM_OF_COMMITTEES = 5
+    total_num_of_committees = 5
     committees = abcrules.compute(
         rule_id,
         profile,
@@ -1268,10 +1270,10 @@ def test_resolute_and_max_num_of_committees(rule_id, algorithm, max_num_of_commi
         algorithm=algorithm,
         max_num_of_committees=max_num_of_committees,
     )
-    if max_num_of_committees <= TOTAL_NUM_OF_COMMITTEES:
+    if max_num_of_committees <= total_num_of_committees:
         assert len(committees) == max_num_of_committees
     else:
-        assert len(committees) == TOTAL_NUM_OF_COMMITTEES
+        assert len(committees) == total_num_of_committees
 
 
 @pytest.mark.parametrize("rule_id, algorithm", testrules.rule_algorithm_onlyresolute)
