@@ -1002,19 +1002,19 @@ def _seq_thiele_irresolute(scorefct_id, profile, committeesize, max_num_of_commi
     """
     scorefct = scores.get_scorefct(scorefct_id, committeesize)
 
-    comm_scores = {(): 0}
+    committee_scores = {(): 0}
     # build committees starting with the empty set
     for _ in range(committeesize):
         comm_scores_next = {}
-        for committee, score in comm_scores.items():
+        for committee, score in committee_scores.items():
             # marginal utility gained by adding candidate to the committee
             additional_score_cand = scores.marginal_thiele_scores_add(scorefct, profile, committee)
             for cand in profile.candidates:
                 if additional_score_cand[cand] >= max(additional_score_cand):
-                    next_comm = tuple(sorted(committee + (cand,)))
-                    comm_scores_next[next_comm] = score + additional_score_cand[cand]
-        comm_scores = comm_scores_next
-    committees = sorted_committees(list(comm_scores.keys()))
+                    next_committee = tuple(sorted(committee + (cand,)))
+                    comm_scores_next[next_committee] = score + additional_score_cand[cand]
+        committee_scores = comm_scores_next
+    committees = sorted_committees(list(committee_scores.keys()))
     if max_num_of_committees is not None:
         committees = committees[:max_num_of_committees]
     detailed_info = {}
@@ -1227,8 +1227,8 @@ def _revseq_thiele_irresolute(scorefct_id, profile, committeesize, max_num_of_co
     """
     scorefct = scores.get_scorefct(scorefct_id, committeesize)
 
-    allcandcomm = tuple(profile.candidates)
-    comm_scores = {allcandcomm: scores.thiele_score(scorefct_id, profile, allcandcomm)}
+    full_committee = tuple(profile.candidates)
+    comm_scores = {full_committee: scores.thiele_score(scorefct_id, profile, full_committee)}
 
     for _ in range(profile.num_cand - committeesize):
         comm_scores_next = {}
@@ -1240,8 +1240,8 @@ def _revseq_thiele_irresolute(scorefct_id, profile, committeesize, max_num_of_co
                 cand for cand in profile.candidates if marg_util_cand[cand] == min(marg_util_cand)
             ]
             for cand in cands_to_remove:
-                next_comm = tuple(set(committee) - {cand})
-                comm_scores_next[next_comm] = score - score_reduction
+                next_committee = tuple(set(committee) - {cand})
+                comm_scores_next[next_committee] = score - score_reduction
             comm_scores = comm_scores_next
 
     committees = sorted_committees(list(comm_scores.keys()))
@@ -1946,10 +1946,10 @@ def compute_seqphragmen(
         output.details("corresponding load distribution:")
     else:
         output.details("corresponding load distributions:")
-    for committee, comm_loads in detailed_info["comm_loads"].items():
-        msg = f"{committee}: ("
+    for committee, load in detailed_info["committee_load_pairs"].items():
+        msg = f"{str_set_of_candidates(committee, cand_names=profile.cand_names)}: ("
         for v, _ in enumerate(profile):
-            msg += str(comm_loads[v]) + ", "
+            msg += str(load[v]) + ", "
         output.details(msg[:-2] + ")")
     # end of optional output
 
@@ -2033,8 +2033,7 @@ def _seqphragmen_resolute(
         detailed_info["load"].append(list(load))  # create copy of `load`
         detailed_info["max_load"].append(opt)
 
-    comm_loads = {tuple(committee): load}
-    detailed_info["comm_loads"] = comm_loads
+    detailed_info["committee_load_pairs"] = {tuple(committee): load}
     return [committee], detailed_info
 
 
@@ -2072,12 +2071,12 @@ def _seqphragmen_irresolute(
         partial_committee = ()  # build committees starting with the empty set
     else:
         partial_committee = tuple(partial_committee)
-    comm_loads = [(partial_committee, load)]
+    committee_load_pairs = [(partial_committee, load)]
     committees = set()
-    detailed_info = {"comm_loads": {}}
+    detailed_info = {"committee_load_pairs": {}}
 
-    while comm_loads:
-        committee, load = comm_loads.pop()
+    while committee_load_pairs:
+        committee, load = committee_load_pairs.pop()
         approvers_load = {}
         for cand in profile.candidates:
             approvers_load[cand] = sum(
@@ -2094,6 +2093,7 @@ def _seqphragmen_irresolute(
             if cand in committee:
                 new_maxload[cand] = committeesize + 2  # that's larger than any possible value
         # compute new loads
+        new_committee_load_pairs = []
         for cand in profile.candidates:
             if algorithm == "float-fractions":
                 select_cand = math.isclose(
@@ -2112,12 +2112,12 @@ def _seqphragmen_irresolute(
                         new_load[v] = new_maxload[cand]
                     else:
                         new_load[v] = load[v]
-                new_comm = committee + (cand,)
+                new_committee = committee + (cand,)
 
-                if len(new_comm) == committeesize:
-                    new_comm = tuple(sorted(new_comm))
-                    committees.add(new_comm)  # remove duplicate committees
-                    detailed_info["comm_loads"][new_comm] = new_load
+                if len(new_committee) == committeesize:
+                    new_committee = tuple(sorted(new_committee))
+                    committees.add(new_committee)  # remove duplicate committees
+                    detailed_info["committee_load_pairs"][new_committee] = new_load
                     if (
                         max_num_of_committees is not None
                         and len(committees) == max_num_of_committees
@@ -2126,7 +2126,9 @@ def _seqphragmen_irresolute(
                         return sorted_committees(committees), detailed_info
                 else:
                     # partial committee
-                    comm_loads.append((new_comm, new_load))
+                    new_committee_load_pairs.append((new_committee, new_load))
+        # add new committee/load pairs in reversed order, so that tiebreaking is correct
+        committee_load_pairs += reversed(new_committee_load_pairs)
 
     return sorted_committees(committees), detailed_info
 
@@ -2277,6 +2279,54 @@ def _rule_x_algorithm(
             poor.update(new_poor)
         return None  # not sufficient budget available
 
+    def find_minimum_dict_entries(dictx):
+        if algorithm == "float-fractions":
+            min_entries = [
+                cand
+                for cand in dictx.keys()
+                if math.isclose(
+                    dictx[cand],
+                    min(dictx.values()),
+                    rel_tol=FLOAT_ISCLOSE_REL_TOL,
+                    abs_tol=FLOAT_ISCLOSE_ABS_TOL,
+                )
+            ]
+        else:
+            min_entries = [cand for cand in dictx.keys() if dictx[cand] == min(dictx.values())]
+        return min_entries
+
+    def phragmen_phase(_committee, _budget):
+        # translate budget to loads
+        start_load = [
+            division(committeesize, len(profile)) - _budget[v] for v in range(len(profile))
+        ]
+        detailed_info["phragmen_start_load"] = list(start_load)  # make a copy
+
+        if resolute:
+            committees, detailed_info_phragmen = _seqphragmen_resolute(
+                profile=profile,
+                committeesize=committeesize,
+                algorithm=algorithm,
+                partial_committee=list(_committee),
+                start_load=start_load,
+            )
+        else:
+            committees, detailed_info_phragmen = _seqphragmen_irresolute(
+                profile=profile,
+                committeesize=committeesize,
+                algorithm=algorithm,
+                max_num_of_committees=None,
+                # TODO: would be nice to have max_num_of_committees=max_num_of_committees
+                #       but there is the issue that some of these committees might be
+                #       already contained in `winning_committees` - so we need more
+                partial_committee=list(_committee),
+                start_load=start_load,
+            )
+        winning_committees.update([tuple(sorted(committee)) for committee in committees])
+        detailed_info["phragmen_phase"] = detailed_info_phragmen
+        # after filling the remaining spots these committees
+        # have size `committeesize`
+
     if algorithm == "float-fractions":
         division = lambda x, y: x / y  # standard float division
     elif algorithm == "standard-fractions":
@@ -2294,7 +2344,7 @@ def _rule_x_algorithm(
         max_num_of_committees = 1  # same algorithm for resolute==True and resolute==False
 
     start_budget = {v: division(committeesize, len(profile)) for v, _ in enumerate(profile)}
-    comm_bugdets = [(tuple(), start_budget)]
+    committee_bugdet_pairs = [(tuple(), start_budget)]
     winning_committees = set()
     detailed_info = {
         "next_cand": [],
@@ -2305,8 +2355,8 @@ def _rule_x_algorithm(
         "phragmen_start_load": None,
     }
 
-    while comm_bugdets:
-        committee, budget = comm_bugdets.pop()
+    while committee_bugdet_pairs:
+        committee, budget = committee_bugdet_pairs.pop()
 
         available_candidates = [cand for cand in profile.candidates if cand not in committee]
         min_q = {}
@@ -2316,25 +2366,17 @@ def _rule_x_algorithm(
                 min_q[cand] = q
 
         if len(min_q) > 0:  # one or more candidates are affordable
-            if algorithm == "float-fractions":
-                tied_cands = [
-                    cand
-                    for cand in min_q.keys()
-                    if math.isclose(
-                        min_q[cand],
-                        min(min_q.values()),
-                        rel_tol=FLOAT_ISCLOSE_REL_TOL,
-                        abs_tol=FLOAT_ISCLOSE_ABS_TOL,
-                    )
-                ]
-            else:
-                tied_cands = [cand for cand in min_q.keys() if min_q[cand] == min(min_q.values())]
-            for next_cand in sorted(tied_cands, reverse=True):
+            # choose those candidates that require the smallest budget
+            tied_cands = find_minimum_dict_entries(min_q)
+
+            new_committee_budget_pairs = []
+            for next_cand in sorted(tied_cands):
                 new_budget = dict(budget)
                 for v, voter in enumerate(profile):
                     if next_cand in voter.approved:
                         new_budget[v] -= min(budget[v], min_q[next_cand])
-                new_comm = committee + (next_cand,)
+
+                new_committee = committee + (next_cand,)
 
                 if resolute:
                     detailed_info["next_cand"].append(next_cand)
@@ -2342,61 +2384,37 @@ def _rule_x_algorithm(
                     detailed_info["cost"].append(min(min_q.values()))
                     detailed_info["budget"].append(new_budget)
 
-                if len(new_comm) == committeesize:
-                    new_comm = tuple(sorted(new_comm))
-                    winning_committees.add(new_comm)  # remove duplicate committees
+                if len(new_committee) == committeesize:
+                    new_committee = tuple(sorted(new_committee))
+                    winning_committees.add(new_committee)  # remove duplicate committees
+                    if (
+                        max_num_of_committees is not None
+                        and len(winning_committees) == max_num_of_committees
+                    ):
+                        # sufficiently many winning committees found
+                        return sorted_committees(winning_committees), detailed_info
                 else:
                     # partial committee
-                    comm_bugdets.append((new_comm, new_budget))
+                    new_committee_budget_pairs.append((new_committee, new_budget))
+
+                if resolute:
+                    break
+
+            # add new committee/budget pairs in reversed order, so that tiebreaking is correct
+            committee_bugdet_pairs += reversed(new_committee_budget_pairs)
 
         else:  # no affordable candidates remain
             if skip_phragmen_phase:
                 winning_committees.add(tuple(sorted(committee)))
             else:
                 # fill committee via seq-Phragmen
-
-                # translate budget to loads
-                start_load = [
-                    division(committeesize, len(profile)) - budget[v] for v in range(len(profile))
-                ]
-                detailed_info["phragmen_start_load"] = list(start_load)  # make a copy
-
-                if resolute:
-                    committees, detailed_info_phragmen = _seqphragmen_resolute(
-                        profile=profile,
-                        committeesize=committeesize,
-                        algorithm=algorithm,
-                        partial_committee=list(committee),
-                        start_load=start_load,
-                    )
-                else:
-                    committees, detailed_info_phragmen = _seqphragmen_irresolute(
-                        profile=profile,
-                        committeesize=committeesize,
-                        algorithm=algorithm,
-                        max_num_of_committees=None,
-                        # TODO: would be nice to have max_num_of_committees=max_num_of_committees
-                        #       but there is the issue that some of these committees might be
-                        #       already contained in `winning_committees` - so we need more
-                        partial_committee=list(committee),
-                        start_load=start_load,
-                    )
-                winning_committees.update([tuple(sorted(committee)) for committee in committees])
-                detailed_info["phragmen_phase"] = detailed_info_phragmen
-                # after filling the remaining spots these committees
-                # have size `committeesize`
+                phragmen_phase(committee, budget)
 
         if max_num_of_committees is not None and len(winning_committees) >= max_num_of_committees:
-            # sufficiently many winning committees found, clear queue
+            winning_committees = sorted_committees(winning_committees)[:max_num_of_committees]
             break
 
-    winning_committees.update([tuple(sorted(committee)) for committee, _ in comm_bugdets])
-    winning_committees = sorted_committees(winning_committees)
-    if max_num_of_committees is not None:
-        winning_committees = winning_committees[:max_num_of_committees]
-    if resolute:
-        winning_committees = [winning_committees[0]]
-    return winning_committees, detailed_info
+    return sorted_committees(winning_committees), detailed_info
 
 
 def compute_rule_x_without_phragmen_phase(
@@ -2562,11 +2580,11 @@ def _phragmen_enestroem_algorithm(
     initial_voter_budget = [voter.weight for voter in profile]
     # price for adding a candidate to the committee
     price = division(sum(initial_voter_budget), committeesize)
-    voter_budgets_for_partial_committee = [(tuple(), initial_voter_budget)]
+    committee_budget_pairs = [(tuple(), initial_voter_budget)]
     committees = set()
 
-    while voter_budgets_for_partial_committee:
-        committee, budget = voter_budgets_for_partial_committee.pop()
+    while committee_budget_pairs:
+        committee, budget = committee_budget_pairs.pop()
         available_candidates = [cand for cand in profile.candidates if cand not in committee]
         support = {cand: 0 for cand in available_candidates}
         for i, voter in enumerate(profile):
@@ -2589,11 +2607,11 @@ def _phragmen_enestroem_algorithm(
                 )
             ]
         else:
-            tied_cands = [cand for cand, supp in support.items() if supp == max_support]
+            tied_cands = sorted([cand for cand, supp in support.items() if supp == max_support])
         assert tied_cands, "_phragmen_enestroem_algorithm: no candidate with max support (??)"
-        # in the following tied_cands is reversed because of tiebreaking. candidate/committee that
-        # is added latest, is popped first (hence ties are broken in favor of smaller numbers)
-        for cand in sorted(tied_cands, reverse=True):
+
+        new_committee_budget_pairs = []
+        for cand in tied_cands:
             new_budget = list(budget)  # copy of budget
             if max_support > price:  # supporters can afford it
                 multiplier = division(max_support - price, max_support)
@@ -2602,18 +2620,20 @@ def _phragmen_enestroem_algorithm(
             for i, voter in enumerate(profile):
                 if cand in voter.approved:
                     new_budget[i] *= multiplier
-            new_comm = committee + (cand,)
+            new_committee = committee + (cand,)
 
-            if len(new_comm) == committeesize:
-                new_comm = tuple(sorted(new_comm))
-                committees.add(new_comm)  # remove duplicate committees
+            if len(new_committee) == committeesize:
+                new_committee = tuple(sorted(new_committee))
+                committees.add(new_committee)  # remove duplicate committees
                 if max_num_of_committees is not None and len(committees) == max_num_of_committees:
                     # sufficiently many winning committees found
                     detailed_info = {}
                     return sorted_committees(committees), detailed_info
             else:
                 # partial committee
-                voter_budgets_for_partial_committee.append((new_comm, new_budget))
+                new_committee_budget_pairs.append((new_committee, new_budget))
+        # add new committee/budget pairs in reversed order, so that tiebreaking is correct
+        committee_budget_pairs += reversed(new_committee_budget_pairs)
 
     detailed_info = {}
     return sorted_committees(committees), detailed_info
@@ -2686,11 +2706,11 @@ def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_n
         max_num_of_committees = 1  # same algorithm for resolute==True and resolute==False
 
     initial_voter_budget = [0] * len(profile)
-    voter_budgets_for_partial_committee = [(tuple(), initial_voter_budget)]
+    committee_budget_pairs = [(tuple(), initial_voter_budget)]
     committees = set()
 
-    while voter_budgets_for_partial_committee:
-        committee, budget = voter_budgets_for_partial_committee.pop()
+    while committee_budget_pairs:
+        committee, budget = committee_budget_pairs.pop()
 
         for i, _ in enumerate(profile):
             budget[i] += profile[i].weight  # weight is 1 by default
@@ -2725,26 +2745,28 @@ def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_n
                 )
             ]
         else:
-            tied_cands = [cand for cand, supp in support.items() if supp == max_support]
+            tied_cands = sorted([cand for cand, supp in support.items() if supp == max_support])
         assert tied_cands, "_consensus_rule_algorithm: no candidate with max support (??)"
-        # in the following tied_cands is reversed because of tiebreaking. candidate/committee that
-        # is added latest, is popped first (hence ties are broken in favor of smaller numbers)
-        for cand in sorted(tied_cands, reverse=True):
+
+        new_committee_budget_pairs = []
+        for cand in tied_cands:
             new_budget = list(budget)  # copy of budget
             for i in supporters[cand]:
                 new_budget[i] -= division(len(profile), len(supporters[cand]))
-            new_comm = committee + (cand,)
+            new_committee = committee + (cand,)
 
-            if len(new_comm) == committeesize:
-                new_comm = tuple(sorted(new_comm))
-                committees.add(new_comm)  # remove duplicate committees
+            if len(new_committee) == committeesize:
+                new_committee = tuple(sorted(new_committee))
+                committees.add(new_committee)  # remove duplicate committees
                 if max_num_of_committees is not None and len(committees) == max_num_of_committees:
                     # sufficiently many winning committees found
                     detailed_info = {}
                     return sorted_committees(committees), detailed_info
             else:
                 # partial committee
-                voter_budgets_for_partial_committee.append((new_comm, new_budget))
+                new_committee_budget_pairs.append((new_committee, new_budget))
+        # add new committee/budget pairs in reversed order, so that tiebreaking is correct
+        committee_budget_pairs += reversed(new_committee_budget_pairs)
 
     detailed_info = {}
     return sorted_committees(committees), detailed_info

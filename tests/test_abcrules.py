@@ -1272,3 +1272,60 @@ def test_resolute_and_max_num_of_committees(rule_id, algorithm, max_num_of_commi
         assert len(committees) == max_num_of_committees
     else:
         assert len(committees) == TOTAL_NUM_OF_COMMITTEES
+
+
+@pytest.mark.parametrize("rule_id, algorithm", testrules.rule_algorithm_onlyresolute)
+def test_natural_tiebreaking_order_resolute(rule_id, algorithm):
+    # test if rules use the natural tiebreaking orders, i.e.,
+    # candidates with smaller indices are preferred
+    num_cand = 6
+    profile = Profile(num_cand)
+    for approval_sets in [
+        reversed([[cand] for cand in range(num_cand)]),
+        reversed([list(range(num_cand))] * 4),
+    ]:
+        profile.add_voters(approval_sets)
+        committeesize = 2
+        if algorithm in ["gurobi", "ortools_cp", "mip_cbc", "mip_gurobi", "fastest"]:
+            return  # ILP solvers do not guarantee a specific solution
+        if rule_id in ["rsd"]:
+            return  # RSD is randomized
+        committees = abcrules.compute(
+            rule_id,
+            profile,
+            committeesize,
+            resolute=True,
+            algorithm=algorithm,
+        )
+        assert committees == [{0, 1}]
+
+
+@pytest.mark.parametrize("rule_id, algorithm", testrules.rule_algorithm_onlyirresolute)
+@pytest.mark.parametrize(
+    "approval_sets",
+    [
+        list(reversed([[cand] for cand in range(6)])),
+        [list(range(6))] * 4,
+        [[]],
+    ],
+)
+def test_natural_tiebreaking_order_max_num_of_committees(rule_id, algorithm, approval_sets):
+    # test if rules use the natural tiebreaking orders, i.e.,
+    # candidates with smaller indices are preferred
+    profile = Profile(num_cand=6)
+    profile.add_voters(approval_sets)
+    print(profile)
+    committeesize = 2
+    if algorithm in ["gurobi", "ortools_cp", "mip_cbc", "mip_gurobi", "fastest"]:
+        return  # ILP solvers do not guarantee a specific solution
+    if rule_id in ["rsd"]:
+        return  # RSD is randomized
+    committees = abcrules.compute(
+        rule_id,
+        profile,
+        committeesize,
+        resolute=False,
+        algorithm=algorithm,
+        max_num_of_committees=6,
+    )
+    assert committees == [{0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {1, 2}]
