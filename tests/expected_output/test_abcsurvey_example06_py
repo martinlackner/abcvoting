@@ -2,32 +2,58 @@
 Example 6
 *********
 
------------------------------------------
-Input (election instance from Example 1):
------------------------------------------
+------
+Input:
+------
 
-profile with 12 votes and 8 candidates:
- 3 x {a, b},
- 3 x {a, c},
- 2 x {a, d},
- 1 x {b, c, f},
- 1 x {e},
- 1 x {f},
- 1 x {g}
+profile with 8 votes and 4 candidates:
+ 1 x {a, b},
+ 1 x {a, b, c},
+ 1 x {a, b, d},
+ 2 x {a, c, d},
+ 1 x {b},
+ 1 x {c},
+ 1 x {d}
 
--------------------------------
-Monroe's Approval Rule (Monroe)
--------------------------------
+--------------------
+Approval Voting (AV)
+--------------------
 
-Algorithm: brute-force
 
-Optimal Monroe score: 10
+Scores of candidates:
+a: 5
+b: 4
+c: 4
+d: 4
 
-6 winning committees:
- {a, b, c, e}
- {a, b, c, f}
- {a, b, c, g}
- {a, b, d, f}
- {a, c, d, f}
- {b, c, d, f}
+Candidates are contained in winning committees
+if their score is >= 5.
+
+The following candidates are contained in
+every winning committee:
+ a
+
+1 winning committee:
+ {a}
+
+------------------------------------------------------------
+Reverse Sequential Proportional Approval Voting (revseq-PAV)
+------------------------------------------------------------
+
+
+full committee (4 candidates) has a total score of 71/6
+
+removing candidate number 1: a
+ score decreases by 11/6 to a total of 10
+
+removing candidate number 2: d
+ score decreases by 5/2 to a total of 15/2
+
+removing candidate number 3: c
+ score decreases by 7/2 to a total of 4
+
+1 winning committee:
+ {b}
+
+PAV-score of winning committee: 4
 

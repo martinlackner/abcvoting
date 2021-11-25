@@ -127,6 +127,11 @@ def test_abcsurvey_example13_py(check_output):
 
 
 # noinspection PyUnresolvedReferences
+def test_abcsurvey_example14_py(check_output):
+    from examples.abcsurvey import example14
+
+
+# noinspection PyUnresolvedReferences
 def test_abcsurvey_remark02_py(check_output):
     from examples.abcsurvey import remark02
 

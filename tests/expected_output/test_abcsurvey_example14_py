@@ -1,0 +1,35 @@
+**********
+Example 14
+**********
+
+------
+Input:
+------
+
+profile with 4 votes and 5 candidates:
+ 1 x {a},
+ 3 x {b, c, d, e}
+
+----------------------------------
+Satisfaction Approval Voting (SAV)
+----------------------------------
+
+Algorithm: Standard algorithm
+
+Scores of candidates:
+a: 1.0
+b: 0.75
+c: 0.75
+d: 0.75
+e: 0.75
+
+Candidates are contained in winning committees
+if their score is >= 1.0.
+
+The following candidates are contained in
+every winning committee:
+ a
+
+1 winning committee:
+ {a}
+

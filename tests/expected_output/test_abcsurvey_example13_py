@@ -6,30 +6,22 @@ Example 13
 Input:
 ------
 
-profile with 4 votes and 5 candidates:
- 1 x {a},
- 3 x {b, c, d, e}
+profile with 100 votes and 3 candidates:
+ 99 x {a},
+ 1 x {b, c}
 
-----------------------------------
-Satisfaction Approval Voting (SAV)
-----------------------------------
+-----------------------------
+Minimax Approval Voting (MAV)
+-----------------------------
 
-Algorithm: Standard algorithm
+Algorithm: brute-force
 
-Scores of candidates:
-a: 1.0
-b: 0.75
-c: 0.75
-d: 0.75
-e: 0.75
+2 winning committees:
+ {b}
+ {c}
 
-Candidates are contained in winning committees
-if their score is >= 1.0.
-
-The following candidates are contained in
-every winning committee:
- a
-
-1 winning committee:
- {a}
+Minimum maximal distance: 2
+Corresponding distances to voters:
+[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
+[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
 

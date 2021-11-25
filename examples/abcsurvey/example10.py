@@ -1,4 +1,4 @@
-"""Example 10 (Rule X)
+"""Example 9 (lexmin-Phragmen)
 from the survey: "Approval-Based Multi-Winner Voting:
 Axioms, Algorithms, and Applications"
 by Martin Lackner and Piotr Skowron
@@ -35,11 +35,17 @@ committeesize = 4
 
 print(misc.header("Example 10", "*"))
 
+print("As of now, lexmin-Phragmen is not implemented.")
+print("Using opt-Phragmen instead (without lexicographic order).\n")
+
 print(misc.header("Input (election instance from Example 1):"))
 print(profile.str_compact())
 
-committees = abcrules.compute_rule_x(profile, 4, algorithm="standard-fractions")
+committees = abcrules.compute_minimaxphragmen(profile, 4)
+
+print("Note: only committee {a, b, c, f} wins according to lexmin-Phragmen.")
+
 
 # verify correctness
 a, b, c, d, e, f, g = range(7)  # a = 0, b = 1, c = 2, ...
-assert committees == [{a, b, c, d}]
+assert committees == [{a, b, c, d}, {a, b, c, f}, {a, b, d, f}, {a, c, d, f}, {b, c, d, f}]

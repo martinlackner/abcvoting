@@ -1,4 +1,4 @@
-"""Example 12 (MAV)
+"""Example 11 (Rule X, seq-Phragmen)
 from the survey: "Approval-Based Multi-Winner Voting:
 Axioms, Algorithms, and Applications"
 by Martin Lackner and Piotr Skowron
@@ -15,10 +15,10 @@ output.set_verbosity(DETAILS)
 print(misc.header("Example 12", "*"))
 
 # Approval profile
-num_cand = 3
-a, b, c = range(3)  # a = 0, b = 1, c = 2
-approval_sets = [{a}] * 99 + [{b, c}]
-cand_names = "abc"
+num_cand = 4
+a, b, c, d = range(4)
+approval_sets = [{c, d}, {c, d}, {c, d}, {a, b}, {a, b}, {a, c}, {a, c}, {b, d}]
+cand_names = "abcd"
 
 profile = Profile(num_cand, cand_names=cand_names)
 profile.add_voters(approval_sets)
@@ -26,8 +26,20 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees = abcrules.compute_minimaxav(profile, 1)
+committees_rule_x = abcrules.compute_rule_x(
+    profile, 3, resolute=False, algorithm="standard-fractions"
+)
 
+# detailed output is only available if resolute=True:
+abcrules.compute_rule_x(profile, 3, resolute=True, algorithm="standard-fractions")
+
+committees_seqphragmen = abcrules.compute_seqphragmen(
+    profile, 3, resolute=False, algorithm="standard-fractions"
+)
+
+# detailed output is only available if resolute=True:
+abcrules.compute_seqphragmen(profile, 3, resolute=True, algorithm="standard-fractions")
 
 # verify correctness
-assert committees == [{b}, {c}]
+assert committees_rule_x == [{a, c, d}]
+assert committees_seqphragmen == [{b, c, d}]

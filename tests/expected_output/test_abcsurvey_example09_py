@@ -2,9 +2,6 @@
 Example 9
 *********
 
-As of now, lexmin-Phragmen is not implemented.
-Using opt-Phragmen instead (without lexicographic order).
-
 -----------------------------------------
 Input (election instance from Example 1):
 -----------------------------------------
@@ -18,17 +15,35 @@ profile with 12 votes and 8 candidates:
  1 x {f},
  1 x {g}
 
-------------------------------------------
-Phragmén's Minimax Rule (minimax-Phragmén)
-------------------------------------------
+-----------------------------------------
+Phragmén's Sequential Rule (seq-Phragmén)
+-----------------------------------------
 
-Algorithm: Gurobi ILP solver
 
-5 winning committees:
+adding candidate number 1: a
+ maximum load increased to 1/8
+ load distribution:
+  (1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 0, 0, 0, 0)
+
+adding candidate number 2: b
+ maximum load increased to 11/32
+ load distribution:
+  (11/32, 11/32, 11/32, 1/8, 1/8, 1/8, 1/8, 1/8, 11/32, 0, 0, 0)
+ tie broken in favor of b,
+ candidates {b, c} are tied (for all those new maximum load = 11/32).
+
+adding candidate number 3: c
+ maximum load increased to 55/128
+ load distribution:
+  (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 1/8, 1/8, 55/128, 0, 0, 0)
+
+adding candidate number 4: d
+ maximum load increased to 5/8
+ load distribution:
+  (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 5/8, 5/8, 55/128, 0, 0, 0)
+
+1 winning committee:
  {a, b, c, d}
- {a, b, c, f}
- {a, b, d, f}
- {a, c, d, f}
- {b, c, d, f}
 
-Note: only committee {a, b, c, f} wins according to lexmin-Phragmen.
+corresponding load distribution:
+{a, b, c, d}: (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 5/8, 5/8, 55/128, 0, 0, 0)

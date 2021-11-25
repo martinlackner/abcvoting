@@ -15,35 +15,21 @@ profile with 12 votes and 8 candidates:
  1 x {f},
  1 x {g}
 
------------------------------------------
-Phragmén's Sequential Rule (seq-Phragmén)
------------------------------------------
+-------------
+Greedy Monroe
+-------------
 
+Algorithm: Standard algorithm
 
-adding candidate number 1: a
- maximum load increased to 1/8
- load distribution:
-  (1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 0, 0, 0, 0)
+The Monroe assignment computed by Greedy Monroe
+has a Monroe score of 10.
+Assignment (unsatisfatied voters marked with *):
 
-adding candidate number 2: b
- maximum load increased to 11/32
- load distribution:
-  (11/32, 11/32, 11/32, 1/8, 1/8, 1/8, 1/8, 1/8, 11/32, 0, 0, 0)
- tie broken in favor of b,
- candidates {b, c} are tied (for all those new maximum load = 11/32).
-
-adding candidate number 3: c
- maximum load increased to 55/128
- load distribution:
-  (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 1/8, 1/8, 55/128, 0, 0, 0)
-
-adding candidate number 4: d
- maximum load increased to 5/8
- load distribution:
-  (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 5/8, 5/8, 55/128, 0, 0, 0)
+ candidate a assigned to: 0, 1, 2
+ candidate c assigned to: 3, 4, 5
+ candidate d assigned to: 6, 7, 11*
+ candidate f assigned to: 8, 9*, 10
 
 1 winning committee:
- {a, b, c, d}
+ {a, c, d, f}
 
-corresponding load distribution:
-(0, 1, 2, 3): (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 5/8, 5/8, 55/128, 0, 0, 0)

@@ -15,21 +15,19 @@ profile with 12 votes and 8 candidates:
  1 x {f},
  1 x {g}
 
--------------
-Greedy Monroe
--------------
+-------------------------------
+Monroe's Approval Rule (Monroe)
+-------------------------------
 
-Algorithm: Standard algorithm
+Algorithm: brute-force
 
-The Monroe assignment computed by Greedy Monroe
-has a Monroe score of 10.
-Assignment (unsatisfatied voters marked with *):
+Optimal Monroe score: 10
 
- candidate a assigned to: 0, 1, 2
- candidate c assigned to: 3, 4, 5
- candidate d assigned to: 6, 7, 11*
- candidate f assigned to: 8, 9*, 10
-
-1 winning committee:
+6 winning committees:
+ {a, b, c, e}
+ {a, b, c, f}
+ {a, b, c, g}
+ {a, b, d, f}
  {a, c, d, f}
+ {b, c, d, f}
 
