@@ -1,6 +1,5 @@
 """Example 11 (Rule X, seq-Phragmen)
-from the survey: "Approval-Based Multi-Winner Voting:
-Axioms, Algorithms, and Applications"
+from "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
 """
 

@@ -535,9 +535,9 @@ def compute_thiele_method(
     compute_av(). (AV is polynomial-time computable (separable) and can thus be
     computed much faster.)
 
-    For a mathematical description of Thiele methods, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    For a mathematical description of Thiele methods, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
     https://arxiv.org/abs/2007.01795
     """
     rule = get_rule(scorefct_id)
@@ -711,12 +711,12 @@ def compute_pav(
 ):
     """Proportional Approval Voting (PAV).
 
-    This ABC rule belongs to the class of Thiele methods.
+      This ABC rule belongs to the class of Thiele methods.
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
     """
     return compute_thiele_method(
         scorefct_id="pav",
@@ -764,12 +764,12 @@ def compute_cc(
 ):
     """Approval Chamberlin-Courant (CC).
 
-    This ABC rule belongs to the class of Thiele methods.
+      This ABC rule belongs to the class of Thiele methods.
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
     """
     return compute_thiele_method(
         scorefct_id="cc",
@@ -892,9 +892,9 @@ def compute_seq_thiele_method(
 ):
     """Sequential Thiele methods.
 
-    For a mathematical description of these rules, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    For a mathematical description of these rules, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
     https://arxiv.org/abs/2007.01795
     """
     scores.get_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
@@ -1031,10 +1031,10 @@ def compute_seqpav(
 ):
     """Sequential PAV (seq-PAV).
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
     """
     return compute_seq_thiele_method(
         scorefct_id="pav",
@@ -1080,10 +1080,10 @@ def compute_seqcc(
 ):
     """Sequential Chamberlin-Courant (seq-CC).
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
     """
     return compute_seq_thiele_method(
         scorefct_id="cc",
@@ -1105,9 +1105,9 @@ def compute_revseq_thiele_method(
 ):
     """Reverse sequential Thiele methods.
 
-    For a mathematical description of these rules, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
+    For a mathematical description of these rules, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
     https://arxiv.org/abs/2007.01795
     """
     scores.get_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
@@ -1261,10 +1261,10 @@ def compute_revseqpav(
 ):
     """Reverse sequential PAV (revseq-PAV).
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
     """
     return compute_revseq_thiele_method(
         scorefct_id="pav",
@@ -1419,10 +1419,10 @@ def compute_sav(
 ):
     """Satisfaction Approval Voting (SAV).
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
     """
     return compute_separable_rule(
         rule_id="sav",
@@ -1443,14 +1443,14 @@ def compute_av(
 ):
     """Approval Voting (AV).
 
-    AV is both a Thiele method and a separable rule. Seperable rules can be computed much
-    faster than Thiele methods (in general), thus `compute_separable_rule` is used
-    to compute AV.
+      AV is both a Thiele method and a separable rule. Seperable rules can be computed much
+      faster than Thiele methods (in general), thus `compute_separable_rule` is used
+      to compute AV.
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
     """
     return compute_separable_rule(
         rule_id="av",
@@ -1471,10 +1471,10 @@ def compute_minimaxav(
 ):
     """Minimax Approval Voting (MAV).
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
     """
     rule_id = "minimaxav"
     rule = get_rule(rule_id)
@@ -1570,11 +1570,11 @@ def compute_lexminimaxav(
 ):
     """Lexicographic Minimax AV (lex-MAV).
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
-    (Remark 2)
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
+      (Remark 2)
     """
     rule_id = "lexminimaxav"
     rule = get_rule(rule_id)
@@ -1661,10 +1661,10 @@ def compute_monroe(
 ):
     """Monroe's rule.
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
     """
     rule_id = "monroe"
     rule = get_rule(rule_id)
@@ -1756,10 +1756,10 @@ def compute_greedy_monroe(
 ):
     """Greedy Monroe.
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
     """
     rule_id = "greedy-monroe"
     rule = get_rule(rule_id)
@@ -1876,10 +1876,10 @@ def compute_seqphragmen(
 ):
     """Phragmen's sequential rule (seq-Phragmen).
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
     """
     rule_id = "seqphragmen"
     rule = get_rule(rule_id)
@@ -2147,15 +2147,15 @@ def compute_rule_x(
 ):
     """Rule X.
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
-    See also https://arxiv.org/pdf/1911.11747.pdf, page 7
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
+      See also https://arxiv.org/pdf/1911.11747.pdf, page 7
 
-    skip_phragmen_phase : bool, optional
-        omit the second phase (that uses seq-Phragmen)
-        may result in a committee that is too small (length smaller than `committeesize`)
+      skip_phragmen_phase : bool, optional
+          omit the second phase (that uses seq-Phragmen)
+          may result in a committee that is too small (length smaller than `committeesize`)
     """
     if skip_phragmen_phase:
         rule_id = "rule-x-without-phragmen-phase"
@@ -2449,19 +2449,19 @@ def compute_minimaxphragmen(
 ):
     """Phragmen's minimax rule (minimax-Phragmen).
 
-    Minimizes the maximum load.
+      Minimizes the maximum load.
 
-    Warning: does not include the lexicographic optimization as specified
-    in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
-    Phragmen's Voting Methods and Justified Representation.
-    https://arxiv.org/abs/2102.12305
-    Instead: minimizes the maximum load (without consideration of the
-             second-, third-, ...-largest load
+      Warning: does not include the lexicographic optimization as specified
+      in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
+      Phragmen's Voting Methods and Justified Representation.
+      https://arxiv.org/abs/2102.12305
+      Instead: minimizes the maximum load (without consideration of the
+               second-, third-, ...-largest load
 
-    For a mathematical description of this rule, see e.g. the survey by
-    Martin Lackner and Piotr Skowron
-    "Approval-Based Multi-Winner Voting: Axioms, Algorithms, and Applications"
-    https://arxiv.org/abs/2007.01795
+      For a mathematical description of this rule, see e.g.
+    "Multi-Winner Voting with Approval Preferences"
+    by Martin Lackner and Piotr Skowron
+      https://arxiv.org/abs/2007.01795
 
     """
     rule_id = "minimaxphragmen"

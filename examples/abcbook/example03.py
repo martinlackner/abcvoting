@@ -1,11 +1,9 @@
-"""Example 6 (Monroe)
-from the survey: "Approval-Based Multi-Winner Voting:
-Axioms, Algorithms, and Applications"
+"""Example 3 (CC)
+from "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
 """
 
 from abcvoting import abcrules
-from abcvoting.scores import monroescore
 from abcvoting import misc
 from abcvoting.preferences import Profile
 from abcvoting.output import output, DETAILS
@@ -34,18 +32,14 @@ profile.add_voters(approval_sets)
 committeesize = 4
 #
 
-print(misc.header("Example 7", "*"))
+print(misc.header("Example 3", "*"))
 
 print(misc.header("Input (election instance from Example 1):"))
 print(profile.str_compact())
 
-committees = abcrules.compute_monroe(profile, 4)
+committees = abcrules.compute_cc(profile, 4)
 
 
 # verify correctness
 a, b, c, d, e, f, g = range(7)  # a = 0, b = 1, c = 2, ...
-assert len(committees) == 6
-# Monroe-score of all committees is the same
-score = monroescore(profile, committees[0])
-for committee in committees:
-    assert score == monroescore(profile, committee)
+assert committees == [{a, e, f, g}]

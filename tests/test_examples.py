@@ -31,7 +31,7 @@ def check_output(capfd, request):
     installed packages, might need to be adjusted to make test work on all platforms.
 
     If a test fails, the actual output is copied to a file called <testname>.new, so it should
-    be easy to accept changes by `mv expected_output/<testnaem>.new survey_output/<testnaem>`.
+    be easy to accept changes by `mv expected_output/<testname>.new expected_output/<testname>`.
     """
     # reset verbosity, because might have been modified, this is just paranoia
     output.set_verbosity(WARNING)
@@ -62,98 +62,98 @@ def check_output(capfd, request):
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example01_py(check_output):
-    from examples.abcsurvey import example01
+def test_abcbook_example01_py(check_output):
+    from examples.abcbook import example01
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example02_py(check_output):
-    from examples.abcsurvey import example02
+def test_abcbook_example02_py(check_output):
+    from examples.abcbook import example02
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example03_py(check_output):
-    from examples.abcsurvey import example03
+def test_abcbook_example03_py(check_output):
+    from examples.abcbook import example03
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example04_py(check_output):
-    from examples.abcsurvey import example04
+def test_abcbook_example04_py(check_output):
+    from examples.abcbook import example04
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example05_py(check_output):
-    from examples.abcsurvey import example05
+def test_abcbook_example05_py(check_output):
+    from examples.abcbook import example05
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example06_py(check_output):
-    from examples.abcsurvey import example06
+def test_abcbook_example06_py(check_output):
+    from examples.abcbook import example06
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example07_py(check_output):
-    from examples.abcsurvey import example07
+def test_abcbook_example07_py(check_output):
+    from examples.abcbook import example07
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example08_py(check_output):
-    from examples.abcsurvey import example08
+def test_abcbook_example08_py(check_output):
+    from examples.abcbook import example08
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example09_py(check_output):
-    from examples.abcsurvey import example09
+def test_abcbook_example09_py(check_output):
+    from examples.abcbook import example09
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example10_py(check_output):
-    from examples.abcsurvey import example10
+def test_abcbook_example10_py(check_output):
+    from examples.abcbook import example10
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example11_py(check_output):
-    from examples.abcsurvey import example11
+def test_abcbook_example11_py(check_output):
+    from examples.abcbook import example11
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example12_py(check_output):
-    from examples.abcsurvey import example12
+def test_abcbook_example12_py(check_output):
+    from examples.abcbook import example12
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example13_py(check_output):
-    from examples.abcsurvey import example13
+def test_abcbook_example13_py(check_output):
+    from examples.abcbook import example13
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_example14_py(check_output):
-    from examples.abcsurvey import example14
+def test_abcbook_example14_py(check_output):
+    from examples.abcbook import example14
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_remark02_py(check_output):
-    from examples.abcsurvey import remark02
+def test_abcbook_remark02_py(check_output):
+    from examples.abcbook import remark02
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_remark03_py(check_output):
-    from examples.abcsurvey import remark03
+def test_abcbook_remark03_py(check_output):
+    from examples.abcbook import remark03
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_propositionA2_py(check_output):
-    from examples.abcsurvey import propositionA2
+def test_abcbook_propositionA2_py(check_output):
+    from examples.abcbook import propositionA2
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_propositionA3_py(check_output):
-    from examples.abcsurvey import propositionA3
+def test_abcbook_propositionA3_py(check_output):
+    from examples.abcbook import propositionA3
 
 
 # noinspection PyUnresolvedReferences
-def test_abcsurvey_propositionA4_py(check_output):
-    from examples.abcsurvey import propositionA4
+def test_abcbook_propositionA4_py(check_output):
+    from examples.abcbook import propositionA4
 
 
 # noinspection PyUnresolvedReferences

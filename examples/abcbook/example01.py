@@ -1,15 +1,10 @@
-"""Example 2 (AV)
-from the survey: "Approval-Based Multi-Winner Voting:
-Axioms, Algorithms, and Applications"
+"""Example 1 (approval profile for running example)
+from "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
 """
 
-from abcvoting import abcrules
-from abcvoting import misc
 from abcvoting.preferences import Profile
-from abcvoting.output import output, DETAILS
-
-output.set_verbosity(DETAILS)
+from abcvoting import misc
 
 # the running example profile (Example 1)
 num_cand = 8
@@ -33,13 +28,6 @@ profile.add_voters(approval_sets)
 committeesize = 4
 #
 
-print(misc.header("Example 2", "*"))
-
-print(misc.header("Input (election instance from Example 1):"))
+print(misc.header("Example 1", "*"))
 print(profile.str_compact())
-
-committees = abcrules.compute_av(profile, 4)
-
-
-# verify correctness
-assert committees == [{a, b, c, d}, {a, b, c, f}]
+print("desired committee size k = " + str(committeesize))

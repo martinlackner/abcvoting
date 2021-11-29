@@ -18,7 +18,7 @@ class Profile(object):
     Properties
     ----------
     num_cand : int
-        number of candidates or alternatives, denoted with m in the survey paper
+        number of candidates or alternatives
     cand_names : iterable of str
         symbolic names for the candidates, defaults to '1', '2', ..., str(num_cand)
     _voters : list of Voter

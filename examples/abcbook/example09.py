@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Example 8 (seq-Phragmen)
-from the survey: "Approval-Based Multi-Winner Voting:
-Axioms, Algorithms, and Applications"
+from "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
 """
 
