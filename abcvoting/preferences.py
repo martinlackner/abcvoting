@@ -57,20 +57,12 @@ class Profile(object):
     def __len__(self):
         return len(self._voters)
 
-    def add_voter(self, voter):
-        """
-        Adds a set of approved candidates of one voter to the preference profile.
-
-        Parameters
-        ----------
-        voter : Voter or iterable of int
-
-        """
-        # note that we trust that each set in self._voters is a unique object even if
+    def _unique_voter(self, voter):
+        # we ensure that each set in self._voters is a unique object even if
         # voter.approved might not be unique, because it is used as dict key
         # (see e.g. the variable utility in abcrules_gurobi or propositionA3.py)
         if isinstance(voter, Voter):
-            _voter = voter
+            _voter = Voter(voter.approved, weight=voter.weight)
         else:
             _voter = Voter(voter)
 
@@ -80,7 +72,21 @@ class Profile(object):
 
         # this check is a bit redundant, but needed to check for consistency with self.num_cand
         _voter.check_valid(self.num_cand)
-        self._voters.append(_voter)
+
+        return _voter
+
+    def add_voter(self, voter):
+        """
+        Adds a set of approved candidates of one voter to the preference profile.
+
+        Parameters
+        ----------
+        voter : Voter or iterable of int
+
+        """
+
+        # ensure that new voter is unique
+        self._voters.append(self._unique_voter(voter))
 
     def add_voters(self, voters):
         """
@@ -107,6 +113,19 @@ class Profile(object):
 
     def __getitem__(self, i):
         return self._voters[i]
+
+    def __setitem__(self, i, voter):
+        """
+        Modifies a voter in the preference profile.
+
+        Parameters
+        ----------
+        voter : Voter or iterable of int
+
+        """
+
+        # ensure that new voter is unique
+        self._voters[i] = self._unique_voter(voter)
 
     def __str__(self):
         if self.has_unit_weights():
