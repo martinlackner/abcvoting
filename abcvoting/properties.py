@@ -4,6 +4,7 @@ Properties of committees (i.e., sets of candidates)
 
 import itertools
 import math
+from abcvoting.output import output
 from abcvoting.preferences import Profile
 
 
@@ -56,6 +57,8 @@ def check_pareto_optimality(profile, committee, algorithm="brute-force"):
         #  - which committee is Pareto dominating
         #  - which voters have a better satisfaction with the new committee
 
+    return result
+
 
 def check_EJR(profile, committee, algorithm="brute-force"):
     """Test whether a committee satisfies EJR.
@@ -96,6 +99,8 @@ def check_EJR(profile, committee, algorithm="brute-force"):
     else:
         output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy EJR.")
 
+    return result
+
 
 def check_PJR(profile, committee, algorithm="brute-force"):
     """Test whether a committee satisfies PJR.
@@ -135,6 +140,8 @@ def check_PJR(profile, committee, algorithm="brute-force"):
         output.info(f"Committee {str_set_of_candidates(committee)} satisfies PJR.")
     else:
         output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy PJR.")
+
+    return result
 
 
 def dominates(comm1, comm2, profile):
