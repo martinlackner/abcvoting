@@ -137,11 +137,6 @@ def test_abcbook_remark02_py(check_output):
 
 
 # noinspection PyUnresolvedReferences
-def test_abcbook_remark03_py(check_output):
-    from examples.abcbook import remark03
-
-
-# noinspection PyUnresolvedReferences
 def test_abcbook_propositionA2_py(check_output):
     from examples.abcbook import propositionA2
 
