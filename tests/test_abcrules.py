@@ -909,7 +909,7 @@ def test_abcrules_correct_with_max_num_of_committees(
             max_num_of_committees=max_num_of_committees,
         )
         print(f"with max_num_of_committees={max_num_of_committees} output: {committees}")
-        assert len(committees) in (max_num_of_committees, len(exp_results[rule_id]))
+        assert len(committees) == min(max_num_of_committees, len(exp_results[rule_id]))
         for comm in committees:
             assert comm in exp_results[rule_id]
 
