@@ -5,6 +5,7 @@ Properties of committees (i.e., sets of candidates)
 import itertools
 import math
 from abcvoting.output import output
+from abcvoting.misc import str_set_of_candidates
 from abcvoting.preferences import Profile
 
 
