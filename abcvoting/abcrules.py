@@ -1002,23 +1002,37 @@ def _seq_thiele_irresolute(scorefct_id, profile, committeesize, max_num_of_commi
     """
     scorefct = scores.get_scorefct(scorefct_id, committeesize)
 
-    committee_scores = {(): 0}
     # build committees starting with the empty set
-    for _ in range(committeesize):
-        comm_scores_next = {}
-        for committee, score in committee_scores.items():
-            # marginal utility gained by adding candidate to the committee
-            additional_score_cand = scores.marginal_thiele_scores_add(scorefct, profile, committee)
-            for cand in profile.candidates:
-                if additional_score_cand[cand] >= max(additional_score_cand):
-                    next_committee = tuple(sorted(committee + (cand,)))
-                    comm_scores_next[next_committee] = score + additional_score_cand[cand]
-        committee_scores = comm_scores_next
-    committees = sorted_committees(list(committee_scores.keys()))
-    if max_num_of_committees is not None:
-        committees = committees[:max_num_of_committees]
+    partial_committees = [()]
+    winning_committees = set()
+
+    while partial_committees:
+        new_partial_committees = []
+        committee = partial_committees.pop()
+        # marginal utility gained by adding candidate to the committee
+        additional_score_cand = scores.marginal_thiele_scores_add(scorefct, profile, committee)
+        for cand in profile.candidates:
+            if additional_score_cand[cand] >= max(additional_score_cand):
+                new_committee = committee + (cand,)
+
+                if len(new_committee) == committeesize:
+                    new_committee = tuple(sorted(new_committee))
+                    winning_committees.add(new_committee)  # remove duplicate committees
+                    if (
+                        max_num_of_committees is not None
+                        and len(winning_committees) == max_num_of_committees
+                    ):
+                        # sufficiently many winning committees found
+                        detailed_info = {}
+                        return sorted_committees(winning_committees), detailed_info
+                else:
+                    # partial committee
+                    new_partial_committees.append(new_committee)
+        # add new partial committees in reversed order, so that tiebreaking is correct
+        partial_committees += reversed(new_partial_committees)
+
     detailed_info = {}
-    return committees, detailed_info
+    return sorted_committees(winning_committees), detailed_info
 
 
 # Sequential PAV
