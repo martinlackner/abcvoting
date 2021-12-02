@@ -31,7 +31,7 @@ def check_pareto_optimality(profile, committee, algorithm="brute-force"):
 
     Returns
     -------
-    None
+    bool
 
     Reference
     ---------
@@ -75,7 +75,7 @@ def check_EJR(profile, committee, algorithm="brute-force"):
 
     Returns
     -------
-    None
+    bool
     
     Reference
     ---------
@@ -103,6 +103,39 @@ def check_EJR(profile, committee, algorithm="brute-force"):
     return result
 
 
+def check_JR(profile, committee):
+    """Test whether a committee satisfies JR.
+    
+    Parameters
+    ----------
+    profile : abcvoting.preferences.Profile
+        approval sets of voters
+    committee : set / list / tuple
+        set of candidates
+
+    Returns
+    -------
+    bool
+
+    Reference
+    ---------
+    Aziz, H., Brill, M., Conitzer, V., Elkind, E., Freeman, R., & Walsh, T. (2017). 
+    Justified representation in approval-based committee voting. 
+    Social Choice and Welfare, 48(2), 461-485.
+    """
+
+    committee = _validate_input(profile, committee)
+
+    result = _check_JR(profile, committee)
+
+    if result:
+        output.info(f"Committee {str_set_of_candidates(committee)} satisfies JR.")
+    else:
+        output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy JR.")
+
+    return result
+
+
 def check_PJR(profile, committee, algorithm="brute-force"):
     """Test whether a committee satisfies PJR.
     
@@ -117,7 +150,7 @@ def check_PJR(profile, committee, algorithm="brute-force"):
 
     Returns
     -------
-    None
+    bool
 
     Reference
     ---------
@@ -484,6 +517,48 @@ def _check_EJR_gurobi(profile, committee):
         return True
     else:
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
+
+
+def _check_JR(profile, committee):
+    """Test whether a committee satisfies JR, using polynomial time algorithm proposed
+    by Aziz et.al (2017).
+    
+    Parameters
+    ----------
+    profile : abcvoting.preferences.Profile
+        approval sets of voters
+    committee : set
+        set of candidates
+
+    Returns
+    -------
+    bool
+    """
+
+    # variable to store in how many approval ballots a candidate appears in,
+    # such that these approval ballots do not intersect with input committee
+    sum_appearances = 0
+
+    # consider all candidates one by one
+    for cand in range(profile.num_cand):
+        #reset the sum of appearances in approval ballots
+        sum_appearances = 0
+
+        # consider all voters
+        for voter in profile:
+            # if current candidate appears in this voter's ballot AND
+            # this voter's approval ballot does NOT intersect with input committee
+            if (cand in voter.approved) and (len(voter.approved & committee) == 0): 
+                sum_appearances += 1
+
+        # if current candidate has >= appearances than (n/k) then this committee
+        # does not satisfy JR
+        if sum_appearances >= math.ceil(len(profile) / len(committee)):
+            return False
+
+    # if function has not yet returned by now, then this means no such candidate
+    # exists. Then input committee must satisfy JR wrt the input profile
+    return True
 
 
 def _check_PJR_brute_force(profile, committee):
