@@ -55,6 +55,9 @@ def _optimize_rule_gurobi(
         a list of winning committees,
         each of them represented as set of integers from `0` to `num_cand`
 
+    maxscore : float
+        best objective value returned by ILP
+
     """
 
     if not gurobipy_available:
@@ -145,9 +148,9 @@ def _optimize_rule_gurobi(
         if resolute:
             break
         if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
-            return committees
+            return committees, maxscore
 
-    return committees
+    return committees, maxscore
 
 
 def _gurobi_thiele_methods(
@@ -213,7 +216,7 @@ def _gurobi_thiele_methods(
             f"(min={min_score_value}) than Gurobi accuracy ({ACCURACY})."
         )
 
-    committees = _optimize_rule_gurobi(
+    committees, _ = _optimize_rule_gurobi(
         set_opt_model_func=set_opt_model_func,
         profile=profile,
         committeesize=committeesize,
@@ -285,7 +288,7 @@ def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
     for iteration in range(1, committeesize):
         # in iteration x maximize the number of voters that have at least x approved candidates
         # in the committee
-        committees = _optimize_rule_gurobi(
+        committees, _ = _optimize_rule_gurobi(
             set_opt_model_func=set_opt_model_func,
             profile=profile,
             committeesize=committeesize,
@@ -298,7 +301,7 @@ def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
             scores.thiele_score(f"atleast{iteration}", profile, committees[0])
         )
     iteration = committeesize
-    committees = _optimize_rule_gurobi(
+    committees, _ = _optimize_rule_gurobi(
         set_opt_model_func=set_opt_model_func,
         profile=profile,
         committeesize=committeesize,
@@ -368,7 +371,7 @@ def _gurobi_monroe(profile, committeesize, resolute, max_num_of_committees):
         # optimization objective
         model.setObjective(satisfaction, gb.GRB.MAXIMIZE)
 
-    committees = _optimize_rule_gurobi(
+    committees, _ = _optimize_rule_gurobi(
         set_opt_model_func=set_opt_model_func,
         profile=profile,
         committeesize=committeesize,
@@ -448,7 +451,7 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute, max_num_of_committ
                 for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
             ]
 
-    committees = _optimize_rule_gurobi(
+    committees, _ = _optimize_rule_gurobi(
         set_opt_model_func=set_opt_model_func,
         profile=profile,
         committeesize=committeesize,
@@ -456,6 +459,115 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute, max_num_of_committ
         max_num_of_committees=max_num_of_committees,
         name="minimax-Phragmen",
     )
+    return sorted_committees(committees)
+
+
+def _gurobi_leximinphragmen(profile, committeesize, resolute, max_num_of_committees):
+    def set_opt_model_func(model, in_committee):
+        load = {}
+        loadbound_constraint = {}
+        for cand in profile.candidates:
+            for i, voter in enumerate(profile):
+                load[(voter, cand)] = model.addVar(ub=1.0, lb=0.0, name=f"load{i}-{cand}")
+
+        for i, _ in enumerate(profile):
+            for j, _ in enumerate(profile):
+                loadbound_constraint[(i, j)] = model.addVar(
+                    vtype=gb.GRB.BINARY, name=f"loadbound_constraint({i, j})"
+                )
+
+        for i, _ in enumerate(profile):
+            model.addConstr(
+                gb.quicksum(loadbound_constraint[(i, j)] for j, _ in enumerate(profile)) == 1
+            )
+            model.addConstr(
+                gb.quicksum(loadbound_constraint[(j, i)] for j, _ in enumerate(profile)) == 1
+            )
+
+        # constraint: the committee has the required size
+        model.addConstr(
+            gb.quicksum(in_committee[cand] for cand in profile.candidates) == committeesize
+        )
+
+        for cand in profile.candidates:
+            for voter in profile:
+                if cand not in voter.approved:
+                    load[(voter, cand)] = 0
+
+        # a candidate's load is distributed among his approvers
+        for cand in profile.candidates:
+            model.addConstr(
+                gb.quicksum(
+                    voter.weight * load[(voter, cand)]
+                    for voter in profile
+                    if cand in profile.candidates
+                )
+                >= in_committee[cand]
+            )
+
+        for i, bound in enumerate(loadbounds):
+            for j, voter in enumerate(profile):
+                model.addConstr(
+                    gb.quicksum(load[(voter, cand)] for cand in voter.approved)
+                    <= loadbounds[i]
+                    + (1 - loadbound_constraint[(i, j)]) * committeesize
+                    + ACCURACY
+                    # constraint applies only if loadbound_constraint[(i, voter)] == 1
+                )
+
+        newloadbound = model.addVar(lb=0, ub=committeesize, name="new loadbound")
+        for j, voter in enumerate(profile):
+            model.addConstr(
+                gb.quicksum(load[(voter, cand)] for cand in voter.approved)
+                <= newloadbound
+                + gb.quicksum(
+                    loadbound_constraint[(i, j)] * committeesize for i in range(len(loadbounds))
+                )
+            )
+
+        # maximizing the negative distance makes code more similar to the other methods here
+        model.setObjective(-newloadbound, gb.GRB.MAXIMIZE)
+
+    # check if a sufficient number of candidates is approved
+    if len(profile.approved_candidates) < committeesize:
+        # An insufficient number of candidates is approved:
+        # Committees consist of all approved candidates plus
+        #  a correct number of unapproved candidates
+        remaining_candidates = [
+            cand for cand in profile.candidates if cand not in profile.approved_candidates
+        ]
+        num_missing_candidates = committeesize - len(profile.approved_candidates)
+        if resolute:
+            return [
+                profile.approved_candidates | set(remaining_candidates[:num_missing_candidates])
+            ]
+        else:
+            return [
+                profile.approved_candidates | set(extra)
+                for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
+            ]
+
+    loadbounds = []
+    for iteration in range(len(profile)):
+        # in interation we enforce a new loadbound.
+        # first for all voters, then for all except one, then for all except two, etc.
+        if iteration == len(profile) - 1:
+            # last iteration
+            _resolute = resolute
+            _max_num_of_committees = max_num_of_committees
+        else:
+            _resolute = True
+            _max_num_of_committees = None
+        committees, neg_loadbound = _optimize_rule_gurobi(
+            set_opt_model_func=set_opt_model_func,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=_resolute,
+            max_num_of_committees=_max_num_of_committees,
+            name=f"leximinphragmen-iteration{iteration}",
+        )
+        loadbounds.append(-neg_loadbound)
+
     return sorted_committees(committees)
 
 
@@ -485,7 +597,7 @@ def _gurobi_minimaxav(profile, committeesize, resolute, max_num_of_committees):
         # maximizing the negative distance makes code more similar to the other methods here
         model.setObjective(-max_hamming_distance, gb.GRB.MAXIMIZE)
 
-    committees = _optimize_rule_gurobi(
+    committees, _ = _optimize_rule_gurobi(
         set_opt_model_func=set_opt_model_func,
         profile=profile,
         committeesize=committeesize,
@@ -500,17 +612,6 @@ def _gurobi_minimaxav(profile, committeesize, resolute, max_num_of_committees):
 
 def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees):
     def set_opt_model_func(model, in_committee):
-        # utility[(voter, l)] contains (intended binary) variables counting the number of approved
-        # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
-        # exactly the number of candidates in the committee approved by `voter` for all
-        # l = 1...committeesize.
-        #
-        # If scorefct(l) > 0 for l >= 1, we assume that scorefct is monotonic decreasing and
-        # therefore in combination with the objective function the following interpreation is
-        # valid:
-        # utility[(voter, l)] indicates whether `voter` approves at least l candidates in the
-        # committee (this is the case for scorefct "pav", "slav" or "geom").
-
         voteratmostdistances = {}
 
         for i, voter in enumerate(profile):
@@ -575,7 +676,7 @@ def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees
         else:
             _resolute = True
             _max_num_of_committees = None
-        committees = _optimize_rule_gurobi(
+        committees, _ = _optimize_rule_gurobi(
             set_opt_model_func=set_opt_model_func,
             profile=profile,
             committeesize=committeesize,

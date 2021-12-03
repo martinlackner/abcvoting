@@ -11,12 +11,12 @@ profile with 5 votes and 6 candidates:
  3 x {a},
  1 x {c}
 
-original winning committees:
+original winning committee:
  {a, c}
 
 Manipulation by voter 0: {a, b} --> {b}
 
-winning committees after manipulation:
+winning committee after manipulation:
  {a, b}
 
 ----------------------------------
@@ -31,12 +31,12 @@ profile with 6 votes and 6 candidates:
  1 x {b, c, f},
  1 x {c, e, f}
 
-original winning committees:
+original winning committee:
  {b, c, f}
 
 Manipulation by voter 0: {c, d, e} --> {e}
 
-winning committees after manipulation:
+winning committee after manipulation:
  {b, c, e}
 
 -------------------------------------------------
@@ -51,12 +51,12 @@ profile with 6 votes and 6 candidates:
  1 x {b, f},
  1 x {b, c}
 
-original winning committees:
+original winning committee:
  {b, c, f}
 
 Manipulation by voter 0: {a, b} --> {a}
 
-winning committees after manipulation:
+winning committee after manipulation:
  {a, b, f}
 
 -----------------------------------------------
@@ -76,13 +76,13 @@ profile with 12 votes and 6 candidates:
  1 x {a, e, f},
  1 x {b, c, d}
 
-original winning committees:
+original winning committee:
  {a, b, d}
 
 Manipulation by voter 0: {b, e, f} --> {c}
  (not a subset!)
 
-winning committees after manipulation:
+winning committee after manipulation:
  {b, c, e}
 
 ------------------------------------------------------------
@@ -96,12 +96,12 @@ profile with 5 votes and 6 candidates:
  1 x {a, d, e},
  1 x {b, e}
 
-original winning committees:
+original winning committee:
  {b, d}
 
 Manipulation by voter 0: {a, b, c} --> {a}
 
-winning committees after manipulation:
+winning committee after manipulation:
  {a, b}
 
 -------------------------------
@@ -121,13 +121,13 @@ profile with 12 votes and 6 candidates:
  1 x {b, c, d},
  1 x {a, d}
 
-original winning committees:
+original winning committee:
  {a, b, e}
 
 Manipulation by voter 0: {b, d} --> {f}
  (not a subset!)
 
-winning committees after manipulation:
+winning committee after manipulation:
  {b, d, f}
 
 -------------
@@ -140,12 +140,12 @@ profile with 4 votes and 6 candidates:
  1 x {a, c, d},
  1 x {e, f}
 
-original winning committees:
+original winning committee:
  {a, c}
 
 Manipulation by voter 0: {a, b} --> {b}
 
-winning committees after manipulation:
+winning committee after manipulation:
  {a, b}
 
 -----------------------------------------
@@ -160,13 +160,29 @@ profile with 6 votes and 6 candidates:
  1 x {b, e, f},
  1 x {b, d, f}
 
-original winning committees:
+original winning committee:
  {b, f}
 
 Manipulation by voter 0: {a, b, c} --> {c}
 
-winning committees after manipulation:
+winning committee after manipulation:
  {b, c}
+
+------------------------------------------
+Phragmén's Leximin Rule (leximin-Phragmén)
+------------------------------------------
+
+profile with 4 votes and 6 candidates:
+ 1 x {a, b},
+ 3 x {b, c, d}
+
+original winning committee:
+ {b, c, d}
+
+Manipulation by voter 0: {a, b} --> {a}
+
+winning committee after manipulation:
+ {a, b, c}
 
 ------
 Rule X
@@ -179,12 +195,12 @@ profile with 6 votes and 6 candidates:
  1 x {c, d},
  2 x {d, e}
 
-original winning committees:
+original winning committee:
  {b, d, e}
 
 Manipulation by voter 0: {b, c, d} --> {c}
 
-winning committees after manipulation:
+winning committee after manipulation:
  {b, c, d}
 
 -----------------------------
@@ -198,12 +214,12 @@ profile with 6 votes and 6 candidates:
  1 x {a, b, d},
  1 x {a, b}
 
-original winning committees:
+original winning committee:
  {a, b, d}
 
 Manipulation by voter 0: {a, b, c} --> {c}
 
-winning committees after manipulation:
+winning committee after manipulation:
  {a, b, c}
 
 ----------------------------------
@@ -214,11 +230,11 @@ profile with 2 votes and 6 candidates:
  1 x {a, b, c},
  1 x {d, e}
 
-original winning committees:
+original winning committee:
  {d}
 
 Manipulation by voter 0: {a, b, c} --> {a}
 
-winning committees after manipulation:
+winning committee after manipulation:
  {a}
 

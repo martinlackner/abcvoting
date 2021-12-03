@@ -144,6 +144,13 @@ Phragmén's Minimax Rule (minimax-Phragmén)
 1 winning committee:
  {0, 1, 2, 3}
 
+------------------------------------------
+Phragmén's Leximin Rule (leximin-Phragmén)
+------------------------------------------
+
+1 winning committee:
+ {0, 1, 2, 3}
+
 -------------------------------
 Monroe's Approval Rule (Monroe)
 -------------------------------

@@ -112,6 +112,14 @@ manipulations = [
         committees_after=[{1, 2}],
     ),
     ManipulationInstance(
+        rule_id="leximinphragmen",
+        committeesize=3,
+        approval_sets=[{a, b}] + [{b, c, d}] + [{b, c, d}] + [{b, c, d}],
+        manipulated_vote={a},
+        committees_first=[{b, c, d}],
+        committees_after=[{a, b, c}],
+    ),
+    ManipulationInstance(
         rule_id="rule-x",
         committeesize=3,
         approval_sets=[{1, 2, 3}, {0, 1}, {1, 3}, {2, 3}, {3, 4}, {3, 4}],
@@ -135,10 +143,6 @@ manipulations = [
         committees_first=[{d}],
         committees_after=[{a}],
     ),
-    # ManipulationInstance("minimaxphragmen", 3,
-    # [{a, b}] + [{b, c, d}] * 3, [a}, {{b, c, d}}, {{a, b, c}]),
-    # this does not work because minimax-Phragmen does not support a specified tiebreaking
-    # between committees ([a, b, c] should be prefered to [b, c, d])
 ]
 
 for inst in manipulations:
@@ -149,16 +153,23 @@ for inst in manipulations:
     truepref = profile[0].approved
     print(profile.str_compact())
 
-    committees = abcrules.compute(inst.rule_id, profile, inst.committeesize, resolute=True)
-    print("original winning committees:\n" + misc.str_sets_of_candidates(committees, cand_names))
+    parameters = {}
+    if inst.rule_id == "leximinphragmen":
+        parameters["lexicographic_tiebreaking"] = True
+
+    committees = abcrules.compute(
+        inst.rule_id, profile, inst.committeesize, resolute=True, **parameters
+    )
+    committee1 = committees[0]
+    print("original winning committee:\n " + misc.str_set_of_candidates(committee1, cand_names))
 
     # verify correctness
     assert (
-        committees == inst.committees_first
-    ), f"({inst.rule_id}) {committees} != {inst.committees_first}"
+        committee1 in inst.committees_first
+    ), f"({inst.rule_id}) {committees[0]} not in {inst.committees_first}"
 
     print(
-        "Manipulation by voter 0: "
+        "\nManipulation by voter 0: "
         + misc.str_set_of_candidates(inst.approval_sets[0], cand_names)
         + " --> "
         + misc.str_set_of_candidates(inst.manipulated_vote, cand_names)
@@ -175,22 +186,22 @@ for inst in manipulations:
     else:
         algorithm = "fastest"
     committees = abcrules.compute(
-        inst.rule_id, profile, inst.committeesize, resolute=True, algorithm=algorithm
+        inst.rule_id, profile, inst.committeesize, resolute=True, algorithm=algorithm, **parameters
     )
+    committee2 = committees[0]
     print(
-        "\nwinning committees after manipulation:\n"
-        + misc.str_sets_of_candidates(committees, cand_names)
+        "\nwinning committee after manipulation:\n "
+        + misc.str_set_of_candidates(committee2, cand_names)
     )
 
     # verify correctness
     assert (
-        committees == inst.committees_after
-    ), f"({inst.rule_id}) {committees} != {inst.committees_after}"
+        committee2 in inst.committees_after
+    ), f"({inst.rule_id}) {committees[0]} not in {inst.committees_after}"
 
-    # verify that this is a counterexample to inclusion-strategyproofness
-    # with the Kelly (cautious) set extension
-    for commfirst in inst.committees_first:
-        for commafter in inst.committees_after:
-            for cand in set(commfirst) & set(truepref):
-                assert cand in commafter
-            assert set(commfirst) & set(truepref) < set(commafter) & set(truepref)
+    # verify that this is a counterexample to inclusion-strategyproofness (resolute)
+    for cand in set(committee1) & set(truepref):
+        assert cand in committee2
+    assert committee1 & set(truepref) < committee2 & set(truepref)
+
+    print()

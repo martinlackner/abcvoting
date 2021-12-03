@@ -193,6 +193,7 @@ class CollectInstances:
                 {2, 3, 4, 5},
             ],
             "minimaxphragmen": [{0, 1, 2, 3}],
+            "leximinphragmen": [{0, 1, 2, 3}],
             "cc": [{0, 1, 2, 3}],
             "lexcc": [{0, 1, 2, 3}],
             "seqcc": [
@@ -312,6 +313,7 @@ class CollectInstances:
             "lexminimaxav": [{0, 1, 3}],
             "seqphragmen": [{0, 1, 3}],
             "minimaxphragmen": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
+            "leximinphragmen": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
             "cc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
             "lexcc": [{0, 1, 3}],
             "seqcc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
@@ -344,7 +346,6 @@ class CollectInstances:
             {0, 1},
         ]
         profile.add_voters(approval_sets)
-
         tests = {
             "seqpav": [{0, 1, 2, 4}],
             "av": [{0, 1, 2, 4}, {0, 2, 3, 4}],
@@ -356,6 +357,17 @@ class CollectInstances:
             "lexminimaxav": [{0, 1, 2, 4}],
             "seqphragmen": [{0, 1, 2, 4}],
             "minimaxphragmen": [
+                {0, 1, 2, 3},
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
+            ],
+            "leximinphragmen": [
                 {0, 1, 2, 3},
                 {0, 1, 2, 4},
                 {0, 1, 2, 5},
@@ -438,6 +450,7 @@ class CollectInstances:
             "lexminimaxav": [{0, 3}],
             "seqphragmen": [{0, 3}],
             "minimaxphragmen": [{0, 3}, {1, 3}],
+            "leximinphragmen": [{0, 3}, {1, 3}],
             "cc": [{0, 2}, {0, 3}, {1, 3}],
             "lexcc": [{0, 3}],
             "seqcc": [{0, 2}, {0, 3}],
@@ -475,6 +488,7 @@ class CollectInstances:
             "lexminimaxav": one_each,
             "seqphragmen": one_each,
             "minimaxphragmen": one_each,
+            "leximinphragmen": one_each,
             "cc": one_each,
             "lexcc": one_each,
             "seqcc": one_each,

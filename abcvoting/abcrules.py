@@ -36,6 +36,7 @@ MAIN_RULE_IDS = [
     "seqcc",
     "seqphragmen",
     "minimaxphragmen",
+    "leximinphragmen",
     "monroe",
     "greedy-monroe",
     "minimaxav",
@@ -347,6 +348,15 @@ def get_rule(rule_id):
             longname="Phragmén's Minimax Rule (minimax-Phragmén)",
             compute_fct=compute_minimaxphragmen,
             algorithms=("gurobi", "mip_gurobi", "mip_cbc"),
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
+        )
+    if rule_id == "leximinphragmen":
+        return Rule(
+            rule_id=rule_id,
+            shortname="leximin-Phragmén",
+            longname="Phragmén's Leximin Rule (leximin-Phragmén)",
+            compute_fct=compute_leximinphragmen,
+            algorithms=("gurobi",),  # TODO: "mip_gurobi", "mip_cbc"),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "monroe":
@@ -1589,6 +1599,10 @@ def compute_lexminimaxav(
     by Martin Lackner and Piotr Skowron
       https://arxiv.org/abs/2007.01795
       (Remark 2)
+
+    If `lexicographic_tiebreaking` is True, compute all winning committees and choose the
+    lexicographically smallest. This is a deterministic form of tiebreaking; if only resolute=True,
+    it is not guaranteed how ties are broken.
     """
     rule_id = "lexminimaxav"
     rule = get_rule(rule_id)
@@ -2507,6 +2521,75 @@ def compute_minimaxphragmen(
         )
     else:
         raise UnknownAlgorithm(rule_id, algorithm)
+
+    # optional output
+    output.info(header(rule.longname))
+    if resolute:
+        output.info("Computing only one winning committee (resolute=True)\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
+    output.info(str_committees_header(committees, winning=True))
+    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    # end of optional output
+
+    return committees
+
+
+def compute_leximinphragmen(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    lexicographic_tiebreaking=False,
+):
+    """Phragmen's leximin rule (leximin-Phragmen).
+
+    Lexicographically minimizes loads.
+    Details in
+    Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
+    Phragmen's Voting Methods and Justified Representation.
+    https://arxiv.org/abs/2102.12305
+    """
+    rule_id = "leximinphragmen"
+    rule = get_rule(rule_id)
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm()
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
+
+    if lexicographic_tiebreaking:
+        if not resolute:
+            raise ValueError(
+                "lexicographic_tiebreaking=True is only valid in "
+                "combination with resolute=True."
+            )
+        resolute = False  # compute all committees to break ties correctly
+
+    if algorithm == "gurobi":
+        committees = abcrules_gurobi._gurobi_leximinphragmen(
+            profile,
+            committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+        )
+    # elif algorithm.startswith("mip_"):
+    #     committees = abcrules_mip._mip_leximinphragmen(
+    #         profile,
+    #         committeesize,
+    #         resolute=resolute,
+    #         max_num_of_committees=max_num_of_committees,
+    #         solver_id=algorithm[4:],
+    #     )
+    else:
+        raise UnknownAlgorithm(rule_id, algorithm)
+
+    if lexicographic_tiebreaking:
+        committees = sorted_committees(committees)[:1]
 
     # optional output
     output.info(header(rule.longname))
