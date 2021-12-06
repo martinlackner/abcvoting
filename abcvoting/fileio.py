@@ -287,9 +287,12 @@ def write_abcvoting_instance_to_yaml_file(
                 raise ValueError('Each compute instance (dict) requires key "rule_id".')
             mod_compute_instance = {"rule_id": compute_instance["rule_id"]}
             if "result" in compute_instance.keys():
-                mod_compute_instance["result"] = _yaml_flow_style_list(
-                    [list(committee) for committee in compute_instance["result"]]
-                )  # TODO: would be nicer to store committees in set notation (curly braces)
+                if compute_instance["result"] is None:
+                    mod_compute_instance["result"] = None
+                else:
+                    mod_compute_instance["result"] = _yaml_flow_style_list(
+                        [list(committee) for committee in compute_instance["result"]]
+                    )  # TODO: would be nicer to store committees in set notation (curly braces)
             if "profile" in compute_instance.keys():  # this is superfluous information
                 # check that the profile is the same as the main profile
                 if str(compute_instance["profile"]) != str(profile):
@@ -351,10 +354,11 @@ def read_abcvoting_yaml_file(filename):
         compute_instance["profile"] = profile
         compute_instance["committeesize"] = committeesize
         if "result" in compute_instance.keys():
-            # compute_instance["result"] should be a list of committees (sets)
-            compute_instance["result"] = [
-                set(committee) for committee in compute_instance["result"]
-            ]
+            if compute_instance["result"] is not None:
+                # compute_instance["result"] should be a list of committees (sets)
+                compute_instance["result"] = [
+                    set(committee) for committee in compute_instance["result"]
+                ]
 
     for key in data.keys():
         if key not in VALID_KEYS:
