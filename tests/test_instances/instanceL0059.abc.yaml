@@ -89,6 +89,12 @@ compute:
 - rule_id: minimaxphragmen
   result: [[1, 4, 7]]
   resolute: true
+- rule_id: leximinphragmen
+  result:
+  resolute: false
+- rule_id: leximinphragmen
+  result:
+  resolute: true
 - rule_id: monroe
   result: [[1, 4, 6], [1, 4, 7], [1, 6, 7], [4, 6, 7]]
   resolute: false
@@ -143,4 +149,7 @@ compute:
       1, 4, 6], [1, 4, 7], [1, 5, 6], [1, 5, 7], [1, 6, 7], [2, 3, 4], [2, 3, 5], [2, 3, 6], [2, 3, 7], [2, 4, 5], [2, 4,
       6], [2, 4, 7], [2, 5, 6], [2, 5, 7], [2, 6, 7], [3, 4, 5], [3, 4, 6], [3, 4, 7], [3, 5, 6], [3, 5, 7], [3, 6, 7], [
       4, 5, 6], [4, 5, 7], [4, 6, 7], [5, 6, 7]]
+  resolute: true
+- rule_id: rsd
+  result:
   resolute: true

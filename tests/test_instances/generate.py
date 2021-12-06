@@ -75,8 +75,6 @@ def generate_abc_yaml_testinstances(
 
         rule_instances = []
         for rule_id in abcrules.MAIN_RULE_IDS:
-            if rule_id == "rsd":
-                continue  # result is random, not sensible for unit tests
             rule = abcrules.get_rule(rule_id)
 
             # if irresolute (resolute = False) is supported, then "result" should be
@@ -85,7 +83,13 @@ def generate_abc_yaml_testinstances(
                 resolute = False
             else:
                 resolute = True
-            committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)
+
+            if rule_id == "rsd":
+                committees = None  # result is random, not sensible for unit tests
+            elif rule_id == "leximinphragmen" and (num_cand > 7 or num_voters > 8):
+                committees = None  # too slow
+            else:
+                committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)
 
             for resolute in rule.resolute_values:
                 rule_instances.append(
