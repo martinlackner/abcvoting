@@ -4,7 +4,7 @@
 import functools
 import itertools
 from abcvoting.output import output
-from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_cvxpy, abcrules_mip, misc
+from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, misc
 from abcvoting.misc import sorted_committees
 from abcvoting.misc import str_committees_header, header
 from abcvoting.misc import str_set_of_candidates, str_sets_of_candidates
@@ -54,10 +54,10 @@ ALGORITHM_NAMES = {
     "brute-force": "brute-force",
     "mip_cbc": "CBC ILP solver via Python MIP library",
     "mip_gurobi": "Gurobi ILP solver via Python MIP library",
-    "cvxpy_gurobi": "Gurobi ILP solver via CVXPY library",
-    "cvxpy_scip": "SCIP ILP solver via CVXPY library",
-    "cvxpy_glpk_mi": "GLPK ILP solver via CVXPY library",
-    "cvxpy_cbc": "CBC ILP solver via CVXPY library",
+    # "cvxpy_gurobi": "Gurobi ILP solver via CVXPY library",
+    # "cvxpy_scip": "SCIP ILP solver via CVXPY library",
+    # "cvxpy_glpk_mi": "GLPK ILP solver via CVXPY library",
+    # "cvxpy_cbc": "CBC ILP solver via CVXPY library",
     "standard": "Standard algorithm",
     "standard-fractions": "Standard algorithm (using standard Python fractions)",
     "gmpy2-fractions": "Standard algorithm (using gmpy2 fractions)",
@@ -187,21 +187,6 @@ def _available_algorithms():
         if "gurobi" in algorithm and not abcrules_gurobi.gurobipy_available:
             continue
 
-        if algorithm.startswith("cvxpy"):
-            if not abcrules_cvxpy.cvxpy_available or not abcrules_cvxpy.numpy_available:
-                continue
-
-            import cvxpy
-
-            if algorithm == "cvxpy_glpk_mi" and cvxpy.GLPK_MI not in cvxpy.installed_solvers():
-                continue
-            elif algorithm == "cvxpy_cbc" and cvxpy.CBC not in cvxpy.installed_solvers():
-                continue
-            elif algorithm == "cvxpy_scip" and cvxpy.SCIP not in cvxpy.installed_solvers():
-                continue
-            elif algorithm == "cvxpy_gurobi" and not abcrules_gurobi.gurobipy_available:
-                continue
-
         if algorithm == "gmpy2-fractions" and not gmpy2_available:
             continue
 
@@ -250,8 +235,6 @@ def get_rule(rule_id):
             longname="Proportional Approval Voting (PAV)",
             compute_fct=compute_pav,
             algorithms=_THIELE_ALGORITHMS,
-            # TODO: cvxpy does not work at the moment ("cvxpy_glpk_mi", "cvxpy_cbc", "cvxpy_scip")
-            #       DeprecationWarning: `np.bool` is a deprecated alias ...
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "slav":
@@ -578,15 +561,6 @@ def compute_thiele_method(
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
-        )
-    elif algorithm.startswith("cvxpy_"):
-        committees = abcrules_cvxpy.cvxpy_thiele_methods(
-            scorefct_id=scorefct_id,
-            profile=profile,
-            committeesize=committeesize,
-            resolute=resolute,
-            max_num_of_committees=max_num_of_committees,
-            solver_id=algorithm[6:],
         )
     elif algorithm.startswith("mip_"):
         committees = abcrules_mip._mip_thiele_methods(

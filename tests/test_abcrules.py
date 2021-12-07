@@ -5,7 +5,6 @@ import pytest
 import os
 import re
 import random
-from abcvoting.abcrules_cvxpy import cvxpy_thiele_methods
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
 from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, DEBUG, output
 from abcvoting.preferences import Profile, Voter
@@ -14,10 +13,10 @@ from itertools import combinations
 
 MARKS = {
     "gurobi": [pytest.mark.gurobi],
-    "cvxpy_scip": [pytest.mark.cvxpy, pytest.mark.scip],
-    "cvxpy_glpk_mi": [pytest.mark.cvxpy, pytest.mark.glpk_mi],
-    "cvxpy_cbc": [pytest.mark.cvxpy, pytest.mark.cbc],
-    "cvxpy_gurobi": [pytest.mark.cvxpy, pytest.mark.gurobi],
+    # "cvxpy_scip": [pytest.mark.cvxpy, pytest.mark.scip],
+    # "cvxpy_glpk_mi": [pytest.mark.cvxpy, pytest.mark.glpk_mi],
+    # "cvxpy_cbc": [pytest.mark.cvxpy, pytest.mark.cbc],
+    # "cvxpy_gurobi": [pytest.mark.cvxpy, pytest.mark.gurobi],
     "ortools_cp": [pytest.mark.ortools],
     "ortools_cbc": [pytest.mark.ortools, pytest.mark.cbc],
     "ortools_gurobi": [pytest.mark.ortools, pytest.mark.gurobi],
@@ -1042,23 +1041,6 @@ def test_gurobi_cant_compute_av():
         )
 
 
-@pytest.mark.cvxpy
-def test_cvxpy_cant_compute_av():
-    profile = Profile(4)
-    profile.add_voters([[0, 1], [1, 2]])
-    committeesize = 2
-
-    with pytest.raises(ValueError):
-        cvxpy_thiele_methods(
-            profile,
-            committeesize,
-            "av",
-            resolute=False,
-            solver_id="glpk_mi",
-            max_num_of_committees=None,
-        )
-
-
 def test_consensus_fails_lower_quota():
     profile = Profile(31)
     profile.add_voters(
@@ -1144,22 +1126,6 @@ def test_fastest_available_algorithm(rule_id):
     abcrules.compute(rule_id, profile, committeesize, algorithm="fastest")
 
 
-@pytest.mark.cvxpy
-def test_cvxpy_wrong_score_fct():
-    profile = Profile(4)
-    profile.add_voters([[0, 1], [2, 3]])
-    committeesize = 1
-    with pytest.raises(NotImplementedError):
-        cvxpy_thiele_methods(
-            profile=profile,
-            committeesize=committeesize,
-            scorefct_id="non_existing",
-            resolute=False,
-            max_num_of_committees=None,
-            solver_id="glpk_mi",
-        )
-
-
 @pytest.mark.parametrize("sizemultiplier", [1, 2, 3, 4, 5])
 def test_revseqpav_fails_EJR(sizemultiplier):
     # from "A Note on Justified RepresentationUnder the Reverse Sequential PAV rule"
@@ -1237,17 +1203,6 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
         # not necessary, output for "fastest" is the same as
         # whatever algorithm is selected as fastest
         # (and "fastest" depends on the available solvers)
-
-    if algorithm == "cvxpy_glpk_mi":
-        # TODO unfortunately GLPK_MI prints "Long-step dual simplex will be used" to stderr and it
-        #  would be very complicated to capture this on all platforms reliably, changing
-        #  sys.stderr doesn't help.
-        #  This seems to be fixed in GLPK 5.0 but not in GLPK 4.65. For some weird reason this
-        #  test succeeds and does not need to be skipped when using conda-forge, although the
-        #  version from conda-forge is given as glpk 4.65 he80fd80_1002.
-        #  This could help to introduce a workaround: https://github.com/xolox/python-capturer
-        #  Sage math is fighting the same problem: https://trac.sagemath.org/ticket/24824
-        pytest.skip("GLPK_MI prints something to stderr, not easy to capture")
 
     output.set_verbosity(verbosity=verbosity)
 
