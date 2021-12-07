@@ -42,28 +42,26 @@ def _optimize_rule_ortools(
     -------
     committees : list of sets
         a list of winning committees,
-        each of them represented as set of integers from `0` to `num_cand`
+        each of them represented as set of integers from `0` to `num_cand` - 1
 
     """
 
     maxscore = None
     committees = []
 
+    model = cp_model.CpModel()
+
+    # `in_committee` is a binary variable indicating whether `cand` is in the committee
+    in_committee = [model.NewBoolVar(f"cand{cand}_in_committee") for cand in profile.candidates]
+
+    set_opt_model_func(
+        model,
+        profile,
+        in_committee,
+        committeesize,
+    )
+
     while True:
-        model = cp_model.CpModel()
-
-        # `in_committee` is a binary variable indicating whether `cand` is in the committee
-        in_committee = [
-            model.NewBoolVar(f"cand{cand}_in_committee") for cand in profile.candidates
-        ]
-
-        set_opt_model_func(
-            model,
-            profile,
-            in_committee,
-            committeesize,
-            committees,
-        )
 
         solver = cp_model.CpSolver()
         status = solver.Solve(model)
@@ -85,8 +83,8 @@ def _optimize_rule_ortools(
         )
         if len(committee) != committeesize:
             raise RuntimeError(
-                "_optimize_rule_ortools produced a committee with "
-                "fewer than `committeesize` members (model {name})."
+                f"_optimize_rule_ortools produced a committee with "
+                f"fewer than `committeesize` members (model {name})."
             )
 
         objective_value = committeescorefct(profile, committee)  # exact value
@@ -110,6 +108,9 @@ def _optimize_rule_ortools(
         if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
             return committees
 
+        # find a new committee that has not been found before
+        model.Add(sum(in_committee[cand] for cand in committee) <= committeesize - 1)
+
     return committees
 
 
@@ -119,7 +120,6 @@ def _ortools_cc(profile, committeesize, resolute, max_num_of_committees):
         profile,
         in_committee,
         committeesize,
-        previously_found_committees,
     ):
         num_voters = len(profile)
         satisfaction = [
@@ -134,10 +134,6 @@ def _ortools_cc(profile, committeesize, resolute, max_num_of_committees):
                 <= sum(in_committee[cand] for cand in profile[voter_id].approved)
             )
             # satisfaction is boolean
-
-        # find a new committee that has not been found before
-        for committee in previously_found_committees:
-            model.Add(sum(in_committee[cand] for cand in committee) <= committeesize - 1)
 
         # maximizing the negative distance makes code more similar to the other methods here
         if profile.has_unit_weights():
@@ -179,7 +175,6 @@ def _ortools_monroe(profile, committeesize, resolute, max_num_of_committees):
         profile,
         in_committee,
         committeesize,
-        previously_found_committees,
     ):
         num_voters = len(profile)
 
@@ -231,10 +226,6 @@ def _ortools_monroe(profile, committeesize, resolute, max_num_of_committees):
             >= satisfaction
         )
 
-        # find a new committee that has not been found before
-        for committee in previously_found_committees:
-            model.Add(sum(in_committee[cand] for cand in committee) <= committeesize - 1)
-
         # optimization objective
         model.Maximize(satisfaction)
 
@@ -256,7 +247,6 @@ def _ortools_minimaxav(profile, committeesize, resolute, max_num_of_committees):
         profile,
         in_committee,
         committeesize,
-        previously_found_committees,
     ):
         max_hamming_distance = model.NewIntVar(
             lb=0, ub=profile.num_cand, name="max_hamming_distance"
@@ -272,10 +262,6 @@ def _ortools_minimaxav(profile, committeesize, resolute, max_num_of_committees):
                 >= sum(1 - in_committee[cand] for cand in voter.approved)
                 + sum(in_committee[cand] for cand in not_approved)
             )
-
-        # find a new committee that has not been found before
-        for committee in previously_found_committees:
-            model.Add(sum(in_committee[cand] for cand in committee) <= committeesize - 1)
 
         # maximizing the negative distance makes code more similar to the other methods here
         model.Maximize(-max_hamming_distance)

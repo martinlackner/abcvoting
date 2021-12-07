@@ -50,7 +50,7 @@ def cvxpy_thiele_methods(
     -------
     committees : list of lists
         a list of chosen committees, each of them represented as list with candidates named from
-        `0` to `num_cand`, profile.cand_names is ignored
+        `0` to `num_cand` - 1, profile.cand_names is ignored
 
     """
     if solver_id in ["glpk_mi", "cbc", "scip"]:

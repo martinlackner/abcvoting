@@ -8,6 +8,7 @@ from abcvoting import scores
 import functools
 import itertools
 from abcvoting.output import output
+import math
 
 try:
     import gurobipy as gb
@@ -53,7 +54,7 @@ def _optimize_rule_gurobi(
     -------
     committees : list of sets
         a list of winning committees,
-        each of them represented as set of integers from `0` to `num_cand`
+        each of them represented as set of integers from `0` to `num_cand` - 1
 
     maxscore : float
         best objective value returned by ILP
@@ -66,29 +67,23 @@ def _optimize_rule_gurobi(
     maxscore = None
     committees = []
 
+    model = gb.Model()
+
+    # `in_committee` is a binary variable indicating whether `cand` is in the committee
+    in_committee = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_committee")
+
+    set_opt_model_func(model, in_committee)
+
+    model.setParam("OutputFlag", False)
+    model.setParam("FeasibilityTol", ACCURACY)
+    model.setParam("OptimalityTol", ACCURACY)
+    model.setParam("IntFeasTol", ACCURACY)
+    model.setParam("MIPGap", ACCURACY)
+    model.setParam("PoolSearchMode", 0)
+    model.setParam("MIPFocus", 2)  # focus more attention on proving optimality
+    model.setParam("IntegralityFocus", 1)
+
     while True:
-        model = gb.Model()
-
-        # `in_committee` is a binary variable indicating whether `cand` is in the committee
-        in_committee = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_committee")
-
-        set_opt_model_func(model, in_committee)
-
-        # find a new committee that has not been found yet by excluding previously found committees
-        for committee in committees:
-            model.addConstr(
-                gb.quicksum(in_committee[cand] for cand in committee) <= committeesize - 1
-            )
-
-        model.setParam("OutputFlag", False)
-        model.setParam("FeasibilityTol", ACCURACY)
-        model.setParam("OptimalityTol", ACCURACY)
-        model.setParam("IntFeasTol", ACCURACY)
-        model.setParam("MIPGap", ACCURACY)
-        model.setParam("PoolSearchMode", 0)
-        model.setParam("MIPFocus", 2)  # focus more attention on proving optimality
-        model.setParam("IntegralityFocus", 1)
-
         model.optimize()
 
         if model.Status not in [2, 3, 4]:
@@ -149,6 +144,9 @@ def _optimize_rule_gurobi(
             break
         if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
             return committees, maxscore
+
+        # find a new committee that has not been found yet by excluding previously found committees
+        model.addConstr(gb.quicksum(in_committee[cand] for cand in committee) <= committeesize - 1)
 
     return committees, maxscore
 
@@ -548,25 +546,30 @@ def _gurobi_leximinphragmen(profile, committeesize, resolute, max_num_of_committ
             ]
 
     loadbounds = []
-    for iteration in range(len(profile)):
+    for iteration in range(len(profile) - 1):
         # in interation we enforce a new loadbound.
         # first for all voters, then for all except one, then for all except two, etc.
-        if iteration == len(profile) - 1:
-            # last iteration
-            _resolute = resolute
-            _max_num_of_committees = max_num_of_committees
-        else:
-            _resolute = True
-            _max_num_of_committees = None
         committees, neg_loadbound = _optimize_rule_gurobi(
             set_opt_model_func=set_opt_model_func,
             profile=profile,
             committeesize=committeesize,
-            resolute=_resolute,
-            max_num_of_committees=_max_num_of_committees,
+            resolute=True,
+            max_num_of_committees=None,
             name=f"leximinphragmen-iteration{iteration}",
         )
+        if math.isclose(neg_loadbound, 0, rel_tol=CMP_ACCURACY, abs_tol=CMP_ACCURACY):
+            # all other voters have a load of zero, no further loadbounds constraints required
+            break
         loadbounds.append(-neg_loadbound)
+
+    committees, _ = _optimize_rule_gurobi(
+        set_opt_model_func=set_opt_model_func,
+        profile=profile,
+        committeesize=committeesize,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+        name=f"leximinphragmen-final",
+    )
 
     return sorted_committees(committees)
 

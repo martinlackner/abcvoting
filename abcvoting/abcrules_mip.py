@@ -24,6 +24,7 @@ def _optimize_rule_mip(
     solver_id,
     name="None",
     committeescorefct=None,
+    reuse_model=True,
 ):
     """Compute rules, which are given in the form of an optimization problem, using Python MIP.
 
@@ -44,33 +45,34 @@ def _optimize_rule_mip(
         name of the model, used for error messages
     committeescorefct : callable
         a function used to compute the score of a committee
+    reuse_model : bool
+        use the same model in each iteration and just add additional constraints,
+        faster if reuse_model==True
 
     Returns
     -------
     committees : list of sets
         a list of winning committees,
-        each of them represented as set of integers from `0` to `num_cand`
+        each of them represented as set of integers from `0` to `num_cand` - 1
 
     """
 
-    maxscore = None
-    committees = []
-
-    if solver_id not in ["gurobi", "cbc"]:
-        raise ValueError(f"Solver {solver_id} not known in Python MIP.")
-
-    while True:
+    def generate_model():
         model = mip.Model(solver_name=solver_id)
-
-        # note: verbose = 1 causes issues with unittests, seems as if output is printed too late
-        # and anyway the output does not seem to be very helpful
-        model.verbose = 0
 
         # `in_committee` is a binary variable indicating whether `cand` is in the committee
         in_committee = [
             model.add_var(var_type=mip.BINARY, name=f"cand{cand}_in_committee")
             for cand in profile.candidates
         ]
+
+        # find a new committee that has not been found yet by excluding previously found committees
+        for committee in committees:
+            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
+
+        # note: verbose = 1 causes issues with unittests, seems as if output is printed too late
+        # and anyway the output does not seem to be very helpful
+        model.verbose = 0
 
         set_opt_model_func(
             model,
@@ -79,10 +81,6 @@ def _optimize_rule_mip(
             committeesize,
         )
 
-        # find a new committee that has not been found yet by excluding previously found committees
-        for committee in committees:
-            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
-
         # emphasis is optimality:
         # activates procedures that produce improved lower bounds, focusing in pruning the search
         # tree even if the production of the first feasible solutions is delayed.
@@ -90,6 +88,20 @@ def _optimize_rule_mip(
         model.opt_tol = ACCURACY
         model.max_mip_gap = ACCURACY
         model.integer_tol = ACCURACY
+
+        return model, in_committee
+
+    maxscore = None
+    committees = []
+
+    if solver_id not in ["gurobi", "cbc"]:
+        raise ValueError(f"Solver {solver_id} not known in Python MIP.")
+
+    model = None
+
+    while True:
+        if model is None or not reuse_model:
+            model, in_committee = generate_model()
 
         status = model.optimize()
 
@@ -114,8 +126,10 @@ def _optimize_rule_mip(
         )
         if len(committee) != committeesize:
             raise RuntimeError(
-                "_optimize_rule_mip produced a committee with "
-                "fewer than `committeesize` members  (model {name})."
+                f"_optimize_rule_mip produced a committee with "
+                f"fewer than `committeesize` members  (model {name}, status {status}).\n"
+                f"Detailed info: in_committee="
+                f"{[in_committee[cand].x for cand in profile.candidates]}"
             )
 
         if committeescorefct is None:
@@ -145,6 +159,10 @@ def _optimize_rule_mip(
             break
         if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
             return committees
+
+        # find a new committee that has not been found yet by excluding previously found committees
+        if reuse_model:
+            model += mip.xsum(in_committee[cand] for cand in committee) <= committeesize - 1
 
     return committees
 
@@ -244,7 +262,7 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
             # maximum number of approved candidates that this voter can have in a committee
             max_in_committee[voter] = min(len(voter.approved), committeesize)
             for l in range(1, max_in_committee[voter] + 1):
-                utility[(voter, l)] = model.add_var(var_type=mip.BINARY, name=f"utility({i, l})")
+                utility[(voter, l)] = model.add_var(var_type=mip.BINARY, name=f"utility({i},{l})")
 
         # constraint: the committee has the required size
         model += mip.xsum(in_committee) == committeesize
@@ -289,10 +307,15 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
             solver_id=solver_id,
             name=f"lexcc-atleast{iteration}",
             committeescorefct=functools.partial(scores.thiele_score, f"atleast{iteration}"),
+            reuse_model=False,  # slower, but apparently necessary
         )
-        satisfaction_constraints.append(
-            scores.thiele_score(f"atleast{iteration}", profile, committees[0])
-        )
+        new_score = scores.thiele_score(f"atleast{iteration}", profile, committees[0])
+        if new_score == 0:
+            satisfaction_constraints += [0] * (committeesize - 1 - len(satisfaction_constraints))
+            break
+        else:
+            satisfaction_constraints.append(new_score)
+
     iteration = committeesize
     committees = _optimize_rule_mip(
         set_opt_model_func=set_opt_model_func,
@@ -303,6 +326,7 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
         solver_id=solver_id,
         name=f"lexcc-final",
         committeescorefct=functools.partial(scores.thiele_score, f"atleast{committeesize}"),
+        reuse_model=False,  # slower, but apparently necessary
     )
     satisfaction_constraints.append(
         scores.thiele_score(f"atleast{iteration}", profile, committees[0])
