@@ -79,13 +79,17 @@ class CollectRules:
 class CollectInstances:
     def __init__(self):
         self.instances = []
+        alltests = {}
+        profiles = {}
 
         # first profile
-        profile = Profile(6)
+        name = "profile1"
+        profiles[name] = Profile(6)
         committeesize = 4
         approval_sets = [{0, 4, 5}, {0}, {1, 4, 5}, {1}, {2, 4, 5}, {2}, {3, 4, 5}, {3}]
-        profile.add_voters(approval_sets)
-        tests = {
+        profiles[name].add_voters(approval_sets)
+        alltests[name] = {
+            "committeesize": committeesize,
             "seqpav": [
                 {0, 1, 4, 5},
                 {0, 2, 4, 5},
@@ -270,24 +274,25 @@ class CollectInstances:
                 {2, 3, 4, 5},
             ],
             "trivial": [
-                set(committee) for committee in combinations(profile.candidates, committeesize)
+                set(committee)
+                for committee in combinations(profiles[name].candidates, committeesize)
             ],
         }
-        self.instances.append((profile, tests, committeesize))
 
         # first profile now with reversed list of voters
+        name = "profile1-reversed"
         approval_sets.reverse()
-        profile = Profile(6)
-        profile.add_voters(approval_sets)
+        profiles[name] = Profile(6)
+        profiles[name].add_voters(approval_sets)
         # Greedy Monroe yields a different result
         # for a different voter ordering
-        tests = dict(tests)
-        tests["greedy-monroe"] = [{0, 1, 2, 4}]
+        alltests[name] = dict(alltests["profile1"])
+        alltests[name]["greedy-monroe"] = [{0, 1, 2, 4}]
         committeesize = 4
-        self.instances.append((profile, tests, committeesize))
 
         # second profile
-        profile = Profile(5)
+        name = "profile2"
+        profiles[name] = Profile(5)
         committeesize = 3
         approval_sets = [
             {0, 1, 2},
@@ -300,9 +305,9 @@ class CollectInstances:
             {3, 4},
             {3},
         ]
-        profile.add_voters(approval_sets)
-
-        tests = {
+        profiles[name].add_voters(approval_sets)
+        alltests[name] = {
+            "committeesize": committeesize,
             "seqpav": [{0, 1, 3}],
             "av": [{0, 1, 2}],
             "sav": [{0, 1, 3}],
@@ -327,13 +332,14 @@ class CollectInstances:
             "phragmen-enestroem": [{0, 1, 3}],
             "consensus-rule": [{0, 1, 3}],
             "trivial": [
-                set(committee) for committee in combinations(profile.candidates, committeesize)
+                set(committee)
+                for committee in combinations(profiles[name].candidates, committeesize)
             ],
         }
-        self.instances.append((profile, tests, committeesize))
 
         # and a third profile
-        profile = Profile(6)
+        name = "profile3"
+        profiles[name] = Profile(6)
         committeesize = 4
         approval_sets = [
             {0, 3, 4, 5},
@@ -345,8 +351,9 @@ class CollectInstances:
             {0, 2, 4},
             {0, 1},
         ]
-        profile.add_voters(approval_sets)
-        tests = {
+        profiles[name].add_voters(approval_sets)
+        alltests[name] = {
+            "committeesize": committeesize,
             "seqpav": [{0, 1, 2, 4}],
             "av": [{0, 1, 2, 4}, {0, 2, 3, 4}],
             "sav": [{0, 1, 2, 4}],
@@ -428,18 +435,19 @@ class CollectInstances:
             "phragmen-enestroem": [{0, 1, 2, 4}],
             "consensus-rule": [{0, 1, 2, 4}],
             "trivial": [
-                set(committee) for committee in combinations(profile.candidates, committeesize)
+                set(committee)
+                for committee in combinations(profiles[name].candidates, committeesize)
             ],
         }
-        self.instances.append((profile, tests, committeesize))
 
         # and a fourth profile
-        profile = Profile(4)
+        name = "profile4"
+        profiles[name] = Profile(4)
         committeesize = 2
         approval_sets = [{0, 1, 3}, {0, 1}, {0, 1}, {0, 3}, {2, 3}]
-        profile.add_voters(approval_sets)
-
-        tests = {
+        profiles[name].add_voters(approval_sets)
+        alltests[name] = {
+            "committeesize": committeesize,
             "seqpav": [{0, 3}],
             "av": [{0, 1}, {0, 3}],
             "sav": [{0, 1}, {0, 3}],
@@ -464,20 +472,22 @@ class CollectInstances:
             "phragmen-enestroem": [{0, 3}],
             "consensus-rule": [{0, 3}],
             "trivial": [
-                set(committee) for committee in combinations(profile.candidates, committeesize)
+                set(committee)
+                for committee in combinations(profiles[name].candidates, committeesize)
             ],
         }
-        self.instances.append((profile, tests, committeesize))
 
         # add a fifth profile
         # this tests a corner case of minimax
-        profile = Profile(10)
+        name = "profile4"
+        profiles[name] = Profile(10)
         committeesize = 2
         approval_sets = [range(5), range(5, 10)]
-        profile.add_voters(approval_sets)
+        profiles[name].add_voters(approval_sets)
         one_each = [{i, j} for i in range(5) for j in range(5, 10)]
         all_possibilities = [{i, j} for i in range(10) for j in range(10) if i != j]
-        tests = {
+        alltests[name] = {
+            "committeesize": committeesize,
             "seqpav": one_each,
             "av": all_possibilities,
             "sav": all_possibilities,
@@ -502,10 +512,35 @@ class CollectInstances:
             "phragmen-enestroem": one_each,
             "consensus-rule": one_each,
             "trivial": [
-                set(committee) for committee in combinations(profile.candidates, committeesize)
+                set(committee)
+                for committee in combinations(profiles[name].candidates, committeesize)
             ],
         }
-        self.instances.append((profile, tests, committeesize))
+
+        for (rule_id, algorithm, resolute), marks, _ in testrules.rule_algorithm_resolute:
+            for name, tests in alltests.items():
+                if algorithm == "fastest":
+                    continue  # redundant
+                if rule_id not in tests:
+                    if rule_id == "rsd":
+                        continue  # randomized results
+                    raise RuntimeError(f"rule {rule_id} not considered in {name}")
+                if rule_id == "leximinphragmen" and (
+                    name in ["profile2", "profile3"] or (name == "profile1" and not resolute)
+                ):
+                    marks += [pytest.mark.slow]
+                self.instances.append(
+                    pytest.param(
+                        rule_id,
+                        algorithm,
+                        resolute,
+                        profiles[name],
+                        name,
+                        tests[rule_id],
+                        tests["committeesize"],
+                        marks=marks,
+                    )
+                )
 
 
 def _list_abc_yaml_compute_instances():
@@ -528,6 +563,8 @@ def _list_abc_yaml_compute_instances():
                     marks = [pytest.mark.slow, pytest.mark.veryslow]  # very large instances
                 elif rule_id == "monroe" and algorithm in ["mip_cbc"]:
                     marks = [pytest.mark.slow, pytest.mark.veryslow]
+                elif rule_id == "leximinphragmen":
+                    marks = [pytest.mark.slow, pytest.mark.veryslow]
                 else:
                     marks = [pytest.mark.slow]
                 _abc_yaml_instances.append(
@@ -546,8 +583,8 @@ def id_function(val):
     return str(val)
 
 
-testinsts = CollectInstances()
 testrules = CollectRules()
+testinsts = CollectInstances()
 abc_yaml_filenames, abc_yaml_compute_instances = _list_abc_yaml_compute_instances()
 
 
@@ -865,11 +902,12 @@ def test_minimaxphragmen_does_not_use_lexicographic_optimization(algorithm):
 
 
 @pytest.mark.parametrize(
-    "rule_id, algorithm, resolute",
-    testrules.rule_algorithm_resolute,
+    "rule_id, algorithm, resolute, profile, profilename, expected_result, committeesize",
+    testinsts.instances,
 )
-@pytest.mark.parametrize("profile, exp_results, committeesize", testinsts.instances)
-def test_abcrules_correct(rule_id, algorithm, resolute, profile, exp_results, committeesize):
+def test_abcrules_correct(
+    rule_id, algorithm, resolute, profile, profilename, expected_result, committeesize
+):
     if rule_id.startswith("geom") and rule_id != "geom2":
         return  # correctness tests only for geom2
     if rule_id.startswith("seq") and rule_id not in ("seqpav", "seqslav", "seqcc"):
@@ -883,25 +921,31 @@ def test_abcrules_correct(rule_id, algorithm, resolute, profile, exp_results, co
         rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
     )
     print(f"output: {committees}")
-    print(f"expected: {exp_results[rule_id]}")
+    print(f"expected: {expected_result}")
     if resolute:
         assert len(committees) == 1
-        assert committees[0] in exp_results[rule_id]
+        assert committees[0] in expected_result
     else:
         # test unordered equality, this requires sets of sets, only possible with frozensets
         committees_ = {frozenset(committee) for committee in committees}
-        exp_results_ = {frozenset(committee) for committee in exp_results[rule_id]}
-        assert committees_ == exp_results_
+        expected_result_ = {frozenset(committee) for committee in expected_result}
+        assert committees_ == expected_result_
 
 
 @pytest.mark.parametrize(
-    "rule_id, algorithm",
-    testrules.rule_algorithm_onlyirresolute,
+    "rule_id, algorithm, resolute, profile, profilename, expected_result, committeesize",
+    testinsts.instances,
 )
-@pytest.mark.parametrize("profile, exp_results, committeesize", testinsts.instances)
 @pytest.mark.parametrize("max_num_of_committees", [1, 2, 3])
 def test_abcrules_correct_with_max_num_of_committees(
-    rule_id, algorithm, profile, exp_results, committeesize, max_num_of_committees
+    rule_id,
+    algorithm,
+    resolute,
+    profile,
+    profilename,
+    expected_result,
+    committeesize,
+    max_num_of_committees,
 ):
     if rule_id.startswith("geom") and rule_id != "geom2":
         return  # correctness tests only for geom2
@@ -912,20 +956,23 @@ def test_abcrules_correct_with_max_num_of_committees(
     if rule_id == "rsd":
         return  # correctness tests do not have much sense due to random nature of RSD
     print(profile)
-    print(f"expected: {exp_results[rule_id]}")
+    print(f"expected: {expected_result}")
     for max_num_of_committees in [1, 2, 3]:
         committees = abcrules.compute(
             rule_id,
             profile,
             committeesize,
             algorithm=algorithm,
-            resolute=False,
+            resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
         print(f"with max_num_of_committees={max_num_of_committees} output: {committees}")
-        assert len(committees) == min(max_num_of_committees, len(exp_results[rule_id]))
+        if resolute:
+            assert len(committees) == 1
+        else:
+            assert len(committees) == min(max_num_of_committees, len(expected_result))
         for comm in committees:
-            assert comm in exp_results[rule_id]
+            assert comm in expected_result
 
 
 def test_seqphragmen_irresolute():
@@ -1169,7 +1216,15 @@ def test_selection_of_abc_yaml_instances(filename, rule_id, algorithm):
     profile, committeesize, compute_instances, _ = fileio.read_abcvoting_yaml_file(filename)
     for compute_instance in compute_instances:
         if compute_instance["rule_id"] == rule_id:
+            if compute_instance["result"] is None:
+                return  # not applicable or too slow
             abcrules.compute(**compute_instance, algorithm=algorithm)
+            return
+    else:
+        pytest.skip(
+            f"{rule_id} ({algorithm}) not precomputed for {filename},\n"
+            "re-run tests/test_instances/generate.py?"
+        )
 
 
 @pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)

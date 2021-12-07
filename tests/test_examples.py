@@ -146,6 +146,7 @@ def test_abcbook_propositionA3_py(check_output):
     from examples.abcbook import propositionA3
 
 
+@pytest.mark.gurobi
 # noinspection PyUnresolvedReferences
 def test_abcbook_propositionA4_py(check_output):
     from examples.abcbook import propositionA4
@@ -156,6 +157,7 @@ def test_simple_py(check_output):
     from examples import simple
 
 
+@pytest.mark.gurobi
 # noinspection PyUnresolvedReferences
 def test_allrules_py(check_output):
     from examples import allrules
