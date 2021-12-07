@@ -141,12 +141,6 @@ class Rule:
                 f"ABC rule {self.rule_id} does not support resolute={resolute}."
             )
 
-        if resolute and not (max_num_of_committees is None or max_num_of_committees == 1):
-            raise ValueError(
-                f"Parameter `max_num_of_committees` can only be used in combination with "
-                f"resolute=False, must be 1 or None otherwise."
-            )
-
         if max_num_of_committees is not None and max_num_of_committees < 1:
             raise ValueError(
                 "Parameter `max_num_of_committees` must be None or a positive integer."
@@ -853,8 +847,8 @@ def compute_lexcc(
     output.details(f"At-least-ell scores:")
     output.details(
         "\n".join(
-            f" at-least-{ell}: {detailed_info['opt_score_vector'][ell-1]}"
-            for ell in range(1, committeesize + 1)
+            f" at-least-{ell+1}: {score}"
+            for ell, score in enumerate(detailed_info["opt_score_vector"])
         )
         + "\n"
     )
