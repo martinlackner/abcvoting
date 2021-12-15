@@ -535,7 +535,7 @@ def _check_JR(profile, committee):
     bool
     """
 
-    # variable to store in how many approval ballots a candidate appears in,
+    # variable to store number of approval ballots a candidate appears in,
     # such that these approval ballots do not intersect with input committee
     sum_appearances = 0
 
