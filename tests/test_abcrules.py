@@ -597,6 +597,7 @@ def remove_solver_output(out):
             "--------------------------------------------\n\n"
         ),
         "Using license file.*\n",
+        "Set parameter Username.*\n",
         "Academic license - for non-commercial use only.*\n",
     )
 
