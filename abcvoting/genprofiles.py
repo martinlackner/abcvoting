@@ -1,5 +1,5 @@
 """
-Random generation of approval profiles
+Random generation of approval profiles.
 """
 
 
@@ -19,7 +19,9 @@ def random_profile(num_voters, num_cand, prob_distribution, committeesize=None, 
 
 
 def random_urn_profile(num_cand, num_voters, setsize, replace):
-    """Generate Polya Urn profile with fixed size approval sets."""
+    """
+    Generate Polya Urn profile with fixed size approval sets.
+    """
     currsize = 1.0
     approval_sets = []
     replacedsets = {}
@@ -52,8 +54,11 @@ def random_urn_profile(num_cand, num_voters, setsize, replace):
 
 
 def random_urn_party_list_profile(num_cand, num_voters, num_parties, replace, uniform=False):
-    """Generate Polya Urn profile from a number of parties.
-    If uniform each party gets the same amount of candidates."""
+    """
+    Generate Polya Urn profile from a number of parties.
+
+    If uniform each party gets the same amount of candidates.
+    """
     currsize = 1.0
     approval_sets = []
     replacedsets = {}
@@ -87,8 +92,9 @@ def random_urn_party_list_profile(num_cand, num_voters, num_parties, replace, un
 
 
 def random_IC_profile(num_cand, num_voters, setsize):
-    """Generates profile with random assignment of candidates to
-    the fix size of setsize."""
+    """
+    Generates profile with random assignment of candidates to the fix size of setsize.
+    """
     approval_sets = []
     for _ in range(num_voters):
         randset = random.sample(range(num_cand), setsize)
@@ -99,10 +105,13 @@ def random_IC_profile(num_cand, num_voters, setsize):
 
 
 def random_IC_party_list_profile(num_cand, num_voters, num_parties, uniform=False):
-    """Generates profile with random assignment of parties.
+    """
+    Generates profile with random assignment of parties.
+
     A party is a list of candidates.
     If uniform the number of candidates per party is the same,
-    else at least 1."""
+    else at least 1.
+    """
     parties = list(range(num_parties))
     party_cands = __distribute_candidates_to_parties(num_cand, parties, uniform=uniform)
     approval_sets = []
@@ -116,8 +125,9 @@ def random_IC_party_list_profile(num_cand, num_voters, num_parties, uniform=Fals
 def random_2d_points_profile(
     num_cand, num_voters, candpointmode, voterpointmode, sigma, approval_threshold
 ):
-    """Generates profiles from randomly generated 2d points according
-    to some distributions with the given sigma."""
+    """
+    Generate profiles from randomly generated 2d points.
+    """
     voters = list(range(num_voters))
     cands = list(range(num_cand))
 
@@ -135,7 +145,10 @@ def random_2d_points_profile(
 def random_2d_points_party_list_profile(
     num_cand, num_voters, num_parties, partypointmode, voterpointmode, sigma, uniform=False
 ):
-    """Generates profiles from randomly generated 2d points according
+    """
+    Generate profile from randomly generated 2d points.
+
+    according
     to some distributions with the given sigma.
     This selects parties for each voter, the parties are either
     uniform (equal size) or randomly generated (at least 1) candidate
@@ -158,9 +171,13 @@ def random_2d_points_party_list_profile(
 
 
 def random_mallows_profile(num_cand, num_voters, setsize, dispersion):
-    """Generates a Mallows Profile after the definition for
+    """
+    Generates a Mallows Profile.
+
+    After the definition for
     repeated insertion  mode (RIM) in
-    https://icml.cc/2011/papers/135_icmlpaper.pdf"""
+    https://icml.cc/2011/papers/135_icmlpaper.pdf
+    """
     if not (0 < dispersion <= 1):
         raise Exception("Invalid dispersion, needs to be in (0, 1].")
     reference_ranking = list(range(num_cand))
@@ -180,8 +197,9 @@ def random_mallows_profile(num_cand, num_voters, setsize, dispersion):
 
 
 def __compute_mallows_insert_distributions(num_cand, dispersion):
-    """Computes the insertion probability vectors for
-    the dispersion and a given number of candidates"""
+    """
+    Compute the insertion probability vectors for the dispersion and a given number of candidates.
+    """
     distributions = []
     denominator = 0
     for i in range(num_cand):
@@ -196,8 +214,9 @@ def __compute_mallows_insert_distributions(num_cand, dispersion):
 
 
 def __select_pos(distribution):
-    """Returns a randomly selected value with the help of the
-    distribution"""
+    """
+    Returns a randomly selected value with the help of the distribution.
+    """
     if round(sum(distribution), 10) != 1.0:
         raise Exception("Invalid Distribution", distribution, "sum:", sum(distribution))
     r = round(random.random(), 10)  # or random.uniform(0, 1)
@@ -213,9 +232,12 @@ def __select_pos(distribution):
 
 
 def __distribute_candidates_to_parties(num_cand, parties, uniform):
-    """Distributes the candidates to the parties.
+    """
+    Distributes the candidates to the parties.
+
     Either uniformly distributed or randomly distributed with
-    at least one candidate per party."""
+    at least one candidate per party.
+    """
     if num_cand < len(parties):
         raise ValueError("Not enough candidates to split them between" + "the parties.")
     if uniform:
@@ -248,8 +270,9 @@ def __distribute_candidates_to_parties(num_cand, parties, uniform):
 
 
 def __generate_2d_points(agents, mode, sigma):
-    """Generates a list of 2d coordinates subject to
-    various distributions."""
+    """
+    Generate a list of 2d coordinates subject to various distributions.
+    """
     points = {}
 
     # normal distribution, 1/3 of agents centered on (-0.5,-0.5),
@@ -276,8 +299,9 @@ def __euclidean(p1, p2):
 
 
 def __get_profile_from_points(voters, cands, voter_points, cand_points, approval_threshold):
-    """Generates a list of approval sets from 2d points according to
-    approval_threshold."""
+    """
+    Generates a list of approval sets from 2d points according to approval_threshold.
+    """
     profile = {}
     for v in voters:
         distances = {cand: __euclidean(voter_points[v], cand_points[cand]) for cand in cands}

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>abcvoting.preferences &mdash; abcvoting  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="abcvoting.scores" href="scores.html" />
+    <link rel="prev" title="abcvoting.output" href="output.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> abcvoting
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">A brief introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="abcrules.html">abcvoting.abcrules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">abcvoting.fileio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genprofiles.html">abcvoting.genprofiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">abcvoting.misc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">abcvoting.preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">abcvoting</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>abcvoting.preferences</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/preferences.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-abcvoting.preferences">
+<span id="abcvoting-preferences"></span><h1>abcvoting.preferences<a class="headerlink" href="#module-abcvoting.preferences" title="Permalink to this headline"></a></h1>
+<p>Preference profiles and voters</p>
+<ul class="simple">
+<li><p>Preference profiles consist of voters.</p></li>
+<li><p>Voters in a profile are indexed by <cite>0</cite>, …, <cite>len(profile)-1</cite></p></li>
+<li><p>Candidates are indexed by <cite>0</cite>, …, <cite>profile.num_cand-1</cite></p></li>
+<li><p>The preferences of voters are specified by approval sets, which are sets of candidates.</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="abcvoting.preferences.Profile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.preferences.</span></span><span class="sig-name descname"><span class="pre">Profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Profile" title="Permalink to this definition"></a></dt>
+<dd><p>Approval profiles.</p>
+<p>Approval profiles are a list of voters, each of which has preferences
+expressed as approval sets.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abcvoting.preferences.Profile.add_voter">
+<span class="sig-name descname"><span class="pre">add_voter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Profile.add_voter" title="Permalink to this definition"></a></dt>
+<dd><p>Add a set of approved candidates of one voter to the preference profile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>voter</strong><span class="classifier">Voter or iterable of int</span></dt><dd><p>The voter to be added.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abcvoting.preferences.Profile.add_voters">
+<span class="sig-name descname"><span class="pre">add_voters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Profile.add_voters" title="Permalink to this definition"></a></dt>
+<dd><p>Add several voters to the preference profile.</p>
+<p>Each voter is specified by a set (or list) of approved candidates
+or by an object of type Voter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>voters</strong><span class="classifier">iterable of Voter or iterable of iterables of int</span></dt><dd><p>The voters to be added.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="abcvoting.preferences.Profile.approved_candidates">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">approved_candidates</span></span><a class="headerlink" href="#abcvoting.preferences.Profile.approved_candidates" title="Permalink to this definition"></a></dt>
+<dd><p>Return a list of all candidates approved by at least one voter.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="abcvoting.preferences.Profile.cand_names">
+<span class="sig-name descname"><span class="pre">cand_names</span></span><a class="headerlink" href="#abcvoting.preferences.Profile.cand_names" title="Permalink to this definition"></a></dt>
+<dd><p>List of symbolic names for the candidates.</p>
+<p>Defaults to <cite>[1, 2, …, str(num_cand)]</cite></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="abcvoting.preferences.Profile.candidates">
+<span class="sig-name descname"><span class="pre">candidates</span></span><a class="headerlink" href="#abcvoting.preferences.Profile.candidates" title="Permalink to this definition"></a></dt>
+<dd><p>A list of all candidates, i.e., the list containing <cite>0</cite>, …, <cite>profile.num_cand-1</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abcvoting.preferences.Profile.has_unit_weights">
+<span class="sig-name descname"><span class="pre">has_unit_weights</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Profile.has_unit_weights" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abcvoting.preferences.Profile.is_party_list">
+<span class="sig-name descname"><span class="pre">is_party_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Profile.is_party_list" title="Permalink to this definition"></a></dt>
+<dd><p>Check whether this profile is a party-list profile.</p>
+<p>In a party-list profile all approval sets are either disjoint or equal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>bool</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="abcvoting.preferences.Profile.num_cand">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cand</span></span><a class="headerlink" href="#abcvoting.preferences.Profile.num_cand" title="Permalink to this definition"></a></dt>
+<dd><p>Number of candidates.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abcvoting.preferences.Profile.str_compact">
+<span class="sig-name descname"><span class="pre">str_compact</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Profile.str_compact" title="Permalink to this definition"></a></dt>
+<dd><p>Return a string that compactly summarizes the profile and its voters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abcvoting.preferences.Profile.totalweight">
+<span class="sig-name descname"><span class="pre">totalweight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Profile.totalweight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the totol weight of all voters, i.e., the sum of weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>int or Fraction</dt><dd><p>Total weight.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="abcvoting.preferences.Voter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.preferences.</span></span><span class="sig-name descname"><span class="pre">Voter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">approved</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Voter" title="Permalink to this definition"></a></dt>
+<dd><p>A set of approved candidates by one voter.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abcvoting.preferences.Voter.check_valid">
+<span class="sig-name descname"><span class="pre">check_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_cand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approved_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Voter.check_valid" title="Permalink to this definition"></a></dt>
+<dd><p>Check if Voter is valid.</p>
+<p>Check if approved candidates are given as non-negative integers.
+If <cite>num_cand</cite> is known, also check if they are too large. Double entries are checked if
+<cite>approved_raw</cite> is given.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="output.html" class="btn btn-neutral float-left" title="abcvoting.output" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="scores.html" class="btn btn-neutral float-right" title="abcvoting.scores" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright MIT license.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

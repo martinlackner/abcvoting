@@ -1,5 +1,9 @@
 """
-Read preflib files (soi, toi, soc or toc)
+Read and write data to files.
+
+Two data formats are supported:
+1. the Preflib format (soi, toi, soc or toc), and
+2. .abc.yaml files (more expressive than Preflib files).
 """
 
 
@@ -10,58 +14,32 @@ from abcvoting import misc
 import ruamel.yaml
 from abcvoting.output import output
 
+#: Valid keys for .abc.yaml files.
+ABC_YAML_VALID_KEYS = ["profile", "num_cand", "committeesize", "compute", "description"]
+
 
 class PreflibException(Exception):
+    """Malformatted preflib file."""
+
     pass
 
 
-def read_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
-    """Loads all election files (soi, toi, soc or toc) from the given dir.
-
-    Parameters:
-        dir_name: str
-            path of directory to be searched for preflib files.
-
-        setsize: int
-            Number of top-ranked candidates that voters approve.
-            In case of ties, more than setsize candidates are approved.
-
-            Paramer `setsize` is ignored if `relative_setsize` is used.
-
-        relative_setsize: float in (0, 1]
-            Indicates which percentage of candidates of the ranking
-            are approved (rounded up). In case of ties, more
-            candidates are approved.
-            E.g., if a voter has 10 candidates and this value is 0.75,
-            then the approval set contains the top 8 candidates.
-
-    Returns:
-        profiles: dict of str: Profile
-            The key is the filename.
-    """
-    files = get_file_names(dir_name, filename_extensions=[".soi", ".toi", ".soc", ".toc"])
-
-    profiles = {}
-    for f in files:
-        profile = read_preflib_file(
-            os.path.join(dir_name, f), setsize=setsize, relative_setsize=relative_setsize
-        )
-        profiles[f] = profile
-    return profiles
-
-
 def get_file_names(dir_name, filename_extensions=None):
-    """List all file names in a directory that fit the specified filename extensions.
-    Does not look into sub-directories.
+    """
+    List all file names in a directory that fit the specified filename extensions.
 
-    Parameters:
+    Not recursive, i.e., does not look into sub-directories!
+
+    Parameters
+    ----------
         dir_name: str
             path of directory to be searched for files.
 
         filename_extensions: list of str or None
             file names must match one of these extensions
 
-    Returns:
+    Returns
+    -------
         files: list of str
             list of file names contained in the directory
     """
@@ -123,10 +101,11 @@ def _approval_set_from_preflib_datastructures(num_appr, ranking, candidate_map):
 
 
 def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=False):
-    """Reads a single preflib file (soi, toi, soc or toc).
+    """
+    Read a Preflib file (soi, toi, soc or toc).
 
-    Parameters:
-
+    Parameters
+    ----------
         filename: str
             Name of the preflib file.
 
@@ -148,7 +127,8 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
             i.e., the number of voters that have this approval set.
             If True, treat vote count as weight and use this weight in class Voter.
 
-    Returns:
+    Returns
+    -------
         profile: abcvoting.preferences.Profile
             Preference profile extracted from preflib file,
             including names of candidates
@@ -225,18 +205,57 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
     return profile
 
 
+def read_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
+    """
+    Read all election files (soi, toi, soc or toc) from the given directory.
+
+    Parameters
+    ----------
+        dir_name: str
+            path of directory to be searched for preflib files.
+
+        setsize: int
+            Number of top-ranked candidates that voters approve.
+            In case of ties, more than setsize candidates are approved.
+
+            Paramer `setsize` is ignored if `relative_setsize` is used.
+
+        relative_setsize: float in (0, 1]
+            Indicates which percentage of candidates of the ranking
+            are approved (rounded up). In case of ties, more
+            candidates are approved.
+            E.g., if a voter has 10 candidates and this value is 0.75,
+            then the approval set contains the top 8 candidates.
+
+    Returns
+    -------
+        profiles: dict of str: Profile
+            The key is the filename.
+    """
+    files = get_file_names(dir_name, filename_extensions=[".soi", ".toi", ".soc", ".toc"])
+
+    profiles = {}
+    for f in files:
+        profile = read_preflib_file(
+            os.path.join(dir_name, f), setsize=setsize, relative_setsize=relative_setsize
+        )
+        profiles[f] = profile
+    return profiles
+
+
 def write_profile_to_preflib_toi_file(filename, profile):
-    """Writes profile in a preflib toi file
+    """Write profile to a preflib .toi file.
 
-    Parameters:
-
+    Parameters
+    ----------
         filename: str
             File name of the preflib file to be written.
 
         profile: Profile
             Profile to be written in preflib file.
 
-    Returns:
+    Returns
+    -------
         None
     """
     with open(filename, "w") as f:
@@ -262,13 +281,58 @@ def _yaml_flow_style_list(x):
     return yamllist
 
 
-VALID_KEYS = ["profile", "num_cand", "committeesize", "compute", "description"]
+def read_abcvoting_yaml_file(filename):
+    """
+    Reads contents of abcvoting yaml file (ending with .abc.yaml).
+    """
+    yaml = ruamel.yaml.YAML(typ="safe", pure=True)
+    with open(filename) as inputfile:
+        data = yaml.load(inputfile)
+    if "profile" not in data.keys():
+        raise ValueError(f"{filename} does not contain a profile")
+    if "num_cand" in data.keys():
+        num_cand = int(data["num_cand"])
+    else:
+        num_cand = max(cand for approval_set in data["profile"] for cand in approval_set) + 1
+    profile = Profile(num_cand)
+    profile.add_voters(data["profile"])
+
+    if "committeesize" in data.keys():
+        committeesize = int(data["committeesize"])
+    else:
+        committeesize = None
+
+    if "compute" in data.keys():
+        compute_instances = data["compute"]
+    else:
+        compute_instances = []
+    for compute_instance in compute_instances:
+        if "rule_id" not in compute_instance.keys():
+            raise ValueError('Each rule instance (dict) requires key "rule_id".')
+        compute_instance["profile"] = profile
+        compute_instance["committeesize"] = committeesize
+        if "result" in compute_instance.keys():
+            if compute_instance["result"] is not None:
+                # compute_instance["result"] should be a list of committees (sets)
+                compute_instance["result"] = [
+                    set(committee) for committee in compute_instance["result"]
+                ]
+
+    for key in data.keys():
+        if key not in ABC_YAML_VALID_KEYS:
+            output.warning(
+                f'Reading {filename}: key "{key}" is not valid and consequently ignored.'
+            )
+
+    return profile, committeesize, compute_instances, data
 
 
 def write_abcvoting_instance_to_yaml_file(
     filename, profile, committeesize=None, compute_instances=None, description=None
 ):
-    """Writes abcvoting instance to a yaml file."""
+    """
+    Writes abcvoting instance to a yaml file.
+    """
     if not profile.has_unit_weights():
         raise NotImplementedError(
             "write_abcvoting_instance_to_yaml_file() cannot handle " "profiles with weights yet."
@@ -323,47 +387,3 @@ def write_abcvoting_instance_to_yaml_file(
     yaml.width = 120
     with open(filename, "w") as outfile:
         yaml.dump(data, outfile)
-
-
-def read_abcvoting_yaml_file(filename):
-    """Reads contents of abcvoting yaml file (ending with .abc.yaml)."""
-    yaml = ruamel.yaml.YAML(typ="safe", pure=True)
-    with open(filename) as inputfile:
-        data = yaml.load(inputfile)
-    if "profile" not in data.keys():
-        raise ValueError(f"{filename} does not contain a profile")
-    if "num_cand" in data.keys():
-        num_cand = int(data["num_cand"])
-    else:
-        num_cand = max(cand for approval_set in data["profile"] for cand in approval_set) + 1
-    profile = Profile(num_cand)
-    profile.add_voters(data["profile"])
-
-    if "committeesize" in data.keys():
-        committeesize = int(data["committeesize"])
-    else:
-        committeesize = None
-
-    if "compute" in data.keys():
-        compute_instances = data["compute"]
-    else:
-        compute_instances = []
-    for compute_instance in compute_instances:
-        if "rule_id" not in compute_instance.keys():
-            raise ValueError('Each rule instance (dict) requires key "rule_id".')
-        compute_instance["profile"] = profile
-        compute_instance["committeesize"] = committeesize
-        if "result" in compute_instance.keys():
-            if compute_instance["result"] is not None:
-                # compute_instance["result"] should be a list of committees (sets)
-                compute_instance["result"] = [
-                    set(committee) for committee in compute_instance["result"]
-                ]
-
-    for key in data.keys():
-        if key not in VALID_KEYS:
-            output.warning(
-                f'Reading {filename}: key "{key}" is not valid and consequently ignored.'
-            )
-
-    return profile, committeesize, compute_instances, data

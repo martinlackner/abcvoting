@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>abcvoting.misc &mdash; abcvoting  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="abcvoting.output" href="output.html" />
+    <link rel="prev" title="abcvoting.genprofiles" href="genprofiles.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> abcvoting
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">A brief introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="abcrules.html">abcvoting.abcrules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">abcvoting.fileio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genprofiles.html">abcvoting.genprofiles</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">abcvoting.misc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">abcvoting</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>abcvoting.misc</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/misc.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-abcvoting.misc">
+<span id="abcvoting-misc"></span><h1>abcvoting.misc<a class="headerlink" href="#module-abcvoting.misc" title="Permalink to this headline"></a></h1>
+<p>Miscellaneous functions for committees (i.e., subsets of candidates).</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.misc.compare_list_of_committees">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">compare_list_of_committees</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.compare_list_of_committees" title="Permalink to this definition"></a></dt>
+<dd><p>Check whether two lists of committees are equal.</p>
+<p>The order of candidates and their multiplicities in these lists are ignored.
+To be precise, two lists are equal if every committee in list1 is contained in list2 and
+vice versa.
+Committees are, as usual, sets of positive integers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>list1, list2</strong><span class="classifier">iterable of sets</span></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>bool</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.misc.hamming">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">hamming</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.hamming" title="Permalink to this definition"></a></dt>
+<dd><p>Hamming distance between sets <cite>set1</cite> and <cite>set2</cite>.</p>
+<p>The Hamming distance for sets is the size of their symmetric difference,
+or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>set1, set2</strong><span class="classifier">set</span></dt><dd><p>The two sets, for which the Hamming distance is computed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>int</dt><dd><p>The Hamming distance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.misc.header">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.header" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a header string for <cite>text</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.misc.sorted_committees">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">sorted_committees</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">committees</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.sorted_committees" title="Permalink to this definition"></a></dt>
+<dd><p>Sort a list of committees and ensure that committees are sets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>committees</strong><span class="classifier">list of iterables</span></dt><dd><p>A list of committees; committees can be sets, tuples, lists, etc.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>list of iterables</dt><dd><p>A sorted list of committees (sets).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.misc.str_committees_header">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">str_committees_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">committees</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">winning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.str_committees_header" title="Permalink to this definition"></a></dt>
+<dd><p>Nicely format a header for a list of committees, stating how many committees there are.</p>
+<p>winning: write “winning committee” instead of “committee”</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.misc.str_set_of_candidates">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">str_set_of_candidates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.str_set_of_candidates" title="Permalink to this definition"></a></dt>
+<dd><p>Nicely format a single committee.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.misc.str_sets_of_candidates">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">str_sets_of_candidates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">committees</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.str_sets_of_candidates" title="Permalink to this definition"></a></dt>
+<dd><p>Nicely format a list of committees.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.misc.verify_expected_committees_equals_actual_committees">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">verify_expected_committees_equals_actual_committees</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actual_committees</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_committees</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Rule'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.verify_expected_committees_equals_actual_committees" title="Permalink to this definition"></a></dt>
+<dd><p>TODO Check whether two lists of committees are equivalent. Raise RuntimeError if not.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="genprofiles.html" class="btn btn-neutral float-left" title="abcvoting.genprofiles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="output.html" class="btn btn-neutral float-right" title="abcvoting.output" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright MIT license.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

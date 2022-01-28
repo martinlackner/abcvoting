@@ -1,6 +1,7 @@
 """
-Print messages to terminal depending on a given verbosity level similar to the Python logging
-module. Also meant to be used as Singleton.
+Print messages to terminal depending on a given verbosity level.
+
+Similar to the Python logging module. Also meant to be used as Singleton.
 """
 
 import logging
@@ -27,12 +28,17 @@ VERBOSITY_TO_NAME = {
 
 class Output:
     """
+    Handling the output based on the current verbosity level.
+
     This is inspired by the class ``logging.Logger()``. A verbosity level is stored,
     only messages printed with methods with higher importance will be printed.
     """
 
     def __init__(self, verbosity=WARNING, logger=None):
-        """At them moment only one instance will created: in the global scope of this module. An
+        """
+        Initialize the unique Output object.
+
+        At the moment only one instance will created: in the global scope of this module. An
         application might use the `setup()` method to set the verbosity and a logger.
 
         Parameters

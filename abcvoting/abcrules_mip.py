@@ -181,11 +181,11 @@ def _mip_thiele_methods(
         # exactly the number of candidates in the committee approved by `voter` for all
         # l = 1...committeesize.
         #
-        # If scorefct(l) > 0 for l >= 1, we assume that scorefct is monotonic decreasing and
+        # If marginal_scorefct(l) > 0 for l >= 1, we assume that marginal_scorefct is monotonic decreasing and
         # therefore in combination with the objective function the following interpreation is
         # valid:
         # utility[(voter, l)] indicates whether `voter` approves at least l candidates in the
-        # committee (this is the case for scorefct "pav", "slav" or "geom").
+        # committee (this is the case for marginal_scorefct "pav", "slav" or "geom").
         utility = {}
 
         max_in_committee = {}
@@ -206,20 +206,20 @@ def _mip_thiele_methods(
         # objective: the Thiele score of the committee
         model.objective = mip.maximize(
             mip.xsum(
-                float(scorefct(l)) * voter.weight * utility[(voter, l)]
+                float(marginal_scorefct(l)) * voter.weight * utility[(voter, l)]
                 for voter in profile
                 for l in range(1, max_in_committee[voter] + 1)
             )
         )
 
-    scorefct = scores.get_scorefct(scorefct_id, committeesize)
+    marginal_scorefct = scores.get_marginal_scorefct(scorefct_id, committeesize)
 
-    score_values = [scorefct(l) for l in range(1, committeesize + 1)]
+    score_values = [marginal_scorefct(l) for l in range(1, committeesize + 1)]
     if not all(
         first > second or first == second == 0
         for first, second in zip(score_values, score_values[1:])
     ):
-        raise ValueError("scorefct must be monotonic decreasing")
+        raise ValueError("The score function must be monotonic decreasing")
     min_score_value = min(val for val in score_values if val > 0)
     if min_score_value < ACCURACY:
         output.warning(
@@ -246,16 +246,12 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
         # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
         # exactly the number of candidates in the committee approved by `voter` for all
         # l = 1...committeesize.
-        #
-        # If scorefct(l) > 0 for l >= 1, we assume that scorefct is monotonic decreasing and
-        # therefore in combination with the objective function the following interpreation is
-        # valid:
-        # utility[(voter, l)] indicates whether `voter` approves at least l candidates in the
-        # committee (this is the case for scorefct "pav", "slav" or "geom").
 
         utility = {}
         iteration = len(satisfaction_constraints)
-        scorefcts = [scores.get_scorefct(f"atleast{i+1}") for i in range(iteration + 1)]
+        marginal_scorefcts = [
+            scores.get_marginal_scorefct(f"atleast{i + 1}") for i in range(iteration + 1)
+        ]
 
         max_in_committee = {}
         for i, voter in enumerate(profile):
@@ -277,7 +273,9 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
         for prev_iteration in range(0, iteration):
             model += (
                 mip.xsum(
-                    float(scorefcts[prev_iteration](l)) * voter.weight * utility[(voter, l)]
+                    float(marginal_scorefcts[prev_iteration](l))
+                    * voter.weight
+                    * utility[(voter, l)]
                     for voter in profile
                     for l in range(1, max_in_committee[voter] + 1)
                 )
@@ -287,7 +285,7 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
         # objective: the at-least-x score of the committee in iteration x
         model.objective = mip.maximize(
             mip.xsum(
-                float(scorefcts[iteration](l)) * voter.weight * utility[(voter, l)]
+                float(marginal_scorefcts[iteration](l)) * voter.weight * utility[(voter, l)]
                 for voter in profile
                 for l in range(1, max_in_committee[voter] + 1)
             )

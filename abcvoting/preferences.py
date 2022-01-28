@@ -1,9 +1,10 @@
 """
 Preference profiles and voters
- Preference profiles consist of voters.
- Voters in a profile are indexed by 0, ..., len(profile)-1
- Candidates are indexed by 0, ..., profile.num_cand-1
- The preferences of voters are specified by approval sets, which are sets of candidates.
+
+- Preference profiles consist of voters.
+- Voters in a profile are indexed by `0`, ..., `len(profile)-1`
+- Candidates are indexed by `0`, ..., `profile.num_cand-1`
+- The preferences of voters are specified by approval sets, which are sets of candidates.
 """
 
 
@@ -13,27 +14,34 @@ from collections import OrderedDict
 
 class Profile(object):
     """
-    Preference profiles consisting of approval sets.
+    Approval profiles.
 
-    Properties
-    ----------
-    num_cand : int
-        number of candidates or alternatives
-    cand_names : iterable of str
-        symbolic names for the candidates, defaults to '1', '2', ..., str(num_cand)
-    _voters : list of Voter
-        the list of voters, use `Profile.add_voter()` or `Profile.add_voters()`
-        to add voters
-
+    Approval profiles are a list of voters, each of which has preferences
+    expressed as approval sets.
     """
 
     def __init__(self, num_cand, cand_names=None):
         if num_cand <= 0:
             raise ValueError(str(num_cand) + " is not a valid number of candidates")
         self.candidates = list(range(num_cand))
-        self._voters = []
-        self._approved_candidates = None
+        """
+        A list of all candidates, i.e., the list containing `0`, ..., `profile.num_cand-1`.
+        """
         self.cand_names = [str(cand) for cand in range(num_cand)]
+        """
+        List of symbolic names for the candidates.
+        
+        Defaults to `[1, 2, ..., str(num_cand)]`
+        """
+        self._voters = []
+        """
+        Internal list of voters.
+        
+        Use `Profile.add_voter()` or `Profile.add_voters()`
+        to add voters
+        """
+        self._approved_candidates = None
+
         if cand_names:
             if len(cand_names) < num_cand:
                 raise ValueError(
@@ -44,10 +52,12 @@ class Profile(object):
 
     @property
     def num_cand(self):  # number of candidates
+        """Number of candidates."""
         return len(self.candidates)
 
     @property
-    def approved_candidates(self):  # candidates approved by at least one voter
+    def approved_candidates(self):
+        """Return a list of all candidates approved by at least one voter."""
         if self._approved_candidates is None:
             _approved_candidates = set()
             for voter in self._voters:
@@ -77,12 +87,16 @@ class Profile(object):
 
     def add_voter(self, voter):
         """
-        Adds a set of approved candidates of one voter to the preference profile.
+        Add a set of approved candidates of one voter to the preference profile.
 
         Parameters
         ----------
-        voter : Voter or iterable of int
+            voter : Voter or iterable of int
+                The voter to be added.
 
+        Returns
+        -------
+            None
         """
 
         # ensure that new voter is unique
@@ -90,19 +104,32 @@ class Profile(object):
 
     def add_voters(self, voters):
         """
-        Adds several voters to the preference profile.
+        Add several voters to the preference profile.
+
         Each voter is specified by a set (or list) of approved candidates
         or by an object of type Voter.
 
         Parameters
         ----------
-        voters : iterable of Voter or iterable of iterables of int
+            voters : iterable of Voter or iterable of iterables of int
+                The voters to be added.
 
+        Returns
+        -------
+            None
         """
         for voter in voters:
             self.add_voter(voter)
 
     def totalweight(self):
+        """
+        Return the totol weight of all voters, i.e., the sum of weights.
+
+        Returns
+        -------
+            int or Fraction
+                Total weight.
+        """
         return sum(voter.weight for voter in self._voters)
 
     def has_unit_weights(self):
@@ -116,7 +143,7 @@ class Profile(object):
 
     def __setitem__(self, i, voter):
         """
-        Modifies a voter in the preference profile.
+        Modify a voter in the preference profile.
 
         Parameters
         ----------
@@ -144,9 +171,13 @@ class Profile(object):
 
     def is_party_list(self):
         """
-        Is this party a party-list profile?
-        In a party-list profile all approval sets are either
-        disjoint or equal (see https://arxiv.org/abs/1704.02453).
+        Check whether this profile is a party-list profile.
+
+        In a party-list profile all approval sets are either disjoint or equal.
+
+        Returns
+        -------
+            bool
         """
         return all(
             len(voter1.approved & voter2.approved) in (0, len(voter1.approved))
@@ -155,6 +186,9 @@ class Profile(object):
         )
 
     def str_compact(self):
+        """
+        Return a string that compactly summarizes the profile and its voters.
+        """
         compact = OrderedDict()
         for voter in self._voters:
             if tuple(voter.approved) in compact:
@@ -188,6 +222,19 @@ class Voter:
     """
 
     def __init__(self, approved, weight=1):
+        """
+        Create a voter.
+
+        Parameters
+        __________
+            approved : iterable
+                List/tuple/set of approved candidates.
+
+            weight : int or Fraction, default=1
+                The weight of the voter.
+
+                This should not be used as the number of voters with these approved candidates.
+        """
         self.approved = set(approved)  # approval set, i.e., the set of approved candidates
         self.weight = weight
 
@@ -207,9 +254,11 @@ class Voter:
 
     def check_valid(self, num_cand=float("inf"), approved_raw=None):
         """
-        Check if approved candidates are given as non-negative integers. If `num_cand` is known,
-        also check if they are too large. Double entries are check if approved_raw is given as
-        list or tuple (or similar).
+        Check if Voter is valid.
+
+        Check if approved candidates are given as non-negative integers.
+        If `num_cand` is known, also check if they are too large. Double entries are checked if
+        `approved_raw` is given.
         """
         if approved_raw is not None and len(self.approved) < len(approved_raw):
             raise ValueError(
@@ -225,3 +274,7 @@ class Voter:
                 )
             if candidate < 0 or candidate >= num_cand:
                 raise ValueError(str(self) + " not valid for num_cand = " + str(num_cand))
+
+        # check weights
+        if not self.weight > 0:
+            raise ValueError("Weight should be a number > 0.")

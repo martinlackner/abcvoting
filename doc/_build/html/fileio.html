@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>abcvoting.fileio &mdash; abcvoting  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="abcvoting.genprofiles" href="genprofiles.html" />
+    <link rel="prev" title="abcvoting.abcrules" href="abcrules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> abcvoting
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">A brief introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="abcrules.html">abcvoting.abcrules</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">abcvoting.fileio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genprofiles.html">abcvoting.genprofiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">abcvoting.misc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">abcvoting</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>abcvoting.fileio</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/fileio.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-abcvoting.fileio">
+<span id="abcvoting-fileio"></span><h1>abcvoting.fileio<a class="headerlink" href="#module-abcvoting.fileio" title="Permalink to this headline"></a></h1>
+<p>Read and write data to files.</p>
+<p>Two data formats are supported:
+1. the Preflib format (soi, toi, soc or toc), and
+2. .abc.yaml files (more expressive than Preflib files).</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="abcvoting.fileio.ABC_YAML_VALID_KEYS">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">ABC_YAML_VALID_KEYS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['profile',</span> <span class="pre">'num_cand',</span> <span class="pre">'committeesize',</span> <span class="pre">'compute',</span> <span class="pre">'description']</span></em><a class="headerlink" href="#abcvoting.fileio.ABC_YAML_VALID_KEYS" title="Permalink to this definition"></a></dt>
+<dd><p>Valid keys for .abc.yaml files.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="abcvoting.fileio.PreflibException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">PreflibException</span></span><a class="headerlink" href="#abcvoting.fileio.PreflibException" title="Permalink to this definition"></a></dt>
+<dd><p>Malformatted preflib file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.fileio.get_file_names">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">get_file_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_extensions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.fileio.get_file_names" title="Permalink to this definition"></a></dt>
+<dd><p>List all file names in a directory that fit the specified filename extensions.</p>
+<p>Not recursive, i.e., does not look into sub-directories!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dir_name: str</strong></dt><dd><p>path of directory to be searched for files.</p>
+</dd>
+<dt><strong>filename_extensions: list of str or None</strong></dt><dd><p>file names must match one of these extensions</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>files: list of str</dt><dd><p>list of file names contained in the directory</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.fileio.read_abcvoting_yaml_file">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">read_abcvoting_yaml_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.fileio.read_abcvoting_yaml_file" title="Permalink to this definition"></a></dt>
+<dd><p>Reads contents of abcvoting yaml file (ending with .abc.yaml).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.fileio.read_preflib_file">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">read_preflib_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_setsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.fileio.read_preflib_file" title="Permalink to this definition"></a></dt>
+<dd><p>Read a Preflib file (soi, toi, soc or toc).</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filename: str</strong></dt><dd><p>Name of the preflib file.</p>
+</dd>
+<dt><strong>setsize: int</strong></dt><dd><p>Number of top-ranked candidates that voters approve.
+In case of ties, more than <cite>setsize</cite> candidates are approved.</p>
+<p>Paramer <cite>setsize</cite> is ignored if <cite>relative_setsize</cite> is used.</p>
+</dd>
+<dt><strong>relative_setsize: float in (0, 1]</strong></dt><dd><p>Indicates which proportion of candidates of the ranking
+are approved (rounded up). In case of ties, more
+candidates are approved.
+E.g., if a voter has 10 approved candidates and <cite>relative_setsize</cite> is 0.75,
+then the approval set contains the top 8 candidates.</p>
+</dd>
+<dt><strong>use_weights: bool</strong></dt><dd><p>If False, treat vote count in preflib file as the number of duplicate ballots,
+i.e., the number of voters that have this approval set.
+If True, treat vote count as weight and use this weight in class Voter.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>profile: abcvoting.preferences.Profile</dt><dd><p>Preference profile extracted from preflib file,
+including names of candidates</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.fileio.read_preflib_files_from_dir">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">read_preflib_files_from_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_setsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.fileio.read_preflib_files_from_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Read all election files (soi, toi, soc or toc) from the given directory.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>dir_name: str</strong></dt><dd><p>path of directory to be searched for preflib files.</p>
+</dd>
+<dt><strong>setsize: int</strong></dt><dd><p>Number of top-ranked candidates that voters approve.
+In case of ties, more than setsize candidates are approved.</p>
+<p>Paramer <cite>setsize</cite> is ignored if <cite>relative_setsize</cite> is used.</p>
+</dd>
+<dt><strong>relative_setsize: float in (0, 1]</strong></dt><dd><p>Indicates which percentage of candidates of the ranking
+are approved (rounded up). In case of ties, more
+candidates are approved.
+E.g., if a voter has 10 candidates and this value is 0.75,
+then the approval set contains the top 8 candidates.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>profiles: dict of str: Profile</dt><dd><p>The key is the filename.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.fileio.write_abcvoting_instance_to_yaml_file">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">write_abcvoting_instance_to_yaml_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_instances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.fileio.write_abcvoting_instance_to_yaml_file" title="Permalink to this definition"></a></dt>
+<dd><p>Writes abcvoting instance to a yaml file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.fileio.write_profile_to_preflib_toi_file">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">write_profile_to_preflib_toi_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.fileio.write_profile_to_preflib_toi_file" title="Permalink to this definition"></a></dt>
+<dd><p>Write profile to a preflib .toi file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename: str</strong></dt><dd><p>File name of the preflib file to be written.</p>
+</dd>
+<dt><strong>profile: Profile</strong></dt><dd><p>Profile to be written in preflib file.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="abcrules.html" class="btn btn-neutral float-left" title="abcvoting.abcrules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="genprofiles.html" class="btn btn-neutral float-right" title="abcvoting.genprofiles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright MIT license.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

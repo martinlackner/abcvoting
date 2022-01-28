@@ -11,15 +11,39 @@ from abcvoting.misc import hamming
 
 
 class UnknownScoreFunctionError(ValueError):
-    """Exception raised if unknown rule id is used."""
+    """
+    Exception raised if unknown rule id is used.
+
+    Parameters
+    ----------
+        scorefct_id : str
+            The score function id that is not known.
+    """
 
     def __init__(self, scorefct_id):
         message = 'Thiele score function "' + str(scorefct_id) + '" is not known.'
         super(ValueError, self).__init__(message)
 
 
-def get_scorefct(scorefct_id, committeesize=None):
-    """Return score function (for a Thiele method) given its name."""
+def get_marginal_scorefct(scorefct_id, committeesize=None):
+    """
+    Return marginal score function (for a Thiele method) given its name.
+
+    Parameters
+    ----------
+        scorefct_id : str
+            A string identifying the marginal score function.
+
+        committeesize : int, optional
+            Committee size.
+
+            Some marginal score functions require fixing the size of committees.
+
+    Returns
+    -------
+        function
+            The corresponding marginal score function.
+    """
     if scorefct_id == "pav":
         return pav_score_fct
     elif scorefct_id == "slav":
@@ -30,7 +54,7 @@ def get_scorefct(scorefct_id, committeesize=None):
         return av_score_fct
     elif scorefct_id[:4] == "geom":
         base = Fraction(scorefct_id[4:])
-        return functools.partial(geometric_score_fct, base=base)
+        return functools.partial(geometric_marginal_score_fct, base=base)
     elif scorefct_id[:7] == "atleast":
         param = int(scorefct_id[7:])
         return functools.partial(at_least_ell_fct, ell=param)
@@ -39,14 +63,34 @@ def get_scorefct(scorefct_id, committeesize=None):
 
 
 def thiele_score(scorefct_id, profile, committee):
-    """Compute Thiele score of a committee subject to a given score function (`scorefct_id`)."""
-    scorefct = get_scorefct(scorefct_id, len(committee))
+    """
+    Compute Thiele score of a committee subject to a given scorefct_id.
+
+    Parameters
+    ----------
+        scorefct_id : str
+            Identifies the score function to be used.
+
+            `scorefct_id` has to be recognized by `abcvoting.scores.get_scorefct`.
+
+        profile : Profile
+            A profile.
+
+        committee : set
+            A committee.
+
+    Returns
+    -------
+        int or Fraction
+            The Thiele score using the score function given by `scorefct_id`.
+    """
+    marginal_scorefct = get_marginal_scorefct(scorefct_id, len(committee))
     score = 0
     for vote in profile:
         cand_in_com = 0
         for _ in set(committee) & vote.approved:
             cand_in_com += 1
-            score += vote.weight * scorefct(cand_in_com)
+            score += vote.weight * marginal_scorefct(cand_in_com)
     return score
 
 
@@ -55,14 +99,37 @@ Thiele score functions:
 """
 
 
-def geometric_score_fct(i, base):
-    """Geometric score functions.
+def geometric_marginal_score_fct(i, base):
+    """
+    Geometric marginal score functions.
 
-    For a mathematical description of Geomtric score functions, see e.g.
+    This is the additional (marginal) score from a voter for the `i`-th approved candidate
+    in the committee.
+
+    For example, the 2-Geometric marginal scoring function (`base=2`) is
+
+    .. math::
+
+       f(i) = 1 / 2^{i-1}.
+
+    For a mathematical description of Geometric score functions, see e.g.
     Martin Lackner and Piotr Skowron
     Utilitarian Welfare and Representation Guarantees of Approval-Based Multiwinner Rules
     In Artificial Intelligence, 288: 103366, 2020.
     https://arxiv.org/abs/1801.01527
+
+    Parameters
+    ----------
+        i : int
+            We are calculating the score for the `i`-th approved candidate in the committee.
+
+        base : float or int or Fraction
+            The base for the geometric function `1 / base ** (i-1)`.
+
+    Returns
+    -------
+        Fraction
+            The corresponding marginal score.
     """
     if i == 0:
         return 0
@@ -71,7 +138,22 @@ def geometric_score_fct(i, base):
 
 
 def pav_score_fct(i):
-    """PAV score function."""
+    """
+    PAV marginal score function.
+
+    This is the additional (marginal) score from a voter for the `i`-th approved candidate
+    in the committee.
+
+    Parameters
+    ----------
+        i : int
+            We are calculating the score for the `i`-th approved candidate in the committee.
+
+    Returns
+    -------
+        Fraction
+            The corresponding marginal score.
+    """
     if i == 0:
         return 0
     else:
@@ -79,13 +161,27 @@ def pav_score_fct(i):
 
 
 def slav_score_fct(i):
-    """SLAV (Sainte-Lague Approval Voting) score function.
+    """
+    SLAV (Sainte-Lague Approval Voting) marginal score function.
+
+    This is the additional (marginal) score from a voter for the `i`-th approved candidate
+    in the committee.
 
     For a mathematical description of this score function, see e.g.
     Martin Lackner and Piotr Skowron
     Utilitarian Welfare and Representation Guarantees of Approval-Based Multiwinner Rules
     In Artificial Intelligence, 288: 103366, 2020.
     https://arxiv.org/abs/1801.01527
+
+    Parameters
+    ----------
+        i : int
+            We are calculating the score for the `i`-th approved candidate in the committee.
+
+    Returns
+    -------
+        Fraction
+            The corresponding marginal score.
     """
     if i == 0:
         return 0
@@ -94,10 +190,24 @@ def slav_score_fct(i):
 
 
 def av_score_fct(i):
-    """AV score function.
+    """
+    AV marginal score function.
 
-    Note: this is used only for unit tests atm, because AV is separable anyway and therefore not
-    implemented as optimization problem
+    This is the additional (marginal) score from a voter for the `i`-th approved candidate
+    in the committee.
+
+    Note: this is used only for unit tests at the moment,
+    because AV is separable anyway and therefore not implemented as optimization problem.
+
+    Parameters
+    ----------
+        i : int
+            We are calculating the score for the `i`-th approved candidate in the committee.
+
+    Returns
+    -------
+        Fraction
+            The corresponding marginal score.
     """
     if i >= 1:
         return 1
@@ -106,7 +216,22 @@ def av_score_fct(i):
 
 
 def cc_score_fct(i):
-    """CC (Chamberlin-Courant) score function."""
+    """
+    CC (Chamberlin-Courant) marginal score function.
+
+    This is the additional (marginal) score from a voter for the `i`-th approved candidate
+    in the committee.
+
+    Parameters
+    ----------
+        i : int
+            We are calculating the score for the `i`-th approved candidate in the committee.
+
+    Returns
+    -------
+        Fraction
+            The corresponding marginal score.
+    """
     if i == 1:
         return 1
     else:
@@ -114,10 +239,25 @@ def cc_score_fct(i):
 
 
 def at_least_ell_fct(i, ell):
-    """At-least-ell score function.
+    """
+    At-least-ell marginal score function.
+
+    This is the additional (marginal) score from a voter for the `i`-th approved candidate
+    in the committee.
 
     Gives a score of 1 if ell approved candidates are in the committee.
-    The CC score function is equivalent to the At-least-1 score function."""
+    The CC score function is equivalent to the at_least_ell_fct score function for ell=1.
+
+    Parameters
+    ----------
+        i : int
+            We are calculating the score for the `i`-th approved candidate in the committee.
+
+    Returns
+    -------
+        Fraction
+            The corresponding marginal score.
+    """
     if i == ell:
         return 1
     else:
@@ -129,18 +269,33 @@ end of Thiele score functions
 """
 
 
-def cumulative_score_fct(scorefct, cand_in_com):
-    """Return cumulative score function for score function `scorefct`.
+def cumulative_score_fct(marginal_scorefct, cand_in_com):
+    """
+    Return cumulative score function for the marginal score function `marginal_scorefct`.
 
     A cumulative score function f(i) returns the total score for having
     i candidates in the committee (as opposed to score functions that return the score increase
     when adding the i-th candidate).
+
+    Parameters
+    ----------
+        marginal_scorefct : function
+            The marginal score function.
+
+        cand_in_com : int
+            The number of approved candidates in the committee.
+
+    Returns
+    -------
+        Fraction
+            The corresponding marginal score.
     """
-    return sum(scorefct(i + 1) for i in range(cand_in_com))
+    return sum(marginal_scorefct(i + 1) for i in range(cand_in_com))
 
 
-def marginal_thiele_scores_add(scorefct, profile, committee):
-    """Return possible marginal score increases from adding one candidate to the committe.
+def marginal_thiele_scores_add(marginal_scorefct, profile, committee):
+    """
+    Return marginal score increases from adding one candidate to the committe.
 
     The function returns a list of length `num_cand` where the i-th entry contains the
     marginal score increase when adding candidate i.
@@ -150,25 +305,42 @@ def marginal_thiele_scores_add(scorefct, profile, committee):
     for voter in profile:
         intersectionsize = len(voter.approved.intersection(committee))
         for cand in voter.approved:
-            marginal[cand] += voter.weight * scorefct(intersectionsize + 1)
+            marginal[cand] += voter.weight * marginal_scorefct(intersectionsize + 1)
     for cand in committee:
         marginal[cand] = -1
     return marginal
 
 
-def marginal_thiele_scores_remove(scorefct, profile, committee):
-    """Return possible marginal score decreases from removing one candidate from the committe.
+def marginal_thiele_scores_remove(marginal_scorefct, profile, committee):
+    """
+    Return possible marginal score decreases from removing one candidate from the committe.
 
     The function returns a list of length `num_cand` where the i-th entry contains the
     marginal score decrease when removing candidate i.
     Candidates that are not in the committee receive a large value (max(marg_util_cand) + 1).
+
+    Parameters
+    ----------
+        marginal_scorefct : function
+            The marginal score function to be used.
+
+        profile : Profile
+            A profile.
+
+        committee : set
+            A committee.
+
+    Returns
+    -------
+        int
+            The Minimax AV score of `committee`.
     """
     marg_util_cand = [0] * profile.num_cand
     #  marginal utility gained by adding candidate to the committee
     for voter in profile:
         satisfaction = len(voter.approved.intersection(committee))
         for cand in voter.approved:
-            marg_util_cand[cand] += voter.weight * scorefct(satisfaction)
+            marg_util_cand[cand] += voter.weight * marginal_scorefct(satisfaction)
     for cand in profile.candidates:
         if cand not in committee:
             # do not choose candidates that already have been removed
@@ -177,7 +349,22 @@ def marginal_thiele_scores_remove(scorefct, profile, committee):
 
 
 def monroescore(profile, committee):
-    """Return Monroe score of a given committee."""
+    """
+    Return Monroe score of a given committee.
+
+    Parameters
+    ----------
+        profile : Profile
+            A profile.
+
+        committee : set
+            A committee.
+
+    Returns
+    -------
+        int
+            The Monroe score.
+    """
     if len(profile) % len(committee) == 0:
         # faster
         return monroescore_matching(profile, committee)
@@ -186,10 +373,24 @@ def monroescore(profile, committee):
 
 
 def monroescore_matching(profile, committee):
-    """Return Monroe score of a given committee.
+    """
+    Return Monroe score of a given committee.
 
     Uses a matching-based algorithm that works only if
     the committee size divides the number of voters.
+
+    Parameters
+    ----------
+        profile : Profile
+            A profile.
+
+        committee : set
+            A committee.
+
+    Returns
+    -------
+        int
+            The Monroe score.
     """
     if len(profile) % len(committee) != 0:
         raise ValueError(
@@ -210,11 +411,25 @@ def monroescore_matching(profile, committee):
 
 
 def monroescore_flowbased(profile, committee):
-    """Return Monroe score of a given committee.
+    """
+    Return Monroe score of a given committee.
 
     Uses a flow-based algorithm that works even if
     `committeesize` does not divide the number of voters.
     Slower than monroescore_matching().
+
+    Parameters
+    ----------
+        profile : Profile
+            A profile.
+
+        committee : set
+            A committee.
+
+    Returns
+    -------
+        int
+            The Monroe score.
     """
     graph = nx.DiGraph()
     committeesize = len(committee)
@@ -243,7 +458,22 @@ def monroescore_flowbased(profile, committee):
 
 
 def minimaxav_score(profile, committee):
-    """Return the Minimax AV (MAV) score of a committee."""
+    """
+    Return the Minimax AV (MAV) score of a committee.
+
+    Parameters
+    ----------
+        profile : Profile
+            A profile.
+
+        committee : set
+            A committee.
+
+    Returns
+    -------
+        int
+            The Minimax AV score of `committee`.
+    """
     score = 0
     for voter in profile:
         hamdistance = hamming(voter.approved, committee)
@@ -253,6 +483,23 @@ def minimaxav_score(profile, committee):
 
 
 def num_voters_with_upper_bounded_hamming_distance(upperbound, profile, committee):
-    """Return the number of voters that have a Hamming distance of at most `upperbound`
-    to the given committee."""
+    """
+    Return the number of voters having a Hamming distance <= `upperbound` to the given committee.
+
+    Parameters
+    ----------
+        upperbound : int
+            The Hamming distance upper bound.
+
+        profile : Profile
+            A profile.
+
+        committee : set
+            A committee.
+
+    Returns
+    -------
+        int
+            The number of voters having a Hamming distance <= `upperbound`.
+    """
     return len([voter for voter in profile if hamming(voter.approved, committee) <= upperbound])
