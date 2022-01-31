@@ -10,6 +10,8 @@
 
 ## Python implementations of approval-based committee (multi-winner) rules
 
+![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) **Documentation is [available](https://martinlackner.github.io/abcvoting/)!**
+
 Approval-based committee rules (ABC rules) are voting methods for selecting a committee, i.e., a fixed-size subset of candidates.
 ABC rules are also known as approval-based multi-winner rules.
 The input of such rules are [approval ballots](https://en.wikipedia.org/wiki/Approval_voting#/media/File:Approval_ballot.svg).
