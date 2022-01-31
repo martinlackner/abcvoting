@@ -36,6 +36,7 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
+Test Results*
 
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
@@ -74,6 +75,9 @@ gurobi.log
 *.nav
 *.run.xml
 
+# Sphinx
+docs-source/_build
+
 # Other
 excluded
 *.cache
@@ -81,3 +85,4 @@ venv*
 /coverage.sh
 scratchpad
 *_py.new
+

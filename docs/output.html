@@ -79,51 +79,150 @@
 <span id="abcvoting-output"></span><h1>abcvoting.output<a class="headerlink" href="#module-abcvoting.output" title="Permalink to this headline"></a></h1>
 <p>Print messages to terminal depending on a given verbosity level.</p>
 <p>Similar to the Python logging module. Also meant to be used as Singleton.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The verbosity levels are:
+- CRITICAL
+- ERROR
+- WARNING
+- INFO
+- DETAILS
+- DEBUG
+- DEBUG2</p>
+</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="abcvoting.output.Output">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.output.</span></span><span class="sig-name descname"><span class="pre">Output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.output.Output" title="Permalink to this definition"></a></dt>
 <dd><p>Handling the output based on the current verbosity level.</p>
 <p>This is inspired by the class <code class="docutils literal notranslate"><span class="pre">logging.Logger()</span></code>. A verbosity level is stored,
 only messages printed with methods with higher importance will be printed.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>verbosity</strong><span class="classifier">int</span></dt><dd><p>Verbosity level.</p>
+<blockquote>
+<div><p>Minimum level of importance of messages to be printed, as defined by
+constants in this module</p>
+</div></blockquote>
+</dd>
+<dt><strong>logger</strong><span class="classifier">logging.Logger, optional</span></dt><dd><p>Optional logger.</p>
+<p>Can be used to send messages also to a log file or elsewhere, log level is separate
+from verbosity.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.output.Output.critical">
 <span class="sig-name descname"><span class="pre">critical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.output.Output.critical" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Print a message with verbosity level CRITICAL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>msg</strong><span class="classifier">str</span></dt><dd><p>The message.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.output.Output.debug">
 <span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.output.Output.debug" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Print a message with verbosity level DEBUG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>msg</strong><span class="classifier">str</span></dt><dd><p>The message.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.output.Output.debug2">
 <span class="sig-name descname"><span class="pre">debug2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.output.Output.debug2" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Print a message with verbosity level DEBUG2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>msg</strong><span class="classifier">str</span></dt><dd><p>The message.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.output.Output.details">
 <span class="sig-name descname"><span class="pre">details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.output.Output.details" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Print a message with verbosity level DETAILS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>msg</strong><span class="classifier">str</span></dt><dd><p>The message.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.output.Output.error">
 <span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.output.Output.error" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Print a message with verbosity level ERROR.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>msg</strong><span class="classifier">str</span></dt><dd><p>The message.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.output.Output.info">
 <span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.output.Output.info" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Print a message with verbosity level INFO.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>msg</strong><span class="classifier">str</span></dt><dd><p>The message.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.output.Output.set_verbosity">
 <span class="sig-name descname"><span class="pre">set_verbosity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbosity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.output.Output.set_verbosity" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Set verbosity level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>verbosity</strong><span class="classifier">int</span></dt><dd><p>Verbosity level.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.output.Output.warning">
 <span class="sig-name descname"><span class="pre">warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.output.Output.warning" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Print a message with verbosity level WARNING.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>msg</strong><span class="classifier">str</span></dt><dd><p>The message.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

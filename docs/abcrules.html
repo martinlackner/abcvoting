@@ -79,16 +79,25 @@
 <h1>abcvoting.abcrules<a class="headerlink" href="#abcvoting-abcrules" title="Permalink to this headline"></a></h1>
 <span class="target" id="module-abcvoting.abcrules"></span><p>Approval-based committee (ABC) voting rules.</p>
 <dl class="py data">
+<dt class="sig sig-object py" id="abcvoting.abcrules.ALGORITHM_NAMES">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">ALGORITHM_NAMES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'branch-and-bound':</span> <span class="pre">'branch-and-bound',</span> <span class="pre">'brute-force':</span> <span class="pre">'brute-force',</span> <span class="pre">'float-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">floats</span> <span class="pre">instead</span> <span class="pre">of</span> <span class="pre">fractions)',</span> <span class="pre">'gmpy2-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">gmpy2</span> <span class="pre">fractions)',</span> <span class="pre">'gurobi':</span> <span class="pre">'Gurobi</span> <span class="pre">ILP</span> <span class="pre">solver',</span> <span class="pre">'mip_cbc':</span> <span class="pre">'CBC</span> <span class="pre">ILP</span> <span class="pre">solver</span> <span class="pre">via</span> <span class="pre">Python</span> <span class="pre">MIP</span> <span class="pre">library',</span> <span class="pre">'mip_gurobi':</span> <span class="pre">'Gurobi</span> <span class="pre">ILP</span> <span class="pre">solver</span> <span class="pre">via</span> <span class="pre">Python</span> <span class="pre">MIP</span> <span class="pre">library',</span> <span class="pre">'ortools_cp':</span> <span class="pre">'OR-Tools</span> <span class="pre">CP-SAT</span> <span class="pre">solver',</span> <span class="pre">'standard':</span> <span class="pre">'Standard</span> <span class="pre">algorithm',</span> <span class="pre">'standard-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">standard</span> <span class="pre">Python</span> <span class="pre">fractions)'}</span></em><a class="headerlink" href="#abcvoting.abcrules.ALGORITHM_NAMES" title="Permalink to this definition"></a></dt>
+<dd><p>The relative tolerance when comparing floats.</p>
+<p>See also: <cite>math.isclose()</cite></p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.FLOAT_ISCLOSE_ABS_TOL">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">FLOAT_ISCLOSE_ABS_TOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-12</span></em><a class="headerlink" href="#abcvoting.abcrules.FLOAT_ISCLOSE_ABS_TOL" title="Permalink to this definition"></a></dt>
-<dd><p>The absolute tolerance when comparing floats.</p>
-<p>See also: <cite>math.isclose()</cite></p>
+<dd><p>The  maximum number of committees that is returned by an ABC voting rule.</p>
+<p>If <cite>MAX_NUM_OF_COMMITTEES_DEFAULT</cite> ist set to <cite>None</cite>, then there is no constraint
+on the maximum number of committees.
+Can be overridden with the parameter <cite>max_num_of_committees</cite> in any <cite>compute</cite> function.</p>
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.FLOAT_ISCLOSE_REL_TOL">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">FLOAT_ISCLOSE_REL_TOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-12</span></em><a class="headerlink" href="#abcvoting.abcrules.FLOAT_ISCLOSE_REL_TOL" title="Permalink to this definition"></a></dt>
-<dd><p>The relative tolerance when comparing floats.</p>
+<dd><p>The absolute tolerance when comparing floats.</p>
 <p>See also: <cite>math.isclose()</cite></p>
 </dd></dl>
 
@@ -96,15 +105,6 @@
 <dt class="sig sig-object py" id="abcvoting.abcrules.MAIN_RULE_IDS">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">MAIN_RULE_IDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['av',</span> <span class="pre">'sav',</span> <span class="pre">'pav',</span> <span class="pre">'slav',</span> <span class="pre">'cc',</span> <span class="pre">'lexcc',</span> <span class="pre">'geom2',</span> <span class="pre">'seqpav',</span> <span class="pre">'revseqpav',</span> <span class="pre">'seqslav',</span> <span class="pre">'seqcc',</span> <span class="pre">'seqphragmen',</span> <span class="pre">'minimaxphragmen',</span> <span class="pre">'leximinphragmen',</span> <span class="pre">'monroe',</span> <span class="pre">'greedy-monroe',</span> <span class="pre">'minimaxav',</span> <span class="pre">'lexminimaxav',</span> <span class="pre">'rule-x',</span> <span class="pre">'phragmen-enestroem',</span> <span class="pre">'consensus-rule',</span> <span class="pre">'trivial',</span> <span class="pre">'rsd']</span></em><a class="headerlink" href="#abcvoting.abcrules.MAIN_RULE_IDS" title="Permalink to this definition"></a></dt>
 <dd><p>A dictionary containing mapping all valid algorithm IDs to full names (i.e., descriptions).</p>
-</dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="abcvoting.abcrules.MAX_NUM_OF_COMMITTEES_DEFAULT">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">MAX_NUM_OF_COMMITTEES_DEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#abcvoting.abcrules.MAX_NUM_OF_COMMITTEES_DEFAULT" title="Permalink to this definition"></a></dt>
-<dd><p>The  maximum number of committees that is returned by an ABC voting rule.</p>
-<p>If <cite>MAX_NUM_OF_COMMITTEES_DEFAULT</cite> ist set to <cite>None</cite>, then there is no constraint
-on the maximum number of committees.
-Can be overridden with the parameter <cite>max_num_of_committees</cite> in any <cite>compute</cite> function.</p>
 </dd></dl>
 
 <dl class="py exception">
@@ -682,10 +682,27 @@ by Martin Lackner and Piotr Skowron
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>profile</strong><span class="classifier">Profile</span></dt><dd><p>A profile.</p>
+<dd class="field-odd"><dl>
+<dt><strong>scorefct_id</strong><span class="classifier">str</span></dt><dd><blockquote>
+<div><p>A string identifying the score function that defines the Thiele method.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>profile<span class="classifier">Profile</span></dt><dd><p>A profile.</p>
 </dd>
-<dt><strong>committeesize</strong><span class="classifier">int</span></dt><dd><p>The desired committee size.</p>
+<dt>committeesize<span class="classifier">int</span></dt><dd><p>The desired committee size.</p>
+</dd>
+</dl>
+</dd>
+<dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
+</dd>
+<dt><strong>resolute</strong><span class="classifier">bool</span></dt><dd><p>Return only one winning committee.</p>
+<p>If <cite>resolute=False</cite>, all winning committees are computed (subject to
+<cite>max_num_of_committees</cite>).</p>
+</dd>
+<dt><strong>max_num_of_committees</strong><span class="classifier">int, optional</span></dt><dd><p>At most <cite>max_num_of_committees</cite> winning committees are computed.</p>
+<p>If <cite>max_num_of_committees=None</cite>, the number of winning committees is not restricted.
+The default value of <cite>max_num_of_committees</cite> can be modified via the constant
+<cite>MAX_NUM_OF_COMMITTEES_DEFAULT</cite>.</p>
 </dd>
 </dl>
 </dd>

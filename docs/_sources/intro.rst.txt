@@ -17,7 +17,7 @@ These candidates correspond to the numbers 0 to 4.
 
 Then we add six voters, specified by the candidates that they approve.
 The first voter approves candidates 0, 1, and 2,
-the second voter approves candidates 0 and 1, etc.
+the second voter approves candidate 3, etc.
 
 .. doctest::
 
@@ -36,7 +36,7 @@ We can also compute the winning committees for several ABC voting rules at once.
 Let's compute them for Approval Voting (AV), Sequential Approval Chamberlin-Courant (seq-CC), and
 Phragmén's Sequential Rule (seq-Phragmén).
 
-These ABC rules are identified by their `rule_id`. These are `"av"`, `"seqcc"`, and `"seqphragmen"`.
+These ABC rules are identified by their `rule_id`: `"av"`, `"seqcc"`, and `"seqphragmen"`, respectively.
 
 .. doctest::
 

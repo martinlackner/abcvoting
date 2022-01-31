@@ -4,6 +4,4 @@ make clean
 make html
 make doctest
 
-cp -rT _build/html/ ../doc/
-
-
+cp -rT _build/html/ ../docs/

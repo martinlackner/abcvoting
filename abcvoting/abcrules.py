@@ -22,6 +22,12 @@ except ImportError:
 ########################################################################
 
 
+"""
+List of IDs (`rule_id`) for the main ABC rules included in abcvoting.
+
+The selection is somewhat arbitrary is rather inclusive (all really important rules are 
+contained in this list.
+"""
 MAIN_RULE_IDS = [
     "av",
     "sav",
@@ -68,22 +74,20 @@ ALGORITHM_NAMES = {
     "ortools_cp": "OR-Tools CP-SAT solver",
 }
 
-
-FLOAT_ISCLOSE_REL_TOL = 1e-12
 """
 The relative tolerance when comparing floats.
 
 See also: `math.isclose()`
 """
+FLOAT_ISCLOSE_REL_TOL = 1e-12
 
-FLOAT_ISCLOSE_ABS_TOL = 1e-12
 """
 The absolute tolerance when comparing floats.
 
 See also: `math.isclose()`
 """
+FLOAT_ISCLOSE_ABS_TOL = 1e-12
 
-MAX_NUM_OF_COMMITTEES_DEFAULT = None
 """
 The  maximum number of committees that is returned by an ABC voting rule.
 
@@ -91,6 +95,7 @@ If `MAX_NUM_OF_COMMITTEES_DEFAULT` ist set to `None`, then there is no constrain
 on the maximum number of committees.
 Can be overridden with the parameter `max_num_of_committees` in any `compute` function. 
 """
+MAX_NUM_OF_COMMITTEES_DEFAULT = None
 
 
 class Rule:
@@ -611,11 +616,30 @@ def compute_thiele_method(
 
     Parameters
     ----------
+        scorefct_id : str
+            A string identifying the score function that defines the Thiele method.
+
         profile : Profile
             A profile.
 
         committeesize : int
             The desired committee size.
+
+       algorithm : str, optional
+            The algorithm to be used.
+
+       resolute : bool
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+       max_num_of_committees : int, optional
+            At most `max_num_of_committees` winning committees are computed.
+
+            If `max_num_of_committees=None`, the number of winning committees is not restricted.
+            The default value of `max_num_of_committees` can be modified via the constant
+            `MAX_NUM_OF_COMMITTEES_DEFAULT`.
 
     Returns
     -------

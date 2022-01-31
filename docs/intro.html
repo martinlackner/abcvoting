@@ -93,7 +93,7 @@ These candidates correspond to the numbers 0 to 4.</p>
 </div>
 <p>Then we add six voters, specified by the candidates that they approve.
 The first voter approves candidates 0, 1, and 2,
-the second voter approves candidates 0 and 1, etc.</p>
+the second voter approves candidate 3, etc.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span><span class="o">.</span><span class="n">add_voters</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="mi">4</span><span class="p">}])</span>
 </pre></div>
 </div>
@@ -106,7 +106,7 @@ the second voter approves candidates 0 and 1, etc.</p>
 <p>We can also compute the winning committees for several ABC voting rules at once.
 Let’s compute them for Approval Voting (AV), Sequential Approval Chamberlin-Courant (seq-CC), and
 Phragmén’s Sequential Rule (seq-Phragmén).</p>
-<p>These ABC rules are identified by their <cite>rule_id</cite>. These are <cite>“av”</cite>, <cite>“seqcc”</cite>, and <cite>“seqphragmen”</cite>.</p>
+<p>These ABC rules are identified by their <cite>rule_id</cite>: <cite>“av”</cite>, <cite>“seqcc”</cite>, and <cite>“seqphragmen”</cite>, respectively.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">rule_id</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;av&quot;</span><span class="p">,</span> <span class="s2">&quot;seqcc&quot;</span><span class="p">,</span> <span class="s2">&quot;seqphragmen&quot;</span><span class="p">]:</span>
 <span class="gp">... </span>   <span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">rule_id</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="n">committeesize</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
 <span class="go">[{0, 1, 2}]</span>

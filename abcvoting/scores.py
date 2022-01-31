@@ -32,7 +32,7 @@ def get_marginal_scorefct(scorefct_id, committeesize=None):
     Parameters
     ----------
         scorefct_id : str
-            A string identifying the marginal score function.
+            A string identifying the score function.
 
         committeesize : int, optional
             Committee size.
@@ -245,13 +245,16 @@ def at_least_ell_fct(i, ell):
     This is the additional (marginal) score from a voter for the `i`-th approved candidate
     in the committee.
 
-    Gives a score of 1 if ell approved candidates are in the committee.
-    The CC score function is equivalent to the at_least_ell_fct score function for ell=1.
+    Gives a score of 1 if `ell` approved candidates are in the committee.
+    The CC score function is equivalent to the `at_least_ell_fct` score function for `ell=1`.
 
     Parameters
     ----------
         i : int
             We are calculating the score for the `i`-th approved candidate in the committee.
+
+        ell : int
+            Gives a score of 1 if `ell` approved candidates are in the committee.
 
     Returns
     -------
@@ -269,9 +272,9 @@ end of Thiele score functions
 """
 
 
-def cumulative_score_fct(marginal_scorefct, cand_in_com):
+def cumulative_score(marginal_scorefct, cand_in_com):
     """
-    Return cumulative score function for the marginal score function `marginal_scorefct`.
+    Return cumulative score using the marginal score function `marginal_scorefct` for a voter.
 
     A cumulative score function f(i) returns the total score for having
     i candidates in the committee (as opposed to score functions that return the score increase
@@ -288,7 +291,7 @@ def cumulative_score_fct(marginal_scorefct, cand_in_com):
     Returns
     -------
         Fraction
-            The corresponding marginal score.
+            Score of a voter with `cand_in_com` many approved candidates in the committee.
     """
     return sum(marginal_scorefct(i + 1) for i in range(cand_in_com))
 
@@ -300,6 +303,22 @@ def marginal_thiele_scores_add(marginal_scorefct, profile, committee):
     The function returns a list of length `num_cand` where the i-th entry contains the
     marginal score increase when adding candidate i.
     Candidates that are already in the committee receive a small value (-1).
+
+    Parameters
+    ----------
+        marginal_scorefct : function
+            The marginal score function to be used.
+
+        profile : Profile
+            A profile.
+
+        committee : set
+            A committee.
+
+    Returns
+    -------
+        int
+            Marginal score increases from adding one candidate to the committe.
     """
     marginal = [0] * profile.num_cand
     for voter in profile:
@@ -313,7 +332,7 @@ def marginal_thiele_scores_add(marginal_scorefct, profile, committee):
 
 def marginal_thiele_scores_remove(marginal_scorefct, profile, committee):
     """
-    Return possible marginal score decreases from removing one candidate from the committe.
+    Return marginal score decreases from removing one candidate from the committe.
 
     The function returns a list of length `num_cand` where the i-th entry contains the
     marginal score decrease when removing candidate i.
@@ -333,7 +352,7 @@ def marginal_thiele_scores_remove(marginal_scorefct, profile, committee):
     Returns
     -------
         int
-            The Minimax AV score of `committee`.
+            Marginal score decreases from removing one candidate from the committe.
     """
     marg_util_cand = [0] * profile.num_cand
     #  marginal utility gained by adding candidate to the committee
