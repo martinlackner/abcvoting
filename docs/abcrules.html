@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="abcvoting.fileio" href="fileio.html" />
-    <link rel="prev" title="A brief introduction" href="intro.html" /> 
+    <link rel="prev" title="ABC rules" href="intro-abcrules.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -38,7 +38,8 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">A brief introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">A simple example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-abcrules.html">ABC rules</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
 <ul class="current">
@@ -49,6 +50,11 @@
 <li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Backmatter:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="howtocite.html">How to cite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acks.html">Acknowledgements</a></li>
 </ul>
 
         </div>
@@ -81,36 +87,44 @@
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.ALGORITHM_NAMES">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">ALGORITHM_NAMES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'branch-and-bound':</span> <span class="pre">'branch-and-bound',</span> <span class="pre">'brute-force':</span> <span class="pre">'brute-force',</span> <span class="pre">'float-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">floats</span> <span class="pre">instead</span> <span class="pre">of</span> <span class="pre">fractions)',</span> <span class="pre">'gmpy2-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">gmpy2</span> <span class="pre">fractions)',</span> <span class="pre">'gurobi':</span> <span class="pre">'Gurobi</span> <span class="pre">ILP</span> <span class="pre">solver',</span> <span class="pre">'mip_cbc':</span> <span class="pre">'CBC</span> <span class="pre">ILP</span> <span class="pre">solver</span> <span class="pre">via</span> <span class="pre">Python</span> <span class="pre">MIP</span> <span class="pre">library',</span> <span class="pre">'mip_gurobi':</span> <span class="pre">'Gurobi</span> <span class="pre">ILP</span> <span class="pre">solver</span> <span class="pre">via</span> <span class="pre">Python</span> <span class="pre">MIP</span> <span class="pre">library',</span> <span class="pre">'ortools_cp':</span> <span class="pre">'OR-Tools</span> <span class="pre">CP-SAT</span> <span class="pre">solver',</span> <span class="pre">'standard':</span> <span class="pre">'Standard</span> <span class="pre">algorithm',</span> <span class="pre">'standard-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">standard</span> <span class="pre">Python</span> <span class="pre">fractions)'}</span></em><a class="headerlink" href="#abcvoting.abcrules.ALGORITHM_NAMES" title="Permalink to this definition"></a></dt>
-<dd><p>The relative tolerance when comparing floats.</p>
-<p>See also: <cite>math.isclose()</cite></p>
+<dd><p>A dictionary containing mapping all valid algorithm IDs to full names (i.e., descriptions).</p>
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.FLOAT_ISCLOSE_ABS_TOL">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">FLOAT_ISCLOSE_ABS_TOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-12</span></em><a class="headerlink" href="#abcvoting.abcrules.FLOAT_ISCLOSE_ABS_TOL" title="Permalink to this definition"></a></dt>
-<dd><p>The  maximum number of committees that is returned by an ABC voting rule.</p>
-<p>If <cite>MAX_NUM_OF_COMMITTEES_DEFAULT</cite> ist set to <cite>None</cite>, then there is no constraint
-on the maximum number of committees.
-Can be overridden with the parameter <cite>max_num_of_committees</cite> in any <cite>compute</cite> function.</p>
+<dd><p>The absolute tolerance when comparing floats.</p>
+<p>See also: <cite>math.isclose()</cite></p>
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.FLOAT_ISCLOSE_REL_TOL">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">FLOAT_ISCLOSE_REL_TOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-12</span></em><a class="headerlink" href="#abcvoting.abcrules.FLOAT_ISCLOSE_REL_TOL" title="Permalink to this definition"></a></dt>
-<dd><p>The absolute tolerance when comparing floats.</p>
+<dd><p>The relative tolerance when comparing floats.</p>
 <p>See also: <cite>math.isclose()</cite></p>
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.MAIN_RULE_IDS">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">MAIN_RULE_IDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['av',</span> <span class="pre">'sav',</span> <span class="pre">'pav',</span> <span class="pre">'slav',</span> <span class="pre">'cc',</span> <span class="pre">'lexcc',</span> <span class="pre">'geom2',</span> <span class="pre">'seqpav',</span> <span class="pre">'revseqpav',</span> <span class="pre">'seqslav',</span> <span class="pre">'seqcc',</span> <span class="pre">'seqphragmen',</span> <span class="pre">'minimaxphragmen',</span> <span class="pre">'leximinphragmen',</span> <span class="pre">'monroe',</span> <span class="pre">'greedy-monroe',</span> <span class="pre">'minimaxav',</span> <span class="pre">'lexminimaxav',</span> <span class="pre">'rule-x',</span> <span class="pre">'phragmen-enestroem',</span> <span class="pre">'consensus-rule',</span> <span class="pre">'trivial',</span> <span class="pre">'rsd']</span></em><a class="headerlink" href="#abcvoting.abcrules.MAIN_RULE_IDS" title="Permalink to this definition"></a></dt>
-<dd><p>A dictionary containing mapping all valid algorithm IDs to full names (i.e., descriptions).</p>
+<dd><p>List of IDs (<cite>rule_id</cite>) for the main ABC rules included in abcvoting.</p>
+<p>This selection is somewhat arbitrary. But all really important rules (that are implemented) 
+are contained in this list.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="abcvoting.abcrules.MAX_NUM_OF_COMMITTEES_DEFAULT">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">MAX_NUM_OF_COMMITTEES_DEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#abcvoting.abcrules.MAX_NUM_OF_COMMITTEES_DEFAULT" title="Permalink to this definition"></a></dt>
+<dd><p>The  maximum number of committees that is returned by an ABC voting rule.</p>
+<p>If <cite>MAX_NUM_OF_COMMITTEES_DEFAULT</cite> ist set to <cite>None</cite>, then there is no constraint
+on the maximum number of committees.
+Can be overridden with the parameter <cite>max_num_of_committees</cite> in any <cite>compute</cite> function.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="abcvoting.abcrules.NoAvailableAlgorithm">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">NoAvailableAlgorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithms</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.NoAvailableAlgorithm" title="Permalink to this definition"></a></dt>
-<dd><p>Error: none of the implemented algorithms are available.</p>
+<dd><p>Exception: none of the implemented algorithms are available.</p>
 <p>This error occurs because no solvers are installed.</p>
 </dd></dl>
 
@@ -550,8 +564,8 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for SAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;sav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
-<span class="go">standard</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;sav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<span class="go">(&#39;standard&#39;,)</span>
 </pre></div>
 </div>
 </dd>
@@ -734,7 +748,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="intro.html" class="btn btn-neutral float-left" title="A brief introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="intro-abcrules.html" class="btn btn-neutral float-left" title="ABC rules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="fileio.html" class="btn btn-neutral float-right" title="abcvoting.fileio" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

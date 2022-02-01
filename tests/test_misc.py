@@ -31,13 +31,19 @@ def test_compare_list_of_committees():
     assert not misc.compare_list_of_committees(committees1, committees2)
 
 
-def test_str_committees_header():
-    assert misc.str_committees_header([{1, 0}]) == "1 committee:"
-    assert misc.str_committees_header([{1, 0}, {1, 2, 3}]) == "2 committees:"
-    assert misc.str_committees_header([]) == "No committees"
-    assert misc.str_committees_header([{1, 0}], winning=True) == "1 winning committee:"
-    assert misc.str_committees_header([{1, 0}, {1, 2, 3}], winning=True) == "2 winning committees:"
+def test_str_committees_with_header():
+    assert misc.str_committees_with_header([{1, 0}]) == "1 committee:\n {0, 1}\n"
     assert (
-        misc.str_committees_header([], winning=True)
-        == "No winning committees (this should not happen)"
+        misc.str_committees_with_header([{1, 0}, {1, 2, 3}])
+        == "2 committees:\n {0, 1}\n {1, 2, 3}\n"
     )
+    assert misc.str_committees_with_header([]) == "No committees"
+    assert (
+        misc.str_committees_with_header([{1, 0}], winning=True)
+        == "1 winning committee:\n {0, 1}\n"
+    )
+    assert (
+        misc.str_committees_with_header([{1, 0}, {1, 2, 3}], cand_names="abcde", winning=True)
+        == "2 winning committees:\n {a, b}\n {b, c, d}\n"
+    )
+    assert misc.str_committees_with_header([], winning=True) == "No winning committees"

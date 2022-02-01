@@ -38,7 +38,8 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">A brief introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">A simple example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-abcrules.html">ABC rules</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
 <ul class="current">
@@ -49,6 +50,11 @@
 <li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Backmatter:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="howtocite.html">How to cite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acks.html">Acknowledgements</a></li>
 </ul>
 
         </div>
@@ -75,21 +81,28 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="module-abcvoting.misc">
-<span id="abcvoting-misc"></span><h1>abcvoting.misc<a class="headerlink" href="#module-abcvoting.misc" title="Permalink to this headline"></a></h1>
-<p>Miscellaneous functions for committees (i.e., subsets of candidates).</p>
+  <div class="section" id="abcvoting-misc">
+<h1>abcvoting.misc<a class="headerlink" href="#abcvoting-misc" title="Permalink to this headline"></a></h1>
+<span class="target" id="module-abcvoting.misc"></span><p>Miscellaneous functions for committees (i.e., subsets of candidates).</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.misc.compare_list_of_committees">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">compare_list_of_committees</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.compare_list_of_committees" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">compare_list_of_committees</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">committees1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committees2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.compare_list_of_committees" title="Permalink to this definition"></a></dt>
 <dd><p>Check whether two lists of committees are equal.</p>
 <p>The order of candidates and their multiplicities in these lists are ignored.
 To be precise, two lists are equal if every committee in list1 is contained in list2 and
 vice versa.
 Committees are, as usual, sets of positive integers.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">misc</span><span class="o">.</span><span class="n">compare_list_of_committees</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}],</span> <span class="p">[{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">}])</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">misc</span><span class="o">.</span><span class="n">compare_list_of_committees</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}],</span> <span class="p">[{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">}])</span>
+<span class="go">False</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>list1, list2</strong><span class="classifier">iterable of sets</span></dt><dd></dd>
+<dt><strong>committees1, committees2</strong><span class="classifier">list of set</span></dt><dd><p>Two lists of committees.</p>
+</dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -125,7 +138,22 @@ or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.misc.header">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.header" title="Permalink to this definition"></a></dt>
-<dd><p>Returns a header string for <cite>text</cite>.</p>
+<dd><p>Format a header for <cite>text</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>text</strong><span class="classifier">str</span></dt><dd><p>Header text.</p>
+</dd>
+<dt><strong>symbol</strong><span class="classifier">str</span></dt><dd><p>Symbol to be used for the box around the header text; should be exactly 1 character.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>str</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -135,13 +163,13 @@ or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>committees</strong><span class="classifier">list of iterables</span></dt><dd><p>A list of committees; committees can be sets, tuples, lists, etc.</p>
+<dt><strong>committees</strong><span class="classifier">list of iterable</span></dt><dd><p>A list of committees; committees can be sets, tuples, lists, etc.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of iterables</dt><dd><p>A sorted list of committees (sets).</p>
+<dt>list of set</dt><dd><p>A sorted list of committees (sets).</p>
 </dd>
 </dl>
 </dd>
@@ -149,28 +177,121 @@ or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="abcvoting.misc.str_committees_header">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">str_committees_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">committees</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">winning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.str_committees_header" title="Permalink to this definition"></a></dt>
-<dd><p>Nicely format a header for a list of committees, stating how many committees there are.</p>
-<p>winning: write “winning committee” instead of “committee”</p>
+<dt class="sig sig-object py" id="abcvoting.misc.str_committees_with_header">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">str_committees_with_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">committees</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">winning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.str_committees_with_header" title="Permalink to this definition"></a></dt>
+<dd><p>Nicely format a list of committees including a header (stating the number of committees).</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">misc</span><span class="o">.</span><span class="n">str_committees_with_header</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}],</span> <span class="n">winning</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">2 winning committees:</span>
+<span class="go"> {0, 1, 3}</span>
+<span class="go"> {0, 1, 4}</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">misc</span><span class="o">.</span><span class="n">str_committees_with_header</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}],</span> <span class="n">cand_names</span><span class="o">=</span><span class="s2">&quot;abcde&quot;</span><span class="p">))</span>
+<span class="go">2 committees:</span>
+<span class="go"> {a, b, d}</span>
+<span class="go"> {a, b, e}</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>committees</strong><span class="classifier">list of set</span></dt><dd><p>A list of committees.</p>
+</dd>
+<dt><strong>cand_names</strong><span class="classifier">list of str or str, optional</span></dt><dd><p>List of symbolic names for every candidate.</p>
+</dd>
+<dt><strong>winning</strong><span class="classifier">bool, optional</span></dt><dd><p>Write “winning committee” instead of “committee”.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>str</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.misc.str_set_of_candidates">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">str_set_of_candidates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.str_set_of_candidates" title="Permalink to this definition"></a></dt>
-<dd><p>Nicely format a single committee.</p>
+<dd><p>Nicely format a set of candidates.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">misc</span><span class="o">.</span><span class="n">str_set_of_candidates</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">}))</span>
+<span class="go">{0, 1, 2, 3}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">misc</span><span class="o">.</span><span class="n">str_set_of_candidates</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="n">cand_names</span><span class="o">=</span><span class="s2">&quot;abcde&quot;</span><span class="p">))</span>
+<span class="go">{a, b, d}</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>candset</strong><span class="classifier">set of int</span></dt><dd><p>A set of candidates.</p>
+</dd>
+<dt><strong>cand_names</strong><span class="classifier">list of str or str, optional</span></dt><dd><p>List of symbolic names for every candidate.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>str</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.misc.str_sets_of_candidates">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">str_sets_of_candidates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">committees</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.str_sets_of_candidates" title="Permalink to this definition"></a></dt>
-<dd><p>Nicely format a list of committees.</p>
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">str_sets_of_candidates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sets_of_candidates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.str_sets_of_candidates" title="Permalink to this definition"></a></dt>
+<dd><p>Nicely format a list of sets of candidates.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">misc</span><span class="o">.</span><span class="n">str_sets_of_candidates</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}]))</span>
+<span class="go"> {0, 1, 3}</span>
+<span class="go"> {0, 1, 4}</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">misc</span><span class="o">.</span><span class="n">str_sets_of_candidates</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}],</span> <span class="n">cand_names</span><span class="o">=</span><span class="s2">&quot;abcde&quot;</span><span class="p">))</span>
+<span class="go"> {a, b, d}</span>
+<span class="go"> {a, b, e}</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sets_of_candidates</strong><span class="classifier">list of set</span></dt><dd><p>A list of sets that contain candidates (i.e., non-negative integers).</p>
+</dd>
+<dt><strong>cand_names</strong><span class="classifier">list of str or str, optional</span></dt><dd><p>List of symbolic names for every candidate.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>str</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.misc.verify_expected_committees_equals_actual_committees">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">verify_expected_committees_equals_actual_committees</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actual_committees</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_committees</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Rule'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.verify_expected_committees_equals_actual_committees" title="Permalink to this definition"></a></dt>
-<dd><p>TODO Check whether two lists of committees are equivalent. Raise RuntimeError if not.</p>
+<dd><p>Verify whether a voting rule returned the correct output. Raises exceptions if not. yielded</p>
+<p>Check whether two lists of committees (<cite>actual_committees</cite> and <cite>expected_committees</cite>) are
+equivalent. Raise RuntimeError if not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>actual_committees</strong><span class="classifier">list of set</span></dt><dd><p>Output of an ABC voting rule.</p>
+</dd>
+<dt><strong>expected_committees</strong><span class="classifier">list of set</span></dt><dd><p>Expected output of this voting rule.</p>
+</dd>
+<dt><strong>resolute</strong><span class="classifier">bool, default=False</span></dt><dd><p>If <cite>True</cite>, raise RuntimeError if more <cite>actual_committees</cite> does not have length 1.</p>
+</dd>
+<dt><strong>shortname</strong><span class="classifier">str, optional</span></dt><dd><p>Name of rule used for Exception messages.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>None</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

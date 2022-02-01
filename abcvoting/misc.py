@@ -9,12 +9,12 @@ def sorted_committees(committees):
 
     Parameters
     ----------
-        committees : list of iterables
+        committees : list of iterable
             A list of committees; committees can be sets, tuples, lists, etc.
 
     Returns
     -------
-        list of iterables
+        list of set
             A sorted list of committees (sets).
     """
     return sorted([set(committee) for committee in committees], key=str)
@@ -22,7 +22,27 @@ def sorted_committees(committees):
 
 def str_set_of_candidates(candset, cand_names=None):
     """
-    Nicely format a single committee.
+    Nicely format a set of candidates.
+
+    .. doctest::
+
+        >>> print(misc.str_set_of_candidates({0, 1, 3, 2}))
+        {0, 1, 2, 3}
+        >>> print(misc.str_set_of_candidates({0, 3, 1}, cand_names="abcde"))
+        {a, b, d}
+
+    Parameters
+    ----------
+
+        candset : set of int
+            A set of candidates.
+
+        cand_names : list of str or str, optional
+            List of symbolic names for every candidate.
+
+    Returns
+    -------
+        str
     """
     if cand_names is None:
         namedset = [str(cand) for cand in candset]
@@ -31,26 +51,77 @@ def str_set_of_candidates(candset, cand_names=None):
     return "{" + ", ".join(map(str, namedset)) + "}"
 
 
-def str_sets_of_candidates(committees, cand_names=None):
+def str_sets_of_candidates(sets_of_candidates, cand_names=None):
     """
-    Nicely format a list of committees.
+    Nicely format a list of sets of candidates.
+
+    .. doctest::
+
+        >>> print(misc.str_sets_of_candidates([{0, 1, 3}, {0, 1, 4}]))
+         {0, 1, 3}
+         {0, 1, 4}
+        <BLANKLINE>
+        >>> print(misc.str_sets_of_candidates([{0, 1, 3}, {0, 1, 4}], cand_names="abcde"))
+         {a, b, d}
+         {a, b, e}
+        <BLANKLINE>
+
+    Parameters
+    ----------
+
+        sets_of_candidates : list of set
+            A list of sets that contain candidates (i.e., non-negative integers).
+
+        cand_names : list of str or str, optional
+            List of symbolic names for every candidate.
+
+    Returns
+    -------
+        str
     """
     output = ""
-    for committee in sorted(map(tuple, committees)):
+    for committee in sorted(map(tuple, sets_of_candidates)):
         output += f" {str_set_of_candidates(committee, cand_names)}\n"
     return output
 
 
-def str_committees_header(committees, winning=False):
+def str_committees_with_header(committees, cand_names=None, winning=False):
     """
-    Nicely format a header for a list of committees, stating how many committees there are.
+    Nicely format a list of committees including a header (stating the number of committees).
 
-    winning: write "winning committee" instead of "committee"
+    .. doctest::
+
+        >>> print(misc.str_committees_with_header([{0, 1, 3}, {0, 1, 4}], winning=True))
+        2 winning committees:
+         {0, 1, 3}
+         {0, 1, 4}
+        <BLANKLINE>
+        >>> print(misc.str_committees_with_header([{0, 1, 3}, {0, 1, 4}], cand_names="abcde"))
+        2 committees:
+         {a, b, d}
+         {a, b, e}
+        <BLANKLINE>
+
+    Parameters
+    ----------
+
+        committees : list of set
+            A list of committees.
+
+        cand_names : list of str or str, optional
+            List of symbolic names for every candidate.
+
+        winning : bool, optional
+            Write "winning committee" instead of "committee".
+
+    Returns
+    -------
+        str
     """
     output = ""
     if committees is None or len(committees) < 1:
         if winning:
-            return "No winning committees (this should not happen)"
+            return "No winning committees"
         else:
             return "No committees"
     if winning:
@@ -58,9 +129,10 @@ def str_committees_header(committees, winning=False):
     else:
         commstring = "committee"
     if len(committees) == 1:
-        output += "1 " + commstring + ":"
+        output += "1 " + commstring + ":\n"
     else:
-        output += str(len(committees)) + " " + commstring + "s:"
+        output += str(len(committees)) + " " + commstring + "s:\n"
+    output += str_sets_of_candidates(committees, cand_names=cand_names)
     return output
 
 
@@ -87,13 +159,25 @@ def hamming(set1, set2):
 
 def header(text, symbol="-"):
     """
-    Returns a header string for `text`.
+    Format a header for `text`.
+
+    Parameters
+    ----------
+        text : str
+            Header text.
+
+        symbol : str
+            Symbol to be used for the box around the header text; should be exactly 1 character.
+
+    Returns
+    -------
+        str
     """
     border = symbol[0] * len(text) + "\n"
     return border + text + "\n" + border
 
 
-def compare_list_of_committees(list1, list2):
+def compare_list_of_committees(committees1, committees2):
     """
     Check whether two lists of committees are equal.
 
@@ -102,18 +186,27 @@ def compare_list_of_committees(list1, list2):
     vice versa.
     Committees are, as usual, sets of positive integers.
 
+    .. doctest::
+
+        >>> misc.compare_list_of_committees([{0, 1, 3}, {0, 1, 4}], [{0, 4, 1}, {0, 1, 3}])
+        True
+        >>> misc.compare_list_of_committees([{0, 1, 3}, {0, 1, 4}], [{0, 1, 3}])
+        False
+
     Parameters
     ----------
-        list1, list2 : iterable of sets
+        committees1, committees2 : list of set
+            Two lists of committees.
 
     Returns
     -------
         bool
     """
-    for committee in list1 + list2:
-        assert isinstance(committee, set)
-    return all(committee in list1 for committee in list2) and all(
-        committee in list2 for committee in list1
+    for committee in committees1 + committees2:
+        if not isinstance(committee, set):
+            raise ValueError("Input has to be two lists of sets.")
+    return all(committee in committees1 for committee in committees2) and all(
+        committee in committees2 for committee in committees1
     )
 
 
@@ -121,7 +214,28 @@ def verify_expected_committees_equals_actual_committees(
     actual_committees, expected_committees, resolute=False, shortname="Rule"
 ):
     """
-    TODO Check whether two lists of committees are equivalent. Raise RuntimeError if not.
+    Verify whether a voting rule returned the correct output. Raises exceptions if not.
+
+    Check whether two lists of committees (`actual_committees` and `expected_committees`) are
+    equivalent. Raise RuntimeError if not.
+
+    Parameters
+    ----------
+        actual_committees : list of set
+            Output of an ABC voting rule.
+
+        expected_committees : list of set
+            Expected output of this voting rule.
+
+        resolute : bool, default=False
+            If `True`, raise RuntimeError if more `actual_committees` does not have length 1.
+
+        shortname : str, optional
+            Name of rule used for Exception messages.
+
+    Returns
+    -------
+        None
     """
     if resolute:
         if len(actual_committees) != 1:

@@ -1243,8 +1243,10 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
                 print(out, start_output)
                 assert out.startswith(start_output)
             end_output = (
-                f"{misc.str_committees_header(committees, winning=True)}\n"
-                f"{misc.str_sets_of_candidates(committees, cand_names=profile.cand_names)}\n"
+                misc.str_committees_with_header(
+                    committees, cand_names=profile.cand_names, winning=True
+                )
+                + "\n"
             )
             if verbosity == INFO:
                 assert out.endswith(end_output)

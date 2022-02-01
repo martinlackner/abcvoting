@@ -1,8 +1,5 @@
-A brief introduction
-====================
-
 A simple example
-----------------
+================
 
 The following code computes the Proportional Approval Voting (PAV) rule for an approval profile.
 Let's first create the approval profile for (up to) five candidates.

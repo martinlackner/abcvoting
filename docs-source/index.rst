@@ -11,6 +11,7 @@ approval-based committee (ABC) rules.
    :caption: Contents:
 
    intro.rst
+   intro-abcrules.rst
 
 .. toctree::
    :maxdepth: 3
@@ -24,8 +25,16 @@ approval-based committee (ABC) rules.
    preferences.rst
    scores.rst
 
+.. toctree::
+   :maxdepth: 3
+   :caption: Backmatter:
+
+   howtocite.rst
+   acks.rst
+
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`search`
+

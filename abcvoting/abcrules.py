@@ -6,7 +6,7 @@ import itertools
 from abcvoting.output import output
 from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, misc
 from abcvoting.misc import sorted_committees
-from abcvoting.misc import str_committees_header, header
+from abcvoting.misc import str_committees_with_header, header
 from abcvoting.misc import str_set_of_candidates, str_sets_of_candidates
 from abcvoting import scores
 from fractions import Fraction
@@ -22,12 +22,6 @@ except ImportError:
 ########################################################################
 
 
-"""
-List of IDs (`rule_id`) for the main ABC rules included in abcvoting.
-
-The selection is somewhat arbitrary is rather inclusive (all really important rules are 
-contained in this list.
-"""
 MAIN_RULE_IDS = [
     "av",
     "sav",
@@ -53,10 +47,13 @@ MAIN_RULE_IDS = [
     "trivial",
     "rsd",
 ]
+"""
+List of IDs (`rule_id`) for the main ABC rules included in abcvoting.
 
+This selection is somewhat arbitrary. But all really important rules (that are implemented) 
+are contained in this list.
 """
-A dictionary containing mapping all valid algorithm IDs to full names (i.e., descriptions).
-"""
+
 ALGORITHM_NAMES = {
     "gurobi": "Gurobi ILP solver",
     "branch-and-bound": "branch-and-bound",
@@ -73,21 +70,26 @@ ALGORITHM_NAMES = {
     "float-fractions": "Standard algorithm (using floats instead of fractions)",
     "ortools_cp": "OR-Tools CP-SAT solver",
 }
+"""
+A dictionary containing mapping all valid algorithm IDs to full names (i.e., descriptions).
+"""
 
+
+FLOAT_ISCLOSE_REL_TOL = 1e-12
 """
 The relative tolerance when comparing floats.
 
 See also: `math.isclose()`
 """
-FLOAT_ISCLOSE_REL_TOL = 1e-12
 
+FLOAT_ISCLOSE_ABS_TOL = 1e-12
 """
 The absolute tolerance when comparing floats.
 
 See also: `math.isclose()`
 """
-FLOAT_ISCLOSE_ABS_TOL = 1e-12
 
+MAX_NUM_OF_COMMITTEES_DEFAULT = None
 """
 The  maximum number of committees that is returned by an ABC voting rule.
 
@@ -95,7 +97,6 @@ If `MAX_NUM_OF_COMMITTEES_DEFAULT` ist set to `None`, then there is no constrain
 on the maximum number of committees.
 Can be overridden with the parameter `max_num_of_committees` in any `compute` function. 
 """
-MAX_NUM_OF_COMMITTEES_DEFAULT = None
 
 
 class Rule:
@@ -124,7 +125,7 @@ class Rule:
         # find all *available* algorithms for this ABC rule
         self.available_algorithms = []
         for algorithm in algorithms:
-            if algorithm in AVAILABLE_ALGORITHMS:
+            if algorithm in available_algorithms:
                 self.available_algorithms.append(algorithm)
 
     def fastest_available_algorithm(self):
@@ -222,7 +223,7 @@ class UnknownAlgorithm(ValueError):
 
 class NoAvailableAlgorithm(ValueError):
     """
-    Error: none of the implemented algorithms are available.
+    Exception: none of the implemented algorithms are available.
 
     This error occurs because no solvers are installed.
     """
@@ -256,7 +257,7 @@ def _available_algorithms():
     return available_algorithms
 
 
-AVAILABLE_ALGORITHMS = _available_algorithms()
+available_algorithms = _available_algorithms()
 
 
 def get_rule(rule_id):
@@ -448,7 +449,7 @@ def get_rule(rule_id):
         return Rule(
             rule_id=rule_id,
             shortname="Rule X",
-            longname="Rule X",
+            longname="Rule X (aka Method of Equal Shares)",
             compute_fct=compute_rule_x,
             algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
             resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
@@ -712,9 +713,9 @@ def compute_thiele_method(
         f"Optimal {scorefct_id.upper()}-score: "
         f"{scores.thiele_score(scorefct_id, profile, committees[0])}\n"
     )
-
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return committees
@@ -986,8 +987,9 @@ def compute_lexcc(
         )
         + "\n"
     )
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return committees
@@ -1089,9 +1091,9 @@ def compute_seq_thiele_method(
                     f" are tied (all would increase the score by the same amount {delta_score})"
                 )
             output.details("")
-
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
 
     output.details(scorefct_id.upper() + "-score of winning committee(s):")
     for committee in committees:
@@ -1331,9 +1333,9 @@ def compute_revseq_thiele_method(
                     f" are tied (all would decrease the score by the same amount {delta_score})"
                 )
             output.details("")
-
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
 
     msg = "PAV-score of winning committee:"
     if not resolute and len(committees) != 1:
@@ -1509,9 +1511,9 @@ def compute_separable_rule(
         msg += (" " + ", ".join(map(str, namedset))) + "\n"
         msg += f"({missing} of those candidates are contained\n in every winning committee.)\n"
         output.details(msg)
-
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return committees
@@ -1604,8 +1606,8 @@ def compute_sav(
 
             .. doctest::
 
-                >>> print(*abcrules.get_rule("sav").algorithms)
-                standard
+                >>> print(abcrules.get_rule("sav").algorithms)
+                ('standard',)
 
         resolute : bool
             Return only one winning committee.
@@ -1803,8 +1805,9 @@ def compute_minimaxav(
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     opt_minimaxav_score = scores.minimaxav_score(profile, committees[0])
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     output.details("Minimum maximal distance: " + str(opt_minimaxav_score))
     msg = "Corresponding distances to voters:\n"
     for committee in committees:
@@ -1930,8 +1933,9 @@ def compute_lexminimaxav(
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     output.details("Minimum maximal distance: " + str(max(opt_distances)))
     msg = "Corresponding distances to voters:\n"
     for committee in committees:
@@ -2075,9 +2079,9 @@ def compute_monroe(
     output.details(
         "Optimal Monroe score: " + str(scores.monroescore(profile, committees[0])) + "\n"
     )
-
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return committees
@@ -2178,9 +2182,9 @@ def compute_greedy_monroe(
             assing_msg += ", "
         msg += assing_msg[:-2] + "\n"
     output.details(msg)
-
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return sorted_committees(committees)
@@ -2301,9 +2305,9 @@ def compute_seqphragmen(
                 msg += f" are tied (for all those new maximum load = {max_load})."
                 output.details(msg)
             output.details("")
-
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
 
     if resolute or len(committees) == 1:
         output.details("corresponding load distribution:")
@@ -2508,7 +2512,7 @@ def compute_rule_x(
     skip_phragmen_phase=False,
 ):
     """
-    Compute winning committees with Rule X.
+    Compute winning committees with Rule X (aka Method of Equal Shares).
 
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences"
@@ -2624,9 +2628,9 @@ def compute_rule_x(
                         f" (for any of those, the new maximum load would be {max_load})."
                     )
                 output.details("")
-
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return sorted_committees(committees)
@@ -2846,8 +2850,9 @@ def compute_minimaxphragmen(
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return committees
@@ -2916,8 +2921,9 @@ def compute_leximinphragmen(
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return committees
@@ -2973,8 +2979,9 @@ def compute_phragmen_enestroem(
             " (aka parallel universes tiebreaking) (resolute=False)\n"
         )
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return committees
@@ -3106,8 +3113,9 @@ def compute_consensus_rule(
             " (aka parallel universes tiebreaking) (resolute=False)\n"
         )
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return committees
@@ -3239,8 +3247,9 @@ def compute_trivial_rule(
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return sorted_committees(committees)
@@ -3288,8 +3297,9 @@ def compute_rsd(
     # optional output
     output.info(header(rule.longname))
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-    output.info(str_committees_header(committees, winning=True))
-    output.info(str_sets_of_candidates(committees, cand_names=profile.cand_names))
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
     # end of optional output
 
     return sorted_committees(committees)

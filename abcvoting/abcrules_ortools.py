@@ -40,7 +40,7 @@ def _optimize_rule_ortools(
 
     Returns
     -------
-    committees : list of sets
+    committees : list of set
         a list of winning committees,
         each of them represented as set of integers from `0` to `num_cand` - 1
 
