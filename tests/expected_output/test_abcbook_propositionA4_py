@@ -184,9 +184,9 @@ Manipulation by voter 0: {a, b} --> {a}
 winning committee after manipulation:
  {a, b, c}
 
-------
-Rule X
-------
+-----------------------------------
+Rule X (aka Method of Equal Shares)
+-----------------------------------
 
 profile with 6 votes and 6 candidates:
  1 x {b, c, d},

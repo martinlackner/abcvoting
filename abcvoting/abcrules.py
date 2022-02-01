@@ -58,8 +58,8 @@ ALGORITHM_NAMES = {
     "gurobi": "Gurobi ILP solver",
     "branch-and-bound": "branch-and-bound",
     "brute-force": "brute-force",
-    "mip_cbc": "CBC ILP solver via Python MIP library",
-    "mip_gurobi": "Gurobi ILP solver via Python MIP library",
+    "mip-cbc": "CBC ILP solver via Python MIP library",
+    "mip-gurobi": "Gurobi ILP solver via Python MIP library",
     # "cvxpy_gurobi": "Gurobi ILP solver via CVXPY library",
     # "cvxpy_scip": "SCIP ILP solver via CVXPY library",
     # "cvxpy_glpk_mi": "GLPK ILP solver via CVXPY library",
@@ -68,7 +68,7 @@ ALGORITHM_NAMES = {
     "standard-fractions": "Standard algorithm (using standard Python fractions)",
     "gmpy2-fractions": "Standard algorithm (using gmpy2 fractions)",
     "float-fractions": "Standard algorithm (using floats instead of fractions)",
-    "ortools_cp": "OR-Tools CP-SAT solver",
+    "ortools-cp": "OR-Tools CP-SAT solver",
 }
 """
 A dictionary containing mapping all valid algorithm identifiers to full names (i.e., descriptions).
@@ -352,8 +352,8 @@ def get_rule(rule_id):
     _THIELE_ALGORITHMS = (
         # algorithms sorted by speed
         "gurobi",
-        "mip_gurobi",
-        "mip_cbc",
+        "mip-gurobi",
+        "mip-cbc",
         "branch-and-bound",
         "brute-force",
     )
@@ -404,11 +404,11 @@ def get_rule(rule_id):
             algorithms=(
                 # algorithms sorted by speed
                 "gurobi",
-                "mip_gurobi",
-                "ortools_cp",
+                "mip-gurobi",
+                "ortools-cp",
                 "branch-and-bound",
                 "brute-force",
-                "mip_cbc",
+                "mip-cbc",
             ),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
@@ -419,7 +419,7 @@ def get_rule(rule_id):
             longname="Lexicographic Chamberlin-Courant (lex-CC)",
             compute_fct=compute_lexcc,
             # algorithms sorted by speed
-            algorithms=("gurobi", "mip_gurobi", "brute-force", "mip_cbc"),
+            algorithms=("gurobi", "mip-gurobi", "brute-force", "mip-cbc"),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "seqpav":
@@ -473,7 +473,7 @@ def get_rule(rule_id):
             shortname="minimax-Phragmén",
             longname="Phragmén's Minimax Rule (minimax-Phragmén)",
             compute_fct=compute_minimaxphragmen,
-            algorithms=("gurobi", "mip_gurobi", "mip_cbc"),
+            algorithms=("gurobi", "mip-gurobi", "mip-cbc"),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "leximinphragmen":
@@ -482,7 +482,7 @@ def get_rule(rule_id):
             shortname="leximin-Phragmén",
             longname="Phragmén's Leximin Rule (leximin-Phragmén)",
             compute_fct=compute_leximinphragmen,
-            algorithms=("gurobi",),  # TODO: "mip_gurobi", "mip_cbc"),
+            algorithms=("gurobi",),  # TODO: "mip-gurobi", "mip-cbc"),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "monroe":
@@ -494,9 +494,9 @@ def get_rule(rule_id):
             algorithms=(
                 # algorithms sorted by speed
                 "gurobi",
-                "mip_gurobi",
-                "mip_cbc",
-                "ortools_cp",
+                "mip-gurobi",
+                "mip-cbc",
+                "ortools-cp",
                 "brute-force",
             ),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
@@ -516,7 +516,7 @@ def get_rule(rule_id):
             shortname="minimaxav",
             longname="Minimax Approval Voting (MAV)",
             compute_fct=compute_minimaxav,
-            algorithms=("gurobi", "mip_gurobi", "ortools_cp", "mip_cbc", "brute-force"),
+            algorithms=("gurobi", "mip-gurobi", "ortools-cp", "mip-cbc", "brute-force"),
             # algorithms sorted by speed. however, for small profiles with a small committee size,
             # brute-force is often the fastest
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
@@ -775,7 +775,7 @@ def compute_thiele_method(
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
-    elif algorithm.startswith("mip_"):
+    elif algorithm.startswith("mip-"):
         committees = abcrules_mip._mip_thiele_methods(
             scorefct_id=scorefct_id,
             profile=profile,
@@ -784,7 +784,7 @@ def compute_thiele_method(
             max_num_of_committees=max_num_of_committees,
             solver_id=algorithm[4:],
         )
-    elif algorithm == "ortools_cp" and scorefct_id == "cc":
+    elif algorithm == "ortools-cp" and scorefct_id == "cc":
         committees = abcrules_ortools._ortools_cc(
             profile=profile,
             committeesize=committeesize,
@@ -931,7 +931,7 @@ def compute_pav(
             .. doctest::
 
                 >>> print(abcrules.get_rule("pav").algorithms)
-                ('gurobi', 'mip_gurobi', 'mip_cbc', 'branch-and-bound', 'brute-force')
+                ('gurobi', 'mip-gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -995,7 +995,7 @@ def compute_slav(
             .. doctest::
 
                 >>> print(abcrules.get_rule("slav").algorithms)
-                ('gurobi', 'mip_gurobi', 'mip_cbc', 'branch-and-bound', 'brute-force')
+                ('gurobi', 'mip-gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -1058,7 +1058,7 @@ def compute_cc(
             .. doctest::
 
                 >>> print(abcrules.get_rule("cc").algorithms)
-                ('gurobi', 'mip_gurobi', 'ortools_cp', 'branch-and-bound', 'brute-force', 'mip_cbc')
+                ('gurobi', 'mip-gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force', 'mip-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -1123,7 +1123,7 @@ def compute_lexcc(
             .. doctest::
 
                 >>> print(abcrules.get_rule("lexcc").algorithms)
-                ('gurobi', 'mip_gurobi', 'brute-force', 'mip_cbc')
+                ('gurobi', 'mip-gurobi', 'brute-force', 'mip-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -1169,7 +1169,7 @@ def compute_lexcc(
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
-    elif algorithm.startswith("mip_"):
+    elif algorithm.startswith("mip-"):
         committees, detailed_info = abcrules_mip._mip_lexcc(
             profile=profile,
             committeesize=committeesize,
@@ -2192,7 +2192,7 @@ def compute_minimaxav(
             .. doctest::
 
                 >>> print(abcrules.get_rule("minimaxav").algorithms)
-                ('gurobi', 'mip_gurobi', 'ortools_cp', 'mip_cbc', 'brute-force')
+                ('gurobi', 'mip-gurobi', 'ortools-cp', 'mip-cbc', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -2231,14 +2231,14 @@ def compute_minimaxav(
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
-    elif algorithm == "ortools_cp":
+    elif algorithm == "ortools-cp":
         committees = abcrules_ortools._ortools_minimaxav(
             profile=profile,
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
-    elif algorithm.startswith("mip_"):
+    elif algorithm.startswith("mip-"):
         solver_id = algorithm[4:]
         committees = abcrules_mip._mip_minimaxav(
             profile=profile,
@@ -2462,7 +2462,7 @@ def compute_monroe(
             .. doctest::
 
                 >>> print(abcrules.get_rule("monroe").algorithms)
-                ('gurobi', 'mip_gurobi', 'mip_cbc', 'ortools_cp', 'brute-force')
+                ('gurobi', 'mip-gurobi', 'mip-cbc', 'ortools-cp', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -2504,14 +2504,14 @@ def compute_monroe(
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
-    elif algorithm == "ortools_cp":
+    elif algorithm == "ortools-cp":
         committees = abcrules_ortools._ortools_monroe(
             profile=profile,
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
-    elif algorithm.startswith("mip_"):
+    elif algorithm.startswith("mip-"):
         committees = abcrules_mip._mip_monroe(
             profile=profile,
             committeesize=committeesize,
@@ -3396,7 +3396,7 @@ def compute_minimaxphragmen(
             .. doctest::
 
                 >>> print(abcrules.get_rule("minimaxphragmen").algorithms)
-                ('gurobi', 'mip_gurobi', 'mip_cbc')
+                ('gurobi', 'mip-gurobi', 'mip-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -3435,7 +3435,7 @@ def compute_minimaxphragmen(
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
-    elif algorithm.startswith("mip_"):
+    elif algorithm.startswith("mip-"):
         committees = abcrules_mip._mip_minimaxphragmen(
             profile,
             committeesize,
@@ -3548,7 +3548,7 @@ def compute_leximinphragmen(
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
-    # elif algorithm.startswith("mip_"):
+    # elif algorithm.startswith("mip-"):
     #     committees = abcrules_mip._mip_leximinphragmen(
     #         profile,
     #         committeesize,

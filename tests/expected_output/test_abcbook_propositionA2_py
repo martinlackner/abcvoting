@@ -195,9 +195,9 @@ profile with 4 votes and 6 candidates:
  1 x {c, d, f}
 
 winning committees for k=3 and k=4:
-------
-Rule X
-------
+-----------------------------------
+Rule X (aka Method of Equal Shares)
+-----------------------------------
 
 
 Phase 1:
@@ -227,9 +227,9 @@ adding candidate number 3: e
 1 winning committee:
  {a, c, e}
 
-------
-Rule X
-------
+-----------------------------------
+Rule X (aka Method of Equal Shares)
+-----------------------------------
 
 
 Phase 1:

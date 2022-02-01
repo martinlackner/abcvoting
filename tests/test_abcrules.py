@@ -17,12 +17,12 @@ MARKS = {
     # "cvxpy_glpk_mi": [pytest.mark.cvxpy, pytest.mark.glpk_mi],
     # "cvxpy_cbc": [pytest.mark.cvxpy, pytest.mark.cbc],
     # "cvxpy_gurobi": [pytest.mark.cvxpy, pytest.mark.gurobi],
-    "ortools_cp": [pytest.mark.ortools],
-    "ortools_cbc": [pytest.mark.ortools, pytest.mark.cbc],
-    "ortools_gurobi": [pytest.mark.ortools, pytest.mark.gurobi],
-    "ortools_scip": [pytest.mark.ortools, pytest.mark.scip],
-    "mip_cbc": [pytest.mark.mip],  # does not require cbc because cbc is included in mip
-    "mip_gurobi": [pytest.mark.mip, pytest.mark.gurobi],
+    "ortools-cp": [pytest.mark.ortools],
+    # "ortools-cbc": [pytest.mark.ortools, pytest.mark.cbc],
+    # "ortools-gurobi": [pytest.mark.ortools, pytest.mark.gurobi],
+    # "ortools-scip": [pytest.mark.ortools, pytest.mark.scip],
+    "mip-cbc": [pytest.mark.mip],  # does not require cbc because cbc is included in mip
+    "mip-gurobi": [pytest.mark.mip, pytest.mark.gurobi],
     "brute-force": [],
     "branch-and-bound": [],
     "standard": [],
@@ -557,11 +557,11 @@ def _list_abc_yaml_compute_instances():
             for algorithm in rule.algorithms:
                 if "instanceS" in filename:
                     marks = []  # small instances, rather fast
-                    if algorithm in ["mip_cbc"]:
+                    if algorithm in ["mip-cbc"]:
                         marks = [pytest.mark.slow]
                 elif "instanceVL" in filename:
                     marks = [pytest.mark.slow, pytest.mark.veryslow]  # very large instances
-                elif rule_id == "monroe" and algorithm in ["mip_cbc"]:
+                elif rule_id == "monroe" and algorithm in ["mip-cbc"]:
                     marks = [pytest.mark.slow, pytest.mark.veryslow]
                 elif rule_id == "leximinphragmen":
                     marks = [pytest.mark.slow, pytest.mark.veryslow]
@@ -1317,7 +1317,7 @@ def test_natural_tiebreaking_order_resolute(rule_id, algorithm):
     ]:
         profile.add_voters(approval_sets)
         committeesize = 2
-        if algorithm in ["gurobi", "ortools_cp", "mip_cbc", "mip_gurobi", "fastest"]:
+        if algorithm in ["gurobi", "ortools-cp", "mip-cbc", "mip-gurobi", "fastest"]:
             return  # ILP solvers do not guarantee a specific solution
         if rule_id in ["rsd"]:
             return  # RSD is randomized
@@ -1347,7 +1347,7 @@ def test_natural_tiebreaking_order_max_num_of_committees(rule_id, algorithm, app
     profile.add_voters(approval_sets)
     print(profile)
     committeesize = 2
-    if algorithm in ["gurobi", "ortools_cp", "mip_cbc", "mip_gurobi", "fastest"]:
+    if algorithm in ["gurobi", "ortools-cp", "mip-cbc", "mip-gurobi", "fastest"]:
         return  # ILP solvers do not guarantee a specific solution
     if rule_id in ["rsd"]:
         return  # RSD is randomized

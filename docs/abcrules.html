@@ -87,7 +87,7 @@
 <span class="target" id="module-abcvoting.abcrules"></span><p>Approval-based committee (ABC) voting rules.</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.ALGORITHM_NAMES">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">ALGORITHM_NAMES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'branch-and-bound':</span> <span class="pre">'branch-and-bound',</span> <span class="pre">'brute-force':</span> <span class="pre">'brute-force',</span> <span class="pre">'float-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">floats</span> <span class="pre">instead</span> <span class="pre">of</span> <span class="pre">fractions)',</span> <span class="pre">'gmpy2-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">gmpy2</span> <span class="pre">fractions)',</span> <span class="pre">'gurobi':</span> <span class="pre">'Gurobi</span> <span class="pre">ILP</span> <span class="pre">solver',</span> <span class="pre">'mip_cbc':</span> <span class="pre">'CBC</span> <span class="pre">ILP</span> <span class="pre">solver</span> <span class="pre">via</span> <span class="pre">Python</span> <span class="pre">MIP</span> <span class="pre">library',</span> <span class="pre">'mip_gurobi':</span> <span class="pre">'Gurobi</span> <span class="pre">ILP</span> <span class="pre">solver</span> <span class="pre">via</span> <span class="pre">Python</span> <span class="pre">MIP</span> <span class="pre">library',</span> <span class="pre">'ortools_cp':</span> <span class="pre">'OR-Tools</span> <span class="pre">CP-SAT</span> <span class="pre">solver',</span> <span class="pre">'standard':</span> <span class="pre">'Standard</span> <span class="pre">algorithm',</span> <span class="pre">'standard-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">standard</span> <span class="pre">Python</span> <span class="pre">fractions)'}</span></em><a class="headerlink" href="#abcvoting.abcrules.ALGORITHM_NAMES" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">ALGORITHM_NAMES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'branch-and-bound':</span> <span class="pre">'branch-and-bound',</span> <span class="pre">'brute-force':</span> <span class="pre">'brute-force',</span> <span class="pre">'float-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">floats</span> <span class="pre">instead</span> <span class="pre">of</span> <span class="pre">fractions)',</span> <span class="pre">'gmpy2-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">gmpy2</span> <span class="pre">fractions)',</span> <span class="pre">'gurobi':</span> <span class="pre">'Gurobi</span> <span class="pre">ILP</span> <span class="pre">solver',</span> <span class="pre">'mip-cbc':</span> <span class="pre">'CBC</span> <span class="pre">ILP</span> <span class="pre">solver</span> <span class="pre">via</span> <span class="pre">Python</span> <span class="pre">MIP</span> <span class="pre">library',</span> <span class="pre">'mip-gurobi':</span> <span class="pre">'Gurobi</span> <span class="pre">ILP</span> <span class="pre">solver</span> <span class="pre">via</span> <span class="pre">Python</span> <span class="pre">MIP</span> <span class="pre">library',</span> <span class="pre">'ortools-cp':</span> <span class="pre">'OR-Tools</span> <span class="pre">CP-SAT</span> <span class="pre">solver',</span> <span class="pre">'standard':</span> <span class="pre">'Standard</span> <span class="pre">algorithm',</span> <span class="pre">'standard-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">standard</span> <span class="pre">Python</span> <span class="pre">fractions)'}</span></em><a class="headerlink" href="#abcvoting.abcrules.ALGORITHM_NAMES" title="Permalink to this definition"></a></dt>
 <dd><p>A dictionary containing mapping all valid algorithm identifiers to full names (i.e., descriptions).</p>
 </dd></dl>
 
@@ -361,7 +361,7 @@ by Martin Lackner and Piotr Skowron
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Approval Chamberlin-Courant (CC):</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;cc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip_gurobi&#39;, &#39;ortools_cp&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;, &#39;mip_cbc&#39;)</span>
+<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;ortools-cp&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;, &#39;mip-cbc&#39;)</span>
 </pre></div>
 </div>
 </dd>
@@ -489,7 +489,7 @@ functions.</p>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Lexicographic Chamberlin-Courant (lex-CC):</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;lexcc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip_gurobi&#39;, &#39;brute-force&#39;, &#39;mip_cbc&#39;)</span>
+<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;brute-force&#39;, &#39;mip-cbc&#39;)</span>
 </pre></div>
 </div>
 </dd>
@@ -627,7 +627,7 @@ by Martin Lackner and Piotr Skowron
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Minimax AV:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;minimaxav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip_gurobi&#39;, &#39;ortools_cp&#39;, &#39;mip_cbc&#39;, &#39;brute-force&#39;)</span>
+<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;ortools-cp&#39;, &#39;mip-cbc&#39;, &#39;brute-force&#39;)</span>
 </pre></div>
 </div>
 </dd>
@@ -679,7 +679,7 @@ third-, …-largest load</p>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Phragmen’s minimax rule (minimax-Phragmen):</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;minimaxphragmen&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip_gurobi&#39;, &#39;mip_cbc&#39;)</span>
+<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;)</span>
 </pre></div>
 </div>
 </dd>
@@ -721,7 +721,7 @@ by Martin Lackner and Piotr Skowron
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Monroe:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;monroe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip_gurobi&#39;, &#39;mip_cbc&#39;, &#39;ortools_cp&#39;, &#39;brute-force&#39;)</span>
+<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;, &#39;ortools-cp&#39;, &#39;brute-force&#39;)</span>
 </pre></div>
 </div>
 </dd>
@@ -764,7 +764,7 @@ by Martin Lackner and Piotr Skowron
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for PAV:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;pav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip_gurobi&#39;, &#39;mip_cbc&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;)</span>
+<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;)</span>
 </pre></div>
 </div>
 </dd>
@@ -1322,7 +1322,7 @@ In Artificial Intelligence, 288: 103366, 2020.
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for SLAV:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;slav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip_gurobi&#39;, &#39;mip_cbc&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;)</span>
+<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;)</span>
 </pre></div>
 </div>
 </dd>

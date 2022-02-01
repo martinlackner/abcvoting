@@ -115,9 +115,9 @@ winning committees after the modification:
 
 Greedy Monroe fails candidate monotonicity with additional voters
 
-------
-Rule X
-------
+-----------------------------------
+Rule X (aka Method of Equal Shares)
+-----------------------------------
 
 profile with 9 votes and 8 candidates:
  1 x {b, d},
@@ -416,9 +416,9 @@ winning committees after the modification:
 
 seq-CC fails support monotonicity without additional voters
 
-------
-Rule X
-------
+-----------------------------------
+Rule X (aka Method of Equal Shares)
+-----------------------------------
 
 profile with 7 votes and 8 candidates:
  1 x {b},
