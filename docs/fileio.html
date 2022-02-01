@@ -38,8 +38,9 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">A simple example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple-example.html">A simple example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro-abcrules.html">ABC rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="computing-winning-committees.html">Computing winning committees</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
 <ul class="current">
@@ -103,19 +104,22 @@
 <dt class="sig sig-object py" id="abcvoting.fileio.get_file_names">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">get_file_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_extensions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.fileio.get_file_names" title="Permalink to this definition"></a></dt>
 <dd><p>List all file names in a directory that fit the specified filename extensions.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
 <p>Not recursive, i.e., does not look into sub-directories!</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>dir_name: str</strong></dt><dd><p>path of directory to be searched for files.</p>
+<dt><strong>dir_name</strong><span class="classifier">str</span></dt><dd><p>Path of directory to be searched for files.</p>
 </dd>
-<dt><strong>filename_extensions: list of str or None</strong></dt><dd><p>file names must match one of these extensions</p>
+<dt><strong>filename_extensions</strong><span class="classifier">list of str, optional</span></dt><dd><p>File names must have one of these extensions.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>files: list of str</dt><dd><p>list of file names contained in the directory</p>
+<dt>list of str</dt><dd><p>List of file names contained in the directory.</p>
 </dd>
 </dl>
 </dd>
@@ -125,7 +129,28 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.fileio.read_abcvoting_yaml_file">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">read_abcvoting_yaml_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.fileio.read_abcvoting_yaml_file" title="Permalink to this definition"></a></dt>
-<dd><p>Reads contents of abcvoting yaml file (ending with .abc.yaml).</p>
+<dd><p>Read contents of an abcvoting yaml file (ending with .abc.yaml).</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>File name of the .abc.yaml file.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
+</dd>
+<dt><strong>committeesize</strong><span class="classifier">int or None</span></dt><dd><p>The desired committee size.</p>
+</dd>
+<dt><strong>compute_instances</strong><span class="classifier">list of dict</span></dt><dd><p>A list of compute instances, which are dictionaries.</p>
+<p>Compute instances can be passed to <cite>Rule.compute</cite>.</p>
+</dd>
+<dt><strong>data</strong><span class="classifier">dict</span></dt><dd><p>The YAML data from <cite>filename</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -135,28 +160,28 @@
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>filename: str</strong></dt><dd><p>Name of the preflib file.</p>
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Name of the Preflib file.</p>
 </dd>
-<dt><strong>setsize: int</strong></dt><dd><p>Number of top-ranked candidates that voters approve.
-In case of ties, more than <cite>setsize</cite> candidates are approved.</p>
+<dt><strong>setsize</strong><span class="classifier">int</span></dt><dd><p>Minimum number of candidates that voters approve.</p>
+<p>These candidates are taken from the top of ranking.
+In case of ties, more than setsize candidates are approved.</p>
 <p>Paramer <cite>setsize</cite> is ignored if <cite>relative_setsize</cite> is used.</p>
 </dd>
-<dt><strong>relative_setsize: float in (0, 1]</strong></dt><dd><p>Indicates which proportion of candidates of the ranking
-are approved (rounded up). In case of ties, more
-candidates are approved.
-E.g., if a voter has 10 approved candidates and <cite>relative_setsize</cite> is 0.75,
-then the approval set contains the top 8 candidates.</p>
+<dt><strong>relative_setsize</strong><span class="classifier">float</span></dt><dd><p>Proportion (number between 0 and 1) of candidates that voters approve (rounded up).</p>
+<p>In case of ties, more candidates are approved.
+E.g., if there are 10 candidates and <cite>relative_setsize=0.75</cite>,
+then the voter approves the top 8 candidates.</p>
 </dd>
-<dt><strong>use_weights: bool</strong></dt><dd><p>If False, treat vote count in preflib file as the number of duplicate ballots,
-i.e., the number of voters that have this approval set.
+<dt><strong>use_weights</strong><span class="classifier">bool, default=False</span></dt><dd><p>Use weights of voters instead of individual voters.</p>
+<p>If False, treat vote count in Preflib file as the number of identical ballots,
+i.e., the number of voters that approve this set of candidates.
 If True, treat vote count as weight and use this weight in class Voter.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>profile: abcvoting.preferences.Profile</dt><dd><p>Preference profile extracted from preflib file,
-including names of candidates</p>
+<dt>abcvoting.preferences.Profile</dt><dd><p>Preference profile extracted from Preflib file.</p>
 </dd>
 </dl>
 </dd>
@@ -166,27 +191,28 @@ including names of candidates</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.fileio.read_preflib_files_from_dir">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">read_preflib_files_from_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_setsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.fileio.read_preflib_files_from_dir" title="Permalink to this definition"></a></dt>
-<dd><p>Read all election files (soi, toi, soc or toc) from the given directory.</p>
+<dd><p>Read all Preflib files (soi, toi, soc or toc) in a given directory.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>dir_name: str</strong></dt><dd><p>path of directory to be searched for preflib files.</p>
+<dt><strong>dir_name</strong><span class="classifier">str</span></dt><dd><p>Path of the directory to be searched for Preflib files.</p>
 </dd>
-<dt><strong>setsize: int</strong></dt><dd><p>Number of top-ranked candidates that voters approve.
+<dt><strong>setsize</strong><span class="classifier">int</span></dt><dd><p>Minimum number of candidates that voters approve.</p>
+<p>These candidates are taken from the top of ranking.
 In case of ties, more than setsize candidates are approved.</p>
 <p>Paramer <cite>setsize</cite> is ignored if <cite>relative_setsize</cite> is used.</p>
 </dd>
-<dt><strong>relative_setsize: float in (0, 1]</strong></dt><dd><p>Indicates which percentage of candidates of the ranking
-are approved (rounded up). In case of ties, more
-candidates are approved.
-E.g., if a voter has 10 candidates and this value is 0.75,
-then the approval set contains the top 8 candidates.</p>
+<dt><strong>relative_setsize</strong><span class="classifier">float</span></dt><dd><p>Proportion (number between 0 and 1) of candidates that voters approve (rounded up).</p>
+<p>In case of ties, more candidates are approved.
+E.g., if there are 10 candidates and <cite>relative_setsize=0.75</cite>,
+then the voter approves the top 8 candidates.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>profiles: dict of str: Profile</dt><dd><p>The key is the filename.</p>
+<dt>dict</dt><dd><p>Dictionary with file names as keys and profiles (class abcvoting.preferences.Profile)
+as values.</p>
 </dd>
 </dl>
 </dd>
@@ -196,19 +222,36 @@ then the approval set contains the top 8 candidates.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.fileio.write_abcvoting_instance_to_yaml_file">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">write_abcvoting_instance_to_yaml_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_instances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.fileio.write_abcvoting_instance_to_yaml_file" title="Permalink to this definition"></a></dt>
-<dd><p>Writes abcvoting instance to a yaml file.</p>
+<dd><p>Write abcvoting instance to an abcvoting yaml file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>File name of the .abc.yaml file.</p>
+</dd>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
+</dd>
+<dt><strong>committeesize</strong><span class="classifier">int, optional</span></dt><dd><p>The desired committee size.</p>
+</dd>
+<dt><strong>compute_instances</strong><span class="classifier">list of dict, optional</span></dt><dd><p>A list of compute instances, which are dictionaries.</p>
+<p>Compute instances can be passed to <cite>Rule.compute</cite>.</p>
+</dd>
+<dt><strong>description</strong><span class="classifier">str, optional</span></dt><dd><p>An optional description of the data.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.fileio.write_profile_to_preflib_toi_file">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">write_profile_to_preflib_toi_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.fileio.write_profile_to_preflib_toi_file" title="Permalink to this definition"></a></dt>
-<dd><p>Write profile to a preflib .toi file.</p>
+<dd><p>Write a profile to a Preflib .toi file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>filename: str</strong></dt><dd><p>File name of the preflib file to be written.</p>
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>File name of the Preflib file.</p>
 </dd>
-<dt><strong>profile: Profile</strong></dt><dd><p>Profile to be written in preflib file.</p>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>Profile to be written.</p>
 </dd>
 </dl>
 </dd>

@@ -8,7 +8,7 @@ The input of such rules are
 `approval ballots
 <https://en.wikipedia.org/wiki/Approval_voting>`_.
 We recommend the book
-`*Multi-Winner Voting with Approval Preferences* <https://arxiv.org/abs/2007.01795>`_ [1]_
+`Multi-Winner Voting with Approval Preferences <https://arxiv.org/abs/2007.01795>`_ [1]_
 by Lackner and Skowron as a detailed introduction
 to ABC rules and related research directions.
 In addition, the
@@ -30,7 +30,7 @@ The main ABC rules implemented in `abcvoting` are the following:
     pav                 Proportional Approval Voting (PAV)
     slav                Sainte-Laguë Approval Voting (SLAV)
     cc                  Approval Chamberlin-Courant (CC)
-    lexcc               Lexicographic Approval Chamberlin-Courant (lex-CC)
+    lexcc               Lexicographic Chamberlin-Courant (lex-CC)
     geom2               2-Geometric Rule
     seqpav              Sequential Proportional Approval Voting (seq-PAV)
     revseqpav           Reverse Sequential Proportional Approval Voting (revseq-PAV)
@@ -43,13 +43,13 @@ The main ABC rules implemented in `abcvoting` are the following:
     greedy-monroe       Greedy Monroe
     minimaxav           Minimax Approval Voting (MAV)
     lexminimaxav        Lexicographic Minimax Approval Voting (lex-MAV)
-    rule-x              Rule X
+    rule-x              Rule X (aka Method of Equal Shares)
     phragmen-enestroem  Method of Phragmén-Eneström
     consensus-rule      Consensus Rule
     trivial             Trivial Rule
     rsd                 Random Serial Dictator
 
-The short IDs on the left side are the respective `rule_id`'s.
+The short identifiers on the left side are the respective `rule_id`'s.
 
 In addition to these rules, there are Thiele methods, Sequential Thiele methods,
 and Reverse Sequential Thiele methods. These are classes of ABC rules and
@@ -75,4 +75,3 @@ are implemented but not specifically listed above.
     new challenge for social choice theory. In Ulle Endriss, editor, Trends in Computational Social
     Choice, chapter 2, pages 27–47. AI Access, 2017.
     http://research.illc.uva.nl/COST-IC1205/BookDocs/Chapters/TrendsCOMSOC-02.pdf
-

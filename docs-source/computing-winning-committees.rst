@@ -1,0 +1,36 @@
+Computing winning committees
+============================
+
+One of the main goals of `abcvoting` is to provide a simple way to compute winning committees for a given
+ABC rule. Here is a bit more detailed explanation of how to do this. (A first, simple explanation can be found
+:doc:`here <simple-example>`.
+
+First steps
+-----------
+
+ABC rules are identified by an identifier called `rule_id`. :doc:`Here <intro-abcrules>` is a list of these
+identifiers. Say we are interested in Proportional Approval Voting, short: PAV. Its `rule_id` is `"pav"`.
+
+The input of an ABC rule consists of a profile and a desired committee size. Once we know the `rule_id` and
+have a profile and a desired committee size, we can compute the ABC rule.
+In the following, we use the simple example used :doc:`previously <intro-abcrules>`.
+
+.. doctest::
+
+    >>> from abcvoting.preferences import Profile
+    >>> from abcvoting import abcrules
+
+    >>> profile = Profile(num_cand=5)
+    >>> profile.add_voters([{0, 1, 2}, {3}, {0, 1, 2, 3}, {0, 1, 2, 4}, {0, 1}, {4}])
+    >>> print(abcrules.compute_pav(profile, committeesize=3))
+    [{0, 1, 3}, {0, 1, 4}]
+
+Number of winning committees
+----------------------------
+
+    TODO
+
+Algorithms
+----------
+
+    TODO

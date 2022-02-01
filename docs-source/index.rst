@@ -10,8 +10,9 @@ approval-based committee (ABC) rules.
    :maxdepth: 3
    :caption: Contents:
 
-   intro.rst
+   simple-example.rst
    intro-abcrules.rst
+   computing-winning-committees.rst
 
 .. toctree::
    :maxdepth: 3

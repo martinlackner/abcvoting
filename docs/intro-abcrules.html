@@ -17,8 +17,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="abcvoting.abcrules" href="abcrules.html" />
-    <link rel="prev" title="A simple example" href="intro.html" /> 
+    <link rel="next" title="Computing winning committees" href="computing-winning-committees.html" />
+    <link rel="prev" title="A simple example" href="simple-example.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -38,8 +38,9 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="intro.html">A simple example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple-example.html">A simple example</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">ABC rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="computing-winning-committees.html">Computing winning committees</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
 <ul>
@@ -89,7 +90,7 @@ ABC rules are also known as approval-based multi-winner rules.
 The input of such rules are
 <a class="reference external" href="https://en.wikipedia.org/wiki/Approval_voting">approval ballots</a>.
 We recommend the book
-<a class="reference external" href="https://arxiv.org/abs/2007.01795">*Multi-Winner Voting with Approval Preferences*</a> <a class="footnote-reference brackets" href="#id4" id="id1">1</a>
+<a class="reference external" href="https://arxiv.org/abs/2007.01795">Multi-Winner Voting with Approval Preferences</a> <a class="footnote-reference brackets" href="#id4" id="id1">1</a>
 by Lackner and Skowron as a detailed introduction
 to ABC rules and related research directions.
 In addition, the
@@ -103,7 +104,7 @@ is useful as a more general introduction to committee voting (not limited to app
 <span class="go">pav                 Proportional Approval Voting (PAV)</span>
 <span class="go">slav                Sainte-Laguë Approval Voting (SLAV)</span>
 <span class="go">cc                  Approval Chamberlin-Courant (CC)</span>
-<span class="go">lexcc               Lexicographic Approval Chamberlin-Courant (lex-CC)</span>
+<span class="go">lexcc               Lexicographic Chamberlin-Courant (lex-CC)</span>
 <span class="go">geom2               2-Geometric Rule</span>
 <span class="go">seqpav              Sequential Proportional Approval Voting (seq-PAV)</span>
 <span class="go">revseqpav           Reverse Sequential Proportional Approval Voting (revseq-PAV)</span>
@@ -116,14 +117,14 @@ is useful as a more general introduction to committee voting (not limited to app
 <span class="go">greedy-monroe       Greedy Monroe</span>
 <span class="go">minimaxav           Minimax Approval Voting (MAV)</span>
 <span class="go">lexminimaxav        Lexicographic Minimax Approval Voting (lex-MAV)</span>
-<span class="go">rule-x              Rule X</span>
+<span class="go">rule-x              Rule X (aka Method of Equal Shares)</span>
 <span class="go">phragmen-enestroem  Method of Phragmén-Eneström</span>
 <span class="go">consensus-rule      Consensus Rule</span>
 <span class="go">trivial             Trivial Rule</span>
 <span class="go">rsd                 Random Serial Dictator</span>
 </pre></div>
 </div>
-<p>The short IDs on the left side are the respective <cite>rule_id</cite>’s.</p>
+<p>The short identifiers on the left side are the respective <cite>rule_id</cite>’s.</p>
 <p>In addition to these rules, there are Thiele methods, Sequential Thiele methods,
 and Reverse Sequential Thiele methods. These are classes of ABC rules and
 are parameterized by arbitary scoring functions (explained in detail here <a class="footnote-reference brackets" href="#id4" id="id3">1</a>).
@@ -156,8 +157,8 @@ Choice, chapter 2, pages 27–47. AI Access, 2017.
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="intro.html" class="btn btn-neutral float-left" title="A simple example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="abcrules.html" class="btn btn-neutral float-right" title="abcvoting.abcrules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="simple-example.html" class="btn btn-neutral float-left" title="A simple example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="computing-winning-committees.html" class="btn btn-neutral float-right" title="Computing winning committees" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

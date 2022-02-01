@@ -73,7 +73,7 @@ def thiele_score(scorefct_id, profile, committee):
 
             `scorefct_id` has to be recognized by `abcvoting.scores.get_scorefct`.
 
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committee : set
@@ -309,7 +309,7 @@ def marginal_thiele_scores_add(marginal_scorefct, profile, committee):
         marginal_scorefct : function
             The marginal score function to be used.
 
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committee : set
@@ -343,7 +343,7 @@ def marginal_thiele_scores_remove(marginal_scorefct, profile, committee):
         marginal_scorefct : function
             The marginal score function to be used.
 
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committee : set
@@ -373,7 +373,7 @@ def monroescore(profile, committee):
 
     Parameters
     ----------
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committee : set
@@ -400,7 +400,7 @@ def monroescore_matching(profile, committee):
 
     Parameters
     ----------
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committee : set
@@ -439,7 +439,7 @@ def monroescore_flowbased(profile, committee):
 
     Parameters
     ----------
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committee : set
@@ -482,7 +482,7 @@ def minimaxav_score(profile, committee):
 
     Parameters
     ----------
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committee : set
@@ -510,7 +510,7 @@ def num_voters_with_upper_bounded_hamming_distance(upperbound, profile, committe
         upperbound : int
             The Hamming distance upper bound.
 
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committee : set

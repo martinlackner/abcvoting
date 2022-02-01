@@ -39,8 +39,9 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">A simple example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple-example.html">A simple example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro-abcrules.html">ABC rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="computing-winning-committees.html">Computing winning committees</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
 <ul class="current">
@@ -263,7 +264,7 @@ Candidates that are already in the committee receive a small value (-1).</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>marginal_scorefct</strong><span class="classifier">function</span></dt><dd><p>The marginal score function to be used.</p>
 </dd>
-<dt><strong>profile</strong><span class="classifier">Profile</span></dt><dd><p>A profile.</p>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
 <dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
 </dd>
@@ -290,7 +291,7 @@ Candidates that are not in the committee receive a large value (max(marg_util_ca
 <dd class="field-odd"><dl class="simple">
 <dt><strong>marginal_scorefct</strong><span class="classifier">function</span></dt><dd><p>The marginal score function to be used.</p>
 </dd>
-<dt><strong>profile</strong><span class="classifier">Profile</span></dt><dd><p>A profile.</p>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
 <dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
 </dd>
@@ -312,7 +313,7 @@ Candidates that are not in the committee receive a large value (max(marg_util_ca
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>profile</strong><span class="classifier">Profile</span></dt><dd><p>A profile.</p>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
 <dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
 </dd>
@@ -334,7 +335,7 @@ Candidates that are not in the committee receive a large value (max(marg_util_ca
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>profile</strong><span class="classifier">Profile</span></dt><dd><p>A profile.</p>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
 <dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
 </dd>
@@ -359,7 +360,7 @@ Slower than monroescore_matching().</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>profile</strong><span class="classifier">Profile</span></dt><dd><p>A profile.</p>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
 <dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
 </dd>
@@ -383,7 +384,7 @@ the committee size divides the number of voters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>profile</strong><span class="classifier">Profile</span></dt><dd><p>A profile.</p>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
 <dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
 </dd>
@@ -407,7 +408,7 @@ the committee size divides the number of voters.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>upperbound</strong><span class="classifier">int</span></dt><dd><p>The Hamming distance upper bound.</p>
 </dd>
-<dt><strong>profile</strong><span class="classifier">Profile</span></dt><dd><p>A profile.</p>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
 <dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
 </dd>
@@ -481,7 +482,7 @@ In Artificial Intelligence, 288: 103366, 2020.
 <dt><strong>scorefct_id</strong><span class="classifier">str</span></dt><dd><p>Identifies the score function to be used.</p>
 <p><cite>scorefct_id</cite> has to be recognized by <cite>abcvoting.scores.get_scorefct</cite>.</p>
 </dd>
-<dt><strong>profile</strong><span class="classifier">Profile</span></dt><dd><p>A profile.</p>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
 <dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
 </dd>

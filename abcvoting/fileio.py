@@ -28,20 +28,22 @@ def get_file_names(dir_name, filename_extensions=None):
     """
     List all file names in a directory that fit the specified filename extensions.
 
-    Not recursive, i.e., does not look into sub-directories!
+    .. important::
+
+        Not recursive, i.e., does not look into sub-directories!
 
     Parameters
     ----------
-        dir_name: str
-            path of directory to be searched for files.
+        dir_name : str
+            Path of directory to be searched for files.
 
-        filename_extensions: list of str or None
-            file names must match one of these extensions
+        filename_extensions : list of str, optional
+            File names must have one of these extensions.
 
     Returns
     -------
-        files: list of str
-            list of file names contained in the directory
+        list of str
+            List of file names contained in the directory.
     """
     files = []
     for (_, _, filenames) in os.walk(dir_name):
@@ -106,32 +108,35 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
 
     Parameters
     ----------
-        filename: str
-            Name of the preflib file.
+        filename : str
+            Name of the Preflib file.
 
-        setsize: int
-            Number of top-ranked candidates that voters approve.
-            In case of ties, more than `setsize` candidates are approved.
+        setsize : int
+            Minimum number of candidates that voters approve.
+
+            These candidates are taken from the top of ranking.
+            In case of ties, more than setsize candidates are approved.
 
             Paramer `setsize` is ignored if `relative_setsize` is used.
 
-        relative_setsize: float in (0, 1]
-            Indicates which proportion of candidates of the ranking
-            are approved (rounded up). In case of ties, more
-            candidates are approved.
-            E.g., if a voter has 10 approved candidates and `relative_setsize` is 0.75,
-            then the approval set contains the top 8 candidates.
+        relative_setsize : float
+            Proportion (number between 0 and 1) of candidates that voters approve (rounded up).
 
-        use_weights: bool
-            If False, treat vote count in preflib file as the number of duplicate ballots,
-            i.e., the number of voters that have this approval set.
+            In case of ties, more candidates are approved.
+            E.g., if there are 10 candidates and `relative_setsize=0.75`,
+            then the voter approves the top 8 candidates.
+
+        use_weights : bool, default=False
+            Use weights of voters instead of individual voters.
+
+            If False, treat vote count in Preflib file as the number of identical ballots,
+            i.e., the number of voters that approve this set of candidates.
             If True, treat vote count as weight and use this weight in class Voter.
 
     Returns
     -------
-        profile: abcvoting.preferences.Profile
-            Preference profile extracted from preflib file,
-            including names of candidates
+        abcvoting.preferences.Profile
+            Preference profile extracted from Preflib file.
     """
     if setsize <= 0:
         raise ValueError("Parameter setsize must be > 0")
@@ -207,30 +212,33 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
 
 def read_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
     """
-    Read all election files (soi, toi, soc or toc) from the given directory.
+    Read all Preflib files (soi, toi, soc or toc) in a given directory.
 
     Parameters
     ----------
-        dir_name: str
-            path of directory to be searched for preflib files.
+        dir_name : str
+            Path of the directory to be searched for Preflib files.
 
-        setsize: int
-            Number of top-ranked candidates that voters approve.
+        setsize : int
+            Minimum number of candidates that voters approve.
+
+            These candidates are taken from the top of ranking.
             In case of ties, more than setsize candidates are approved.
 
             Paramer `setsize` is ignored if `relative_setsize` is used.
 
-        relative_setsize: float in (0, 1]
-            Indicates which percentage of candidates of the ranking
-            are approved (rounded up). In case of ties, more
-            candidates are approved.
-            E.g., if a voter has 10 candidates and this value is 0.75,
-            then the approval set contains the top 8 candidates.
+        relative_setsize : float
+            Proportion (number between 0 and 1) of candidates that voters approve (rounded up).
+
+            In case of ties, more candidates are approved.
+            E.g., if there are 10 candidates and `relative_setsize=0.75`,
+            then the voter approves the top 8 candidates.
 
     Returns
     -------
-        profiles: dict of str: Profile
-            The key is the filename.
+        dict
+            Dictionary with file names as keys and profiles (class abcvoting.preferences.Profile)
+            as values.
     """
     files = get_file_names(dir_name, filename_extensions=[".soi", ".toi", ".soc", ".toc"])
 
@@ -244,15 +252,16 @@ def read_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
 
 
 def write_profile_to_preflib_toi_file(filename, profile):
-    """Write profile to a preflib .toi file.
+    """
+    Write a profile to a Preflib .toi file.
 
     Parameters
     ----------
-        filename: str
-            File name of the preflib file to be written.
+        filename : str
+            File name of the Preflib file.
 
-        profile: Profile
-            Profile to be written in preflib file.
+        profile : abcvoting.preferences.Profile
+            Profile to be written.
 
     Returns
     -------
@@ -283,7 +292,28 @@ def _yaml_flow_style_list(x):
 
 def read_abcvoting_yaml_file(filename):
     """
-    Reads contents of abcvoting yaml file (ending with .abc.yaml).
+    Read contents of an abcvoting yaml file (ending with .abc.yaml).
+
+    Parameters
+    ----------
+        filename : str
+            File name of the .abc.yaml file.
+
+    Returns
+    -------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int or None
+            The desired committee size.
+
+        compute_instances : list of dict
+            A list of compute instances, which are dictionaries.
+
+            Compute instances can be passed to `Rule.compute`.
+
+        data : dict
+            The YAML data from `filename`.
     """
     yaml = ruamel.yaml.YAML(typ="safe", pure=True)
     with open(filename) as inputfile:
@@ -331,7 +361,26 @@ def write_abcvoting_instance_to_yaml_file(
     filename, profile, committeesize=None, compute_instances=None, description=None
 ):
     """
-    Writes abcvoting instance to a yaml file.
+    Write abcvoting instance to an abcvoting yaml file.
+
+    Parameters
+    ----------
+        filename : str
+            File name of the .abc.yaml file.
+
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int, optional
+            The desired committee size.
+
+        compute_instances : list of dict, optional
+            A list of compute instances, which are dictionaries.
+
+            Compute instances can be passed to `Rule.compute`.
+
+        description : str, optional
+            An optional description of the data.
     """
     if not profile.has_unit_weights():
         raise NotImplementedError(

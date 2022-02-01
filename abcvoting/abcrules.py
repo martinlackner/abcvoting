@@ -48,7 +48,7 @@ MAIN_RULE_IDS = [
     "rsd",
 ]
 """
-List of IDs (`rule_id`) for the main ABC rules included in abcvoting.
+List of rule identifiers (`rule_id`) for the main ABC rules included in abcvoting.
 
 This selection is somewhat arbitrary. But all really important rules (that are implemented) 
 are contained in this list.
@@ -71,7 +71,7 @@ ALGORITHM_NAMES = {
     "ortools_cp": "OR-Tools CP-SAT solver",
 }
 """
-A dictionary containing mapping all valid algorithm IDs to full names (i.e., descriptions).
+A dictionary containing mapping all valid algorithm identifiers to full names (i.e., descriptions).
 """
 
 
@@ -79,14 +79,14 @@ FLOAT_ISCLOSE_REL_TOL = 1e-12
 """
 The relative tolerance when comparing floats.
 
-See also: `math.isclose()`
+See also: `math.isclose() <https://docs.python.org/3/library/math.html#math.isclose>`_.
 """
 
 FLOAT_ISCLOSE_ABS_TOL = 1e-12
 """
 The absolute tolerance when comparing floats.
 
-See also: `math.isclose()`
+See also: `math.isclose() <https://docs.python.org/3/library/math.html#math.isclose>`_.
 """
 
 MAX_NUM_OF_COMMITTEES_DEFAULT = None
@@ -102,6 +102,26 @@ Can be overridden with the parameter `max_num_of_committees` in any `compute` fu
 class Rule:
     """
     A class that contains the main information about an ABC rule.
+
+    Parameters
+    ----------
+        rule_id : str
+            The rule identifier.
+
+        shortname : str
+            The name of the ABC rule (shortened).
+
+        longname : str
+            The full name of the ABC rule.
+
+        compute_fct : function
+            Function used to compute this rule.
+
+        algorithms : list of str
+            List of algorithms that compute this rule.
+
+        resolute_values : list of bool
+            Values that the `resolute` can take.
     """
 
     def __init__(
@@ -130,11 +150,15 @@ class Rule:
 
     def fastest_available_algorithm(self):
         """
-        Return the fastest lgorithm for this rule that is available on this system.
+        Return the fastest algorithm for this rule that is available on this system.
 
         An algorithm may not be available because its requirements are not satisfied. For example,
         some algorithms require Gurobi, others require gmpy2 - both of which are not requirements
         for abcvoting.
+
+        Returns
+        -------
+            str
         """
         if self.available_algorithms:
             # This rests on the assumption that ``self.algorithms`` are sorted by speed.
@@ -148,11 +172,19 @@ class Rule:
 
         Parameters
         ----------
-            profile : Profile
+            profile : abcvoting.preferences.Profile
                 A profile.
 
             committeesize : int
                 The desired committee size.
+
+            **kwargs : dict
+                Optional arguments for computing the rule (e.g., `resolute`).
+
+        Returns
+        -------
+            list of set
+                A list of winning committees.
         """
         return self._compute_fct(profile, committeesize, **kwargs)
 
@@ -169,11 +201,33 @@ class Rule:
 
         Parameters
         ----------
-            profile : Profile
+
+            profile : abcvoting.preferences.Profile
                 A profile.
 
             committeesize : int
                 The desired committee size.
+
+            algorithm : str, optional
+                The algorithm to be used.
+
+            resolute : bool
+                Return only one winning committee.
+
+                If `resolute=False`, all winning committees are computed
+                (subject to `max_num_of_committees`).
+
+            max_num_of_committees : int, optional
+                At most `max_num_of_committees` winning committees are computed.
+
+                If `max_num_of_committees=None`, the number of winning committees is not
+                restricted.
+                The default value of `max_num_of_committees` can be modified via the constant
+                `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+            Returns
+            -------
+                bool
         """
         if committeesize < 1:
             raise ValueError(f"Parameter `committeesize` must be a positive integer.")
@@ -204,6 +258,11 @@ class Rule:
 class UnknownRuleIDError(ValueError):
     """
     Error: unknown rule id.
+
+    Parameters
+    ----------
+        rule_id : str
+            The unknown rule identifier.
     """
 
     def __init__(self, rule_id):
@@ -214,6 +273,14 @@ class UnknownRuleIDError(ValueError):
 class UnknownAlgorithm(ValueError):
     """
     Error: unknown algorithm for a given ABC rule.
+
+    Parameters
+    ----------
+        rule_id : str
+            The ABC rule for which the algorithm is not known.
+
+        algorithm : str
+            The unknown algorithm.
     """
 
     def __init__(self, rule_id, algorithm):
@@ -226,6 +293,14 @@ class NoAvailableAlgorithm(ValueError):
     Exception: none of the implemented algorithms are available.
 
     This error occurs because no solvers are installed.
+
+    Parameters
+    ----------
+        rule_id : str
+            The ABC rule for which no algorithm are available.
+
+        algorithms : list of str
+            List of algorithms for this rule (none of which are available).
     """
 
     def __init__(self, rule_id, algorithms):
@@ -263,6 +338,16 @@ available_algorithms = _available_algorithms()
 def get_rule(rule_id):
     """
     Get instance of `Rule` for the ABC rule specified by `rule_id`.
+
+    Parameters
+    ----------
+        rule_id : str
+            The rule identifier.
+
+    Returns
+    -------
+        Rule
+            A corresponding `Rule` object.
     """
     _THIELE_ALGORITHMS = (
         # algorithms sorted by speed
@@ -331,7 +416,7 @@ def get_rule(rule_id):
         return Rule(
             rule_id=rule_id,
             shortname="lex-CC",
-            longname="Lexicographic Approval Chamberlin-Courant (lex-CC)",
+            longname="Lexicographic Chamberlin-Courant (lex-CC)",
             compute_fct=compute_lexcc,
             # algorithms sorted by speed
             algorithms=("gurobi", "mip_gurobi", "brute-force", "mip_cbc"),
@@ -559,17 +644,23 @@ def compute(rule_id, profile, committeesize, result=None, **kwargs):
 
     Parameters
     ----------
-        profile : Profile
+        rule_id : str
+            The rule identifier.
+
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committeesize : int
             The desired committee size.
 
-        result : list of set
+        result : list of set, optional
             Expected winning committees.
 
             This is used in unit tests to verify correctness. Raises `ValueError` if
             `result` is different from actual winning committees.
+
+        **kwargs : dict
+            Optional arguments for computing the rule (e.g., `resolute`).
 
     Returns
     -------
@@ -620,22 +711,22 @@ def compute_thiele_method(
         scorefct_id : str
             A string identifying the score function that defines the Thiele method.
 
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committeesize : int
             The desired committee size.
 
-       algorithm : str, optional
+        algorithm : str, optional
             The algorithm to be used.
 
-       resolute : bool
+        resolute : bool, optional
             Return only one winning committee.
 
             If `resolute=False`, all winning committees are computed (subject to
             `max_num_of_committees`).
 
-       max_num_of_committees : int, optional
+        max_num_of_committees : int, optional
             At most `max_num_of_committees` winning committees are computed.
 
             If `max_num_of_committees=None`, the number of winning committees is not restricted.
@@ -826,18 +917,39 @@ def compute_pav(
 
     Parameters
     ----------
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committeesize : int
             The desired committee size.
 
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for PAV:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("pav").algorithms)
+                ('gurobi', 'mip_gurobi', 'mip_cbc', 'branch-and-bound', 'brute-force')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
     Returns
     -------
         list of set
-            The winning committees.
-
-            If `resolute=True`, the list contains only one winning committee.
+            A list of winning committees.
     """
     return compute_thiele_method(
         scorefct_id="pav",
@@ -869,18 +981,39 @@ def compute_slav(
 
     Parameters
     ----------
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committeesize : int
             The desired committee size.
 
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for SLAV:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("slav").algorithms)
+                ('gurobi', 'mip_gurobi', 'mip_cbc', 'branch-and-bound', 'brute-force')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
     Returns
     -------
         list of set
-            The winning committees.
-
-            If `resolute=True`, the list contains only one winning committee.
+            A list of winning committees.
     """
     return compute_thiele_method(
         scorefct_id="slav",
@@ -908,6 +1041,42 @@ def compute_cc(
     "Multi-Winner Voting with Approval Preferences"
     by Martin Lackner and Piotr Skowron
     <https://arxiv.org/abs/2007.01795>
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Approval Chamberlin-Courant (CC):
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("cc").algorithms)
+                ('gurobi', 'mip_gurobi', 'ortools_cp', 'branch-and-bound', 'brute-force', 'mip_cbc')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     return compute_thiele_method(
         scorefct_id="cc",
@@ -927,15 +1096,52 @@ def compute_lexcc(
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
     """
-    Compute winning committees with a lexicographic variant of Approval Chamberlin-Courant (CC).
+    Compute winning committees with a Lexicographic Chamberlin-Courant (lex-CC).
 
-    This ABC rule maximizes the CC score, i.e., the number of voters with at least one approved
+    This ABC rule is a lexicographic variant of Approval Chamberlin-Courant (CC). It maximizes the
+    CC score, i.e., the number of voters with at least one approved
     candidate in the winning committee. If there is more than one such committee, it chooses the
     committee with most voters having at least two approved candidates in the committee. This
     tie-breaking continues with values of 3, 4, .., k if necessary.
 
     This rule can be seen as an analogue to the leximin social welfare ordering for utility
     functions.
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Lexicographic Chamberlin-Courant (lex-CC):
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("lexcc").algorithms)
+                ('gurobi', 'mip_gurobi', 'brute-force', 'mip_cbc')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     rule_id = "lexcc"
     rule = get_rule(rule_id)
@@ -1030,12 +1236,45 @@ def compute_seq_thiele_method(
     resolute=True,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
-    """Sequential Thiele methods.
+    """
+    Sequential Thiele methods.
 
     For a mathematical description of these rules, see e.g.
     "Multi-Winner Voting with Approval Preferences"
     by Martin Lackner and Piotr Skowron
     <https://arxiv.org/abs/2007.01795>
+
+    Parameters
+    ----------
+        scorefct_id : str
+            A string identifying the score function that defines the Thiele method.
+
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     scores.get_marginal_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
     rule_id = "seq" + scorefct_id
@@ -1187,12 +1426,49 @@ def compute_seqpav(
     resolute=True,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
-    """Sequential PAV (seq-PAV).
+    """
+    Sequential PAV (seq-PAV).
 
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences"
     by Martin Lackner and Piotr Skowron
     <https://arxiv.org/abs/2007.01795>
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Sequential PAV:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("seqpav").algorithms)
+                ('standard',)
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     return compute_seq_thiele_method(
         scorefct_id="pav",
@@ -1211,13 +1487,50 @@ def compute_seqslav(
     resolute=True,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
-    """Sequential Sainte-Lague Approval Voting (SLAV).
+    """
+    Sequential Sainte-Lague Approval Voting (SLAV).
 
     For a mathematical description of SLAV, see e.g.
     Martin Lackner and Piotr Skowron
     Utilitarian Welfare and Representation Guarantees of Approval-Based Multiwinner Rules
     In Artificial Intelligence, 288: 103366, 2020.
     <https://arxiv.org/abs/1801.01527>
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Sequential SLAV:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("seqslav").algorithms)
+                ('standard',)
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     return compute_seq_thiele_method(
         scorefct_id="slav",
@@ -1236,12 +1549,49 @@ def compute_seqcc(
     resolute=True,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
-    """Sequential Chamberlin-Courant (seq-CC).
+    """
+    Sequential Chamberlin-Courant (seq-CC).
 
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences"
     by Martin Lackner and Piotr Skowron
     <https://arxiv.org/abs/2007.01795>
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Sequential CC:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("seqcc").algorithms)
+                ('standard',)
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     return compute_seq_thiele_method(
         scorefct_id="cc",
@@ -1261,12 +1611,45 @@ def compute_revseq_thiele_method(
     resolute=True,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
-    """Reverse sequential Thiele methods.
+    """
+    Reverse sequential Thiele methods.
 
     For a mathematical description of these rules, see e.g.
     "Multi-Winner Voting with Approval Preferences"
     by Martin Lackner and Piotr Skowron
     <https://arxiv.org/abs/2007.01795>
+
+    Parameters
+    ----------
+        scorefct_id : str
+            A string identifying the score function that defines the Thiele method.
+
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     scores.get_marginal_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
     rule_id = "revseq" + scorefct_id
@@ -1423,12 +1806,48 @@ def compute_revseqpav(
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
     """
-    Reverse sequential PAV (revseq-PAV).
+    Reverse Sequential PAV (revseq-PAV).
 
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences"
     by Martin Lackner and Piotr Skowron
     <https://arxiv.org/abs/2007.01795>
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Reverse Sequential PAV:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("revseqpav").algorithms)
+                ('standard',)
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     return compute_revseq_thiele_method(
         scorefct_id="pav",
@@ -1448,13 +1867,53 @@ def compute_separable_rule(
     resolute=True,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
-    """Separable rules (such as AV and SAV).
+    """
+    Separable rules (such as AV and SAV).
 
     For a mathematical description of separable rules (for ranking-based rules), see
     E. Elkind, P. Faliszewski, P. Skowron, and A. Slinko.
     Properties of multiwinner voting rules.
     Social Choice and Welfare, 48(3):599–632, 2017.
     <https://link.springer.com/article/10.1007/s00355-017-1026-z>
+
+    Parameters
+    ----------
+        rule_id : str
+            The rule identifier for a separable rule.
+
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for AV:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("av").algorithms)
+                ('standard',)
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     rule = get_rule(rule_id)
     if algorithm == "fastest":
@@ -1593,7 +2052,7 @@ def compute_sav(
 
     Parameters
     ----------
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committeesize : int
@@ -1609,7 +2068,7 @@ def compute_sav(
                 >>> print(abcrules.get_rule("sav").algorithms)
                 ('standard',)
 
-        resolute : bool
+        resolute : bool, optional
             Return only one winning committee.
 
             If `resolute=False`, all winning committees are computed (subject to
@@ -1658,7 +2117,7 @@ def compute_av(
 
     Parameters
     ----------
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committeesize : int
@@ -1674,7 +2133,7 @@ def compute_av(
                 >>> print(abcrules.get_rule("av").algorithms)
                 ('standard',)
 
-        resolute : bool
+        resolute : bool, optional
             Return only one winning committee.
 
             If `resolute=False`, all winning committees are computed (subject to
@@ -1719,7 +2178,7 @@ def compute_minimaxav(
 
     Parameters
     ----------
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committeesize : int
@@ -1735,7 +2194,7 @@ def compute_minimaxav(
                 >>> print(abcrules.get_rule("minimaxav").algorithms)
                 ('gurobi', 'mip_gurobi', 'ortools_cp', 'mip_cbc', 'brute-force')
 
-        resolute : bool
+        resolute : bool, optional
             Return only one winning committee.
 
             If `resolute=False`, all winning committees are computed (subject to
@@ -1861,7 +2320,7 @@ def compute_lexminimaxav(
 
     Parameters
     ----------
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committeesize : int
@@ -1877,7 +2336,7 @@ def compute_lexminimaxav(
                 >>> print(abcrules.get_rule("lexminimaxav").algorithms)
                 ('gurobi', 'brute-force')
 
-        resolute : bool
+        resolute : bool, optional
             Return only one winning committee.
 
             If `resolute=False`, all winning committees are computed (subject to
@@ -1989,7 +2448,7 @@ def compute_monroe(
 
     Parameters
     ----------
-        profile : Profile
+        profile : abcvoting.preferences.Profile
             A profile.
 
         committeesize : int
@@ -2004,9 +2463,8 @@ def compute_monroe(
 
                 >>> print(abcrules.get_rule("monroe").algorithms)
                 ('gurobi', 'mip_gurobi', 'mip_cbc', 'ortools_cp', 'brute-force')
-            )
 
-        resolute : bool
+        resolute : bool, optional
             Return only one winning committee.
 
             If `resolute=False`, all winning committees are computed (subject to
@@ -2121,6 +2579,42 @@ def compute_greedy_monroe(
     "Multi-Winner Voting with Approval Preferences"
     by Martin Lackner and Piotr Skowron
     <https://arxiv.org/abs/2007.01795>
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Greedy Monroe:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("greedy-monroe").algorithms)
+                ('standard',)
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     rule_id = "greedy-monroe"
     rule = get_rule(rule_id)
@@ -2244,6 +2738,42 @@ def compute_seqphragmen(
     "Multi-Winner Voting with Approval Preferences"
     by Martin Lackner and Piotr Skowron
     <https://arxiv.org/abs/2007.01795>
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Phragmen's sequential rule (seq-Phragmen):
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("seqphragmen").algorithms)
+                ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     rule_id = "seqphragmen"
     rule = get_rule(rule_id)
@@ -2522,10 +3052,44 @@ def compute_rule_x(
 
     Parameters
     ----------
-      skip_phragmen_phase : bool, default=False
-          Omit the second phase (that uses seq-Phragmen).
+        profile : abcvoting.preferences.Profile
+            A profile.
 
-          May result in a committee that is too small (length smaller than `committeesize`).
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Rule X (aka Method of Equal Shares):
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("rule-x").algorithms)
+                ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+        skip_phragmen_phase : bool, default=False
+             Omit the second phase (that uses seq-Phragmen).
+
+             May result in a committee that is too small (length smaller than `committeesize`).
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     if skip_phragmen_phase:
         rule_id = "rule-x-without-phragmen-phase"
@@ -2802,18 +3366,55 @@ def compute_minimaxphragmen(
 
     Minimizes the maximum load.
 
-    Warning: does not include the lexicographic optimization as specified
-    in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
-    Phragmen's Voting Methods and Justified Representation.
-    <https://arxiv.org/abs/2102.12305>
-    Instead: minimizes the maximum load (without consideration of the second-,
-    third-, ...-largest load
-
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences"
     by Martin Lackner and Piotr Skowron
     <https://arxiv.org/abs/2007.01795>
 
+    .. important::
+
+        Warning: does not include the lexicographic optimization as specified
+        in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
+        Phragmen's Voting Methods and Justified Representation.
+        <https://arxiv.org/abs/2102.12305>
+        Instead: minimizes the maximum load (without consideration of the second-,
+        third-, ...-largest load
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Phragmen's minimax rule (minimax-Phragmen):
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("minimaxphragmen").algorithms)
+                ('gurobi', 'mip_gurobi', 'mip_cbc')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     rule_id = "minimaxphragmen"
     rule = get_rule(rule_id)
@@ -2874,6 +3475,51 @@ def compute_leximinphragmen(
     Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
     Phragmen's Voting Methods and Justified Representation.
     <https://arxiv.org/abs/2102.12305>
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Phragmen's leximin rule (leximin-Phragmen):
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("leximinphragmen").algorithms)
+                ('gurobi',)
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+        lexicographic_tiebreaking : bool
+            Require lexicographic tiebreaking among tied committees.
+
+            This requires the computation of *all* winning committees and is therefore very slow.
+
+            .. important::
+
+                `lexicographic_tiebreaking=True` is only valid in "combination with resolute=True.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     rule_id = "leximinphragmen"
     rule = get_rule(rule_id)
@@ -2937,7 +3583,7 @@ def compute_phragmen_enestroem(
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
     """
-    Compute winning committees with Phragmen-Enestroem
+    Compute winning committees with Phragmen-Enestroem.
 
     This ABC rule is also known as Phragmen's first method and Enestroem's method.
 
@@ -2947,6 +3593,42 @@ def compute_phragmen_enestroem(
     Svante Janson
     Phragmén's and Thiele's election methods
     <https://arxiv.org/pdf/1611.08826.pdf> (Section 18.5, Page 59)
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Phragmen-Enestroem:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("phragmen-enestroem").algorithms)
+                ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     rule_id = "phragmen-enestroem"
     rule = get_rule(rule_id)
@@ -3084,6 +3766,42 @@ def compute_consensus_rule(
     Based on Perpetual Consensus from
     Martin Lackner Perpetual Voting: Fairness in Long-Term Decision Making
     In Proceedings of the 34th AAAI Conference on Artificial Intelligence (AAAI 2020)
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for the Consensus rule:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("consensus-rule").algorithms)
+                ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     rule_id = "consensus-rule"
     rule = get_rule(rule_id)
@@ -3217,6 +3935,42 @@ def compute_trivial_rule(
 ):
     """
     Compute winning committees with the trivial rule (all committees are winning).
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for the trivial rule:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("trivial").algorithms)
+                ('standard',)
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     rule_id = "trivial"
     rule = get_rule(rule_id)
@@ -3260,6 +4014,52 @@ def compute_rsd(
 ):
     """
     Compute winning committees with the Random Serial Dictator rule.
+
+    This rule randomy selects a permutation of voters. The first voter in this permutation
+    adds all approved candidates to the winning committee, then the second voter,
+    then the third, etc. At some point, a voter has more approved candidates than
+    can be added to the winning committee. In this case, as many as possible are added
+    (candidates with smaller index first). In this way, the winning committee is constructed.
+
+    .. important::
+
+        This algorithm is not deterministic and relies on the Python module `random`.
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Random Serial Dictator:
+
+            .. doctest::
+
+                >>> print(abcrules.get_rule("rsd").algorithms)
+                ('standard',)
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of set
+            A list of winning committees.
     """
     rule_id = "rsd"
     rule = get_rule(rule_id)
