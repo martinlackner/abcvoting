@@ -181,7 +181,7 @@ black formatter.
 
 Pre-commit hooks are not required, but they are recommended for development.
 [Pre-commit](https://pre-commit.com/) is used to manage and maintain pre-commit hooks. Install
-pre-commit (e.g. via apt, conda or pip) and then run`$ pre-commit install` to install the hooks.
+pre-commit (e.g. via apt, conda or pip) and then run `$ pre-commit install` to install the hooks.
 
 
 ## Acknowledgements

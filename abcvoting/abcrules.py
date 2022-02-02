@@ -573,7 +573,7 @@ def get_rule(rule_id):
             longname="Trivial Rule",
             compute_fct=compute_trivial_rule,
             algorithms=("standard",),
-            resolute_values=[False, True],
+            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
         )
     if rule_id == "rsd":
         return Rule(
