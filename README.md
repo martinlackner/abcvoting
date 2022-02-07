@@ -15,7 +15,7 @@
 Approval-based committee rules (ABC rules) are voting methods for selecting a committee, i.e., a fixed-size subset of candidates.
 ABC rules are also known as approval-based multi-winner rules.
 The input of such rules are [approval ballots](https://en.wikipedia.org/wiki/Approval_voting#/media/File:Approval_ballot.svg).
-We recommend the book *Multi-Winner Voting with Approval Preferences* ([freely available](https://arxiv.org/abs/2007.01795)) by Lackner and Skowron as a detailed introduction to ABC rules and related research directions [2].
+We recommend the book *Multi-Winner Voting with Approval Preferences* ([freely available](https://arxiv.org/abs/2007.01795)) by Lackner and Skowron [2] as a detailed introduction to ABC rules and related research directions.
 In addition, the [survey by Faliszewski et al.](http://research.illc.uva.nl/COST-IC1205/BookDocs/Chapters/TrendsCOMSOC-02.pdf) [1] is useful as a more general introduction to committee voting (not limited to approval ballots).
 
 The following ABC rules are implemented:
@@ -46,47 +46,6 @@ The following ABC rules are implemented:
 
 * and many more ...
 
-## Example
-
-The following code computes the Proportional Approval Voting (PAV) rule for a profile with 6 voters and 5 candidates. Candidates correspond to the numbers 0 to 4.
-
-```python
-from abcvoting.preferences import Profile
-from abcvoting import abcrules
-
-# a preference profile with 5 candidates (0, 1, 2, 3, 4)
-profile = Profile(5)
-
-# add six voters, specified by the candidates that they approve;
-# the first voter approves candidates 0, 1, and 2,
-# the second voter approves candidates 0 and 1, etc.
-profile.add_voters([{0,1,2}, {0,1}, {0,1}, {1,2}, {3,4}, {3,4}])
-committeesize = 3
-
-# find winning committees for this profile according to PAV
-print(abcrules.compute_pav(profile, committeesize))
-```
-The output is
-```
-[{0, 1, 3}, {0, 1, 4}]
-```
-which corresponds to the two winning committees {0,1,3} and {0,1,4}. Further examples can be found in the directory [examples/](examples).
-In [examples/abcsurvey/](examples/abcsurvey), all examples from the survey on ABC rules [2] are implemented.
-
-## Usage
-
-At the moment there is no command line interface. The package can be used only as Python model as
-shown in the example above.
-
-Notes:
-
-* Most computationally hard rules are also implemented via the ILP solver [Gurobi](http://www.gurobi.com/). The corresponding functions require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
-  If Gurobi is not available, the open-source solver [CBC](https://github.com/coin-or/Cbc) is a (slower) alternative.
-* Some functions use fractions (e.g., `compute_seqphragmen`). These compute significantly faster if the module [gmpy2](https://gmpy2.readthedocs.io/) is available. If gmpy2 is not available, the much slower Python module [fractions](https://docs.python.org/2/library/fractions.html) is used.
-* All voting methods have a parameter `resolute`. If it is set to true, only one winning committee is computed. In most cases, `resolute=True` speeds up the computation.
-* It is possible to specify the maximum number of committees that are returned by ABC rules via the parameter `max_num_of_committees`.
-This parameter has no effect if `resolute` is true.
-
 ## Installation
 
 Using pip:
@@ -107,10 +66,15 @@ Requirements:
 * see [setup.py](setup.py) for 3rd party dependencies
 
 Optional requirements:
-* gmpy2
-* Gurobi (gurobipy)
+* [gmpy2](https://pypi.org/project/gmpy2/): Some functions use fractions (e.g., `compute_seqphragmen`). These compute significantly faster if the module [gmpy2](https://gmpy2.readthedocs.io/) is available. If gmpy2 is not available, the much slower Python module [fractions](https://docs.python.org/2/library/fractions.html) is used.
+* [Gurobi (gurobipy)](https://www.gurobi.com/): Most computationally hard rules are also implemented via the ILP solver Gurobi. The corresponding functions require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
+  If Gurobi is not available, the open-source solver [CBC](https://github.com/coin-or/Cbc) is a (slower) alternative.
 
 <!-- TODO: add instructions for installation of solvers -->
+
+## Documentation
+
+A documentation can be found [here](https://martinlackner.github.io/abcvoting/).
 
 ## How to Cite
 
