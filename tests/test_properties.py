@@ -33,3 +33,24 @@ def test_pareto_optimality_methods(algorithm):
 
     assert not is_pareto_optimal
     assert monroe_output == [{2, 3}]
+
+
+# Test from literature: Lackner and Skowron 2021
+# With given input profile, the given committee should satisfy EJR
+@pytest.mark.parametrize("algorithm", ["brute-force", "gurobi"])
+def test_EJR_methods(algorithm):
+    # profile with 4 candidates: a, b, c, d
+    profile = Profile(4)
+
+    # add voters in the profile
+    profile.add_voters(
+        [[0, 3]] + [[0, 1]] + [[1, 2]] + [[2, 3]] + [[0]] * 2 + [[1]] * 2 + [[2]] * 2 + [[3]] * 2
+    )
+
+    # the input committee, which satisfies EJR
+    committee = {0, 1, 2}
+
+    # check whether the committee satisfies EJR
+    satisfies_EJR = properties.check_EJR(profile, committee, algorithm=algorithm)
+
+    assert satisfies_EJR
