@@ -627,6 +627,23 @@ def test_resolute_parameter(rule_id):
                     )
 
 
+@pytest.mark.parametrize("rule_id", abcrules.MAIN_RULE_IDS)
+def test_resolute_parameter_default(rule_id):
+    rule = abcrules.get_rule(rule_id)
+    resolute_values = rule.resolute_values
+    profile = Profile(5)
+    committeesize = 1
+    approval_sets = [{0}, {1}, {2}]
+    profile.add_voters(approval_sets)
+    committees1 = abcrules.compute(rule_id, profile, committeesize, resolute=resolute_values[0])
+    committees2 = abcrules.compute(
+        rule_id, profile, committeesize  # using default value for resolute
+    )
+    if rule_id == "rsd":
+        return  # RSD is randomized
+    assert misc.compare_list_of_committees(committees1, committees2)
+
+
 @pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)
 def test_abcrules_toofewcandidates(rule_id, algorithm, resolute):
     profile = Profile(5)
