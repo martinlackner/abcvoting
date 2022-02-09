@@ -35,22 +35,46 @@ def test_pareto_optimality_methods(algorithm):
     assert monroe_output == [{2, 3}]
 
 
-# Test from literature: Lackner and Skowron 2021
-# With given input profile, the given committee should satisfy EJR
+# instances to check output of EJR methods
+EJR_instances = []
+
+# create and add the first instance from literature:
+# Lackner and Skowron, 2021
+profile = Profile(4)
+profile.add_voters(
+    [[0, 3]] + [[0, 1]] + [[1, 2]] + [[2, 3]] + [[0]] * 2 + [[1]] * 2 + [[2]] * 2 + [[3]] * 2
+)
+committee = {0, 1, 2}
+expected_result = True
+EJR_instances.append((profile, committee, expected_result))
+
+# create and add the second instance
+# Aziz et al, 2016
+profile = Profile(6)
+profile.add_voters([[0]] * 2 + [[0, 1, 2]] * 2 + [[1, 2, 3]] * 2 + [[3, 4]] + [[3, 5]])
+committee = {0, 3, 4, 5}
+expected_result = False
+EJR_instances.append((profile, committee, expected_result))
+
+# create and add the third instance
+# Brill et al, 2021
+profile = Profile(14)
+profile.add_voters(
+    [[0, 1, 2]] * 2
+    + [[0, 1, 3]] * 2
+    + [[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]] * 6
+    + [[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]] * 5
+    + [[4, 5, 6, 7, 8, 9, 10, 11, 12, 13]] * 9
+)
+committee = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}
+expected_result = False
+EJR_instances.append((profile, committee, expected_result))
+
+
 @pytest.mark.parametrize("algorithm", ["brute-force", "gurobi"])
-def test_EJR_methods(algorithm):
-    # profile with 4 candidates: a, b, c, d
-    profile = Profile(4)
-
-    # add voters in the profile
-    profile.add_voters(
-        [[0, 3]] + [[0, 1]] + [[1, 2]] + [[2, 3]] + [[0]] * 2 + [[1]] * 2 + [[2]] * 2 + [[3]] * 2
-    )
-
-    # the input committee, which satisfies EJR
-    committee = {0, 1, 2}
-
+@pytest.mark.parametrize("profile, committee, expected_result", EJR_instances)
+def test_EJR_methods(algorithm, profile, committee, expected_result):
     # check whether the committee satisfies EJR
     satisfies_EJR = properties.check_EJR(profile, committee, algorithm=algorithm)
 
-    assert satisfies_EJR
+    assert satisfies_EJR == expected_result
