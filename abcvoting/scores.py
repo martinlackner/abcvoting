@@ -76,7 +76,7 @@ def thiele_score(scorefct_id, profile, committee):
         profile : abcvoting.preferences.Profile
             A profile.
 
-        committee : set
+        committee : set or tuple or list
             A committee.
 
     Returns
@@ -94,9 +94,9 @@ def thiele_score(scorefct_id, profile, committee):
     return score
 
 
-"""
-Thiele score functions:
-"""
+#
+# Thiele marginal score functions:
+#
 
 
 def geometric_marginal_score_fct(i, base):
@@ -267,9 +267,9 @@ def at_least_ell_fct(i, ell):
         return 0
 
 
-"""
-end of Thiele score functions
-"""
+#
+# end of Thiele marginal score functions:
+#
 
 
 def cumulative_score(marginal_scorefct, cand_in_com):
@@ -298,7 +298,7 @@ def cumulative_score(marginal_scorefct, cand_in_com):
 
 def marginal_thiele_scores_add(marginal_scorefct, profile, committee):
     """
-    Return marginal score increases from adding one candidate to the committe.
+    Return marginal score increases from adding one candidate to the committee.
 
     The function returns a list of length `num_cand` where the i-th entry contains the
     marginal score increase when adding candidate i.
@@ -317,8 +317,8 @@ def marginal_thiele_scores_add(marginal_scorefct, profile, committee):
 
     Returns
     -------
-        int
-            Marginal score increases from adding one candidate to the committe.
+        list
+            Marginal score increases from adding candidates to the committee.
     """
     marginal = [0] * profile.num_cand
     for voter in profile:
@@ -332,7 +332,7 @@ def marginal_thiele_scores_add(marginal_scorefct, profile, committee):
 
 def marginal_thiele_scores_remove(marginal_scorefct, profile, committee):
     """
-    Return marginal score decreases from removing one candidate from the committe.
+    Return marginal score decreases from removing one candidate from the committee.
 
     The function returns a list of length `num_cand` where the i-th entry contains the
     marginal score decrease when removing candidate i.
@@ -351,8 +351,8 @@ def marginal_thiele_scores_remove(marginal_scorefct, profile, committee):
 
     Returns
     -------
-        int
-            Marginal score decreases from removing one candidate from the committe.
+        list
+            Marginal score decreases from removing candidates from the committee.
     """
     marg_util_cand = [0] * profile.num_cand
     #  marginal utility gained by adding candidate to the committee

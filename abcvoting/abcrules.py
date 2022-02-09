@@ -3,11 +3,11 @@
 
 import functools
 import itertools
-from abcvoting.output import output
+from abcvoting.output import output, DETAILS
 from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, misc
 from abcvoting.misc import sorted_committees
 from abcvoting.misc import str_committees_with_header, header
-from abcvoting.misc import str_set_of_candidates, str_sets_of_candidates
+from abcvoting.misc import str_set_of_candidates
 from abcvoting import scores
 from fractions import Fraction
 import math
@@ -117,10 +117,10 @@ class Rule:
         compute_fct : function
             Function used to compute this rule.
 
-        algorithms : list of str
+        algorithms : tuple of str
             List of algorithms that compute this rule.
 
-        resolute_values : list of bool
+        resolute_values : tuple of bool
             Values that the `resolute` can take.
     """
 
@@ -299,7 +299,7 @@ class NoAvailableAlgorithm(ValueError):
         rule_id : str
             The ABC rule for which no algorithm are available.
 
-        algorithms : list of str
+        algorithms : tuple of str
             List of algorithms for this rule (none of which are available).
     """
 
@@ -357,8 +357,8 @@ def get_rule(rule_id):
         "branch-and-bound",
         "brute-force",
     )
-    _RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES = [False, True]
-    _RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES = [True, False]
+    _RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES = (False, True)
+    _RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES = (True, False)
     if rule_id == "av":
         return Rule(
             rule_id=rule_id,
@@ -1057,8 +1057,8 @@ def compute_cc(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("cc").algorithms)
-                ('gurobi', 'mip-gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force', 'mip-cbc')
+            >>> print(abcrules.get_rule("cc").algorithms)
+            ('gurobi', 'mip-gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force', 'mip-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
