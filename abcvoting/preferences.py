@@ -11,7 +11,6 @@ Preference profiles and voters
 """
 
 
-from abcvoting.misc import str_set_of_candidates
 from collections import OrderedDict
 
 
@@ -82,10 +81,10 @@ class Profile(object):
         A list of all candidates approved by at least one voter.
         """
         if self._approved_candidates is None:
-            _approved_candidates = set()
+            self._approved_candidates = set()
             for voter in self._voters:
-                _approved_candidates.update(voter.approved)
-        return _approved_candidates
+                self._approved_candidates.update(voter.approved)
+        return self._approved_candidates
 
     def __len__(self):
         return len(self._voters)
@@ -95,16 +94,13 @@ class Profile(object):
         # voter.approved might not be unique, because it is used as dict key
         # (see e.g. the variable utility in abcrules_gurobi or propositionA3.py)
         if isinstance(voter, Voter):
-            _voter = Voter(voter.approved, weight=voter.weight)
+            _voter = Voter(voter.approved, weight=voter.weight, num_cand=self.num_cand)
         else:
-            _voter = Voter(voter)
+            _voter = Voter(voter, num_cand=self.num_cand)
 
         # there might be new approved candidates,
         # but update self._approved_candidates only on demand
         self._approved_candidates = None
-
-        # this check is a bit redundant, but needed to check for consistency with self.num_cand
-        _voter.check_valid(self.num_cand)
 
         return _voter
 
@@ -187,7 +183,7 @@ class Profile(object):
         if self.has_unit_weights():
             output = f"profile with {len(self._voters)} votes and {self.num_cand} candidates:\n"
             for voter in self._voters:
-                output += " " + str_set_of_candidates(voter.approved, self.cand_names) + ",\n"
+                output += " " + voter.str_with_names(self.cand_names) + ",\n"
         else:
             output = (
                 f"weighted profile with {len(self._voters)} votes"
@@ -195,7 +191,7 @@ class Profile(object):
             )
             for voter in self._voters:
                 output += f" {voter.weight} * "
-                output += f"{str_set_of_candidates(voter.approved, self.cand_names)} ,\n"
+                output += f"{str(voter, self.cand_names)} ,\n"
         return output[:-2]
 
     def is_party_list(self):
@@ -235,11 +231,8 @@ class Profile(object):
         output += "profile with %d votes and %d candidates:\n" % (len(self._voters), self.num_cand)
         for approval_set in compact:
             output += (
-                " "
-                + str(compact[approval_set])
-                + " x "
-                + str_set_of_candidates(approval_set, self.cand_names)
-                + ",\n"
+                f" {compact[approval_set]} x "
+                f"{CandidateSet(approval_set).str_with_names(self.cand_names)},\n"
             )
         output = output[:-2]
         if not self.has_unit_weights():
@@ -255,24 +248,47 @@ class Voter:
 
     Parameters
     ----------
-        approved : iterable
-            List/tuple/set of approved candidates.
+        approved : CandidateSet
+            The set of approved candidates.
 
         weight : int or Fraction, default=1
             The weight of the voter.
 
             This should not be used as the number of voters with these approved candidates.
+
+        num_cand : int, optional
+            The maximum number of candidates. Used only for checks.
+
+            If this `num_cand` is provided, it is verified that `approved` does not contain
+            numbers `>= num_cand`.
     """
 
-    def __init__(self, approved, weight=1):
-        self.approved = set(approved)  # approval set, i.e., the set of approved candidates
+    def __init__(self, approved, weight=1, num_cand=None):
+        self.approved = CandidateSet(approved, num_cand=num_cand)
         self.weight = weight
 
-        # does not check for num_cand, because not known here
-        self.check_valid(approved_raw=approved)
+        # check weights
+        if not self.weight > 0:
+            raise ValueError("Weight should be a number > 0.")
 
     def __str__(self):
-        return str(list(self.approved))
+        return str(self.approved)
+
+    def str_with_names(self, cand_names=None):
+        """
+        Format a Voter, using the names of candidates (instead of indices) if provided.
+
+        Parameters
+        ----------
+
+            cand_names : list of str or str, optional
+                List of symbolic names for every candidate.
+
+        Returns
+        -------
+            str
+        """
+        return self.approved.str_with_names(cand_names)
 
     # some shortcuts, removed for clarity
     #
@@ -282,45 +298,69 @@ class Voter:
     # def __iter__(self):
     #     return iter(self.approved)
 
-    def check_valid(self, num_cand=float("inf"), approved_raw=None):
-        """
-        Check if Voter is valid.
 
-        Check if approved candidates are given as non-negative integers.
-        If `num_cand` is known, also check if they are too large. Double entries are checked if
-        `approved_raw` is given.
+class CandidateSet(set):
+    """
+    A set of candidates, that is, a set of positive integers.
+
+    Parameters
+    ----------
+
+        candidates : iterable
+            An iterable of candidates (positive integers).
+
+        num_cand : int, optional
+            The maximum number of candidates. Used only for checks.
+
+            If this `num_cand` is provided, it is verified that `approved` does not contain
+            numbers `>= num_cand`.
+    """
+
+    def __init__(self, candidates=(), num_cand=None):
+        # note: empty approval sets are fine
+
+        super(CandidateSet, self).__init__(candidates)
+        if len(candidates) != len(self):
+            raise ValueError(f"CandidateSet initialized with duplicate elements ({candidates}).")
+
+        for cand in candidates:
+            if not isinstance(cand, int):
+                raise TypeError(
+                    f"Object of type {str(type(cand))} not suitable as candidate, "
+                    f"only positive integers allowed."
+                )
+
+        if not all(cand >= 0 for cand in candidates):
+            raise ValueError(
+                f"CandidateSet initialized with elements that are not positive "
+                f"integers ({candidates})."
+            )
+
+        if num_cand is not None and any(cand >= num_cand for cand in candidates):
+            raise ValueError(
+                f"CandidateSet initialized with elements that are >= num_cand ({num_cand}), "
+                f"the number of candidate ({candidates})."
+            )
+
+    def __str__(self):
+        return self.str_with_names()
+
+    def str_with_names(self, cand_names=None):
+        """
+        Format a CandidateSet, using the names of candidates (instead of indices) if provided.
 
         Parameters
         ----------
-            num_cand : int, optional
-                Number of candidates.
 
-                Also determines that candidates are indexed by `0`, ..., `profile.num_cand-1`.
-
-            approved_raw : iterable, optional
-                Input for the `Voter.__init__()` constructur.
-
-                Should be a list/tuple/set of approved candidates.
+            cand_names : list of str or str, optional
+                List of symbolic names for every candidate.
 
         Returns
         -------
-            bool
+            str
         """
-        if approved_raw is not None and len(self.approved) < len(approved_raw):
-            raise ValueError(
-                f"double entries found in list of approved candidates: {approved_raw}"
-            )
-
-        # note: empty approval sets are fine
-        for candidate in self.approved:
-            if not isinstance(candidate, int):
-                raise TypeError(
-                    f"Object of type {str(type(candidate))} not suitable as candidate, "
-                    f"only positive integers allowed."
-                )
-            if candidate < 0 or candidate >= num_cand:
-                raise ValueError(str(self) + " not valid for num_cand = " + str(num_cand))
-
-        # check weights
-        if not self.weight > 0:
-            raise ValueError("Weight should be a number > 0.")
+        if cand_names is None:
+            named = sorted(str(cand) for cand in self)
+        else:
+            named = sorted([cand_names[cand] for cand in self])
+        return "{" + ", ".join(named) + "}"

@@ -3,7 +3,7 @@ abcvoting.abcrules
 
 .. testsetup::
 
-    from abcvoting import abcrules
+    from abcvoting.abcrules import *
 
 .. automodule:: abcvoting.abcrules
    :members:

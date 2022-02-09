@@ -25,8 +25,9 @@ And finally, let's compute the winning committees for this profile according to 
 .. doctest::
 
     >>> print(abcrules.compute_pav(profile, committeesize=3))
-    [{0, 1, 3}, {0, 1, 4}]
+    [CandidateSet({0, 1, 3}), CandidateSet({0, 1, 4})]
 
+Committees are of the type `CandidateSet`, which is essentially a `set` with some extra validity checks.
 We see that there are two winning committees: {0,1,3} and {0,1,4}.
 
 We can also compute the winning committees for several ABC voting rules at once.
@@ -39,8 +40,8 @@ These ABC rules are identified by their `rule_id`: `"av"`, `"seqcc"`, and `"seqp
 
     >>> for rule_id in ["av", "seqcc", "seqphragmen"]:
     ...    print(abcrules.compute(rule_id, profile, committeesize=3))
-    [{0, 1, 2}]
-    [{0, 3, 4}]
-    [{0, 1, 3}]
+    [CandidateSet({0, 1, 2})]
+    [CandidateSet({0, 3, 4})]
+    [CandidateSet({0, 1, 3})]
 
 Each of the three rules yields a different winning committee.

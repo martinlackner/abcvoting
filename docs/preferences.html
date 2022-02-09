@@ -95,6 +95,43 @@
 </ul>
 </div>
 <dl class="py class">
+<dt class="sig sig-object py" id="abcvoting.preferences.CandidateSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.preferences.</span></span><span class="sig-name descname"><span class="pre">CandidateSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.CandidateSet" title="Permalink to this definition"></a></dt>
+<dd><p>A set of candidates, that is, a set of positive integers.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>candidates</strong><span class="classifier">iterable</span></dt><dd><p>An iterable of candidates (positive integers).</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int, optional</span></dt><dd><p>The maximum number of candidates. Used only for checks.</p>
+<p>If this <cite>num_cand</cite> is provided, it is verified that <cite>approved</cite> does not contain
+numbers <cite>&gt;= num_cand</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="abcvoting.preferences.CandidateSet.str_with_names">
+<span class="sig-name descname"><span class="pre">str_with_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.CandidateSet.str_with_names" title="Permalink to this definition"></a></dt>
+<dd><p>Format a CandidateSet, using the names of candidates (instead of indices) if provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cand_names</strong><span class="classifier">list of str or str, optional</span></dt><dd><p>List of symbolic names for every candidate.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>str</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="abcvoting.preferences.Profile">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.preferences.</span></span><span class="sig-name descname"><span class="pre">Profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Profile" title="Permalink to this definition"></a></dt>
 <dd><p>Approval profiles.</p>
@@ -232,40 +269,37 @@ or by an object of type Voter.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="abcvoting.preferences.Voter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.preferences.</span></span><span class="sig-name descname"><span class="pre">Voter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">approved</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Voter" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.preferences.</span></span><span class="sig-name descname"><span class="pre">Voter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">approved</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Voter" title="Permalink to this definition"></a></dt>
 <dd><p>A set of approved candidates by one voter.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>approved</strong><span class="classifier">iterable</span></dt><dd><p>List/tuple/set of approved candidates.</p>
+<dt><strong>approved</strong><span class="classifier">CandidateSet</span></dt><dd><p>The set of approved candidates.</p>
 </dd>
 <dt><strong>weight</strong><span class="classifier">int or Fraction, default=1</span></dt><dd><p>The weight of the voter.</p>
 <p>This should not be used as the number of voters with these approved candidates.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int, optional</span></dt><dd><p>The maximum number of candidates. Used only for checks.</p>
+<p>If this <cite>num_cand</cite> is provided, it is verified that <cite>approved</cite> does not contain
+numbers <cite>&gt;= num_cand</cite>.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="abcvoting.preferences.Voter.check_valid">
-<span class="sig-name descname"><span class="pre">check_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_cand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approved_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Voter.check_valid" title="Permalink to this definition"></a></dt>
-<dd><p>Check if Voter is valid.</p>
-<p>Check if approved candidates are given as non-negative integers.
-If <cite>num_cand</cite> is known, also check if they are too large. Double entries are checked if
-<cite>approved_raw</cite> is given.</p>
-<dl class="field-list">
+<dt class="sig sig-object py" id="abcvoting.preferences.Voter.str_with_names">
+<span class="sig-name descname"><span class="pre">str_with_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Voter.str_with_names" title="Permalink to this definition"></a></dt>
+<dd><p>Format a Voter, using the names of candidates (instead of indices) if provided.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>num_cand</strong><span class="classifier">int, optional</span></dt><dd><p>Number of candidates.</p>
-<p>Also determines that candidates are indexed by <cite>0</cite>, …, <cite>profile.num_cand-1</cite>.</p>
-</dd>
-<dt><strong>approved_raw</strong><span class="classifier">iterable, optional</span></dt><dd><p>Input for the <cite>Voter.__init__()</cite> constructur.</p>
-<p>Should be a list/tuple/set of approved candidates.</p>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cand_names</strong><span class="classifier">list of str or str, optional</span></dt><dd><p>List of symbolic names for every candidate.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>bool</dt><dd></dd>
+<dt>str</dt><dd></dd>
 </dl>
 </dd>
 </dl>

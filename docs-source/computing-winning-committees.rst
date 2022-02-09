@@ -24,7 +24,10 @@ In the following, we use the simple example used :doc:`previously <intro-abcrule
     >>> profile = Profile(num_cand=5)
     >>> profile.add_voters([{0, 1, 2}, {3}, {0, 1, 2, 3}, {0, 1, 2, 4}, {0, 1}, {4}])
     >>> print(abcrules.compute("pav", profile, committeesize=3))
-    [{0, 1, 3}, {0, 1, 4}]
+    [CandidateSet({0, 1, 3}), CandidateSet({0, 1, 4})]
+
+The output of all ABC is rules is a list of `CandidateSet`. `CandidateSet` is a sub class of set and represents
+a set of candidates.
 
 Number of winning committees
 ----------------------------
@@ -42,19 +45,20 @@ If `resolute=True`, only one winning committee is returned.
 .. doctest::
 
     >>> print(abcrules.compute("pav", profile, committeesize=3, resolute=True))
-    [{0, 1, 3}]
+    [CandidateSet({0, 1, 3})]
 
-If `resolute=True`, the maximum number of winning committees is determined by `max_num_of_committees`.
+If `resolute=False` (which is the default), the maximum number of winning committees
+is determined by `max_num_of_committees`.
 
 .. doctest::
 
     >>> print(abcrules.compute("pav", profile, committeesize=3, max_num_of_committees=1))
-    [{0, 1, 3}]
+    [CandidateSet({0, 1, 3})]
 
 .. doctest::
 
     >>> print(abcrules.compute("pav", profile, committeesize=3, max_num_of_committees=4))
-    [{0, 1, 3}, {0, 1, 4}]
+    [CandidateSet({0, 1, 3}), CandidateSet({0, 1, 4})]
 
 While most ABC rule are implemented for both  `resolute=True` and `resolute=False`, for some one choice is
 more natural than the other.
@@ -64,7 +68,7 @@ For example,
 .. doctest::
 
     >>> abcrules.get_rule("pav").resolute_values
-    [False, True]
+    (False, True)
 
 The first entry in this list is the default choice. That is, if we do not provide the `resolute` parameter
 when computing PAV, all winning committees are computed (`resolute=False`).

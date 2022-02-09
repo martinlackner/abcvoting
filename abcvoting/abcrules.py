@@ -8,6 +8,7 @@ from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, misc
 from abcvoting.misc import sorted_committees
 from abcvoting.misc import str_committees_with_header, header
 from abcvoting.misc import str_set_of_candidates
+from abcvoting.preferences import CandidateSet
 from abcvoting import scores
 from fractions import Fraction
 import math
@@ -183,7 +184,7 @@ class Rule:
 
         Returns
         -------
-            list of set
+            list of CandidateSet
                 A list of winning committees.
         """
         return self._compute_fct(profile, committeesize, **kwargs)
@@ -582,7 +583,7 @@ def get_rule(rule_id):
             longname="Random Serial Dictator",
             compute_fct=compute_rsd,
             algorithms=("standard",),
-            resolute_values=[True],
+            resolute_values=(True,),
         )
     if rule_id.startswith("geom"):
         parameter = rule_id[4:]
@@ -653,7 +654,7 @@ def compute(rule_id, profile, committeesize, result=None, **kwargs):
         committeesize : int
             The desired committee size.
 
-        result : list of set, optional
+        result : list of CandidateSet, optional
             Expected winning committees.
 
             This is used in unit tests to verify correctness. Raises `ValueError` if
@@ -664,8 +665,8 @@ def compute(rule_id, profile, committeesize, result=None, **kwargs):
 
     Returns
     -------
-        list of set
-            The winning committees.
+        list of CandidateSet
+            A list of the winning committees.
 
             If `resolute=True`, the list contains only one winning committee.
     """
@@ -735,8 +736,8 @@ def compute_thiele_method(
 
     Returns
     -------
-        list of set
-            The winning committees.
+        list of CandidateSet
+            A list of winning committees.
 
             If `resolute=True`, the list contains only one winning committee.
     """
@@ -930,7 +931,7 @@ def compute_pav(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("pav").algorithms)
+                >>> get_rule("pav").algorithms
                 ('gurobi', 'mip-gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
@@ -948,7 +949,7 @@ def compute_pav(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     return compute_thiele_method(
@@ -994,7 +995,7 @@ def compute_slav(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("slav").algorithms)
+                >>> get_rule("slav").algorithms
                 ('gurobi', 'mip-gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
@@ -1012,7 +1013,7 @@ def compute_slav(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     return compute_thiele_method(
@@ -1057,8 +1058,8 @@ def compute_cc(
 
             .. doctest::
 
-            >>> print(abcrules.get_rule("cc").algorithms)
-            ('gurobi', 'mip-gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force', 'mip-cbc')
+                >>> get_rule("cc").algorithms
+                ('gurobi', 'mip-gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force', 'mip-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -1075,7 +1076,7 @@ def compute_cc(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     return compute_thiele_method(
@@ -1122,7 +1123,7 @@ def compute_lexcc(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("lexcc").algorithms)
+                >>> get_rule("lexcc").algorithms
                 ('gurobi', 'mip-gurobi', 'brute-force', 'mip-cbc')
 
         resolute : bool, optional
@@ -1140,7 +1141,7 @@ def compute_lexcc(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "lexcc"
@@ -1273,7 +1274,7 @@ def compute_seq_thiele_method(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     scores.get_marginal_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
@@ -1451,7 +1452,7 @@ def compute_seqpav(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("seqpav").algorithms)
+                >>> get_rule("seqpav").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -1469,7 +1470,7 @@ def compute_seqpav(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     return compute_seq_thiele_method(
@@ -1513,7 +1514,7 @@ def compute_seqslav(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("seqslav").algorithms)
+                >>> get_rule("seqslav").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -1531,7 +1532,7 @@ def compute_seqslav(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     return compute_seq_thiele_method(
@@ -1574,7 +1575,7 @@ def compute_seqcc(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("seqcc").algorithms)
+                >>> get_rule("seqcc").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -1592,7 +1593,7 @@ def compute_seqcc(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     return compute_seq_thiele_method(
@@ -1650,7 +1651,7 @@ def compute_revseq_thiele_method(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     scores.get_marginal_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
@@ -1830,7 +1831,7 @@ def compute_revseqpav(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("revseqpav").algorithms)
+                >>> get_rule("revseqpav").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -1848,7 +1849,7 @@ def compute_revseqpav(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     return compute_revseq_thiele_method(
@@ -1896,7 +1897,7 @@ def compute_separable_rule(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("av").algorithms)
+                >>> get_rule("av").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -1914,7 +1915,7 @@ def compute_separable_rule(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule = get_rule(rule_id)
@@ -2067,7 +2068,7 @@ def compute_sav(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("sav").algorithms)
+                >>> get_rule("sav").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -2085,7 +2086,7 @@ def compute_sav(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     return compute_separable_rule(
@@ -2132,7 +2133,7 @@ def compute_av(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("av").algorithms)
+                >>> get_rule("av").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -2150,7 +2151,7 @@ def compute_av(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     return compute_separable_rule(
@@ -2193,7 +2194,7 @@ def compute_minimaxav(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("minimaxav").algorithms)
+                >>> get_rule("minimaxav").algorithms
                 ('gurobi', 'mip-gurobi', 'ortools-cp', 'mip-cbc', 'brute-force')
 
         resolute : bool, optional
@@ -2211,7 +2212,7 @@ def compute_minimaxav(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "minimaxav"
@@ -2335,7 +2336,7 @@ def compute_lexminimaxav(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("lexminimaxav").algorithms)
+                >>> get_rule("lexminimaxav").algorithms
                 ('gurobi', 'brute-force')
 
         resolute : bool, optional
@@ -2353,7 +2354,7 @@ def compute_lexminimaxav(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "lexminimaxav"
@@ -2463,7 +2464,7 @@ def compute_monroe(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("monroe").algorithms)
+                >>> get_rule("monroe").algorithms
                 ('gurobi', 'mip-gurobi', 'mip-cbc', 'ortools-cp', 'brute-force')
 
         resolute : bool, optional
@@ -2481,7 +2482,7 @@ def compute_monroe(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "monroe"
@@ -2597,7 +2598,7 @@ def compute_greedy_monroe(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("greedy-monroe").algorithms)
+                >>> get_rule("greedy-monroe").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -2615,7 +2616,7 @@ def compute_greedy_monroe(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "greedy-monroe"
@@ -2756,7 +2757,7 @@ def compute_seqphragmen(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("seqphragmen").algorithms)
+                >>> get_rule("seqphragmen").algorithms
                 ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
 
         resolute : bool, optional
@@ -2774,7 +2775,7 @@ def compute_seqphragmen(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "seqphragmen"
@@ -3067,7 +3068,7 @@ def compute_rule_x(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("rule-x").algorithms)
+                >>> get_rule("rule-x").algorithms
                 ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
 
         resolute : bool, optional
@@ -3090,7 +3091,7 @@ def compute_rule_x(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     if skip_phragmen_phase:
@@ -3397,7 +3398,7 @@ def compute_minimaxphragmen(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("minimaxphragmen").algorithms)
+                >>> get_rule("minimaxphragmen").algorithms
                 ('gurobi', 'mip-gurobi', 'mip-cbc')
 
         resolute : bool, optional
@@ -3415,7 +3416,7 @@ def compute_minimaxphragmen(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "minimaxphragmen"
@@ -3493,7 +3494,7 @@ def compute_leximinphragmen(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("leximinphragmen").algorithms)
+                >>> get_rule("leximinphragmen").algorithms
                 ('gurobi',)
 
         resolute : bool, optional
@@ -3520,7 +3521,7 @@ def compute_leximinphragmen(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "leximinphragmen"
@@ -3611,7 +3612,7 @@ def compute_phragmen_enestroem(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("phragmen-enestroem").algorithms)
+                >>> get_rule("phragmen-enestroem").algorithms
                 ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
 
         resolute : bool, optional
@@ -3629,7 +3630,7 @@ def compute_phragmen_enestroem(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "phragmen-enestroem"
@@ -3784,7 +3785,7 @@ def compute_consensus_rule(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("consensus-rule").algorithms)
+                >>> get_rule("consensus-rule").algorithms
                 ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
 
         resolute : bool, optional
@@ -3802,7 +3803,7 @@ def compute_consensus_rule(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "consensus-rule"
@@ -3953,7 +3954,7 @@ def compute_trivial_rule(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("trivial").algorithms)
+                >>> get_rule("trivial").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -3971,7 +3972,7 @@ def compute_trivial_rule(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "trivial"
@@ -4042,7 +4043,7 @@ def compute_rsd(
 
             .. doctest::
 
-                >>> print(abcrules.get_rule("rsd").algorithms)
+                >>> get_rule("rsd").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -4060,7 +4061,7 @@ def compute_rsd(
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A list of winning committees.
     """
     rule_id = "rsd"

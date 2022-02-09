@@ -132,7 +132,7 @@ Can be overridden with the parameter <cite>max_num_of_committees</cite> in any <
 <dd class="field-odd"><dl class="simple">
 <dt><strong>rule_id</strong><span class="classifier">str</span></dt><dd><p>The ABC rule for which no algorithm are available.</p>
 </dd>
-<dt><strong>algorithms</strong><span class="classifier">list of str</span></dt><dd><p>List of algorithms for this rule (none of which are available).</p>
+<dt><strong>algorithms</strong><span class="classifier">tuple of str</span></dt><dd><p>List of algorithms for this rule (none of which are available).</p>
 </dd>
 </dl>
 </dd>
@@ -154,9 +154,9 @@ Can be overridden with the parameter <cite>max_num_of_committees</cite> in any <
 </dd>
 <dt><strong>compute_fct</strong><span class="classifier">function</span></dt><dd><p>Function used to compute this rule.</p>
 </dd>
-<dt><strong>algorithms</strong><span class="classifier">list of str</span></dt><dd><p>List of algorithms that compute this rule.</p>
+<dt><strong>algorithms</strong><span class="classifier">tuple of str</span></dt><dd><p>List of algorithms that compute this rule.</p>
 </dd>
-<dt><strong>resolute_values</strong><span class="classifier">list of bool</span></dt><dd><p>Values that the <cite>resolute</cite> can take.</p>
+<dt><strong>resolute_values</strong><span class="classifier">tuple of bool</span></dt><dd><p>Values that the <cite>resolute</cite> can take.</p>
 </dd>
 </dl>
 </dd>
@@ -178,7 +178,7 @@ Can be overridden with the parameter <cite>max_num_of_committees</cite> in any <
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -279,7 +279,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt><strong>committeesize</strong><span class="classifier">int</span></dt><dd><p>The desired committee size.</p>
 </dd>
-<dt><strong>result</strong><span class="classifier">list of set, optional</span></dt><dd><p>Expected winning committees.</p>
+<dt><strong>result</strong><span class="classifier">list of CandidateSet, optional</span></dt><dd><p>Expected winning committees.</p>
 <p>This is used in unit tests to verify correctness. Raises <cite>ValueError</cite> if
 <cite>result</cite> is different from actual winning committees.</p>
 </dd>
@@ -289,7 +289,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt>list of set</dt><dd><p>The winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of the winning committees.</p>
 <p>If <cite>resolute=True</cite>, the list contains only one winning committee.</p>
 </dd>
 </dl>
@@ -317,7 +317,7 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for AV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;av&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;av&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;standard&#39;,)</span>
 </pre></div>
 </div>
@@ -335,7 +335,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -360,7 +360,7 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Approval Chamberlin-Courant (CC):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;cc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;cc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;ortools-cp&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;, &#39;mip-cbc&#39;)</span>
 </pre></div>
 </div>
@@ -378,7 +378,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -401,7 +401,7 @@ In Proceedings of the 34th AAAI Conference on Artificial Intelligence (AAAI 2020
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for the Consensus rule:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;consensus-rule&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;consensus-rule&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;float-fractions&#39;, &#39;gmpy2-fractions&#39;, &#39;standard-fractions&#39;)</span>
 </pre></div>
 </div>
@@ -419,7 +419,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -443,7 +443,7 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Greedy Monroe:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;greedy-monroe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;greedy-monroe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;standard&#39;,)</span>
 </pre></div>
 </div>
@@ -461,7 +461,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -488,7 +488,7 @@ functions.</p>
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Lexicographic Chamberlin-Courant (lex-CC):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;lexcc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;lexcc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;brute-force&#39;, &#39;mip-cbc&#39;)</span>
 </pre></div>
 </div>
@@ -506,7 +506,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -531,7 +531,7 @@ Phragmen’s Voting Methods and Justified Representation.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Phragmen’s leximin rule (leximin-Phragmen):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;leximinphragmen&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;leximinphragmen&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;gurobi&#39;,)</span>
 </pre></div>
 </div>
@@ -556,7 +556,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -584,7 +584,7 @@ it is not guaranteed how ties are broken.</p>
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Lexicographic Minimax AV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;lexminimaxav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;lexminimaxav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;gurobi&#39;, &#39;brute-force&#39;)</span>
 </pre></div>
 </div>
@@ -602,7 +602,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -626,7 +626,7 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Minimax AV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;minimaxav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;minimaxav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;ortools-cp&#39;, &#39;mip-cbc&#39;, &#39;brute-force&#39;)</span>
 </pre></div>
 </div>
@@ -644,7 +644,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -678,7 +678,7 @@ third-, …-largest load</p>
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Phragmen’s minimax rule (minimax-Phragmen):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;minimaxphragmen&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;minimaxphragmen&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;)</span>
 </pre></div>
 </div>
@@ -696,7 +696,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -720,7 +720,7 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Monroe:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;monroe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;monroe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;, &#39;ortools-cp&#39;, &#39;brute-force&#39;)</span>
 </pre></div>
 </div>
@@ -738,7 +738,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -763,7 +763,7 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for PAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;pav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;pav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;)</span>
 </pre></div>
 </div>
@@ -781,7 +781,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -808,7 +808,7 @@ Phragmén’s and Thiele’s election methods
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Phragmen-Enestroem:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;phragmen-enestroem&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;phragmen-enestroem&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;float-fractions&#39;, &#39;gmpy2-fractions&#39;, &#39;standard-fractions&#39;)</span>
 </pre></div>
 </div>
@@ -826,7 +826,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -865,7 +865,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -889,7 +889,7 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Reverse Sequential PAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;revseqpav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;revseqpav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;standard&#39;,)</span>
 </pre></div>
 </div>
@@ -907,7 +907,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -936,7 +936,7 @@ can be added to the winning committee. In this case, as many as possible are add
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Random Serial Dictator:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;rsd&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;rsd&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;standard&#39;,)</span>
 </pre></div>
 </div>
@@ -954,7 +954,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -979,7 +979,7 @@ See also &lt;<a class="reference external" href="https://arxiv.org/pdf/1911.1174
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Rule X (aka Method of Equal Shares):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;rule-x&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;rule-x&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;float-fractions&#39;, &#39;gmpy2-fractions&#39;, &#39;standard-fractions&#39;)</span>
 </pre></div>
 </div>
@@ -1000,7 +1000,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -1024,7 +1024,7 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for SAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;sav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;sav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;standard&#39;,)</span>
 </pre></div>
 </div>
@@ -1042,7 +1042,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -1069,7 +1069,7 @@ Social Choice and Welfare, 48(3):599–632, 2017.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for AV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;av&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;av&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;standard&#39;,)</span>
 </pre></div>
 </div>
@@ -1087,7 +1087,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -1126,7 +1126,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -1150,7 +1150,7 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Sequential CC:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqcc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqcc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;standard&#39;,)</span>
 </pre></div>
 </div>
@@ -1168,7 +1168,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -1192,7 +1192,7 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Sequential PAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqpav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqpav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;standard&#39;,)</span>
 </pre></div>
 </div>
@@ -1210,7 +1210,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -1234,7 +1234,7 @@ by Martin Lackner and Piotr Skowron
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Phragmen’s sequential rule (seq-Phragmen):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqphragmen&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqphragmen&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;float-fractions&#39;, &#39;gmpy2-fractions&#39;, &#39;standard-fractions&#39;)</span>
 </pre></div>
 </div>
@@ -1252,7 +1252,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -1277,7 +1277,7 @@ In Artificial Intelligence, 288: 103366, 2020.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Sequential SLAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqslav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqslav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;standard&#39;,)</span>
 </pre></div>
 </div>
@@ -1295,7 +1295,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -1321,7 +1321,7 @@ In Artificial Intelligence, 288: 103366, 2020.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for SLAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;slav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;slav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;)</span>
 </pre></div>
 </div>
@@ -1339,7 +1339,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>
@@ -1384,7 +1384,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt>list of set</dt><dd><p>The winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 <p>If <cite>resolute=True</cite>, the list contains only one winning committee.</p>
 </dd>
 </dl>
@@ -1405,7 +1405,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for the trivial rule:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;trivial&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span><span class="p">)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;trivial&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">(&#39;standard&#39;,)</span>
 </pre></div>
 </div>
@@ -1423,7 +1423,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of set</dt><dd><p>A list of winning committees.</p>
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
 </dd>
 </dl>
 </dd>

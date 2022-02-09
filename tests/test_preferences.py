@@ -3,8 +3,7 @@ Unit tests for preferences.py
 """
 
 import pytest
-from abcvoting.preferences import Profile
-from abcvoting.preferences import Voter
+from abcvoting.preferences import Profile, Voter, CandidateSet
 
 
 def test_invalid_approvalsets():
@@ -12,13 +11,25 @@ def test_invalid_approvalsets():
         Voter([-1])
 
     with pytest.raises(ValueError):
-        Voter([1]).check_valid(1)
+        Voter([1], num_cand=1)
 
     with pytest.raises(TypeError):
         Voter([0.42])
 
     with pytest.raises(ValueError):
         Voter([1, 1, 2, 42])
+
+    with pytest.raises(ValueError):
+        CandidateSet([-1])
+
+    with pytest.raises(ValueError):
+        CandidateSet([1], num_cand=1)
+
+    with pytest.raises(TypeError):
+        CandidateSet([0.42])
+
+    with pytest.raises(ValueError):
+        CandidateSet([1, 1, 2, 42])
 
 
 @pytest.mark.parametrize("num_cand", [6, 8])

@@ -101,19 +101,20 @@ the second voter approves candidate 3, etc.</p>
 </div>
 <p>And finally, let’s compute the winning committees for this profile according to PAV for a committee size of 3.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">compute_pav</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">committeesize</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
-<span class="go">[{0, 1, 3}, {0, 1, 4}]</span>
+<span class="go">[CandidateSet({0, 1, 3}), CandidateSet({0, 1, 4})]</span>
 </pre></div>
 </div>
-<p>We see that there are two winning committees: {0,1,3} and {0,1,4}.</p>
+<p>Committees are of the type <cite>CandidateSet</cite>, which is essentially a <cite>set</cite> with some extra validity checks.
+We see that there are two winning committees: {0,1,3} and {0,1,4}.</p>
 <p>We can also compute the winning committees for several ABC voting rules at once.
 Let’s compute them for Approval Voting (AV), Sequential Approval Chamberlin-Courant (seq-CC), and
 Phragmén’s Sequential Rule (seq-Phragmén).</p>
 <p>These ABC rules are identified by their <cite>rule_id</cite>: <cite>“av”</cite>, <cite>“seqcc”</cite>, and <cite>“seqphragmen”</cite>, respectively.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">rule_id</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;av&quot;</span><span class="p">,</span> <span class="s2">&quot;seqcc&quot;</span><span class="p">,</span> <span class="s2">&quot;seqphragmen&quot;</span><span class="p">]:</span>
 <span class="gp">... </span>   <span class="nb">print</span><span class="p">(</span><span class="n">abcrules</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">rule_id</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="n">committeesize</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
-<span class="go">[{0, 1, 2}]</span>
-<span class="go">[{0, 3, 4}]</span>
-<span class="go">[{0, 1, 3}]</span>
+<span class="go">[CandidateSet({0, 1, 2})]</span>
+<span class="go">[CandidateSet({0, 3, 4})]</span>
+<span class="go">[CandidateSet({0, 1, 3})]</span>
 </pre></div>
 </div>
 <p>Each of the three rules yields a different winning committee.</p>

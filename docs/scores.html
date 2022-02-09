@@ -255,7 +255,7 @@ In Artificial Intelligence, 288: 103366, 2020.
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.scores.marginal_thiele_scores_add">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.scores.</span></span><span class="sig-name descname"><span class="pre">marginal_thiele_scores_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">marginal_scorefct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.scores.marginal_thiele_scores_add" title="Permalink to this definition"></a></dt>
-<dd><p>Return marginal score increases from adding one candidate to the committe.</p>
+<dd><p>Return marginal score increases from adding one candidate to the committee.</p>
 <p>The function returns a list of length <cite>num_cand</cite> where the i-th entry contains the
 marginal score increase when adding candidate i.
 Candidates that are already in the committee receive a small value (-1).</p>
@@ -272,7 +272,7 @@ Candidates that are already in the committee receive a small value (-1).</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>int</dt><dd><p>Marginal score increases from adding one candidate to the committe.</p>
+<dt>list</dt><dd><p>Marginal score increases from adding candidates to the committee.</p>
 </dd>
 </dl>
 </dd>
@@ -282,7 +282,7 @@ Candidates that are already in the committee receive a small value (-1).</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.scores.marginal_thiele_scores_remove">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.scores.</span></span><span class="sig-name descname"><span class="pre">marginal_thiele_scores_remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">marginal_scorefct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.scores.marginal_thiele_scores_remove" title="Permalink to this definition"></a></dt>
-<dd><p>Return marginal score decreases from removing one candidate from the committe.</p>
+<dd><p>Return marginal score decreases from removing one candidate from the committee.</p>
 <p>The function returns a list of length <cite>num_cand</cite> where the i-th entry contains the
 marginal score decrease when removing candidate i.
 Candidates that are not in the committee receive a large value (max(marg_util_cand) + 1).</p>
@@ -299,7 +299,7 @@ Candidates that are not in the committee receive a large value (max(marg_util_ca
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>int</dt><dd><p>Marginal score decreases from removing one candidate from the committe.</p>
+<dt>list</dt><dd><p>Marginal score decreases from removing candidates from the committee.</p>
 </dd>
 </dl>
 </dd>
@@ -484,7 +484,7 @@ In Artificial Intelligence, 288: 103366, 2020.
 </dd>
 <dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
-<dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
+<dt><strong>committee</strong><span class="classifier">set or tuple or list</span></dt><dd><p>A committee.</p>
 </dd>
 </dl>
 </dd>

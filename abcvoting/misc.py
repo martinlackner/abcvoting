@@ -2,6 +2,8 @@
 Miscellaneous functions for committees (i.e., subsets of candidates).
 """
 
+from abcvoting.preferences import CandidateSet
+
 
 def sorted_committees(committees):
     """
@@ -9,15 +11,15 @@ def sorted_committees(committees):
 
     Parameters
     ----------
-        committees : list of iterable
-            A list of committees; committees can be sets, tuples, lists, etc.
+        committees : iterable of iterable
+            An iterable of committees; committees can be sets, tuples, lists, etc.
 
     Returns
     -------
-        list of set
+        list of CandidateSet
             A sorted list of committees (sets).
     """
-    return sorted([set(committee) for committee in committees], key=str)
+    return sorted([CandidateSet(committee) for committee in committees], key=str)
 
 
 def str_set_of_candidates(candset, cand_names=None):
@@ -26,9 +28,9 @@ def str_set_of_candidates(candset, cand_names=None):
 
     .. doctest::
 
-        >>> print(misc.str_set_of_candidates({0, 1, 3, 2}))
+        >>> print(str_set_of_candidates({0, 1, 3, 2}))
         {0, 1, 2, 3}
-        >>> print(misc.str_set_of_candidates({0, 3, 1}, cand_names="abcde"))
+        >>> print(str_set_of_candidates({0, 3, 1}, cand_names="abcde"))
         {a, b, d}
 
     Parameters
@@ -58,11 +60,11 @@ def str_sets_of_candidates(sets_of_candidates, cand_names=None):
 
     .. doctest::
 
-        >>> print(misc.str_sets_of_candidates([{0, 1, 3}, {0, 1, 4}]))
+        >>> print(str_sets_of_candidates([{0, 1, 3}, {0, 1, 4}]))
          {0, 1, 3}
          {0, 1, 4}
         <BLANKLINE>
-        >>> print(misc.str_sets_of_candidates([{0, 1, 3}, {0, 1, 4}], cand_names="abcde"))
+        >>> print(str_sets_of_candidates([{0, 1, 3}, {0, 1, 4}], cand_names="abcde"))
          {a, b, d}
          {a, b, e}
         <BLANKLINE>
@@ -92,12 +94,12 @@ def str_committees_with_header(committees, cand_names=None, winning=False):
 
     .. doctest::
 
-        >>> print(misc.str_committees_with_header([{0, 1, 3}, {0, 1, 4}], winning=True))
+        >>> print(str_committees_with_header([{0, 1, 3}, {0, 1, 4}], winning=True))
         2 winning committees:
          {0, 1, 3}
          {0, 1, 4}
         <BLANKLINE>
-        >>> print(misc.str_committees_with_header([{0, 1, 3}, {0, 1, 4}], cand_names="abcde"))
+        >>> print(str_committees_with_header([{0, 1, 3}, {0, 1, 4}], cand_names="abcde"))
         2 committees:
          {a, b, d}
          {a, b, e}
@@ -189,9 +191,9 @@ def compare_list_of_committees(committees1, committees2):
 
     .. doctest::
 
-        >>> misc.compare_list_of_committees([{0, 1, 3}, {0, 1, 4}], [{0, 4, 1}, {0, 1, 3}])
+        >>> compare_list_of_committees([{0, 1, 3}, {0, 1, 4}], [{0, 4, 1}, {0, 1, 3}])
         True
-        >>> misc.compare_list_of_committees([{0, 1, 3}, {0, 1, 4}], [{0, 1, 3}])
+        >>> compare_list_of_committees([{0, 1, 3}, {0, 1, 4}], [{0, 1, 3}])
         False
 
     Parameters
