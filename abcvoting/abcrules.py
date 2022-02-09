@@ -1306,41 +1306,43 @@ def compute_seq_thiele_method(
             "Computing all possible winning committees for any tiebreaking order\n"
             " (aka parallel universes tiebreaking) (resolute=False)\n"
         )
-    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-    if resolute:
-        output.details(
-            f"starting with the empty committee (score = "
-            f"{scores.thiele_score(scorefct_id, profile, [])})\n"
-        )
-        committee = []
-        for i, next_cand in enumerate(detailed_info["next_cand"]):
-            tied_cands = detailed_info["tied_cands"][i]
-            delta_score = detailed_info["delta_score"][i]
-            committee.append(next_cand)
-            output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
+    if output.verbosity <= DETAILS:  # skip thiele_score() calculations if not necessary
+        output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
+        if resolute:
             output.details(
-                f" score increases by {delta_score} to"
-                f" a total of {scores.thiele_score(scorefct_id, profile, committee)}"
+                f"starting with the empty committee (score = "
+                f"{scores.thiele_score(scorefct_id, profile, [])})\n"
             )
-            if len(tied_cands) > 1:
-                output.details(f" tie broken in favor of {next_cand},\n")
+            committee = []
+            for i, next_cand in enumerate(detailed_info["next_cand"]):
+                tied_cands = detailed_info["tied_cands"][i]
+                delta_score = detailed_info["delta_score"][i]
+                committee.append(next_cand)
+                output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
                 output.details(
-                    f" candidates "
-                    f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
-                    f" are tied (all would increase the score by the same amount {delta_score})"
+                    f" score increases by {delta_score} to"
+                    f" a total of {scores.thiele_score(scorefct_id, profile, committee)}"
                 )
-            output.details("")
+                if len(tied_cands) > 1:
+                    output.details(f" tie broken in favor of {next_cand},\n")
+                    output.details(
+                        f" candidates "
+                        f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)} "
+                        f"are tied (all would increase the score by the same amount {delta_score})"
+                    )
+                output.details("")
     output.info(
         str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
     )
 
-    output.details(scorefct_id.upper() + "-score of winning committee(s):")
-    for committee in committees:
-        output.details(
-            f" {str_set_of_candidates(committee, cand_names=profile.cand_names)}: "
-            f"{scores.thiele_score(scorefct_id, profile, committee)}"
-        )
-    output.details("\n")
+    if output.verbosity <= DETAILS:  # skip thiele_score() calculations if not necessary
+        output.details(scorefct_id.upper() + "-score of winning committee(s):")
+        for committee in committees:
+            output.details(
+                f" {str_set_of_candidates(committee, cand_names=profile.cand_names)}: "
+                f"{scores.thiele_score(scorefct_id, profile, committee)}"
+            )
+        output.details("\n")
     # end of optional output
 
     return sorted_committees(committees)
@@ -1361,13 +1363,13 @@ def _seq_thiele_resolute(scorefct_id, profile, committeesize):
         additional_score_cand = scores.marginal_thiele_scores_add(
             marginal_scorefct, profile, committee
         )
-        next_cand = additional_score_cand.index(max(additional_score_cand))
-        committee.append(next_cand)
         tied_cands = [
             cand
             for cand in range(len(additional_score_cand))
             if additional_score_cand[cand] == max(additional_score_cand)
         ]
+        next_cand = tied_cands[0]  # tiebreaking in favor of candidate with smallest index
+        committee.append(next_cand)
         detailed_info["next_cand"].append(next_cand)
         detailed_info["tied_cands"].append(tied_cands)
         detailed_info["delta_score"].append(max(additional_score_cand))
