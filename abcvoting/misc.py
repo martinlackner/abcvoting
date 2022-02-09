@@ -45,10 +45,11 @@ def str_set_of_candidates(candset, cand_names=None):
         str
     """
     if cand_names is None:
-        namedset = [str(cand) for cand in candset]
+        named = [str(cand) for cand in candset]
     else:
-        namedset = [cand_names[cand] for cand in candset]
-    return "{" + ", ".join(map(str, namedset)) + "}"
+        named = [cand_names[cand] for cand in candset]
+    named.sort()
+    return "{" + ", ".join(map(str, named)) + "}"
 
 
 def str_sets_of_candidates(sets_of_candidates, cand_names=None):
