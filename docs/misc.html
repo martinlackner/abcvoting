@@ -92,17 +92,20 @@
 <p>The order of candidates and their multiplicities in these lists are ignored.
 To be precise, two lists are equal if every committee in list1 is contained in list2 and
 vice versa.
-Committees are, as usual, sets of positive integers.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">compare_list_of_committees</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}],</span> <span class="p">[{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">}])</span>
+Committees are, as usual, of type <cite>CandidateSet</cite> (i.e., sets of positive integers).</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">comm1</span> <span class="o">=</span> <span class="n">CandidateSet</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comm2</span> <span class="o">=</span> <span class="n">CandidateSet</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">})</span>  <span class="c1"># the same set as `comm1`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comm3</span> <span class="o">=</span> <span class="n">CandidateSet</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">compare_list_of_committees</span><span class="p">([</span><span class="n">comm1</span><span class="p">,</span> <span class="n">comm2</span><span class="p">,</span> <span class="n">comm3</span><span class="p">],</span> <span class="p">[</span><span class="n">comm1</span><span class="p">,</span> <span class="n">comm3</span><span class="p">])</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">compare_list_of_committees</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}],</span> <span class="p">[{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">}])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">compare_list_of_committees</span><span class="p">([</span><span class="n">comm1</span><span class="p">,</span> <span class="n">comm3</span><span class="p">],</span> <span class="p">[</span><span class="n">comm1</span><span class="p">])</span>
 <span class="go">False</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>committees1, committees2</strong><span class="classifier">list of set</span></dt><dd><p>Two lists of committees.</p>
+<dt><strong>committees1, committees2</strong><span class="classifier">list of CandidateSet</span></dt><dd><p>Two lists of committees.</p>
 </dd>
 </dl>
 </dd>
@@ -123,7 +126,7 @@ or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>set1, set2</strong><span class="classifier">set</span></dt><dd><p>The two sets, for which the Hamming distance is computed.</p>
+<dt><strong>set1, set2</strong><span class="classifier">set of int</span></dt><dd><p>The two sets for which the Hamming distance is computed.</p>
 </dd>
 </dl>
 </dd>
@@ -170,7 +173,7 @@ or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>list of CandidateSet</dt><dd><p>A sorted list of committees (sets).</p>
+<dt>list of CandidateSet</dt><dd><p>A sorted list of committees.</p>
 </dd>
 </dl>
 </dd>
@@ -181,12 +184,14 @@ or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings
 <dt class="sig sig-object py" id="abcvoting.misc.str_committees_with_header">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">str_committees_with_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">committees</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">winning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.str_committees_with_header" title="Permalink to this definition"></a></dt>
 <dd><p>Nicely format a list of committees including a header (stating the number of committees).</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">str_committees_with_header</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}],</span> <span class="n">winning</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">comm1</span> <span class="o">=</span> <span class="n">CandidateSet</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comm2</span> <span class="o">=</span> <span class="n">CandidateSet</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">str_committees_with_header</span><span class="p">([</span><span class="n">comm1</span><span class="p">,</span> <span class="n">comm2</span><span class="p">],</span> <span class="n">winning</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <span class="go">2 winning committees:</span>
 <span class="go"> {0, 1, 3}</span>
 <span class="go"> {0, 1, 4}</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">str_committees_with_header</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}],</span> <span class="n">cand_names</span><span class="o">=</span><span class="s2">&quot;abcde&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">str_committees_with_header</span><span class="p">([</span><span class="n">comm1</span><span class="p">,</span> <span class="n">comm2</span><span class="p">],</span> <span class="n">cand_names</span><span class="o">=</span><span class="s2">&quot;abcde&quot;</span><span class="p">))</span>
 <span class="go">2 committees:</span>
 <span class="go"> {a, b, d}</span>
 <span class="go"> {a, b, e}</span>
@@ -195,7 +200,7 @@ or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>committees</strong><span class="classifier">list of set</span></dt><dd><p>A list of committees.</p>
+<dt><strong>committees</strong><span class="classifier">list of iterable of int</span></dt><dd><p>A list of committees (set of positive integers).</p>
 </dd>
 <dt><strong>cand_names</strong><span class="classifier">list of str or str, optional</span></dt><dd><p>List of symbolic names for every candidate.</p>
 </dd>
@@ -224,7 +229,7 @@ or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>candset</strong><span class="classifier">set of int</span></dt><dd><p>A set of candidates.</p>
+<dt><strong>candset</strong><span class="classifier">iterable of int</span></dt><dd><p>An iteratble of candidates.</p>
 </dd>
 <dt><strong>cand_names</strong><span class="classifier">list of str or str, optional</span></dt><dd><p>List of symbolic names for every candidate.</p>
 </dd>
@@ -242,11 +247,13 @@ or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings
 <dt class="sig sig-object py" id="abcvoting.misc.str_sets_of_candidates">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">str_sets_of_candidates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sets_of_candidates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.str_sets_of_candidates" title="Permalink to this definition"></a></dt>
 <dd><p>Nicely format a list of sets of candidates.</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">str_sets_of_candidates</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}]))</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">comm1</span> <span class="o">=</span> <span class="n">CandidateSet</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comm2</span> <span class="o">=</span> <span class="n">CandidateSet</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">str_sets_of_candidates</span><span class="p">([</span><span class="n">comm1</span><span class="p">,</span> <span class="n">comm2</span><span class="p">]))</span>
 <span class="go"> {0, 1, 3}</span>
 <span class="go"> {0, 1, 4}</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">str_sets_of_candidates</span><span class="p">([{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">}],</span> <span class="n">cand_names</span><span class="o">=</span><span class="s2">&quot;abcde&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">str_sets_of_candidates</span><span class="p">([</span><span class="n">comm1</span><span class="p">,</span> <span class="n">comm2</span><span class="p">],</span> <span class="n">cand_names</span><span class="o">=</span><span class="s2">&quot;abcde&quot;</span><span class="p">))</span>
 <span class="go"> {a, b, d}</span>
 <span class="go"> {a, b, e}</span>
 </pre></div>
@@ -254,7 +261,7 @@ or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>sets_of_candidates</strong><span class="classifier">list of set</span></dt><dd><p>A list of sets that contain candidates (i.e., non-negative integers).</p>
+<dt><strong>sets_of_candidates</strong><span class="classifier">list of iterable of int</span></dt><dd><p>A list of iterables that contain candidates (i.e., non-negative integers).</p>
 </dd>
 <dt><strong>cand_names</strong><span class="classifier">list of str or str, optional</span></dt><dd><p>List of symbolic names for every candidate.</p>
 </dd>
@@ -277,9 +284,9 @@ equivalent. Raise RuntimeError if not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>actual_committees</strong><span class="classifier">list of set</span></dt><dd><p>Output of an ABC voting rule.</p>
+<dt><strong>actual_committees</strong><span class="classifier">list of CandidateSet</span></dt><dd><p>Output of an ABC voting rule.</p>
 </dd>
-<dt><strong>expected_committees</strong><span class="classifier">list of set</span></dt><dd><p>Expected output of this voting rule.</p>
+<dt><strong>expected_committees</strong><span class="classifier">list of CandidateSet</span></dt><dd><p>Expected output of this voting rule.</p>
 </dd>
 <dt><strong>resolute</strong><span class="classifier">bool, default=False</span></dt><dd><p>If <cite>True</cite>, raise RuntimeError if more <cite>actual_committees</cite> does not have length 1.</p>
 </dd>

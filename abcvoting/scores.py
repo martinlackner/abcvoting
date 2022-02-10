@@ -282,7 +282,7 @@ def cumulative_score(marginal_scorefct, cand_in_com):
 
     Parameters
     ----------
-        marginal_scorefct : function
+        marginal_scorefct : func
             The marginal score function.
 
         cand_in_com : int
@@ -306,13 +306,13 @@ def marginal_thiele_scores_add(marginal_scorefct, profile, committee):
 
     Parameters
     ----------
-        marginal_scorefct : function
+        marginal_scorefct : func
             The marginal score function to be used.
 
         profile : abcvoting.preferences.Profile
             A profile.
 
-        committee : set
+        committee : iterable of int
             A committee.
 
     Returns
@@ -340,7 +340,7 @@ def marginal_thiele_scores_remove(marginal_scorefct, profile, committee):
 
     Parameters
     ----------
-        marginal_scorefct : function
+        marginal_scorefct : func
             The marginal score function to be used.
 
         profile : abcvoting.preferences.Profile
@@ -376,7 +376,7 @@ def monroescore(profile, committee):
         profile : abcvoting.preferences.Profile
             A profile.
 
-        committee : set
+        committee : iterable of int
             A committee.
 
     Returns
@@ -485,7 +485,7 @@ def minimaxav_score(profile, committee):
         profile : abcvoting.preferences.Profile
             A profile.
 
-        committee : set
+        committee : iterable of int
             A committee.
 
     Returns

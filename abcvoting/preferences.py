@@ -12,6 +12,7 @@ Preference profiles and voters
 
 
 from collections import OrderedDict
+from abcvoting import misc
 
 
 class Profile(object):
@@ -43,11 +44,11 @@ class Profile(object):
 
             List of all candidates, i.e., the list containing `0`, ..., `profile.num_cand-1`.
 
-        cand_names : list of str
+        cand_names : list of str or str
 
-            List of symbolic names for every candidate.
+            Symbolic names for every candidate.
 
-            Defaults to `[1, 2, ..., str(num_cand)]`.
+            Defaults to `["0", "1", ..., str(num_cand-1)]`.
     """
 
     def __init__(self, num_cand, cand_names=None):
@@ -191,7 +192,7 @@ class Profile(object):
             )
             for voter in self._voters:
                 output += f" {voter.weight} * "
-                output += f"{str(voter, self.cand_names)} ,\n"
+                output += f"{misc.str_set_of_candidates(voter.approved, self.cand_names)} ,\n"
         return output[:-2]
 
     def is_party_list(self):
@@ -359,8 +360,4 @@ class CandidateSet(set):
         -------
             str
         """
-        if cand_names is None:
-            named = sorted(str(cand) for cand in self)
-        else:
-            named = sorted([cand_names[cand] for cand in self])
-        return "{" + ", ".join(named) + "}"
+        return misc.str_set_of_candidates(self, cand_names)

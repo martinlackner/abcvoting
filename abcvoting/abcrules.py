@@ -5,9 +5,8 @@ import functools
 import itertools
 from abcvoting.output import output, DETAILS
 from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, misc
+from abcvoting.misc import str_committees_with_header, header, str_set_of_candidates
 from abcvoting.misc import sorted_committees
-from abcvoting.misc import str_committees_with_header, header
-from abcvoting.misc import str_set_of_candidates
 from abcvoting.preferences import CandidateSet
 from abcvoting import scores
 from fractions import Fraction
@@ -115,7 +114,7 @@ class Rule:
         longname : str
             The full name of the ABC rule.
 
-        compute_fct : function
+        compute_fct : func
             Function used to compute this rule.
 
         algorithms : tuple of str
@@ -2413,7 +2412,7 @@ def _lexminimaxav_bruteforce(profile, committeesize, resolute, max_num_of_commit
     opt_distances = [profile.num_cand + 1] * len(profile)
     for committee in itertools.combinations(profile.candidates, committeesize):
         distances = sorted(
-            [misc.hamming(voter.approved, committee) for voter in profile], reverse=True
+            [misc.hamming(voter.approved, set(committee)) for voter in profile], reverse=True
         )
         for i in range(len(distances)):
             if opt_distances[i] < distances[i]:
@@ -3989,13 +3988,14 @@ def compute_trivial_rule(
 
     if algorithm == "standard":
         if resolute:
-            committees = [list(range(committeesize))]
+            committees = [range(committeesize)]
         else:
             all_committees = itertools.combinations(profile.candidates, committeesize)
             if max_num_of_committees is None:
                 committees = list(all_committees)
             else:
-                committees = list(itertools.islice(all_committees, max_num_of_committees))
+                committees = itertools.islice(all_committees, max_num_of_committees)
+        committees = [CandidateSet(comm) for comm in committees]
     else:
         raise UnknownAlgorithm(rule_id, algorithm)
 

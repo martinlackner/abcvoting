@@ -8,7 +8,7 @@ Two data formats are supported:
 
 
 import os
-from abcvoting.preferences import Profile, Voter
+from abcvoting.preferences import Profile, Voter, CandidateSet
 from math import ceil
 from abcvoting import misc
 import ruamel.yaml
@@ -343,9 +343,9 @@ def read_abcvoting_yaml_file(filename):
         compute_instance["committeesize"] = committeesize
         if "result" in compute_instance.keys():
             if compute_instance["result"] is not None:
-                # compute_instance["result"] should be a list of committees (sets)
+                # compute_instance["result"] should be a list of CandidateSet
                 compute_instance["result"] = [
-                    set(committee) for committee in compute_instance["result"]
+                    CandidateSet(committee) for committee in compute_instance["result"]
                 ]
 
     for key in data.keys():

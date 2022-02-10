@@ -86,29 +86,9 @@
 <span id="abcvoting-genprofiles"></span><h1>abcvoting.genprofiles<a class="headerlink" href="#module-abcvoting.genprofiles" title="Permalink to this headline"></a></h1>
 <p>Random generation of approval profiles.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="abcvoting.genprofiles.random_2d_points_party_list_profile">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.genprofiles.</span></span><span class="sig-name descname"><span class="pre">random_2d_points_party_list_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_parties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partypointmode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voterpointmode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uniform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.genprofiles.random_2d_points_party_list_profile" title="Permalink to this definition"></a></dt>
-<dd><p>Generate profile from randomly generated 2d points.</p>
-<p>according
-to some distributions with the given sigma.
-This selects parties for each voter, the parties are either
-uniform (equal size) or randomly generated (at least 1) candidate
-lists.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.genprofiles.random_2d_points_profile">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.genprofiles.</span></span><span class="sig-name descname"><span class="pre">random_2d_points_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candpointmode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voterpointmode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approval_threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.genprofiles.random_2d_points_profile" title="Permalink to this definition"></a></dt>
 <dd><p>Generate profiles from randomly generated 2d points.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="abcvoting.genprofiles.random_IC_party_list_profile">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.genprofiles.</span></span><span class="sig-name descname"><span class="pre">random_IC_party_list_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_parties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uniform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.genprofiles.random_IC_party_list_profile" title="Permalink to this definition"></a></dt>
-<dd><p>Generates profile with random assignment of parties.</p>
-<p>A party is a list of candidates.
-If uniform the number of candidates per party is the same,
-else at least 1.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -128,15 +108,8 @@ repeated insertion  mode (RIM) in
 
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.genprofiles.random_profile">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.genprofiles.</span></span><span class="sig-name descname"><span class="pre">random_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.genprofiles.random_profile" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">abcvoting.genprofiles.</span></span><span class="sig-name descname"><span class="pre">random_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_distribution</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.genprofiles.random_profile" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="abcvoting.genprofiles.random_urn_party_list_profile">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.genprofiles.</span></span><span class="sig-name descname"><span class="pre">random_urn_party_list_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_parties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uniform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.genprofiles.random_urn_party_list_profile" title="Permalink to this definition"></a></dt>
-<dd><p>Generate Polya Urn profile from a number of parties.</p>
-<p>If uniform each party gets the same amount of candidates.</p>
-</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.genprofiles.random_urn_profile">

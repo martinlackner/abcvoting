@@ -17,7 +17,7 @@ def sorted_committees(committees):
     Returns
     -------
         list of CandidateSet
-            A sorted list of committees (sets).
+            A sorted list of committees.
     """
     return sorted([CandidateSet(committee) for committee in committees], key=str)
 
@@ -36,8 +36,8 @@ def str_set_of_candidates(candset, cand_names=None):
     Parameters
     ----------
 
-        candset : set of int
-            A set of candidates.
+        candset : iterable of int
+            An iteratble of candidates.
 
         cand_names : list of str or str, optional
             List of symbolic names for every candidate.
@@ -47,11 +47,10 @@ def str_set_of_candidates(candset, cand_names=None):
         str
     """
     if cand_names is None:
-        named = [str(cand) for cand in candset]
+        named = sorted(str(cand) for cand in candset)
     else:
-        named = [cand_names[cand] for cand in candset]
-    named.sort()
-    return "{" + ", ".join(map(str, named)) + "}"
+        named = sorted([str(cand_names[cand]) for cand in candset])
+    return "{" + ", ".join(named) + "}"
 
 
 def str_sets_of_candidates(sets_of_candidates, cand_names=None):
@@ -60,11 +59,13 @@ def str_sets_of_candidates(sets_of_candidates, cand_names=None):
 
     .. doctest::
 
-        >>> print(str_sets_of_candidates([{0, 1, 3}, {0, 1, 4}]))
+        >>> comm1 = CandidateSet({0, 1, 3})
+        >>> comm2 = CandidateSet({0, 1, 4})
+        >>> print(str_sets_of_candidates([comm1, comm2]))
          {0, 1, 3}
          {0, 1, 4}
         <BLANKLINE>
-        >>> print(str_sets_of_candidates([{0, 1, 3}, {0, 1, 4}], cand_names="abcde"))
+        >>> print(str_sets_of_candidates([comm1, comm2], cand_names="abcde"))
          {a, b, d}
          {a, b, e}
         <BLANKLINE>
@@ -72,8 +73,8 @@ def str_sets_of_candidates(sets_of_candidates, cand_names=None):
     Parameters
     ----------
 
-        sets_of_candidates : list of set
-            A list of sets that contain candidates (i.e., non-negative integers).
+        sets_of_candidates : list of iterable of int
+            A list of iterables that contain candidates (i.e., non-negative integers).
 
         cand_names : list of str or str, optional
             List of symbolic names for every candidate.
@@ -82,10 +83,8 @@ def str_sets_of_candidates(sets_of_candidates, cand_names=None):
     -------
         str
     """
-    output = ""
-    for committee in sorted(map(tuple, sets_of_candidates)):
-        output += f" {str_set_of_candidates(committee, cand_names)}\n"
-    return output
+    str_sets = [str_set_of_candidates(candset, cand_names) for candset in sets_of_candidates]
+    return " " + "\n ".join(str_sets) + "\n"
 
 
 def str_committees_with_header(committees, cand_names=None, winning=False):
@@ -94,12 +93,14 @@ def str_committees_with_header(committees, cand_names=None, winning=False):
 
     .. doctest::
 
-        >>> print(str_committees_with_header([{0, 1, 3}, {0, 1, 4}], winning=True))
+        >>> comm1 = CandidateSet({0, 1, 3})
+        >>> comm2 = CandidateSet({0, 1, 4})
+        >>> print(str_committees_with_header([comm1, comm2], winning=True))
         2 winning committees:
          {0, 1, 3}
          {0, 1, 4}
         <BLANKLINE>
-        >>> print(str_committees_with_header([{0, 1, 3}, {0, 1, 4}], cand_names="abcde"))
+        >>> print(str_committees_with_header([comm1, comm2], cand_names="abcde"))
         2 committees:
          {a, b, d}
          {a, b, e}
@@ -108,8 +109,8 @@ def str_committees_with_header(committees, cand_names=None, winning=False):
     Parameters
     ----------
 
-        committees : list of set
-            A list of committees.
+        committees : list of iterable of int
+            A list of committees (set of positive integers).
 
         cand_names : list of str or str, optional
             List of symbolic names for every candidate.
@@ -148,8 +149,8 @@ def hamming(set1, set2):
 
     Parameters
     ----------
-        set1, set2 : set
-            The two sets, for which the Hamming distance is computed.
+        set1, set2 : set of int
+            The two sets for which the Hamming distance is computed.
 
     Returns
     -------
@@ -187,18 +188,21 @@ def compare_list_of_committees(committees1, committees2):
     The order of candidates and their multiplicities in these lists are ignored.
     To be precise, two lists are equal if every committee in list1 is contained in list2 and
     vice versa.
-    Committees are, as usual, sets of positive integers.
+    Committees are, as usual, of type `CandidateSet` (i.e., sets of positive integers).
 
     .. doctest::
 
-        >>> compare_list_of_committees([{0, 1, 3}, {0, 1, 4}], [{0, 4, 1}, {0, 1, 3}])
+        >>> comm1 = CandidateSet({0, 1, 3})
+        >>> comm2 = CandidateSet({0, 3, 1})  # the same set as `comm1`
+        >>> comm3 = CandidateSet({0, 1, 4})
+        >>> compare_list_of_committees([comm1, comm2, comm3], [comm1, comm3])
         True
-        >>> compare_list_of_committees([{0, 1, 3}, {0, 1, 4}], [{0, 1, 3}])
+        >>> compare_list_of_committees([comm1, comm3], [comm1])
         False
 
     Parameters
     ----------
-        committees1, committees2 : list of set
+        committees1, committees2 : list of CandidateSet
             Two lists of committees.
 
     Returns
@@ -224,10 +228,10 @@ def verify_expected_committees_equals_actual_committees(
 
     Parameters
     ----------
-        actual_committees : list of set
+        actual_committees : list of CandidateSet
             Output of an ABC voting rule.
 
-        expected_committees : list of set
+        expected_committees : list of CandidateSet
             Expected output of this voting rule.
 
         resolute : bool, default=False

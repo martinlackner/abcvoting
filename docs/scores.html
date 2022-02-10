@@ -182,7 +182,7 @@ when adding the i-th candidate).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>marginal_scorefct</strong><span class="classifier">function</span></dt><dd><p>The marginal score function.</p>
+<dt><strong>marginal_scorefct</strong><span class="classifier">func</span></dt><dd><p>The marginal score function.</p>
 </dd>
 <dt><strong>cand_in_com</strong><span class="classifier">int</span></dt><dd><p>The number of approved candidates in the committee.</p>
 </dd>
@@ -262,11 +262,11 @@ Candidates that are already in the committee receive a small value (-1).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>marginal_scorefct</strong><span class="classifier">function</span></dt><dd><p>The marginal score function to be used.</p>
+<dt><strong>marginal_scorefct</strong><span class="classifier">func</span></dt><dd><p>The marginal score function to be used.</p>
 </dd>
 <dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
-<dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
+<dt><strong>committee</strong><span class="classifier">iterable of int</span></dt><dd><p>A committee.</p>
 </dd>
 </dl>
 </dd>
@@ -289,7 +289,7 @@ Candidates that are not in the committee receive a large value (max(marg_util_ca
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>marginal_scorefct</strong><span class="classifier">function</span></dt><dd><p>The marginal score function to be used.</p>
+<dt><strong>marginal_scorefct</strong><span class="classifier">func</span></dt><dd><p>The marginal score function to be used.</p>
 </dd>
 <dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
@@ -315,7 +315,7 @@ Candidates that are not in the committee receive a large value (max(marg_util_ca
 <dd class="field-odd"><dl class="simple">
 <dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
-<dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
+<dt><strong>committee</strong><span class="classifier">iterable of int</span></dt><dd><p>A committee.</p>
 </dd>
 </dl>
 </dd>
@@ -337,7 +337,7 @@ Candidates that are not in the committee receive a large value (max(marg_util_ca
 <dd class="field-odd"><dl class="simple">
 <dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
 </dd>
-<dt><strong>committee</strong><span class="classifier">set</span></dt><dd><p>A committee.</p>
+<dt><strong>committee</strong><span class="classifier">iterable of int</span></dt><dd><p>A committee.</p>
 </dd>
 </dl>
 </dd>

@@ -3,8 +3,9 @@ Approval-based committee (ABC) rules implemented as a integer linear
 programs (ILPs) with Gurobi (https://www.gurobi.com/)
 """
 
-from abcvoting.misc import sorted_committees, hamming
+from abcvoting.misc import sorted_committees
 from abcvoting import scores
+from abcvoting import misc
 import functools
 import itertools
 from abcvoting.output import output
@@ -691,6 +692,6 @@ def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees
     committees = sorted_committees(committees)
     detailed_info = {
         "hammingdistance_constraints": hammingdistance_constraints,
-        "opt_distances": [hamming(voter.approved, committees[0]) for voter in profile],
+        "opt_distances": [misc.hamming(voter.approved, committees[0]) for voter in profile],
     }
     return committees, detailed_info
