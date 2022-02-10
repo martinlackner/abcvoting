@@ -78,3 +78,29 @@ def test_EJR_methods(algorithm, profile, committee, expected_result):
     satisfies_EJR = properties.check_EJR(profile, committee, algorithm=algorithm)
 
     assert satisfies_EJR == expected_result
+
+
+# instances to check output of PJR methods
+PJR_instances = []
+
+# create and add the first instance from literature:
+# Sanchez-Fernandez et al, 2017
+profile = Profile(8)
+profile.add_voters([[0]] + [[1]] + [[2]] + [[3]] + [[4, 5, 6, 7]] * 6)
+committee = {0, 1, 2, 3, 4, 5, 6}
+expected_result = False
+PJR_instances.append((profile, committee, expected_result))
+
+# for the second instance, the profile is the same
+committee = {1, 2, 3, 4, 5, 6, 7}
+expected_result = True
+PJR_instances.append((profile, committee, expected_result))
+
+
+@pytest.mark.parametrize("algorithm", ["brute-force", "gurobi"])
+@pytest.mark.parametrize("profile, committee, expected_result", PJR_instances)
+def test_PJR_methods(algorithm, profile, committee, expected_result):
+    # check whether the committee satisfies PJR
+    satisfies_PJR = properties.check_PJR(profile, committee, algorithm=algorithm)
+
+    assert satisfies_PJR == expected_result
