@@ -635,12 +635,19 @@ def test_resolute_parameter_default(rule_id):
     committeesize = 1
     approval_sets = [{0}, {1}, {2}]
     profile.add_voters(approval_sets)
-    committees1 = abcrules.compute(rule_id, profile, committeesize, resolute=resolute_values[0])
-    committees2 = abcrules.compute(
-        rule_id, profile, committeesize  # using default value for resolute
-    )
+    try:
+        committees1 = abcrules.compute(
+            rule_id, profile, committeesize, resolute=resolute_values[0]
+        )
+        committees2 = abcrules.compute(
+            rule_id, profile, committeesize  # using default value for resolute
+        )
+    except abcrules.NoAvailableAlgorithm:
+        pytest.skip("no supported algorithms for " + abcrules.get_rule(rule_id).shortname)
+
     if rule_id == "rsd":
-        return  # RSD is randomized
+        assert len(committees1) == len(committees2)  # RSD is randomized
+
     assert misc.compare_list_of_committees(committees1, committees2)
 
 
@@ -670,10 +677,10 @@ def test_abcrules_toofewcandidates(rule_id, algorithm, resolute):
 
 @pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)
 def test_abcrules_noapprovedcandidates(rule_id, algorithm, resolute):
-    def _check():
+    def _check(profile):
         committees = abcrules.get_rule(rule_id).compute(
             profile,
-            committeesize,
+            committeesize=4,
             algorithm=algorithm,
             resolute=resolute,
         )
@@ -683,13 +690,12 @@ def test_abcrules_noapprovedcandidates(rule_id, algorithm, resolute):
             assert len(committees) == 5
 
     profile = Profile(5)
-    committeesize = 4
     approval_sets = [{}]
     profile.add_voters(approval_sets)
-    _check()
+    _check(profile)
 
     profile.add_voters(approval_sets)
-    _check()
+    _check(profile)
 
 
 def test_abcrules_wrong_rule_id():
