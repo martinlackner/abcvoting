@@ -8,12 +8,13 @@ from math import fabs, sqrt
 from abcvoting.preferences import Profile
 
 
-def random_profile(num_voters, num_cand, prob_distribution, committeesize=None, **kwargs):
+def random_profile(num_voters, num_cand, prob_distribution, **kwargs):
     if prob_distribution == "IC":
         return random_IC_profile(num_cand, num_voters, **kwargs)
-    elif prob_distribution.startswith("Mallows"):
-        dispersion = float(prob_distribution[7:])
-        return random_mallows_profile(num_cand, num_voters, dispersion=dispersion, **kwargs)
+    elif prob_distribution == "Mallows":
+        return random_mallows_profile(num_cand, num_voters, **kwargs)
+    elif prob_distribution == "Urn":
+        return random_urn_profile(num_cand, num_voters, **kwargs)
     else:
         raise ValueError(f"Probability model {prob_distribution} unknown.")
 
@@ -53,44 +54,6 @@ def random_urn_profile(num_cand, num_voters, setsize, replace):
     return profile
 
 
-def random_urn_party_list_profile(num_cand, num_voters, num_parties, replace, uniform=False):
-    """
-    Generate Polya Urn profile from a number of parties.
-
-    If uniform each party gets the same amount of candidates.
-    """
-    currsize = 1.0
-    approval_sets = []
-    replacedsets = {}
-    parties = list(range(num_parties))
-    party_cands = __distribute_candidates_to_parties(num_cand, parties, uniform=uniform)
-    for _ in range(num_voters):
-        r = random.random() * currsize
-        if r < 1.0:
-            # base case: sample uniformly at random
-            party = random.choice(parties)
-            randpartyset = list(party_cands[party])
-            approval_sets.append(randpartyset)
-            if party in replacedsets:
-                replacedsets[party] += 1
-            else:
-                replacedsets[party] = 1
-            currsize += replace
-        else:
-            # sample from one of the parties
-            r = random.randint(0, sum(replacedsets.values()))
-            for party in replacedsets:
-                count = replacedsets[party]
-                if r <= count:
-                    approval_sets.append(list(party_cands[party]))
-                    break
-                else:
-                    r -= count
-    profile = Profile(num_cand)
-    profile.add_voters(approval_sets)
-    return profile
-
-
 def random_IC_profile(num_cand, num_voters, setsize):
     """
     Generates profile with random assignment of candidates to the fix size of setsize.
@@ -99,24 +62,6 @@ def random_IC_profile(num_cand, num_voters, setsize):
     for _ in range(num_voters):
         randset = random.sample(range(num_cand), setsize)
         approval_sets.append(randset)
-    profile = Profile(num_cand)
-    profile.add_voters(approval_sets)
-    return profile
-
-
-def random_IC_party_list_profile(num_cand, num_voters, num_parties, uniform=False):
-    """
-    Generates profile with random assignment of parties.
-
-    A party is a list of candidates.
-    If uniform the number of candidates per party is the same,
-    else at least 1.
-    """
-    parties = list(range(num_parties))
-    party_cands = __distribute_candidates_to_parties(num_cand, parties, uniform=uniform)
-    approval_sets = []
-    for _ in range(num_voters):
-        approval_sets.append(party_cands[random.choice(parties)])
     profile = Profile(num_cand)
     profile.add_voters(approval_sets)
     return profile
@@ -137,34 +82,6 @@ def random_2d_points_profile(
     approval_sets = __get_profile_from_points(
         voters, cands, voter_points, cand_points, approval_threshold
     )
-    profile = Profile(num_cand)
-    profile.add_voters(approval_sets)
-    return profile
-
-
-def random_2d_points_party_list_profile(
-    num_cand, num_voters, num_parties, partypointmode, voterpointmode, sigma, uniform=False
-):
-    """
-    Generate profile from randomly generated 2d points.
-
-    according
-    to some distributions with the given sigma.
-    This selects parties for each voter, the parties are either
-    uniform (equal size) or randomly generated (at least 1) candidate
-    lists."""
-    parties = list(range(num_parties))
-    party_cands = __distribute_candidates_to_parties(num_cand, parties, uniform=uniform)
-    voters = list(range(num_voters))
-
-    voter_points = __generate_2d_points(voters, voterpointmode, sigma)
-    party_points = __generate_2d_points(parties, partypointmode, sigma)
-
-    party_sets = __get_profile_from_points(voters, parties, voter_points, party_points, 1.0)
-
-    approval_sets = []
-    for p in party_sets:
-        approval_sets.append(party_cands[p[0]])
     profile = Profile(num_cand)
     profile.add_voters(approval_sets)
     return profile
@@ -229,44 +146,6 @@ def __select_pos(distribution):
             return pos
 
     return pos  # in case of rounding errors
-
-
-def __distribute_candidates_to_parties(num_cand, parties, uniform):
-    """
-    Distributes the candidates to the parties.
-
-    Either uniformly distributed or randomly distributed with
-    at least one candidate per party.
-    """
-    if num_cand < len(parties):
-        raise ValueError("Not enough candidates to split them between" + "the parties.")
-    if uniform:
-        if num_cand % len(parties) != 0:
-            raise ValueError(
-                "To uniformly distribute candidates "
-                + "between parties the number of candidates"
-                + " needs to be divisible by the number of"
-                + " parties."
-            )
-        party_cands = {}
-        party_size = int(num_cand / len(parties))
-        cands = set(range(num_cand))
-        for i, party in enumerate(parties):
-            # note: there is no guaranty about reproducibility because cands is a set
-            appr = random.sample(tuple(cands), party_size)
-            party_cands[party] = appr
-            cands = cands - set(appr)
-        return party_cands
-    else:  # not uniform
-        num_parties = len(parties)
-        party_cands = {}
-        num_random_cands = num_cand - num_parties
-        for i, party in enumerate(parties):
-            party_cands[party] = [num_random_cands + i]
-        for cand in range(num_random_cands):
-            party = random.choice(parties)
-            party_cands[party].append(cand)
-        return party_cands
 
 
 def __generate_2d_points(agents, mode, sigma):
