@@ -647,6 +647,7 @@ def test_resolute_parameter_default(rule_id):
 
     if rule_id == "rsd":
         assert len(committees1) == len(committees2)  # RSD is randomized
+        return
 
     assert misc.compare_list_of_committees(committees1, committees2)
 
