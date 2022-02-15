@@ -6,8 +6,7 @@ import itertools
 from abcvoting.output import output, DETAILS
 from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, misc
 from abcvoting.misc import str_committees_with_header, header, str_set_of_candidates
-from abcvoting.misc import sorted_committees
-from abcvoting.preferences import CandidateSet
+from abcvoting.misc import sorted_committees, CandidateSet
 from abcvoting import scores
 from fractions import Fraction
 import math
@@ -36,7 +35,7 @@ MAIN_RULE_IDS = [
     "seqcc",
     "seqphragmen",
     "minimaxphragmen",
-    "leximinphragmen",
+    "leximinphragmen",  # TODO: called leximax-Phragmen in https://arxiv.org/abs/2102.12305
     "monroe",
     "greedy-monroe",
     "minimaxav",

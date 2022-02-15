@@ -2,7 +2,68 @@
 Miscellaneous functions for committees (i.e., subsets of candidates).
 """
 
-from abcvoting.preferences import CandidateSet
+
+class CandidateSet(set):
+    """
+    A set of candidates, that is, a set of positive integers.
+
+    Parameters
+    ----------
+
+        candidates : iterable
+            An iterable of candidates (positive integers).
+
+        num_cand : int, optional
+            The maximum number of candidates. Used only for checks.
+
+            If this `num_cand` is provided, it is verified that `approved` does not contain
+            numbers `>= num_cand`.
+    """
+
+    def __init__(self, candidates=(), num_cand=None):
+        # note: empty approval sets are fine
+
+        super(CandidateSet, self).__init__(candidates)
+        if len(candidates) != len(self):
+            raise ValueError(f"CandidateSet initialized with duplicate elements ({candidates}).")
+
+        for cand in candidates:
+            if not isinstance(cand, int):
+                raise TypeError(
+                    f"Object of type {str(type(cand))} not suitable as candidate, "
+                    f"only positive integers allowed."
+                )
+
+        if not all(cand >= 0 for cand in candidates):
+            raise ValueError(
+                f"CandidateSet initialized with elements that are not positive "
+                f"integers ({candidates})."
+            )
+
+        if num_cand is not None and any(cand >= num_cand for cand in candidates):
+            raise ValueError(
+                f"CandidateSet initialized with elements that are >= num_cand ({num_cand}), "
+                f"the number of candidate ({candidates})."
+            )
+
+    def __str__(self):
+        return self.str_with_names()
+
+    def str_with_names(self, cand_names=None):
+        """
+        Format a CandidateSet, using the names of candidates (instead of indices) if provided.
+
+        Parameters
+        ----------
+
+            cand_names : list of str or str, optional
+                List of symbolic names for every candidate.
+
+        Returns
+        -------
+            str
+        """
+        return str_set_of_candidates(self, cand_names)
 
 
 def sorted_committees(committees):
