@@ -95,43 +95,6 @@
 </ul>
 </div>
 <dl class="py class">
-<dt class="sig sig-object py" id="abcvoting.preferences.CandidateSet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.preferences.</span></span><span class="sig-name descname"><span class="pre">CandidateSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.CandidateSet" title="Permalink to this definition"></a></dt>
-<dd><p>A set of candidates, that is, a set of positive integers.</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>candidates</strong><span class="classifier">iterable</span></dt><dd><p>An iterable of candidates (positive integers).</p>
-</dd>
-<dt><strong>num_cand</strong><span class="classifier">int, optional</span></dt><dd><p>The maximum number of candidates. Used only for checks.</p>
-<p>If this <cite>num_cand</cite> is provided, it is verified that <cite>approved</cite> does not contain
-numbers <cite>&gt;= num_cand</cite>.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="abcvoting.preferences.CandidateSet.str_with_names">
-<span class="sig-name descname"><span class="pre">str_with_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.CandidateSet.str_with_names" title="Permalink to this definition"></a></dt>
-<dd><p>Format a CandidateSet, using the names of candidates (instead of indices) if provided.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>cand_names</strong><span class="classifier">list of str or str, optional</span></dt><dd><p>List of symbolic names for every candidate.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>str</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="abcvoting.preferences.Profile">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.preferences.</span></span><span class="sig-name descname"><span class="pre">Profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Profile" title="Permalink to this definition"></a></dt>
 <dd><p>Approval profiles.</p>

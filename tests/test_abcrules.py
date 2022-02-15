@@ -7,7 +7,7 @@ import re
 import random
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
 from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, DEBUG, output
-from abcvoting.preferences import Profile, Voter, CandidateSet
+from abcvoting.preferences import Profile, Voter
 from abcvoting import abcrules, misc, scores, fileio
 from itertools import combinations
 
@@ -751,7 +751,7 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute):
 def test_abcrules_correct_simple(rule_id, algorithm, resolute):
     def simple_checks(_committees):
         for comm in _committees:
-            assert isinstance(comm, CandidateSet)
+            assert isinstance(comm, misc.CandidateSet)
         if resolute:
             assert len(_committees) == 1
         else:

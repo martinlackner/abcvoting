@@ -3,7 +3,8 @@ Unit tests for preferences.py
 """
 
 import pytest
-from abcvoting.preferences import Profile, Voter, CandidateSet
+from abcvoting.preferences import Profile, Voter
+from abcvoting.misc import CandidateSet
 
 
 def test_invalid_approvalsets():
