@@ -3212,7 +3212,21 @@ def _rule_x_algorithm(
         while len(rich) > 0:
             poor_budget = sum(budget[v] for v in poor)
             q = division(1 - poor_budget, len(rich))
-            new_poor = set([v for v in rich if budget[v] < q])
+            if algorithm == "float-fractions":
+                # due to float imprecision, values very close to `q` count as `q`
+                new_poor = set(
+                    v
+                    for v in rich
+                    if budget[v] < q
+                    and not math.isclose(
+                        budget[v],
+                        q,
+                        rel_tol=FLOAT_ISCLOSE_REL_TOL,
+                        abs_tol=FLOAT_ISCLOSE_ABS_TOL,
+                    )
+                )
+            else:
+                new_poor = set([v for v in rich if budget[v] < q])
             if len(new_poor) == 0:
                 return q
             rich -= new_poor
