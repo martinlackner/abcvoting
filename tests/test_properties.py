@@ -39,7 +39,7 @@ def test_pareto_optimality_methods(algorithm):
 EJR_instances = []
 
 # create and add the first instance from literature:
-# Lackner and Skowron, 2021
+# Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 20
 profile = Profile(4)
 profile.add_voters(
     [[0, 3]] + [[0, 1]] + [[1, 2]] + [[2, 3]] + [[0]] * 2 + [[1]] * 2 + [[2]] * 2 + [[3]] * 2
