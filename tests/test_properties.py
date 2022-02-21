@@ -49,15 +49,41 @@ expected_result = True
 EJR_instances.append((profile, committee, expected_result))
 
 # create and add the second instance
-# Aziz et al, 2016
+# Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 4
+profile = Profile(6)
+profile.add_voters(
+    [[0]] + [[1]] + [[2]] + [[3]] + [[0, 4, 5]] + [[1, 4, 5]] + [[2, 4, 5]] + [[3, 4, 5]]
+)
+committee = {0, 1, 2, 3}
+expected_result = False
+EJR_instances.append((profile, committee, expected_result))
+
+# create and add the third instance
+# Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 5
 profile = Profile(6)
 profile.add_voters([[0]] * 2 + [[0, 1, 2]] * 2 + [[1, 2, 3]] * 2 + [[3, 4]] + [[3, 5]])
 committee = {0, 3, 4, 5}
 expected_result = False
 EJR_instances.append((profile, committee, expected_result))
 
-# create and add the third instance
-# Brill et al, 2021
+# create and add the fourth instance
+# Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 6
+profile = Profile(12)
+profile.add_voters([[0, 10]] * 3 + [[0, 11]] * 3 + [[1, 2, 3, 4, 5, 6, 7, 8, 9]] * 14)
+committee = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+expected_result = True
+EJR_instances.append((profile, committee, expected_result))
+
+# create and add the fifth instance
+# Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 8
+profile = Profile(5)
+profile.add_voters([[0, 1]] * 2 + [[2]] + [[3, 4]])
+committee = {0, 2, 3, 4}
+expected_result = False
+EJR_instances.append((profile, committee, expected_result))
+
+# create and add the final instance
+# Brill et al, 2021, "Phragmen's Voting Methods and Justified Representation", Example 6
 profile = Profile(14)
 profile.add_voters(
     [[0, 1, 2]] * 2
@@ -84,7 +110,7 @@ def test_EJR_methods(algorithm, profile, committee, expected_result):
 PJR_instances = []
 
 # create and add the first instance from literature:
-# Sanchez-Fernandez et al, 2017
+# Sanchez-Fernandez et al, 2017, "Proportional Justified Representation", Example 1
 profile = Profile(8)
 profile.add_voters([[0]] + [[1]] + [[2]] + [[3]] + [[4, 5, 6, 7]] * 6)
 committee = {0, 1, 2, 3, 4, 5, 6}
@@ -93,6 +119,44 @@ PJR_instances.append((profile, committee, expected_result))
 
 # for the second instance, the profile is the same
 committee = {1, 2, 3, 4, 5, 6, 7}
+expected_result = True
+PJR_instances.append((profile, committee, expected_result))
+
+# create and add the third instance
+# Brill et al, 2021, "Phragmen's Voting Methods and Justified Representation", Example 5
+profile = Profile(6)
+profile.add_voters(
+    [[0]] + [[1]] + [[2]] + [[3]] + [[0, 4, 5]] + [[1, 4, 5]] + [[2, 4, 5]] + [[3, 4, 5]]
+)
+committee = {0, 1, 2, 3}
+expected_result = True
+PJR_instances.append((profile, committee, expected_result))
+
+# create and add the final instance
+# Brill et al, 2021, "Phragmen's Voting Methods and Justified Representation", Example 7
+profile = Profile(7)
+profile.add_voters([[0, 1, 2, 3]] * 67 + [[4]] * 12 + [[5]] * 11 + [[6]] * 10)
+committee = {0, 1, 2, 4, 5, 6}
+expected_result = False
+PJR_instances.append((profile, committee, expected_result))
+
+# From Sanchez-Fernandez et al, 2017:
+# "EJR implies PJR"
+# Also adding the positive instances from test_EJR_methods()
+
+# Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 20
+profile = Profile(4)
+profile.add_voters(
+    [[0, 3]] + [[0, 1]] + [[1, 2]] + [[2, 3]] + [[0]] * 2 + [[1]] * 2 + [[2]] * 2 + [[3]] * 2
+)
+committee = {0, 1, 2}
+expected_result = True
+PJR_instances.append((profile, committee, expected_result))
+
+# Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 6
+profile = Profile(12)
+profile.add_voters([[0, 10]] * 3 + [[0, 11]] * 3 + [[1, 2, 3, 4, 5, 6, 7, 8, 9]] * 14)
+committee = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 expected_result = True
 PJR_instances.append((profile, committee, expected_result))
 
