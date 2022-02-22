@@ -168,3 +168,51 @@ def test_PJR_methods(algorithm, profile, committee, expected_result):
     satisfies_PJR = properties.check_PJR(profile, committee, algorithm=algorithm)
 
     assert satisfies_PJR == expected_result
+
+
+# instances to check output of JR method
+JR_instances = []
+
+# From Sanchez-Fernandez et al, 2017:
+# "PJR implies JR"
+# adding the positive instances from test_PJR_methods()
+
+# Sanchez-Fernandez et al, 2017, "Proportional Justified Representation", Example 1
+profile = Profile(8)
+profile.add_voters([[0]] + [[1]] + [[2]] + [[3]] + [[4, 5, 6, 7]] * 6)
+committee = {1, 2, 3, 4, 5, 6, 7}
+expected_result = True
+JR_instances.append((profile, committee, expected_result))
+
+# Brill et al, 2021, "Phragmen's Voting Methods and Justified Representation", Example 5
+profile = Profile(6)
+profile.add_voters(
+    [[0]] + [[1]] + [[2]] + [[3]] + [[0, 4, 5]] + [[1, 4, 5]] + [[2, 4, 5]] + [[3, 4, 5]]
+)
+committee = {0, 1, 2, 3}
+expected_result = True
+JR_instances.append((profile, committee, expected_result))
+
+# Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 20
+profile = Profile(4)
+profile.add_voters(
+    [[0, 3]] + [[0, 1]] + [[1, 2]] + [[2, 3]] + [[0]] * 2 + [[1]] * 2 + [[2]] * 2 + [[3]] * 2
+)
+committee = {0, 1, 2}
+expected_result = True
+JR_instances.append((profile, committee, expected_result))
+
+# Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 6
+profile = Profile(12)
+profile.add_voters([[0, 10]] * 3 + [[0, 11]] * 3 + [[1, 2, 3, 4, 5, 6, 7, 8, 9]] * 14)
+committee = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+expected_result = True
+JR_instances.append((profile, committee, expected_result))
+
+
+@pytest.mark.parametrize("profile, committee, expected_result", JR_instances)
+def test_JR_method(profile, committee, expected_result):
+    # check whether the committee satisfies JR
+    satisfies_JR = properties.check_JR(profile, committee)
+
+    assert satisfies_JR == expected_result
