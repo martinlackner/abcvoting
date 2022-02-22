@@ -234,24 +234,48 @@ abc_yaml_filenames = _list_abc_yaml_instances()
 
 # to test the output of the brute-force vs gurobi counterparts
 @pytest.mark.veryslow
-@pytest.mark.parametrize("abc_yaml_instance", [abc_yaml_filename for abc_yaml_filename in abc_yaml_filenames if abc_yaml_filename.__contains__("instanceS") or abc_yaml_filename.__contains__("instanceP") or abc_yaml_filename.__contains__("instanceM")])
+@pytest.mark.parametrize(
+    "abc_yaml_instance",
+    [
+        abc_yaml_filename
+        for abc_yaml_filename in abc_yaml_filenames
+        if abc_yaml_filename.__contains__("instanceS")
+        or abc_yaml_filename.__contains__("instanceP")
+        or abc_yaml_filename.__contains__("instanceM")
+    ],
+)
 def test_matching_output_different_approaches(abc_yaml_instance):
     # read the instance from the file
-    profile, _ , compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
+    profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
 
     # get one sample committee as input for the functions
     input_committee = compute_instances[0]["result"][0]
 
-    assert properties.check_pareto_optimality(profile, input_committee, algorithm="brute-force") == properties.check_pareto_optimality(profile, input_committee, algorithm="gurobi")
-    assert properties.check_EJR(profile, input_committee, algorithm="brute-force") == properties.check_EJR(profile, input_committee, algorithm="gurobi")
-    assert properties.check_PJR(profile, input_committee, algorithm="brute-force") == properties.check_PJR(profile, input_committee, algorithm="gurobi")
+    assert properties.check_pareto_optimality(
+        profile, input_committee, algorithm="brute-force"
+    ) == properties.check_pareto_optimality(profile, input_committee, algorithm="gurobi")
+    assert properties.check_EJR(
+        profile, input_committee, algorithm="brute-force"
+    ) == properties.check_EJR(profile, input_committee, algorithm="gurobi")
+    assert properties.check_PJR(
+        profile, input_committee, algorithm="brute-force"
+    ) == properties.check_PJR(profile, input_committee, algorithm="gurobi")
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("abc_yaml_instance", [abc_yaml_filename for abc_yaml_filename in abc_yaml_filenames if abc_yaml_filename.__contains__("instanceS") or abc_yaml_filename.__contains__("instanceP") or abc_yaml_filename.__contains__("instanceM0")])
+@pytest.mark.parametrize(
+    "abc_yaml_instance",
+    [
+        abc_yaml_filename
+        for abc_yaml_filename in abc_yaml_filenames
+        if abc_yaml_filename.__contains__("instanceS")
+        or abc_yaml_filename.__contains__("instanceP")
+        or abc_yaml_filename.__contains__("instanceM0")
+    ],
+)
 def test_output_EJR_PAV(abc_yaml_instance):
     # read the instance from the file
-    profile, _ , compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
+    profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
 
     # get output computed by rule PAV for this instance
     for computed_output in compute_instances:
@@ -264,10 +288,17 @@ def test_output_EJR_PAV(abc_yaml_instance):
 
 
 @pytest.mark.veryslow
-@pytest.mark.parametrize("abc_yaml_instance", [abc_yaml_filename for abc_yaml_filename in abc_yaml_filenames if not abc_yaml_filename.__contains__("instanceVL")])
+@pytest.mark.parametrize(
+    "abc_yaml_instance",
+    [
+        abc_yaml_filename
+        for abc_yaml_filename in abc_yaml_filenames
+        if not abc_yaml_filename.__contains__("instanceVL")
+    ],
+)
 def test_output_EJR_PAV_full(abc_yaml_instance):
     # read the instance from the file
-    profile, _ , compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
+    profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
 
     # get output computed by rule PAV for this instance
     for computed_output in compute_instances:
@@ -280,10 +311,19 @@ def test_output_EJR_PAV_full(abc_yaml_instance):
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("abc_yaml_instance", [abc_yaml_filename for abc_yaml_filename in abc_yaml_filenames if abc_yaml_filename.__contains__("instanceS") or abc_yaml_filename.__contains__("instanceP") or abc_yaml_filename.__contains__("instanceM0")])
+@pytest.mark.parametrize(
+    "abc_yaml_instance",
+    [
+        abc_yaml_filename
+        for abc_yaml_filename in abc_yaml_filenames
+        if abc_yaml_filename.__contains__("instanceS")
+        or abc_yaml_filename.__contains__("instanceP")
+        or abc_yaml_filename.__contains__("instanceM0")
+    ],
+)
 def test_output_PJR_seqPhragmen(abc_yaml_instance):
     # read the instance from the file
-    profile, _ , compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
+    profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
 
     # get output computed by rule seqPhragmen for this instance
     for computed_output in compute_instances:
@@ -296,10 +336,17 @@ def test_output_PJR_seqPhragmen(abc_yaml_instance):
 
 
 @pytest.mark.veryslow
-@pytest.mark.parametrize("abc_yaml_instance", [abc_yaml_filename for abc_yaml_filename in abc_yaml_filenames if not abc_yaml_filename.__contains__("instanceVL")])
+@pytest.mark.parametrize(
+    "abc_yaml_instance",
+    [
+        abc_yaml_filename
+        for abc_yaml_filename in abc_yaml_filenames
+        if not abc_yaml_filename.__contains__("instanceVL")
+    ],
+)
 def test_output_PJR_seqPhragmen_full(abc_yaml_instance):
     # read the instance from the file
-    profile, _ , compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
+    profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
 
     # get output computed by rule seqPhragmen for this instance
     for computed_output in compute_instances:
@@ -312,10 +359,19 @@ def test_output_PJR_seqPhragmen_full(abc_yaml_instance):
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("abc_yaml_instance", [abc_yaml_filename for abc_yaml_filename in abc_yaml_filenames if abc_yaml_filename.__contains__("instanceS") or abc_yaml_filename.__contains__("instanceP") or abc_yaml_filename.__contains__("instanceM0")])
+@pytest.mark.parametrize(
+    "abc_yaml_instance",
+    [
+        abc_yaml_filename
+        for abc_yaml_filename in abc_yaml_filenames
+        if abc_yaml_filename.__contains__("instanceS")
+        or abc_yaml_filename.__contains__("instanceP")
+        or abc_yaml_filename.__contains__("instanceM0")
+    ],
+)
 def test_output_JR_monroe(abc_yaml_instance):
     # read the instance from the file
-    profile, _ , compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
+    profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
 
     # get output computed by rule Monroe for this instance
     for computed_output in compute_instances:
@@ -328,10 +384,17 @@ def test_output_JR_monroe(abc_yaml_instance):
 
 
 @pytest.mark.veryslow
-@pytest.mark.parametrize("abc_yaml_instance", [abc_yaml_filename for abc_yaml_filename in abc_yaml_filenames if not abc_yaml_filename.__contains__("instanceVL")])
+@pytest.mark.parametrize(
+    "abc_yaml_instance",
+    [
+        abc_yaml_filename
+        for abc_yaml_filename in abc_yaml_filenames
+        if not abc_yaml_filename.__contains__("instanceVL")
+    ],
+)
 def test_output_JR_monroe_full(abc_yaml_instance):
     # read the instance from the file
-    profile, _ , compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
+    profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
 
     # get output computed by rule Monroe for this instance
     for computed_output in compute_instances:
