@@ -13,6 +13,7 @@ from abcvoting import abcrules, properties, misc, scores, fileio
 # Test from literature: Lackner and Skowron 2020
 # With given input profile, committee returned by Monroe Rule
 # is not Pareto optimal
+@pytest.mark.gurobi
 @pytest.mark.parametrize("algorithm", ["brute-force", "gurobi"])
 def test_pareto_optimality_methods(algorithm):
     # profile with 4 candidates: a, b, c, d
@@ -97,6 +98,7 @@ expected_result = False
 EJR_instances.append((profile, committee, expected_result))
 
 
+@pytest.mark.gurobi
 @pytest.mark.parametrize("algorithm", ["brute-force", "gurobi"])
 @pytest.mark.parametrize("profile, committee, expected_result", EJR_instances)
 def test_EJR_methods(algorithm, profile, committee, expected_result):
@@ -161,6 +163,7 @@ expected_result = True
 PJR_instances.append((profile, committee, expected_result))
 
 
+@pytest.mark.gurobi
 @pytest.mark.parametrize("algorithm", ["brute-force", "gurobi"])
 @pytest.mark.parametrize("profile, committee, expected_result", PJR_instances)
 def test_PJR_methods(algorithm, profile, committee, expected_result):
@@ -233,6 +236,7 @@ abc_yaml_filenames = _list_abc_yaml_instances()
 
 
 # to test the output of the brute-force vs gurobi counterparts
+@pytest.mark.gurobi
 @pytest.mark.veryslow
 @pytest.mark.parametrize(
     "abc_yaml_instance",
@@ -262,6 +266,7 @@ def test_matching_output_different_approaches(abc_yaml_instance):
     ) == properties.check_PJR(profile, input_committee, algorithm="gurobi")
 
 
+@pytest.mark.gurobi
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "abc_yaml_instance",
@@ -287,6 +292,7 @@ def test_output_EJR_PAV(abc_yaml_instance):
     assert properties.check_EJR(profile, input_committee, algorithm="gurobi")
 
 
+@pytest.mark.gurobi
 @pytest.mark.veryslow
 @pytest.mark.parametrize(
     "abc_yaml_instance",
@@ -310,6 +316,7 @@ def test_output_EJR_PAV_full(abc_yaml_instance):
     assert properties.check_EJR(profile, input_committee, algorithm="gurobi")
 
 
+@pytest.mark.gurobi
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "abc_yaml_instance",
@@ -335,6 +342,7 @@ def test_output_PJR_seqPhragmen(abc_yaml_instance):
     assert properties.check_PJR(profile, input_committee, algorithm="gurobi")
 
 
+@pytest.mark.gurobi
 @pytest.mark.veryslow
 @pytest.mark.parametrize(
     "abc_yaml_instance",
