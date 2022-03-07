@@ -48,6 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="misc.html">abcvoting.misc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="properties.html">abcvoting.properties</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Backmatter:</span></p>
@@ -153,6 +154,13 @@
 </li>
       </ul></li>
       <li>
+    abcvoting.properties
+
+      <ul>
+        <li><a href="properties.html#module-abcvoting.properties">module</a>
+</li>
+      </ul></li>
+      <li>
     abcvoting.scores
 
       <ul>
@@ -165,7 +173,7 @@
 </li>
       <li><a href="abcrules.html#abcvoting.abcrules.ALGORITHM_NAMES">ALGORITHM_NAMES (in module abcvoting.abcrules)</a>
 </li>
-      <li><a href="preferences.html#abcvoting.preferences.Profile.approved_candidates">approved_candidates (abcvoting.preferences.Profile property)</a>
+      <li><a href="preferences.html#abcvoting.preferences.Profile.approved_candidates">approved_candidates() (abcvoting.preferences.Profile method)</a>
 </li>
       <li><a href="scores.html#abcvoting.scores.at_least_ell_fct">at_least_ell_fct() (in module abcvoting.scores)</a>
 </li>
@@ -180,6 +188,14 @@
       <li><a href="misc.html#abcvoting.misc.CandidateSet">CandidateSet (class in abcvoting.misc)</a>
 </li>
       <li><a href="scores.html#abcvoting.scores.cc_score_fct">cc_score_fct() (in module abcvoting.scores)</a>
+</li>
+      <li><a href="properties.html#abcvoting.properties.check_EJR">check_EJR() (in module abcvoting.properties)</a>
+</li>
+      <li><a href="properties.html#abcvoting.properties.check_JR">check_JR() (in module abcvoting.properties)</a>
+</li>
+      <li><a href="properties.html#abcvoting.properties.check_pareto_optimality">check_pareto_optimality() (in module abcvoting.properties)</a>
+</li>
+      <li><a href="properties.html#abcvoting.properties.check_PJR">check_PJR() (in module abcvoting.properties)</a>
 </li>
       <li><a href="misc.html#abcvoting.misc.compare_list_of_committees">compare_list_of_committees() (in module abcvoting.misc)</a>
 </li>
@@ -207,12 +223,12 @@
 </li>
       <li><a href="abcrules.html#abcvoting.abcrules.compute_minimaxphragmen">compute_minimaxphragmen() (in module abcvoting.abcrules)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="abcrules.html#abcvoting.abcrules.compute_monroe">compute_monroe() (in module abcvoting.abcrules)</a>
 </li>
       <li><a href="abcrules.html#abcvoting.abcrules.compute_pav">compute_pav() (in module abcvoting.abcrules)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="abcrules.html#abcvoting.abcrules.compute_phragmen_enestroem">compute_phragmen_enestroem() (in module abcvoting.abcrules)</a>
 </li>
       <li><a href="abcrules.html#abcvoting.abcrules.compute_revseq_thiele_method">compute_revseq_thiele_method() (in module abcvoting.abcrules)</a>
@@ -255,11 +271,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="output.html#abcvoting.output.Output.debug">debug() (abcvoting.output.Output method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="output.html#abcvoting.output.Output.debug2">debug2() (abcvoting.output.Output method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="output.html#abcvoting.output.Output.details">details() (abcvoting.output.Output method)</a>
+</li>
+      <li><a href="misc.html#abcvoting.misc.dominate">dominate() (in module abcvoting.misc)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -356,6 +374,8 @@
         <li><a href="output.html#module-abcvoting.output">abcvoting.output</a>
 </li>
         <li><a href="preferences.html#module-abcvoting.preferences">abcvoting.preferences</a>
+</li>
+        <li><a href="properties.html#module-abcvoting.properties">abcvoting.properties</a>
 </li>
         <li><a href="scores.html#module-abcvoting.scores">abcvoting.scores</a>
 </li>

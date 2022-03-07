@@ -1,7 +1,9 @@
-source ./../venv-new/bin/activate
+source venv-new/bin/activate
 
+cd docs-source
 make clean
 make html
 make doctest
 
-cp -rT _build/html/ ../docs/
+cd ..
+cp -rT docs-source/_build/html/ docs/

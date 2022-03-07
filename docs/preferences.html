@@ -17,7 +17,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="abcvoting.scores" href="scores.html" />
+    <link rel="next" title="abcvoting.properties" href="properties.html" />
     <link rel="prev" title="abcvoting.output" href="output.html" /> 
 </head>
 
@@ -50,6 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="misc.html">abcvoting.misc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">abcvoting.preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="properties.html">abcvoting.properties</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Backmatter:</span></p>
@@ -162,10 +163,17 @@ or by an object of type Voter.</p>
 </dl>
 </dd></dl>
 
-<dl class="py property">
+<dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.preferences.Profile.approved_candidates">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">approved_candidates</span></span><a class="headerlink" href="#abcvoting.preferences.Profile.approved_candidates" title="Permalink to this definition"></a></dt>
-<dd><p>A list of all candidates approved by at least one voter.</p>
+<span class="sig-name descname"><span class="pre">approved_candidates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.preferences.Profile.approved_candidates" title="Permalink to this definition"></a></dt>
+<dd><p>A set of all candidates approved by at least one voter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>set of int</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -277,7 +285,7 @@ numbers <cite>&gt;= num_cand</cite>.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="output.html" class="btn btn-neutral float-left" title="abcvoting.output" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="scores.html" class="btn btn-neutral float-right" title="abcvoting.scores" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="properties.html" class="btn btn-neutral float-right" title="abcvoting.properties" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

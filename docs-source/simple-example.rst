@@ -5,10 +5,16 @@ The following code computes the Proportional Approval Voting (PAV) rule for an a
 Let's first create the approval profile for (up to) five candidates.
 These candidates correspond to the numbers 0 to 4.
 
+.. testsetup::
+
+    from abcvoting import abcrules
+    abcrules.available_algorithms = ["brute-force", "standard", "standard-fractions"]
+
 .. doctest::
 
     >>> from abcvoting.preferences import Profile
     >>> from abcvoting import abcrules
+    >>> abcrules.available_algorithms = ["brute-force", "standard", "standard-fractions"]  # doctest: +SKIP
 
     >>> profile = Profile(num_cand=5)
 

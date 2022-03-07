@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>abcvoting.properties &mdash; abcvoting  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="abcvoting.scores" href="scores.html" />
+    <link rel="prev" title="abcvoting.preferences" href="preferences.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> abcvoting
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="simple-example.html">A simple example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-abcrules.html">ABC rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="computing-winning-committees.html">Computing winning committees</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="abcrules.html">abcvoting.abcrules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">abcvoting.fileio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genprofiles.html">abcvoting.genprofiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">abcvoting.misc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">abcvoting.properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Backmatter:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="howtocite.html">How to cite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acks.html">Acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">abcvoting</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>abcvoting.properties</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/properties.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="abcvoting-properties">
+<h1>abcvoting.properties<a class="headerlink" href="#abcvoting-properties" title="Permalink to this headline"></a></h1>
+<span class="target" id="module-abcvoting.properties"></span><p>Properties of committees</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.properties.check_EJR">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.properties.</span></span><span class="sig-name descname"><span class="pre">check_EJR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.properties.check_EJR" title="Permalink to this definition"></a></dt>
+<dd><p>Test whether a committee satisfies Extended Justified Representation (EJR).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
+</dd>
+<dt><strong>committee</strong><span class="classifier">iterable of int</span></dt><dd><p>A committee.</p>
+</dd>
+<dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>bool</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>Aziz, H., Brill, M., Conitzer, V., Elkind, E., Freeman, R., &amp; Walsh, T. (2017).
+Justified representation in approval-based committee voting.
+Social Choice and Welfare, 48(2), 461-485.
+<a class="reference external" href="https://arxiv.org/abs/1407.8269">https://arxiv.org/abs/1407.8269</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.properties.check_JR">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.properties.</span></span><span class="sig-name descname"><span class="pre">check_JR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.properties.check_JR" title="Permalink to this definition"></a></dt>
+<dd><p>Test whether a committee satisfies Justified Representation (JR).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
+</dd>
+<dt><strong>committee</strong><span class="classifier">iterable of int</span></dt><dd><p>A committee.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>bool</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>Aziz, H., Brill, M., Conitzer, V., Elkind, E., Freeman, R., &amp; Walsh, T. (2017).
+Justified representation in approval-based committee voting.
+Social Choice and Welfare, 48(2), 461-485.
+<a class="reference external" href="https://arxiv.org/abs/1407.8269">https://arxiv.org/abs/1407.8269</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.properties.check_PJR">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.properties.</span></span><span class="sig-name descname"><span class="pre">check_PJR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.properties.check_PJR" title="Permalink to this definition"></a></dt>
+<dd><p>Test whether a committee satisfies Proportional Justified Representation (PJR).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
+</dd>
+<dt><strong>committee</strong><span class="classifier">iterable of int</span></dt><dd><p>A committee.</p>
+</dd>
+<dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>bool</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>Sánchez-Fernández, L., Elkind, E., Lackner, M., Fernández, N., Fisteus, J., Val, P. B., &amp;
+Skowron, P. (2017).
+Proportional justified representation.
+In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 31, No. 1).
+<a class="reference external" href="https://arxiv.org/abs/1611.09928">https://arxiv.org/abs/1611.09928</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.properties.check_pareto_optimality">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.properties.</span></span><span class="sig-name descname"><span class="pre">check_pareto_optimality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.properties.check_pareto_optimality" title="Permalink to this definition"></a></dt>
+<dd><p>Test whether a committee satisfies Pareto optimality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
+</dd>
+<dt><strong>committee</strong><span class="classifier">iterable of int</span></dt><dd><p>A committee.</p>
+</dd>
+<dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>bool</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>Multi-Winner Voting with Approval Preferences.
+Martin Lackner and Piotr Skowron.
+&lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="preferences.html" class="btn btn-neutral float-left" title="abcvoting.preferences" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="scores.html" class="btn btn-neutral float-right" title="abcvoting.scores" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright MIT license.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -24,6 +24,7 @@ approval-based committee (ABC) rules.
    misc.rst
    output.rst
    preferences.rst
+   properties.rst
    scores.rst
 
 .. toctree::

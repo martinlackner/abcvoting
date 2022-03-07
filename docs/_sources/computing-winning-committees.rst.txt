@@ -13,7 +13,13 @@ identifiers. Say we are interested in Proportional Approval Voting, short: PAV. 
 
 The input of an ABC rule consists of a profile and a desired committee size. Once we know the `rule_id` and
 have a profile and a desired committee size, we can compute the ABC rule.
-In the following, we use the simple example used :doc:`previously <intro-abcrules>`.
+In the following, we use the simple example used :doc:`previously <simple-example>`.
+
+
+.. testsetup::
+
+    from abcvoting import abcrules
+    abcrules.available_algorithms = ["brute-force", "standard", "standard-fractions"]
 
 .. doctest::
 
@@ -44,21 +50,24 @@ If `resolute=True`, only one winning committee is returned.
 
 .. doctest::
 
-    >>> print(abcrules.compute("pav", profile, committeesize=3, resolute=True))
-    [CandidateSet({0, 1, 3})]
+    >>> committees = abcrules.compute("pav", profile, committeesize=3, resolute=True)
+    >>> len(committees)
+    1
 
 If `resolute=False` (which is the default), the maximum number of winning committees
 is determined by `max_num_of_committees`.
 
 .. doctest::
 
-    >>> print(abcrules.compute("pav", profile, committeesize=3, max_num_of_committees=1))
-    [CandidateSet({0, 1, 3})]
+    >>> committees = abcrules.compute("pav", profile, committeesize=3, max_num_of_committees=1)
+    >>> len(committees)
+    1
 
 .. doctest::
 
-    >>> print(abcrules.compute("pav", profile, committeesize=3, max_num_of_committees=4))
-    [CandidateSet({0, 1, 3}), CandidateSet({0, 1, 4})]
+    >>> committees = abcrules.compute("pav", profile, committeesize=3, max_num_of_committees=4)
+    >>> len(committees)
+    2
 
 While most ABC rule are implemented for both  `resolute=True` and `resolute=False`, for some one choice is
 more natural than the other.

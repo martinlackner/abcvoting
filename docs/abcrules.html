@@ -50,6 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="misc.html">abcvoting.misc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="properties.html">abcvoting.properties</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Backmatter:</span></p>
@@ -305,8 +306,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 faster than Thiele methods (in general), thus <cite>compute_separable_rule</cite> is used
 to compute AV.</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -348,8 +349,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <dd><p>Compute winning committees with Approval Chamberlin-Courant (CC).</p>
 <p>This ABC rule belongs to the class of Thiele methods.</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -431,8 +432,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_greedy_monroe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_greedy_monroe" title="Permalink to this definition"></a></dt>
 <dd><p>Compute winning committees with Greedy Monroe.</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -568,8 +569,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_lexminimaxav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_lexminimaxav" title="Permalink to this definition"></a></dt>
 <dd><p>Compute winning committees with Lexicographic Minimax AV (lex-MAV).</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;
 (Remark 2)</p>
 <p>If <cite>lexicographic_tiebreaking</cite> is True, compute all winning committees and choose the
@@ -614,8 +615,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_minimaxav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_minimaxav" title="Permalink to this definition"></a></dt>
 <dd><p>Compute winning committees with Minimax Approval Voting (MAV).</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -657,8 +658,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <dd><p>Compute winning committees with Phragmen’s minimax rule (minimax-Phragmen).</p>
 <p>Minimizes the maximum load.</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
@@ -708,8 +709,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_monroe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_monroe" title="Permalink to this definition"></a></dt>
 <dd><p>Compute winning committees with Monroe’s rule.</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -751,8 +752,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <dd><p>Compute winning committees with Proportional Approval Voting (PAV).</p>
 <p>This ABC rule belongs to the class of Thiele methods.</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -838,8 +839,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_revseq_thiele_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scorefct_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_revseq_thiele_method" title="Permalink to this definition"></a></dt>
 <dd><p>Reverse sequential Thiele methods.</p>
 <p>For a mathematical description of these rules, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -877,8 +878,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_revseqpav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_revseqpav" title="Permalink to this definition"></a></dt>
 <dd><p>Reverse Sequential PAV (revseq-PAV).</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -966,8 +967,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_rule_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_phragmen_phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_rule_x" title="Permalink to this definition"></a></dt>
 <dd><p>Compute winning committees with Rule X (aka Method of Equal Shares).</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;
 See also &lt;<a class="reference external" href="https://arxiv.org/pdf/1911.11747.pdf">https://arxiv.org/pdf/1911.11747.pdf</a>&gt;, page 7</p>
 <dl class="field-list">
@@ -1012,8 +1013,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_sav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_sav" title="Permalink to this definition"></a></dt>
 <dd><p>Compute winning committees with Satisfaction Approval Voting (SAV).</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -1099,8 +1100,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_seq_thiele_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scorefct_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_seq_thiele_method" title="Permalink to this definition"></a></dt>
 <dd><p>Sequential Thiele methods.</p>
 <p>For a mathematical description of these rules, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -1138,8 +1139,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_seqcc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_seqcc" title="Permalink to this definition"></a></dt>
 <dd><p>Sequential Chamberlin-Courant (seq-CC).</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -1180,8 +1181,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_seqpav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_seqpav" title="Permalink to this definition"></a></dt>
 <dd><p>Sequential PAV (seq-PAV).</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -1222,8 +1223,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_seqphragmen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_seqphragmen" title="Permalink to this definition"></a></dt>
 <dd><p>Compute winning committees with Phragmen’s sequential rule (seq-Phragmen).</p>
 <p>For a mathematical description of this rule, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -1357,8 +1358,8 @@ An exception is Approval Voting (AV), which should be computed using
 compute_av(). (AV is polynomial-time computable (separable) and can thus be
 computed much faster.)</p>
 <p>For a mathematical description of Thiele methods, see e.g.
-“Multi-Winner Voting with Approval Preferences”
-by Martin Lackner and Piotr Skowron
+“Multi-Winner Voting with Approval Preferences”.
+Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>

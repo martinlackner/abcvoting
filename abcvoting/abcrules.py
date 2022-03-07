@@ -701,8 +701,8 @@ def compute_thiele_method(
     computed much faster.)
 
     For a mathematical description of Thiele methods, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -910,8 +910,8 @@ def compute_pav(
     This ABC rule belongs to the class of Thiele methods.
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -1037,8 +1037,8 @@ def compute_cc(
     This ABC rule belongs to the class of Thiele methods.
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -1239,8 +1239,8 @@ def compute_seq_thiele_method(
     Sequential Thiele methods.
 
     For a mathematical description of these rules, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -1431,8 +1431,8 @@ def compute_seqpav(
     Sequential PAV (seq-PAV).
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -1554,8 +1554,8 @@ def compute_seqcc(
     Sequential Chamberlin-Courant (seq-CC).
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -1616,8 +1616,8 @@ def compute_revseq_thiele_method(
     Reverse sequential Thiele methods.
 
     For a mathematical description of these rules, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -1810,8 +1810,8 @@ def compute_revseqpav(
     Reverse Sequential PAV (revseq-PAV).
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -2047,8 +2047,8 @@ def compute_sav(
     Compute winning committees with Satisfaction Approval Voting (SAV).
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -2112,8 +2112,8 @@ def compute_av(
     to compute AV.
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -2173,8 +2173,8 @@ def compute_minimaxav(
     Compute winning committees with Minimax Approval Voting (MAV).
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -2310,8 +2310,8 @@ def compute_lexminimaxav(
     Compute winning committees with Lexicographic Minimax AV (lex-MAV).
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
     (Remark 2)
 
@@ -2443,8 +2443,8 @@ def compute_monroe(
     Compute winning committees with Monroe's rule.
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -2577,8 +2577,8 @@ def compute_greedy_monroe(
     Compute winning committees with Greedy Monroe.
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -2736,8 +2736,8 @@ def compute_seqphragmen(
     Compute winning committees with Phragmen's sequential rule (seq-Phragmen).
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     Parameters
@@ -3046,8 +3046,8 @@ def compute_rule_x(
     Compute winning committees with Rule X (aka Method of Equal Shares).
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
     See also <https://arxiv.org/pdf/1911.11747.pdf>, page 7
 
@@ -3382,8 +3382,8 @@ def compute_minimaxphragmen(
     Minimizes the maximum load.
 
     For a mathematical description of this rule, see e.g.
-    "Multi-Winner Voting with Approval Preferences"
-    by Martin Lackner and Piotr Skowron
+    "Multi-Winner Voting with Approval Preferences".
+    Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
     .. important::

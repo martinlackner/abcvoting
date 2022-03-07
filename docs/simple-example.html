@@ -50,6 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="misc.html">abcvoting.misc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="properties.html">abcvoting.properties</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Backmatter:</span></p>
@@ -89,6 +90,7 @@ Let’s first create the approval profile for (up to) five candidates.
 These candidates correspond to the numbers 0 to 4.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">abcvoting.preferences</span> <span class="kn">import</span> <span class="n">Profile</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">abcvoting</span> <span class="kn">import</span> <span class="n">abcrules</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">abcrules</span><span class="o">.</span><span class="n">available_algorithms</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;brute-force&quot;</span><span class="p">,</span> <span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="s2">&quot;standard-fractions&quot;</span><span class="p">]</span>  
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span> <span class="o">=</span> <span class="n">Profile</span><span class="p">(</span><span class="n">num_cand</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>

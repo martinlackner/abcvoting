@@ -50,6 +50,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">abcvoting.misc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="properties.html">abcvoting.properties</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Backmatter:</span></p>
@@ -143,6 +144,30 @@ Committees are, as usual, of type <cite>CandidateSet</cite> (i.e., sets of posit
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>committees1, committees2</strong><span class="classifier">list of CandidateSet</span></dt><dd><p>Two lists of committees.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>bool</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.misc.dominate">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">dominate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.dominate" title="Permalink to this definition"></a></dt>
+<dd><p>Test whether committee <cite>committee1</cite> dominates committee <cite>committee2</cite>.</p>
+<p>That is, test whether each voter in the profile has at least as many approved candidates
+in comm1 as in comm2, and there is at least one voter with strictly more approved candidates
+in comm1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
+</dd>
+<dt><strong>committee1, committee2</strong><span class="classifier">iterable of int</span></dt><dd><p>Two committees.</p>
 </dd>
 </dl>
 </dd>

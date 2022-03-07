@@ -77,7 +77,11 @@ class Profile(object):
 
     def approved_candidates(self):
         """
-        A list of all candidates approved by at least one voter.
+        A set of all candidates approved by at least one voter.
+
+        Returns
+        -------
+        set of int
         """
         _approved_candidates = set()
         for voter in self._voters:
