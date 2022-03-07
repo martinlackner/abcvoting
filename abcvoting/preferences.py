@@ -59,7 +59,6 @@ class Profile(object):
 
         self._voters = []  # Internal list of voters.
         # Use `Profile.add_voter()` or `Profile.add_voters()` to add voters
-        self._approved_candidates = None  # internal. Use approved_candidates.
 
         if cand_names:
             if len(cand_names) < num_cand:
@@ -81,11 +80,10 @@ class Profile(object):
         """
         A list of all candidates approved by at least one voter.
         """
-        if self._approved_candidates is None:
-            self._approved_candidates = set()
-            for voter in self._voters:
-                self._approved_candidates.update(voter.approved)
-        return self._approved_candidates
+        _approved_candidates = set()
+        for voter in self._voters:
+            _approved_candidates.update(voter.approved)
+        return _approved_candidates
 
     def __len__(self):
         return len(self._voters)
@@ -98,10 +96,6 @@ class Profile(object):
             _voter = Voter(voter.approved, weight=voter.weight, num_cand=self.num_cand)
         else:
             _voter = Voter(voter, num_cand=self.num_cand)
-
-        # there might be new approved candidates,
-        # but update self._approved_candidates only on demand
-        self._approved_candidates = None
 
         return _voter
 
