@@ -153,7 +153,8 @@ def check_PJR(profile, committee, algorithm="brute-force"):
 
     Reference
     ---------
-    Sánchez-Fernández, L., Elkind, E., Lackner, M., Fernández, N., Fisteus, J., Val, P. B., & Skowron, P. (2017, February).
+    Sánchez-Fernández, L., Elkind, E., Lackner, M., Fernández, N., Fisteus, J., Val, P. B., &
+    Skowron, P. (2017).
     Proportional justified representation.
     In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 31, No. 1).
     """
@@ -254,7 +255,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
 
     # constraint: all voters should have at least as many preferred candidates
     # in the dominating committee as in the query committee
-    for voter, i in zip(profile, range(len(profile))):
+    for i, voter in enumerate(profile):
         model.addConstr(
             gb.quicksum(utility[(voter, l)] for l in range(1, len(committee) + 1))
             >= num_apprvd_cands_query[i]
@@ -267,7 +268,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
     # loop through all variables in the condition_strictly_more array (there is one for each voter)
     # if it has value 1, then the condition of having strictly more preferred candidates on the dominating committee
     # has to be satisfied for this voter
-    for voter, i in zip(profile, range(len(profile))):
+    for i, voter in enumerate(profile):
         model.addConstr(
             (condition_strictly_more[i] == 1)
             >> (
@@ -439,7 +440,7 @@ def _check_EJR_gurobi(profile, committee):
             (
                 sum(
                     (approval_matrix[(voter, cand)] * in_group[voter_index])
-                    for voter, voter_index in zip(profile, range(len(profile)))
+                    for voter_index, voter in enumerate(profile)
                 )
                 * in_cut[cand]
                 for cand in range(profile.num_cand)
@@ -462,7 +463,7 @@ def _check_EJR_gurobi(profile, committee):
 
     # # if both in_group[voter] = 1 AND in_cut[cand] = 1
     # # then the entry approval_matrix[voter, cand] = 1
-    # for voter, voter_index in zip(profile, range(len(profile))):
+    # for voter_index, voter in enumerate(profile):
     #     for cand in range(profile.num_cand):
     #         model.addGenConstrIndicator(in_group_in_cut[voter_index, cand], 1, approval_matrix[voter, cand], gb.GRB.EQUAL, 1)
 
@@ -679,7 +680,7 @@ def _check_PJR_gurobi(profile, committee):
             (
                 sum(
                     (approval_matrix[(voter, cand)] * in_group[voter_index])
-                    for voter, voter_index in zip(profile, range(len(profile)))
+                    for voter_index, voter in enumerate(profile)
                 )
                 * in_cut[cand]
                 for cand in range(profile.num_cand)
@@ -704,7 +705,7 @@ def _check_PJR_gurobi(profile, committee):
     # -----------------------------------------------------------------------------------------
     # constraint to ensure that no in_union variable is wrongly set to 1
     # for cand in range(profile.num_cand):
-    #     model.addConstr((gb.quicksum(in_group[voter_index] * approval_matrix[voter, cand] for voter_index, voter in zip(range(len(profile)), profile))) - in_union[cand] >= 0)
+    #     model.addConstr((gb.quicksum(in_group[voter_index] * approval_matrix[voter, cand] for voter_index, voter in enumerate(profile)) - in_union[cand] >= 0)
     # -----------------------------------------------------------------------------------------
     # -----------------------------------------------------------------------------------------
 
