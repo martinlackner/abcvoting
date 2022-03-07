@@ -151,6 +151,7 @@ pre-commit (e.g. via apt, conda or pip) and then run `$ pre-commit install` to i
 ## Acknowledgements
 
 The following people have contributed code to this package or provided help with technical and scientific questions (in alphabetic order):
+[Elvi Cela](https://github.com/elvic96),
 [Piotr Faliszewski](http://home.agh.edu.pl/~faliszew/),
 [Stefan Schlomo Forster](https://github.com/stefanschlomoforster),
 [Andrzej Kaczmarczyk](http://www.user.tu-berlin.de/droores/),
