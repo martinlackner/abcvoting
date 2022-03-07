@@ -4,11 +4,14 @@ Unit tests for: properties.py
 
 import pytest
 import os
-import re
-import random
-from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, DEBUG, output
+
+import abcvoting.misc
+from abcvoting.output import DETAILS, output
 from abcvoting.preferences import Profile, Voter
-from abcvoting import abcrules, properties, misc, scores, fileio
+from abcvoting import abcrules, properties, fileio
+
+# set verbosity to DETAILS to increase unittest coverage
+output.set_verbosity(verbosity=DETAILS)
 
 # Test from literature: Lackner and Skowron 2020
 # With given input profile, committee returned by Monroe Rule
@@ -34,14 +37,16 @@ def test_pareto_optimality_methods(algorithm):
     )
 
     assert monroe_output == [{2, 3}]
-    assert properties.dominates({0, 1}, {2, 3}, profile)
+    assert abcvoting.misc.dominate(profile, {0, 1}, {2, 3})
     assert not is_pareto_optimal
+
+    assert properties.check_pareto_optimality(profile, {0, 1}, algorithm=algorithm)
 
 
 # instances to check output of EJR methods
 EJR_instances = []
 
-# create and add the first instance from literature:
+# add an instance from
 # Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 20
 profile = Profile(4)
 profile.add_voters(
@@ -51,7 +56,7 @@ committee = {0, 1, 2}
 expected_result = True
 EJR_instances.append((profile, committee, expected_result))
 
-# create and add the second instance
+# add an instance from
 # Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 4
 profile = Profile(6)
 profile.add_voters(
@@ -61,7 +66,7 @@ committee = {0, 1, 2, 3}
 expected_result = False
 EJR_instances.append((profile, committee, expected_result))
 
-# create and add the third instance
+# add an instance from
 # Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 5
 profile = Profile(6)
 profile.add_voters([[0]] * 2 + [[0, 1, 2]] * 2 + [[1, 2, 3]] * 2 + [[3, 4]] + [[3, 5]])
@@ -69,7 +74,7 @@ committee = {0, 3, 4, 5}
 expected_result = False
 EJR_instances.append((profile, committee, expected_result))
 
-# create and add the fourth instance
+# add an instance from
 # Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 6
 profile = Profile(12)
 profile.add_voters([[0, 10]] * 3 + [[0, 11]] * 3 + [[1, 2, 3, 4, 5, 6, 7, 8, 9]] * 14)
@@ -77,7 +82,7 @@ committee = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 expected_result = True
 EJR_instances.append((profile, committee, expected_result))
 
-# create and add the fifth instance
+# add an instance from
 # Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 8
 profile = Profile(5)
 profile.add_voters([[0, 1]] * 2 + [[2]] + [[3, 4]])
@@ -85,7 +90,7 @@ committee = {0, 2, 3, 4}
 expected_result = False
 EJR_instances.append((profile, committee, expected_result))
 
-# create and add the final instance
+# add an instance from
 # Brill et al, 2021, "Phragmen's Voting Methods and Justified Representation", Example 6
 profile = Profile(14)
 profile.add_voters(
@@ -114,7 +119,7 @@ def test_EJR_methods(algorithm, profile, committee, expected_result):
 # instances to check output of PJR methods
 PJR_instances = []
 
-# create and add the first instance from literature:
+# add an instance from
 # Sanchez-Fernandez et al, 2017, "Proportional Justified Representation", Example 1
 profile = Profile(8)
 profile.add_voters([[0]] + [[1]] + [[2]] + [[3]] + [[4, 5, 6, 7]] * 6)
@@ -127,7 +132,7 @@ committee = {1, 2, 3, 4, 5, 6, 7}
 expected_result = True
 PJR_instances.append((profile, committee, expected_result))
 
-# create and add the third instance
+# add an instance from
 # Brill et al, 2021, "Phragmen's Voting Methods and Justified Representation", Example 5
 profile = Profile(6)
 profile.add_voters(
@@ -137,7 +142,7 @@ committee = {0, 1, 2, 3}
 expected_result = True
 PJR_instances.append((profile, committee, expected_result))
 
-# create and add the final instance
+# add an instance from
 # Brill et al, 2021, "Phragmen's Voting Methods and Justified Representation", Example 7
 profile = Profile(7)
 profile.add_voters([[0, 1, 2, 3]] * 67 + [[4]] * 12 + [[5]] * 11 + [[6]] * 10)
@@ -148,22 +153,9 @@ PJR_instances.append((profile, committee, expected_result))
 # From Sanchez-Fernandez et al, 2017:
 # "EJR implies PJR"
 # Also adding the positive instances from test_EJR_methods()
-
-# Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 20
-profile = Profile(4)
-profile.add_voters(
-    [[0, 3]] + [[0, 1]] + [[1, 2]] + [[2, 3]] + [[0]] * 2 + [[1]] * 2 + [[2]] * 2 + [[3]] * 2
-)
-committee = {0, 1, 2}
-expected_result = True
-PJR_instances.append((profile, committee, expected_result))
-
-# Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 6
-profile = Profile(12)
-profile.add_voters([[0, 10]] * 3 + [[0, 11]] * 3 + [[1, 2, 3, 4, 5, 6, 7, 8, 9]] * 14)
-committee = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-expected_result = True
-PJR_instances.append((profile, committee, expected_result))
+for profile, committee, expected_result in EJR_instances:
+    if expected_result:
+        PJR_instances.append((profile, committee, expected_result))
 
 
 @pytest.mark.parametrize(
@@ -183,37 +175,16 @@ JR_instances = []
 # From Sanchez-Fernandez et al, 2017:
 # "PJR implies JR"
 # adding the positive instances from test_PJR_methods()
+for profile, committee, expected_result in PJR_instances:
+    if expected_result:
+        JR_instances.append((profile, committee, expected_result))
 
-# Sanchez-Fernandez et al, 2017, "Proportional Justified Representation", Example 1
-profile = Profile(8)
-profile.add_voters([[0]] + [[1]] + [[2]] + [[3]] + [[4, 5, 6, 7]] * 6)
-committee = {1, 2, 3, 4, 5, 6, 7}
-expected_result = True
-JR_instances.append((profile, committee, expected_result))
 
-# Brill et al, 2021, "Phragmen's Voting Methods and Justified Representation", Example 5
-profile = Profile(6)
-profile.add_voters(
-    [[0]] + [[1]] + [[2]] + [[3]] + [[0, 4, 5]] + [[1, 4, 5]] + [[2, 4, 5]] + [[3, 4, 5]]
-)
-committee = {0, 1, 2, 3}
-expected_result = True
-JR_instances.append((profile, committee, expected_result))
-
-# Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 20
-profile = Profile(4)
-profile.add_voters(
-    [[0, 3]] + [[0, 1]] + [[1, 2]] + [[2, 3]] + [[0]] * 2 + [[1]] * 2 + [[2]] * 2 + [[3]] * 2
-)
-committee = {0, 1, 2}
-expected_result = True
-JR_instances.append((profile, committee, expected_result))
-
-# Aziz et al, 2016, "Justified Representation in Approval-Based Committee Voting", Example 6
+# negative JR instance
 profile = Profile(12)
-profile.add_voters([[0, 10]] * 3 + [[0, 11]] * 3 + [[1, 2, 3, 4, 5, 6, 7, 8, 9]] * 14)
-committee = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-expected_result = True
+profile.add_voters([[0, 1, 2]] * 2 + [[3]])
+committee = {0, 1, 2}
+expected_result = False
 JR_instances.append((profile, committee, expected_result))
 
 
