@@ -13,8 +13,9 @@ from abcvoting import abcrules, properties, misc, scores, fileio
 # Test from literature: Lackner and Skowron 2020
 # With given input profile, committee returned by Monroe Rule
 # is not Pareto optimal
-@pytest.mark.gurobi
-@pytest.mark.parametrize("algorithm", ["brute-force", "gurobi"])
+@pytest.mark.parametrize(
+    "algorithm", ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobi)]
+)
 def test_pareto_optimality_methods(algorithm):
     # profile with 4 candidates: a, b, c, d
     profile = Profile(4)
@@ -32,8 +33,9 @@ def test_pareto_optimality_methods(algorithm):
         profile, monroe_output[0], algorithm=algorithm
     )
 
-    assert not is_pareto_optimal
     assert monroe_output == [{2, 3}]
+    assert properties.dominates({0, 1}, {2, 3}, profile)
+    assert not is_pareto_optimal
 
 
 # instances to check output of EJR methods
@@ -98,8 +100,9 @@ expected_result = False
 EJR_instances.append((profile, committee, expected_result))
 
 
-@pytest.mark.gurobi
-@pytest.mark.parametrize("algorithm", ["brute-force", "gurobi"])
+@pytest.mark.parametrize(
+    "algorithm", ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobi)]
+)
 @pytest.mark.parametrize("profile, committee, expected_result", EJR_instances)
 def test_EJR_methods(algorithm, profile, committee, expected_result):
     # check whether the committee satisfies EJR
@@ -163,8 +166,9 @@ expected_result = True
 PJR_instances.append((profile, committee, expected_result))
 
 
-@pytest.mark.gurobi
-@pytest.mark.parametrize("algorithm", ["brute-force", "gurobi"])
+@pytest.mark.parametrize(
+    "algorithm", ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobi)]
+)
 @pytest.mark.parametrize("profile, committee, expected_result", PJR_instances)
 def test_PJR_methods(algorithm, profile, committee, expected_result):
     # check whether the committee satisfies PJR
@@ -237,7 +241,7 @@ abc_yaml_filenames = _list_abc_yaml_instances()
 
 # to test the output of the brute-force vs gurobi counterparts
 @pytest.mark.gurobi
-@pytest.mark.veryslow
+@pytest.mark.slow
 @pytest.mark.parametrize(
     "abc_yaml_instance",
     [
@@ -268,16 +272,7 @@ def test_matching_output_different_approaches(abc_yaml_instance):
 
 @pytest.mark.gurobi
 @pytest.mark.slow
-@pytest.mark.parametrize(
-    "abc_yaml_instance",
-    [
-        abc_yaml_filename
-        for abc_yaml_filename in abc_yaml_filenames
-        if abc_yaml_filename.__contains__("instanceS")
-        or abc_yaml_filename.__contains__("instanceP")
-        or abc_yaml_filename.__contains__("instanceM0")
-    ],
-)
+@pytest.mark.parametrize("abc_yaml_instance", abc_yaml_filenames)
 def test_output_EJR_PAV(abc_yaml_instance):
     # read the instance from the file
     profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
@@ -293,41 +288,8 @@ def test_output_EJR_PAV(abc_yaml_instance):
 
 
 @pytest.mark.gurobi
-@pytest.mark.veryslow
-@pytest.mark.parametrize(
-    "abc_yaml_instance",
-    [
-        abc_yaml_filename
-        for abc_yaml_filename in abc_yaml_filenames
-        if not abc_yaml_filename.__contains__("instanceVL")
-    ],
-)
-def test_output_EJR_PAV_full(abc_yaml_instance):
-    # read the instance from the file
-    profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
-
-    # get output computed by rule PAV for this instance
-    for computed_output in compute_instances:
-        if computed_output["rule_id"] == "pav":
-            input_committee = computed_output["result"][0]
-            break
-
-    # winning committee for this profile computed by PAV should satisfy EJR
-    assert properties.check_EJR(profile, input_committee, algorithm="gurobi")
-
-
-@pytest.mark.gurobi
 @pytest.mark.slow
-@pytest.mark.parametrize(
-    "abc_yaml_instance",
-    [
-        abc_yaml_filename
-        for abc_yaml_filename in abc_yaml_filenames
-        if abc_yaml_filename.__contains__("instanceS")
-        or abc_yaml_filename.__contains__("instanceP")
-        or abc_yaml_filename.__contains__("instanceM0")
-    ],
-)
+@pytest.mark.parametrize("abc_yaml_instance", abc_yaml_filenames)
 def test_output_PJR_seqPhragmen(abc_yaml_instance):
     # read the instance from the file
     profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
@@ -342,73 +304,17 @@ def test_output_PJR_seqPhragmen(abc_yaml_instance):
     assert properties.check_PJR(profile, input_committee, algorithm="gurobi")
 
 
-@pytest.mark.gurobi
-@pytest.mark.veryslow
-@pytest.mark.parametrize(
-    "abc_yaml_instance",
-    [
-        abc_yaml_filename
-        for abc_yaml_filename in abc_yaml_filenames
-        if not abc_yaml_filename.__contains__("instanceVL")
-    ],
-)
-def test_output_PJR_seqPhragmen_full(abc_yaml_instance):
-    # read the instance from the file
-    profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
-
-    # get output computed by rule seqPhragmen for this instance
-    for computed_output in compute_instances:
-        if computed_output["rule_id"] == "seqphragmen":
-            input_committee = computed_output["result"][0]
-            break
-
-    # winning committee for this profile computed by seqPhragmen should satisfy PJR
-    assert properties.check_PJR(profile, input_committee, algorithm="gurobi")
-
-
 @pytest.mark.slow
-@pytest.mark.parametrize(
-    "abc_yaml_instance",
-    [
-        abc_yaml_filename
-        for abc_yaml_filename in abc_yaml_filenames
-        if abc_yaml_filename.__contains__("instanceS")
-        or abc_yaml_filename.__contains__("instanceP")
-        or abc_yaml_filename.__contains__("instanceM0")
-    ],
-)
-def test_output_JR_monroe(abc_yaml_instance):
+@pytest.mark.parametrize("abc_yaml_instance", abc_yaml_filenames)
+def test_output_JR_with_rules(abc_yaml_instance):
     # read the instance from the file
     profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
 
-    # get output computed by rule Monroe for this instance
-    for computed_output in compute_instances:
-        if computed_output["rule_id"] == "monroe":
-            input_committee = computed_output["result"][0]
-            break
-
-    # winning committee for this profile computed by Monroe should satisfy JR
-    assert properties.check_JR(profile, input_committee)
-
-
-@pytest.mark.veryslow
-@pytest.mark.parametrize(
-    "abc_yaml_instance",
-    [
-        abc_yaml_filename
-        for abc_yaml_filename in abc_yaml_filenames
-        if not abc_yaml_filename.__contains__("instanceVL")
-    ],
-)
-def test_output_JR_monroe_full(abc_yaml_instance):
-    # read the instance from the file
-    profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
-
-    # get output computed by rule Monroe for this instance
-    for computed_output in compute_instances:
-        if computed_output["rule_id"] == "monroe":
-            input_committee = computed_output["result"][0]
-            break
-
-    # winning committee for this profile computed by Monroe should satisfy JR
-    assert properties.check_JR(profile, input_committee)
+    for rule_id in ["monroe", "seqcc", "greedy-monroe", "cc"]:
+        # get output computed by rule `rule_id` for this instance
+        for computed_output in compute_instances:
+            if computed_output["rule_id"] == rule_id:
+                input_committee = computed_output["result"][0]
+                break
+        # winning committee should satisfy JR
+        assert properties.check_JR(profile, input_committee)
