@@ -5,8 +5,7 @@ Properties of committees (i.e., sets of candidates)
 import itertools
 import math
 from abcvoting.output import output
-from abcvoting.misc import str_set_of_candidates
-from abcvoting.preferences import Profile
+from abcvoting.misc import str_set_of_candidates, CandidateSet
 
 
 try:
@@ -39,7 +38,8 @@ def check_pareto_optimality(profile, committee, algorithm="brute-force"):
     Survey "Approval-Based Committee Voting"
     """
 
-    committee = _validate_input(profile, committee)
+    # check that `committee` is a valid input
+    committee = CandidateSet(committee, num_cand=profile.num_cand)
 
     if algorithm == "brute-force":
         result = _check_pareto_optimality_brute_force(profile, committee)
@@ -84,7 +84,8 @@ def check_EJR(profile, committee, algorithm="brute-force"):
     Social Choice and Welfare, 48(2), 461-485.
     """
 
-    committee = _validate_input(profile, committee)
+    # check that `committee` is a valid input
+    committee = CandidateSet(committee, num_cand=profile.num_cand)
 
     if algorithm == "brute-force":
         result = _check_EJR_brute_force(profile, committee)
@@ -122,7 +123,8 @@ def check_JR(profile, committee):
     Social Choice and Welfare, 48(2), 461-485.
     """
 
-    committee = _validate_input(profile, committee)
+    # check that `committee` is a valid input
+    committee = CandidateSet(committee, num_cand=profile.num_cand)
 
     result = _check_JR(profile, committee)
 
@@ -157,7 +159,8 @@ def check_PJR(profile, committee, algorithm="brute-force"):
     In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 31, No. 1).
     """
 
-    committee = _validate_input(profile, committee)
+    # check that `committee` is a valid input
+    committee = CandidateSet(committee, num_cand=profile.num_cand)
 
     if algorithm == "brute-force":
         result = _check_PJR_brute_force(profile, committee)
@@ -774,50 +777,3 @@ def _check_PJR_gurobi(profile, committee):
         return True
     else:
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
-
-
-def _validate_input(profile, committee):
-    """Test whether input is valid.
-
-    Parameters
-    ----------
-    profile : abcvoting.preferences.Profile
-        approval sets of voters
-    committee : set / list / tuple
-        set of candidates
-
-    Returns
-    -------
-    committee : set
-        set of candidates
-    """
-
-    # check the data types
-    if not isinstance(profile, Profile):
-        raise TypeError(f'Argument "profile" should be instance of {Profile}')
-
-    if not (
-        isinstance(committee, set) or isinstance(committee, list) or isinstance(committee, tuple)
-    ):
-        raise TypeError(
-            f'Argument "committee" should be instance of either {set}, {list} or {tuple}'
-        )
-
-    # if argument committee is not of type set, first convert to set
-    if not isinstance(committee, set):
-        committee = set(committee)
-
-    # check if candidates appearing in committee actually exist within the profile
-    # and also whether they are the correct datatype (int)
-    for cand in committee:
-        if not isinstance(cand, int):
-            raise TypeError(f'Elements of "committee" should be instance of {int}')
-
-        if cand < 0:
-            raise TypeError(f'Elements of "committee" should be non-negative integers')
-
-        if cand >= profile.num_cand:
-            raise TypeError(f'Candidate {cand} in "committee" does not appear in "profile"')
-
-    # return the argument committee (possibly changed data type)
-    return committee
