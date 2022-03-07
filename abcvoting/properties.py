@@ -193,7 +193,7 @@ def _check_pareto_optimality_brute_force(profile, committee):
     bool
     """
     # iterate through all possible combinations of number_candidates taken committee_size at a time
-    for comm in itertools.combinations(range(profile.num_cand), len(committee)):
+    for comm in itertools.combinations(profile.candidates, len(committee)):
         if dominate(profile, set(comm), committee):
             # if a generated committee dominates the "query" committee, then it is not Pareto optimal
             return False
@@ -392,7 +392,7 @@ def _check_EJR_gurobi(profile, committee):
     approval_matrix = {}
 
     for voter in profile:
-        for cand in range(profile.num_cand):
+        for cand in profile.candidates:
             if cand in voter.approved:
                 approval_matrix[(voter, cand)] = 1
             else:
@@ -443,7 +443,7 @@ def _check_EJR_gurobi(profile, committee):
                     for voter_index, voter in enumerate(profile)
                 )
                 * in_cut[cand]
-                for cand in range(profile.num_cand)
+                for cand in profile.candidates
             )
         )
     )
@@ -454,17 +454,17 @@ def _check_EJR_gurobi(profile, committee):
     # -----------------------------------------------------------------------------------------
 
     # add auxiliary binary variables for each voter-cand pair
-    # in_group_in_cut = model.addVars(range(len(profile)), range(profile.num_cand), vtype=gb.GRB.BINARY, name="in_group_in_cut")
+    # in_group_in_cut = model.addVars(range(len(profile)), profile.candidates, vtype=gb.GRB.BINARY, name="in_group_in_cut")
 
     # # compute value of auxiliary variables
     # for voter in range(len(profile)):
-    #     for cand in range(profile.num_cand):
+    #     for cand in profile.candidates:
     #         model.addConstr(in_group_in_cut[voter, cand] == gb.and_(in_group[voter], in_cut[cand]))
 
     # # if both in_group[voter] = 1 AND in_cut[cand] = 1
     # # then the entry approval_matrix[voter, cand] = 1
     # for voter_index, voter in enumerate(profile):
-    #     for cand in range(profile.num_cand):
+    #     for cand in profile.candidates:
     #         model.addGenConstrIndicator(in_group_in_cut[voter_index, cand], 1, approval_matrix[voter, cand], gb.GRB.EQUAL, 1)
 
     # -----------------------------------------------------------------------------------------
@@ -510,7 +510,7 @@ def _check_JR(profile, committee):
     sum_appearances = 0
 
     # consider all candidates one by one
-    for cand in range(profile.num_cand):
+    for cand in profile.candidates:
         # reset the sum of appearances in approval ballots
         sum_appearances = 0
 
@@ -627,7 +627,7 @@ def _check_PJR_gurobi(profile, committee):
     approval_matrix = {}
 
     for voter in profile:
-        for cand in range(profile.num_cand):
+        for cand in profile.candidates:
             if cand in voter.approved:
                 approval_matrix[(voter, cand)] = 1
             else:
@@ -636,7 +636,7 @@ def _check_PJR_gurobi(profile, committee):
     # compute deterministically array of binary variables that
     # indicate whether a candidate is inside the input committee
     in_committee = []
-    for cand in range(profile.num_cand):
+    for cand in profile.candidates:
         if cand in committee:
             in_committee.append(1)
         else:
@@ -683,7 +683,7 @@ def _check_PJR_gurobi(profile, committee):
                     for voter_index, voter in enumerate(profile)
                 )
                 * in_cut[cand]
-                for cand in range(profile.num_cand)
+                for cand in profile.candidates
             )
         )
     )
@@ -704,7 +704,7 @@ def _check_PJR_gurobi(profile, committee):
     # that satisfies the condition of PJR
     # -----------------------------------------------------------------------------------------
     # constraint to ensure that no in_union variable is wrongly set to 1
-    # for cand in range(profile.num_cand):
+    # for cand in profile.candidates:
     #     model.addConstr((gb.quicksum(in_group[voter_index] * approval_matrix[voter, cand] for voter_index, voter in enumerate(profile)) - in_union[cand] >= 0)
     # -----------------------------------------------------------------------------------------
     # -----------------------------------------------------------------------------------------
@@ -712,8 +712,7 @@ def _check_PJR_gurobi(profile, committee):
     # constraint to ensure that the intersection between candidates that are in union
     # intersected with the input committee, has size strictly less than ell
     model.addConstr(
-        gb.quicksum(in_union[cand] * in_committee[cand] for cand in range(profile.num_cand)) + 1
-        <= ell
+        gb.quicksum(in_union[cand] * in_committee[cand] for cand in profile.candidates) + 1 <= ell
     )
 
     # add objective function
