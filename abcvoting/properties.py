@@ -5,8 +5,7 @@ Properties of committees (i.e., sets of candidates)
 import itertools
 import math
 from abcvoting.output import output
-from abcvoting.misc import str_set_of_candidates, CandidateSet
-
+from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate
 
 try:
     import gurobipy as gb
@@ -177,50 +176,6 @@ def check_PJR(profile, committee, algorithm="brute-force"):
     return result
 
 
-def dominates(comm1, comm2, profile):
-    """Test whether a committee comm1 dominates another committee comm2. That is, test whether
-    each voter in the profile has at least as many approved candidates in comm1 as in comm2,
-    and there is at least one voter with strictly more approved candidates in comm1.
-
-    Parameters
-    ----------
-    comm1 : set
-        set of candidates
-    comm2 : set
-        set of candidates
-    profile : abcvoting.preferences.Profile
-        approval sets of voters
-
-    Returns
-    -------
-    bool
-    """
-
-    # flag to check whether there are at least as many approved candidates
-    # in dominating committee as in input committee
-    condition_at_least_as_many = True
-
-    # iterate through all voters
-    for voter in profile:
-        # check if there are at least as many approved candidates in comm1 as in comm2
-        condition_at_least_as_many = condition_at_least_as_many and (
-            len(voter.approved & comm1) >= len(voter.approved & comm2)
-        )
-        # check if domination has already failed
-        if not condition_at_least_as_many:
-            return False
-
-    # if not yet returned by now, then check for condition whether there is a voter with strictly
-    # more preferred candidates in dominating committee than in input committee
-    for voter in profile:
-        # check if for some voter, there are strictly more preferred candidates in comm1 than in comm2
-        if len(voter.approved & comm1) > len(voter.approved & comm2):
-            return True
-
-    # If function has still not returned by now, then it means that comm1 does not dominate comm2
-    return False
-
-
 def _check_pareto_optimality_brute_force(profile, committee):
     """Test using brute-force whether a committee is Pareto optimal. That is, there is no other committee
     which dominates it.
@@ -238,7 +193,7 @@ def _check_pareto_optimality_brute_force(profile, committee):
     """
     # iterate through all possible combinations of number_candidates taken committee_size at a time
     for comm in itertools.combinations(range(profile.num_cand), len(committee)):
-        if dominates(set(comm), committee, profile):
+        if dominate(profile, set(comm), committee):
             # if a generated committee dominates the "query" committee, then it is not Pareto optimal
             return False
 

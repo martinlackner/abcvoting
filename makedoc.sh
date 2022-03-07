@@ -1,4 +1,4 @@
-source ../venv-new/bin/activate
+source ./../venv-new/bin/activate
 
 make clean
 make html

@@ -320,3 +320,51 @@ def verify_expected_committees_equals_actual_committees(
             raise ValueError(
                 f"{shortname} returns {actual_committees}, expected {expected_committees}"
             )
+
+
+def dominate(profile, comm1, comm2):
+    """
+    Test whether a committee `comm1` dominates committee `comm2`.
+
+    That is, test whether each voter in the profile has at least as many approved candidates
+    in comm1 as in comm2, and there is at least one voter with strictly more approved candidates
+    in comm1.
+
+    Parameters
+    ----------
+    comm1 : set
+        set of candidates
+    comm2 : set
+        set of candidates
+    profile : abcvoting.preferences.Profile
+        approval sets of voters
+
+    Returns
+    -------
+    bool
+    """
+
+    # flag to check whether there are at least as many approved candidates
+    # in dominating committee as in input committee
+    condition_at_least_as_many = True
+
+    # iterate through all voters
+    for voter in profile:
+        # check if there are at least as many approved candidates in comm1 as in comm2
+        condition_at_least_as_many = condition_at_least_as_many and (
+            len(voter.approved & comm1) >= len(voter.approved & comm2)
+        )
+        # check if domination has already failed
+        if not condition_at_least_as_many:
+            return False
+
+    # if not yet returned by now, then check for condition whether there is a voter with strictly
+    # more preferred candidates in dominating committee than in input committee
+    for voter in profile:
+        # check if there are for some voter strictly more preferred candidates in comm1
+        # than in comm2
+        if len(voter.approved & comm1) > len(voter.approved & comm2):
+            return True
+
+    # If function has still not returned by now, then it means that comm1 does not dominate comm2
+    return False
