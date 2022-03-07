@@ -35,7 +35,7 @@ jobs:
         # pip install cvxpy
         # pip install cvxopt
 
-    # TODO: cvxpy pip install is not working currently
+    # cvxpy is currently not used
     #- name: Test if solver GLPK_MI is installed
       # this is just a paranoia check, because unit tests won't fail, they would be silently skipped
       # run: python -c "import cvxpy as cp; assert cp.GLPK_MI in cp.installed_solvers(), 'GLPKI_MI not installed'"
@@ -54,7 +54,7 @@ jobs:
     - name: Test with pytest
       run: |
         # note that some tests are skipped because Gurobi is not available on Github
-        coverage run --source=. -m pytest -v --tb=long -m "not gurobi and not scip and not cbc and not glpk_mi and not cvxpy and not gmpy2 and not slow" -ra tests/
+        coverage run --source=. -m pytest -v --tb=long -m "not gurobi and not gmpy2 and not veryslow" -ra tests/
 
     - name: Generate coverage report
       run: coverage xml
