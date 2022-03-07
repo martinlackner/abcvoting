@@ -445,21 +445,20 @@ def _mip_minimaxphragmen(profile, committeesize, resolute, max_num_of_committees
         model.objective = mip.maximize(-loadbound)
 
     # check if a sufficient number of candidates is approved
-    if len(profile.approved_candidates) < committeesize:
+    approved_candidates = profile.approved_candidates()
+    if len(approved_candidates) < committeesize:
         # An insufficient number of candidates is approved:
         # Committees consist of all approved candidates plus
         #  a correct number of unapproved candidates
         remaining_candidates = [
-            cand for cand in profile.candidates if cand not in profile.approved_candidates
+            cand for cand in profile.candidates if cand not in approved_candidates
         ]
-        num_missing_candidates = committeesize - len(profile.approved_candidates)
+        num_missing_candidates = committeesize - len(approved_candidates)
         if resolute:
-            return [
-                profile.approved_candidates | set(remaining_candidates[:num_missing_candidates])
-            ]
+            return [approved_candidates | set(remaining_candidates[:num_missing_candidates])]
         else:
             return [
-                profile.approved_candidates | set(extra)
+                approved_candidates | set(extra)
                 for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
             ]
 

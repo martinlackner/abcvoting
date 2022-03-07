@@ -75,7 +75,6 @@ class Profile(object):
         """
         return len(self.candidates)
 
-    @property
     def approved_candidates(self):
         """
         A list of all candidates approved by at least one voter.

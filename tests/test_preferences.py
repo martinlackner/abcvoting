@@ -115,10 +115,10 @@ def test_approved_candidates():
     profile = Profile(10)
     profile.add_voter(Voter([1, 3, 5], 3))
     profile.add_voter([0])
-    assert profile.approved_candidates == {0, 1, 3, 5}
+    assert profile.approved_candidates() == {0, 1, 3, 5}
     profile.add_voter([4])
-    assert profile.approved_candidates == {0, 1, 3, 4, 5}
+    assert profile.approved_candidates() == {0, 1, 3, 4, 5}
     profile.add_voters([[7], [1, 8]])
-    assert profile.approved_candidates == {0, 1, 3, 4, 5, 7, 8}
+    assert profile.approved_candidates() == {0, 1, 3, 4, 5, 7, 8}
     profile[0].approved = [1, 5]
-    assert profile.approved_candidates == {0, 1, 4, 5, 7, 8}
+    assert profile.approved_candidates() == {0, 1, 4, 5, 7, 8}
