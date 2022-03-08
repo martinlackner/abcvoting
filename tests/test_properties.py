@@ -106,7 +106,7 @@ EJR_instances.append((profile, committee, expected_result))
 
 
 @pytest.mark.parametrize(
-    "algorithm", ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobi)]
+    "algorithm", ["brute-force", "fastest", pytest.param("gurobi", marks=pytest.mark.gurobi)]
 )
 @pytest.mark.parametrize("profile, committee, expected_result", EJR_instances)
 def test_EJR_methods(algorithm, profile, committee, expected_result):
@@ -159,7 +159,7 @@ for profile, committee, expected_result in EJR_instances:
 
 
 @pytest.mark.parametrize(
-    "algorithm", ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobi)]
+    "algorithm", ["brute-force", "fastest", pytest.param("gurobi", marks=pytest.mark.gurobi)]
 )
 @pytest.mark.parametrize("profile, committee, expected_result", PJR_instances)
 def test_PJR_methods(algorithm, profile, committee, expected_result):
