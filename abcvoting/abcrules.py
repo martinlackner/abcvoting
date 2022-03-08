@@ -495,7 +495,7 @@ def get_rule(rule_id):
                 "gurobi",
                 "mip-gurobi",
                 "mip-cbc",
-                "ortools-cp",
+                # "ortools-cp", # TODO: deactivated, ortools crashes occasionally
                 "brute-force",
             ),
             resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
@@ -2463,7 +2463,7 @@ def compute_monroe(
             .. doctest::
 
                 >>> get_rule("monroe").algorithms
-                ('gurobi', 'mip-gurobi', 'mip-cbc', 'ortools-cp', 'brute-force')
+                ('gurobi', 'mip-gurobi', 'mip-cbc', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -2505,13 +2505,14 @@ def compute_monroe(
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
-    elif algorithm == "ortools-cp":
-        committees = abcrules_ortools._ortools_monroe(
-            profile=profile,
-            committeesize=committeesize,
-            resolute=resolute,
-            max_num_of_committees=max_num_of_committees,
-        )
+    # TODO: deactivated, ortools crashes occasionally
+    # elif algorithm == "ortools-cp":
+    #     committees = abcrules_ortools._ortools_monroe(
+    #         profile=profile,
+    #         committeesize=committeesize,
+    #         resolute=resolute,
+    #         max_num_of_committees=max_num_of_committees,
+    #     )
     elif algorithm.startswith("mip-"):
         committees = abcrules_mip._mip_monroe(
             profile=profile,
