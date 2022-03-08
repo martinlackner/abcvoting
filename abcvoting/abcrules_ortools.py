@@ -196,25 +196,34 @@ def _ortools_monroe(profile, committeesize, resolute, max_num_of_committees):
         for cand in profile.candidates:
             # every voter set in the partition has to contain
             # at least (num_voters // committeesize) candidates
+
             model.Add(
                 sum(partition[(cand, j)] for j in range(len(profile)))
-                >= (num_voters // committeesize - num_voters * (1 - in_committee[cand]))
-            )
+                >= (num_voters // committeesize)
+            ).OnlyEnforceIf(in_committee[cand])
+
+            # alternatively:
+            # model.Add(
+            #     sum(partition[(cand, j)] for j in range(len(profile)))
+            #     >= (num_voters // committeesize - num_voters * (1 - in_committee[cand]))
+            # )
+
             # every voter set in the partition has to contain
             # at most ceil(num_voters/committeesize) candidates
             model.Add(
                 sum(partition[(cand, j)] for j in range(len(profile)))
-                <= (
-                    num_voters // committeesize
-                    + bool(num_voters % committeesize)
-                    + num_voters * (1 - in_committee[cand])
-                )
-            )
+                <= (num_voters // committeesize + bool(num_voters % committeesize))
+            ).OnlyEnforceIf(in_committee[cand])
+
             # if in_committee[i] = 0 then partition[(i,j) = 0
-            model.Add(
-                sum(partition[(cand, j)] for j in range(len(profile)))
-                <= num_voters * in_committee[cand]
-            )
+            for j in range(len(profile)):
+                model.Add(partition[(cand, j)] <= in_committee[cand])
+
+            # # alternatively
+            # model.Add(
+            #     sum(partition[(cand, j)] for j in range(len(profile)))
+            #     <= num_voters * in_committee[cand]
+            # )
 
         # constraint for objective variable "satisfaction"
         model.Add(
