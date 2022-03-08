@@ -4,6 +4,7 @@ Unit tests for misc.py
 
 import pytest
 from abcvoting import misc
+from abcvoting.preferences import Profile
 
 
 @pytest.mark.parametrize(
@@ -47,3 +48,15 @@ def test_str_committees_with_header():
         == "2 winning committees:\n {a, b}\n {b, c, d}\n"
     )
     assert misc.str_committees_with_header([], winning=True) == "No winning committees"
+
+
+def test_dominate():
+    profile = Profile(6)
+    profile.add_voters([[0, 1], [0, 1], [1, 2, 3], [2, 3]])
+    assert not misc.dominate(profile, {0, 2}, {1, 3})
+    assert not misc.dominate(profile, {0, 2}, {1, 2})
+    assert misc.dominate(profile, {1, 3}, {0, 2})
+    assert misc.dominate(profile, {1, 2}, {0, 2})
+    assert not misc.dominate(profile, {0, 2}, {0, 2})
+    assert not misc.dominate(profile, {1}, {2})
+    assert not misc.dominate(profile, {2}, {1})

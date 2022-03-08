@@ -327,8 +327,8 @@ def dominate(profile, committee1, committee2):
     Test whether committee `committee1` dominates committee `committee2`.
 
     That is, test whether each voter in the profile has at least as many approved candidates
-    in comm1 as in comm2, and there is at least one voter with strictly more approved candidates
-    in comm1.
+    in `committee1` as in `committee2`, and there is at least one voter with strictly more approved
+    candidates in `committee1`.
 
     Parameters
     ----------
@@ -345,27 +345,21 @@ def dominate(profile, committee1, committee2):
     committee1 = CandidateSet(committee1)
     committee2 = CandidateSet(committee2)
 
-    # flag to check whether there are at least as many approved candidates
-    # in dominating committee as in input committee
-    condition_at_least_as_many = True
-
     # iterate through all voters
     for voter in profile:
-        # check if there are at least as many approved candidates in comm1 as in comm2
-        condition_at_least_as_many = condition_at_least_as_many and (
-            len(voter.approved & committee1) >= len(voter.approved & committee2)
-        )
-        # check if domination has already failed
-        if not condition_at_least_as_many:
+        # check if there are at least as many approved candidates in `committee1`
+        # as in `committee2`
+        if len(voter.approved & committee1) < len(voter.approved & committee2):
             return False
 
     # if not yet returned by now, then check for condition whether there is a voter with strictly
     # more preferred candidates in dominating committee than in input committee
     for voter in profile:
-        # check if there are for some voter strictly more preferred candidates in comm1
-        # than in comm2
+        # check if there are for some voter strictly more preferred candidates in `committee1`
+        # than in `committee2`
         if len(voter.approved & committee1) > len(voter.approved & committee2):
             return True
 
-    # If function has still not returned by now, then it means that comm1 does not dominate comm2
+    # If function has still not returned by now, then it means that `committee1` does not
+    # dominate `committee2`.
     return False
