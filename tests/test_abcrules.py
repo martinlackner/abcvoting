@@ -568,9 +568,41 @@ def _list_abc_yaml_compute_instances():
                 else:
                     marks = [pytest.mark.slow]
                 _abc_yaml_instances.append(
-                    pytest.param(filename, rule_id, algorithm, marks=marks + MARKS[algorithm])
+                    pytest.param(
+                        filename,
+                        rule_id,
+                        algorithm,
+                        marks=marks + MARKS[algorithm],
+                    )
                 )
-    return filenames, _abc_yaml_instances
+    return _abc_yaml_instances
+
+
+abc_yaml_instances = _list_abc_yaml_compute_instances()
+
+
+@pytest.fixture(scope="module")
+def load_abc_yaml_file():
+    currdir = os.path.dirname(os.path.abspath(__file__))
+    filenames = [
+        currdir + "/test_instances/" + filename
+        for filename in os.listdir(currdir + "/test_instances/")
+        if filename.endswith(".abc.yaml")
+    ]
+    abc_yaml_content = {}
+    for filename in filenames:
+        profile, committeesize, compute_instances, _ = fileio.read_abcvoting_yaml_file(filename)
+        abc_yaml_content[filename] = (profile, committeesize, compute_instances)
+        rule_ids = set()
+        for compute_instance in compute_instances:
+            rule_id = compute_instance["rule_id"]
+            rule_ids.add(rule_id)
+        for rule_id in abcrules.MAIN_RULE_IDS:
+            if rule_id not in rule_ids:
+                raise RuntimeError(f"rule_id {rule_id} does not appear in {filename}")
+        if len(rule_ids) != len(abcrules.MAIN_RULE_IDS):
+            raise RuntimeError(f"rule_ids in {filename} differ from abcrules.MAIN_RULE_IDS.")
+    return abc_yaml_content
 
 
 def id_function(val):
@@ -585,7 +617,6 @@ def id_function(val):
 
 testrules = CollectRules()
 testinsts = CollectInstances()
-abc_yaml_filenames, abc_yaml_compute_instances = _list_abc_yaml_compute_instances()
 
 
 def remove_solver_output(out):
@@ -1194,32 +1225,21 @@ def test_seqphragmen_fails_ejr():
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("filename", abc_yaml_filenames)
-def test_abc_yaml_instances_use_only_main_rule_ids(filename):
-    profile, committeesize, compute_instances, _ = fileio.read_abcvoting_yaml_file(filename)
-    for compute_instance in compute_instances:
-        # If this assertation fails, _load_abc_yaml_compute_instances() has to be adapted
-        # so that it actually loads the .abc.yaml files and extracts the rule_id's.
-        # However, this would be rather slow.
-        assert compute_instance["rule_id"] in abcrules.MAIN_RULE_IDS
-
-
 @pytest.mark.parametrize(
-    "filename, rule_id, algorithm", abc_yaml_compute_instances, ids=id_function
+    "filename, rule_id, algorithm",
+    abc_yaml_instances,
+    ids=id_function,
 )
-def test_selection_of_abc_yaml_instances(filename, rule_id, algorithm):
-    profile, committeesize, compute_instances, _ = fileio.read_abcvoting_yaml_file(filename)
+def test_selection_of_abc_yaml_instances(filename, rule_id, algorithm, load_abc_yaml_file):
+    profile, committeesize, compute_instances = load_abc_yaml_file[filename]
     for compute_instance in compute_instances:
-        if compute_instance["rule_id"] == rule_id:
-            if compute_instance["result"] is None:
-                return  # not applicable or too slow
-            abcrules.compute(**compute_instance, algorithm=algorithm)
-            return
-    else:
-        pytest.skip(
-            f"{rule_id} ({algorithm}) not precomputed for {filename},\n"
-            "re-run tests/test_instances/generate.py?"
-        )
+        if compute_instance["rule_id"] != rule_id:
+            continue
+        if compute_instance["result"] is None:
+            if rule_id == "rsd":
+                return  # random, not applicable
+            pytest.skip(f"test for {rule_id} ({algorithm}), instance {filename}.")
+        abcrules.compute(**compute_instance, algorithm=algorithm)
 
 
 @pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)
