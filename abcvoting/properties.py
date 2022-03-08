@@ -46,7 +46,7 @@ def check_pareto_optimality(profile, committee, algorithm="fastest"):
         if gurobipy_available:
             algorithm = "gurobi"
         else:
-            algorithm == "brute-force"
+            algorithm = "brute-force"
 
     if algorithm == "brute-force":
         result = _check_pareto_optimality_brute_force(profile, committee)
@@ -100,7 +100,7 @@ def check_EJR(profile, committee, algorithm="fastest"):
         if gurobipy_available:
             algorithm = "gurobi"
         else:
-            algorithm == "brute-force"
+            algorithm = "brute-force"
 
     if algorithm == "brute-force":
         result = _check_EJR_brute_force(profile, committee)
@@ -150,7 +150,7 @@ def check_PJR(profile, committee, algorithm="fastest"):
         if gurobipy_available:
             algorithm = "gurobi"
         else:
-            algorithm == "brute-force"
+            algorithm = "brute-force"
 
     if algorithm == "brute-force":
         result = _check_PJR_brute_force(profile, committee)
@@ -218,13 +218,14 @@ def _check_pareto_optimality_brute_force(profile, committee):
     -------
     bool
     """
-    # iterate through all possible combinations of number_candidates taken committee_size at a time
-    for comm in itertools.combinations(profile.candidates, len(committee)):
-        if dominate(profile, set(comm), committee):
-            # if a generated committee dominates the "query" committee, then it is not Pareto optimal
+    # iterate through all possible committees
+    for other_committee in itertools.combinations(profile.candidates, len(committee)):
+        if dominate(profile, other_committee, committee):
+            # if a generated committee dominates the "query" committee,
+            # then it is not Pareto optimal
             return False
-
-    # if function has not returned up until now, then no other committee dominates it. Thus Pareto optimal
+    # If function has not returned up until now, then no other committee dominates it.
+    # It is thus Pareto optimal.
     return True
 
 
@@ -249,13 +250,8 @@ def _check_pareto_optimality_gurobi(profile, committee):
         raise ImportError("Gurobi (gurobipy) not available.")
 
     # array to store number of approved candidates per voter in the query committee
-    num_apprvd_cands_query = []
+    num_apprvd_cands_query = [len(voter.approved & committee) for voter in profile]
 
-    # loop through all voters and store how many approved candidates they have in query committee
-    for voter in profile:
-        num_apprvd_cands_query.append(len(voter.approved & committee))
-
-    # create the model to be optimized
     model = gb.Model()
 
     # binary variables: indicate whether voter i approves of
@@ -274,7 +270,8 @@ def _check_pareto_optimality_gurobi(profile, committee):
         range(len(profile)), vtype=gb.GRB.BINARY, name="condition_strictly_more"
     )
 
-    # constraint: utility actually matches the number of approved candidates in the committee, for all voters
+    # constraint: utility actually matches the number of approved candidates
+    # in the dominating committee, for all voters
     for voter in profile:
         model.addConstr(
             gb.quicksum(utility[(voter, l)] for l in range(1, len(committee) + 1))
@@ -294,8 +291,8 @@ def _check_pareto_optimality_gurobi(profile, committee):
     model.addConstr(gb.quicksum(condition_strictly_more) >= 1)
 
     # loop through all variables in the condition_strictly_more array (there is one for each voter)
-    # if it has value 1, then the condition of having strictly more preferred candidates on the dominating committee
-    # has to be satisfied for this voter
+    # if it has value 1, then the condition of having strictly more preferred candidates on the
+    # dominating committee has to be satisfied for this voter
     for i, voter in enumerate(profile):
         model.addConstr(
             (condition_strictly_more[i] == 1)
@@ -345,16 +342,14 @@ def _check_EJR_brute_force(profile, committee):
     -------
     bool
     """
-    # list of candidates with less than ell approved candidates in committee
-    voters_less_than_ell_approved_candidates = []
 
     # should check for ell from 1 until committee size
     ell_upper_bound = len(committee) + 1
 
     # loop through all possible ell
     for ell in range(1, ell_upper_bound):
-        # clear list of candidates to consider
-        voters_less_than_ell_approved_candidates.clear()
+        # list of candidates with less than ell approved candidates in committee
+        voters_less_than_ell_approved_candidates = []
 
         # compute minimum group size for this ell
         group_size = math.ceil(ell * (len(profile) / len(committee)))
@@ -375,10 +370,9 @@ def _check_EJR_brute_force(profile, committee):
             voters_less_than_ell_approved_candidates, group_size
         ):
             # to calculate the cut of approved candidates for the considered voters
-            cut = set()
-
-            # initialize the cut to be the approval set of the first candidate in current combination
-            cut = profile[combination[0]].approved
+            # initialize the cut to be the approval set of the first candidate in current
+            # combination
+            cut = set(profile[combination[0]].approved)
 
             # calculate the cut over all voters for current combination
             # (also can skip first voter in combination, but inexpensive enough...)
@@ -484,18 +478,21 @@ def _check_EJR_gurobi(profile, committee):
     # -----------------------------------------------------------------------------------------
 
     # add auxiliary binary variables for each voter-cand pair
-    # in_group_in_cut = model.addVars(range(len(profile)), profile.candidates, vtype=gb.GRB.BINARY, name="in_group_in_cut")
+    # in_group_in_cut = model.addVars(range(len(profile)), profile.candidates,
+    #                                 vtype=gb.GRB.BINARY, name="in_group_in_cut")
 
     # # compute value of auxiliary variables
     # for voter in range(len(profile)):
     #     for cand in profile.candidates:
-    #         model.addConstr(in_group_in_cut[voter, cand] == gb.and_(in_group[voter], in_cut[cand]))
+    #         model.addConstr(
+    #             in_group_in_cut[voter, cand] == gb.and_(in_group[voter], in_cut[cand]))
 
     # # if both in_group[voter] = 1 AND in_cut[cand] = 1
     # # then the entry approval_matrix[voter, cand] = 1
     # for voter_index, voter in enumerate(profile):
     #     for cand in profile.candidates:
-    #         model.addGenConstrIndicator(in_group_in_cut[voter_index, cand], 1, approval_matrix[voter, cand], gb.GRB.EQUAL, 1)
+    #         model.addGenConstrIndicator(in_group_in_cut[voter_index, cand], 1,
+    #                                     approval_matrix[voter, cand], gb.GRB.EQUAL, 1)
 
     # -----------------------------------------------------------------------------------------
     # -----------------------------------------------------------------------------------------
@@ -535,15 +532,12 @@ def _check_PJR_brute_force(profile, committee):
     bool
     """
 
-    # list of candidates with less than ell approved candidates in committee
-    # will not consider voters with >= ell approved candidates in committee,
-    # because this voter will immediately satisfy the condition of PJR
-    voters_less_than_ell_approved_candidates = []
-
-    # loop through all ell from 1 to committee size
+    # considering ell-cohesive groups
     for ell in range(1, len(committee) + 1):
-        # clear list of candidates to consider
-        voters_less_than_ell_approved_candidates.clear()
+        # list of candidates with less than ell approved candidates in committee
+        # will not consider voters with >= ell approved candidates in committee,
+        # because this voter will immediately satisfy the condition of PJR
+        voters_less_than_ell_approved_candidates = []
 
         # compute minimum group size for this ell
         group_size = math.ceil(ell * (len(profile) / len(committee)))
@@ -560,25 +554,20 @@ def _check_PJR_brute_force(profile, committee):
 
         # check all possible combinations of considered voters,
         # taken (possible group size) at a time
-        for combination in itertools.combinations(
-            voters_less_than_ell_approved_candidates, group_size
-        ):
-            # to calculate the cut of approved candidates for the voters in this considered group
-            cut = set()
+        for group in itertools.combinations(voters_less_than_ell_approved_candidates, group_size):
+            # initialize the cut to be the approval set of the first voter in the group
+            cut = set(profile[group[0]].approved)
 
-            # initialize the cut to be the approval set of the first candidate in current combination
-            cut = profile[combination[0]].approved
-
-            # calculate the cut over all voters for current combination
-            # (also can skip first voter in combination, but inexpensive enough...)
-            for j in combination:
+            # calculate the cut over all voters for current group
+            for j in group:
                 cut = cut & profile[j].approved
 
-            # if size of cut is >= ell, then combination is an ell-cohesive group
+            # if size of cut is >= ell, then group is an ell-cohesive group
             if len(cut) >= ell:
-                # now calculate union of approved candidates over all voters inside this ell-cohesive group
+                # now calculate union of approved candidates over all voters inside
+                # this ell-cohesive group
                 approved_cands_union = set()
-                for j in combination:
+                for j in group:
                     approved_cands_union = approved_cands_union.union(profile[j].approved)
 
                 # if intersection of approved_cands_union with committee yields a set of size
@@ -695,7 +684,8 @@ def _check_PJR_gurobi(profile, committee):
     # -----------------------------------------------------------------------------------------
     # constraint to ensure that no in_union variable is wrongly set to 1
     # for cand in profile.candidates:
-    #     model.addConstr((gb.quicksum(in_group[voter_index] * approval_matrix[voter, cand] for voter_index, voter in enumerate(profile)) - in_union[cand] >= 0)
+    #     model.addConstr((gb.quicksum(in_group[voter_index] * approval_matrix[voter, cand]
+    #     for voter_index, voter in enumerate(profile)) - in_union[cand] >= 0)
     # -----------------------------------------------------------------------------------------
     # -----------------------------------------------------------------------------------------
 
@@ -741,16 +731,12 @@ def _check_JR(profile, committee):
     bool
     """
 
-    # variable to store number of approval ballots a candidate appears in,
-    # such that these approval ballots do not intersect with input committee
-    sum_appearances = 0
-
     # consider all candidates one by one
     for cand in profile.candidates:
-        # reset the sum of appearances in approval ballots
+        # variable to store number of approval ballots a candidate appears in,
+        # such that these approval ballots do not intersect with input committee
         sum_appearances = 0
 
-        # consider all voters
         for voter in profile:
             # if current candidate appears in this voter's ballot AND
             # this voter's approval ballot does NOT intersect with input committee
