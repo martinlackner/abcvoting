@@ -2,6 +2,7 @@
 [![MIT License](https://badgen.net/github/license/martinlackner/abcvoting)](https://choosealicense.com/licenses/mit/)
 [![PyPi](https://badgen.net/pypi/v/abcvoting)](https://pypi.org/project/abcvoting/)
 ![Python versions](https://badgen.net/pypi/python/abcvoting)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Build badge](https://github.com/martinlackner/abcvoting/workflows/Build/badge.svg)](https://github.com/martinlackner/abcvoting/actions)
 [![Unittests badge](https://github.com/martinlackner/abcvoting/workflows/Unittests/badge.svg)](https://github.com/martinlackner/abcvoting/actions)
 [![codecov](https://codecov.io/gh/martinlackner/abcvoting/branch/master/graph/badge.svg)](https://codecov.io/gh/martinlackner/abcvoting)
@@ -119,7 +120,7 @@ pip install -e .[dev]
 Basic unit tests can be run by excluding tests which require additional dependencies:
 
 ```bash
-pytest  -m "not gurobi and not scip and not cbc and not glpk_mi and not cvxpy and not gmpy2 and not slow" tests/
+pytest  -m "not gurobi and not gmpy2 and not slow" tests/
 ```
 
 For development, configure the black formatter and pre-commit hooks - see below. Also installing
