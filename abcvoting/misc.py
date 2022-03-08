@@ -342,6 +342,9 @@ def dominate(profile, committee1, committee2):
     bool
     """
 
+    committee1 = CandidateSet(committee1)
+    committee2 = CandidateSet(committee2)
+
     # flag to check whether there are at least as many approved candidates
     # in dominating committee as in input committee
     condition_at_least_as_many = True
