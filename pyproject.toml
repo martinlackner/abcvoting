@@ -49,6 +49,7 @@ branch = true
 
 [tool.coverage.report]
 show_missing = true
+fail_under = 0
 
 [tool.black]
 # https://black.readthedocs.io/en/stable/pyproject_toml.html
