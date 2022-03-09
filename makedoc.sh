@@ -1,6 +1,7 @@
 source venv-new/bin/activate
 
 cd docs-source
+mkdir -p _static
 make clean
 make html
 make doctest

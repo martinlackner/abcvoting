@@ -73,40 +73,11 @@ Optional requirements:
 
 <!-- TODO: add instructions for installation of solvers -->
 
-## Documentation
+## Further information
 
-A documentation can be found [here](https://martinlackner.github.io/abcvoting/).
-
-## How to Cite
-
-If you would like to cite abcvoting in a research paper or text,
-please use the following (or a similar) citation:
-
-```
-M. Lackner, P. Regner, B. Krenn, and S. S. Forster.
-abcvoting: A Python library of approval-based committee voting rules, 2021.
-URL https://doi.org/10.5281/zenodo.3904466.
-Current version: https://github.com/martinlackner/abcvoting.
-```
-
-Bibtex:
-
-```
-@misc{abcvoting,
-  author       = {Martin Lackner and
-                  Peter Regner and
-                  Benjamin Krenn and
-                  Stefan Schlomo Forster},
-  title        = {{abcvoting: A Python library of approval-based
-                   committee voting rules}},
-  year         = 2021,
-  publisher    = {Zenodo},
-  doi          = {10.5281/zenodo.3904466},
-  url          = {https://doi.org/10.5281/zenodo.3904466},
-  note         = {Current version: \url{https://github.com/martinlackner/abcvoting}}
-}
-```
-
+- [abcvoting documentation](https://martinlackner.github.io/abcvoting/)
+- [how to cite](https://martinlackner.github.io/abcvoting/howtocite.html) the abcvoting library in a research paper
+- [contributors and acknowledgments](https://martinlackner.github.io/abcvoting/acks.html)
 
 ## Development
 
@@ -147,23 +118,6 @@ black formatter.
 Pre-commit hooks are not required, but they are recommended for development.
 [Pre-commit](https://pre-commit.com/) is used to manage and maintain pre-commit hooks. Install
 pre-commit (e.g. via apt, conda or pip) and then run `$ pre-commit install` to install the hooks.
-
-
-## Acknowledgements
-
-The following people have contributed code to this package or provided help with technical and scientific questions (in alphabetic order):
-[Elvi Cela](https://github.com/elvic96),
-[Piotr Faliszewski](http://home.agh.edu.pl/~faliszew/),
-[Stefan Schlomo Forster](https://github.com/stefanschlomoforster),
-[Andrzej Kaczmarczyk](http://www.user.tu-berlin.de/droores/),
-[Benjamin Krenn](https://github.com/benjaminkrenn),
-[Martin Lackner](http://martin.lackner.xyz/),
-[Pawel Batko](https://github.com/pbatko),
-[Dominik Peters](http://dominik-peters.de/),
-[Peter Regner](https://github.com/lumbric),
-[Piotr Skowron](https://www.mimuw.edu.pl/~ps219737/).
-
-The development of this module has been supported by the Austrian Science Fund FWF, grant P31890.
 
 
 ## References
