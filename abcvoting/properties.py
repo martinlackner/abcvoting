@@ -4,7 +4,7 @@ Properties of committees
 
 import itertools
 import math
-from abcvoting.output import output
+from abcvoting.output import output, WARNING
 from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate
 
 try:
@@ -13,6 +13,49 @@ try:
     gurobipy_available = True
 except ImportError:
     gurobipy_available = False
+
+
+def full_analysis(profile, committee):
+    """
+    Test all implemented properties for the given committee.
+
+    Returns a dictionary with the following keys: "pareto", "jr", "pjr", and "ejr".
+    The values are `True` or `False`, depending on whether this property is satisfied.
+
+    Parameters
+    ----------
+    profile : abcvoting.preferences.Profile
+        A profile.
+    committee : iterable of int
+        A committee.
+
+    Returns
+    -------
+    dict
+    """
+    results = {}
+
+    # temporarily no output
+    current_verbosity = output.verbosity
+    output.set_verbosity(WARNING)
+
+    results["pareto"] = check_pareto_optimality(profile, committee)
+    results["jr"] = check_JR(profile, committee)
+    results["pjr"] = check_PJR(profile, committee)
+    results["ejr"] = check_EJR(profile, committee)
+
+    description = {
+        "pareto": "Pareto optimality",
+        "jr": "Justified representation (JR)",
+        "pjr": "Proportional justified representation (PJR)",
+        "ejr": "Extended justified representation (EJR)",
+    }
+
+    # restore output verbosity
+    output.set_verbosity(current_verbosity)
+
+    for prop, value in results.items():
+        output.info(f"{description[prop]:50s} : {value}")
 
 
 def check_pareto_optimality(profile, committee, algorithm="fastest"):
