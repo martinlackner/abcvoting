@@ -8,6 +8,8 @@ exclude =
     scratch*,
     benchmark,
     setup.py,
-    */__init__.py
+    */__init__.py,
+    .eggs,
+    .github
 max-complexity = 100
 max-line-length = 99

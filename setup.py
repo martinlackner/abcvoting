@@ -101,8 +101,9 @@ setuptools.setup(
             "pytest>=6",
             "coverage[toml]>=5.3",
             "black==20.8b1",
+            "Sphinx>=4.4.0",
+            "sphinx-rtd-theme>=1.0.0",
+            "numpydoc>=1.2",
         ]
     },
 )
-
-# TODO Add optional requirements?
