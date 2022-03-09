@@ -76,7 +76,6 @@ setuptools.setup(
     license="MIT License",
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
@@ -86,7 +85,7 @@ setuptools.setup(
         "Intended Audience :: Science/Research",
     ],
     packages=["abcvoting", "abcvoting.bipartite_matching"],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     setup_requires=[
         "wheel",
     ],
@@ -100,7 +99,7 @@ setuptools.setup(
         "dev": [
             "pytest>=6",
             "coverage[toml]>=5.3",
-            "black==20.8b1",
+            "black==22.1.0",
             "Sphinx>=4.4.0",
             "sphinx-rtd-theme>=1.0.0",
             "numpydoc>=1.2",

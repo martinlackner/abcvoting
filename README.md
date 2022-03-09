@@ -63,7 +63,7 @@ python setup.py install
 ```
 
 Requirements:
-* Python 3.6+
+* Python 3.7+
 * see [setup.py](setup.py) for 3rd party dependencies
 
 Optional requirements:
