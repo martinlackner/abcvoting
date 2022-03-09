@@ -38,9 +38,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="simple-example.html">A simple example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-example.html">A simple example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro-abcrules.html">ABC rules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="computing-winning-committees.html">Computing winning committees</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-computing-winning-committees.html">Computing winning committees</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-properties.html">Properties of committees</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
 <ul class="current">
@@ -160,8 +161,8 @@ Committees are, as usual, of type <cite>CandidateSet</cite> (i.e., sets of posit
 <span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">dominate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committee2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.dominate" title="Permalink to this definition"></a></dt>
 <dd><p>Test whether committee <cite>committee1</cite> dominates committee <cite>committee2</cite>.</p>
 <p>That is, test whether each voter in the profile has at least as many approved candidates
-in comm1 as in comm2, and there is at least one voter with strictly more approved candidates
-in comm1.</p>
+in <cite>committee1</cite> as in <cite>committee2</cite>, and there is at least one voter with strictly more approved
+candidates in <cite>committee1</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">

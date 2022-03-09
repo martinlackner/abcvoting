@@ -172,7 +172,7 @@ The development of this module has been supported by the Austrian Science Fund F
 new challenge for social choice theory. In Ulle Endriss, editor, Trends in Computational Social
 Choice, chapter 2, pages 27–47. AI Access, 2017. http://research.illc.uva.nl/COST-IC1205/BookDocs/Chapters/TrendsCOMSOC-02.pdf
 
-[2] Lackner, Martin, and Piotr Skowron. "Multi-Winner Voting with Approval Preferences" arXiv preprint arXiv:2007.01795. 2020. https://arxiv.org/abs/2007.01795
+[2] Lackner, Martin, and Piotr Skowron. "Multi-Winner Voting with Approval Preferences". arXiv preprint arXiv:2007.01795. 2020. https://arxiv.org/abs/2007.01795
 
 
 <!--

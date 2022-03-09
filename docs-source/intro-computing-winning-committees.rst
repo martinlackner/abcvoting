@@ -3,7 +3,7 @@ Computing winning committees
 
 One of the main goals of `abcvoting` is to provide a simple way to compute winning committees for a given
 ABC rule. Here is a bit more detailed explanation of how to do this. (A first, simple explanation can be found
-:doc:`here <simple-example>`.
+:doc:`here <intro-example>`.
 
 First steps
 -----------
@@ -13,7 +13,7 @@ identifiers. Say we are interested in Proportional Approval Voting, short: PAV. 
 
 The input of an ABC rule consists of a profile and a desired committee size. Once we know the `rule_id` and
 have a profile and a desired committee size, we can compute the ABC rule.
-In the following, we use the simple example used :doc:`previously <simple-example>`.
+In the following, we use the simple example used :doc:`previously <intro-example>`.
 
 
 .. testsetup::

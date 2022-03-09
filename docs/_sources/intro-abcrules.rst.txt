@@ -68,7 +68,8 @@ are implemented but not specifically listed above.
 
 
 .. [1] Lackner, Martin, and Piotr Skowron.
-    "Multi-Winner Voting with Approval Preferences" arXiv preprint arXiv:2007.01795. 2020.
+    "Multi-Winner Voting with Approval Preferences".
+    arXiv preprint arXiv:2007.01795. 2020.
     `<https://arxiv.org/abs/2007.01795>`_
 
 .. [2] Piotr Faliszewski, Piotr Skowron, Arkadii Slinko, and Nimrod Talmon. Multiwinner voting: A
