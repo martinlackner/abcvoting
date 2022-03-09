@@ -1,5 +1,5 @@
 """
-Properties of committees
+Properties of committees.
 """
 
 import itertools
@@ -298,11 +298,11 @@ def _check_pareto_optimality_gurobi(profile, committee):
     model = gb.Model()
 
     # binary variables: indicate whether voter i approves of
-    # at least l candidates in the dominating committee
+    # at least x candidates in the dominating committee
     utility = {}
     for voter in profile:
-        for l in range(1, len(committee) + 1):
-            utility[(voter, l)] = model.addVar(vtype=gb.GRB.BINARY)
+        for x in range(1, len(committee) + 1):
+            utility[(voter, x)] = model.addVar(vtype=gb.GRB.BINARY)
 
     # binary variables: indicate whether a candidate is inside the dominating committee
     in_committee = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_committee")
@@ -317,7 +317,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
     # in the dominating committee, for all voters
     for voter in profile:
         model.addConstr(
-            gb.quicksum(utility[(voter, l)] for l in range(1, len(committee) + 1))
+            gb.quicksum(utility[(voter, x)] for x in range(1, len(committee) + 1))
             == gb.quicksum(in_committee[cand] for cand in voter.approved)
         )
 
@@ -325,7 +325,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
     # in the dominating committee as in the query committee
     for i, voter in enumerate(profile):
         model.addConstr(
-            gb.quicksum(utility[(voter, l)] for l in range(1, len(committee) + 1))
+            gb.quicksum(utility[(voter, x)] for x in range(1, len(committee) + 1))
             >= num_apprvd_cands_query[i]
         )
 
@@ -340,7 +340,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
         model.addConstr(
             (condition_strictly_more[i] == 1)
             >> (
-                gb.quicksum(utility[(voter, l)] for l in range(1, len(committee) + 1))
+                gb.quicksum(utility[(voter, x)] for x in range(1, len(committee) + 1))
                 >= num_apprvd_cands_query[i] + 1
             )
         )
@@ -351,7 +351,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
     # set the objective function
     model.setObjective(
         gb.quicksum(
-            utility[(voter, l)] for voter in profile for l in range(1, len(committee) + 1)
+            utility[(voter, x)] for voter in profile for x in range(1, len(committee) + 1)
         ),
         gb.GRB.MAXIMIZE,
     )
@@ -478,15 +478,8 @@ def _check_EJR_gurobi(profile, committee):
     model.addConstr(ell >= 1)
     model.addConstr(ell <= len(committee))
 
-    # model the value ceil(ell * (len(profile) / len(committee))) using auxiliary
-    # integer variable min_group_size
-    # source: https://support.gurobi.com/hc/en-us/community/posts/360054499471-Linear-program-with-ceiling-or-floor-functions-HOW-
-    min_group_size = model.addVar(vtype=gb.GRB.INTEGER, name="min_group_size")
-    model.addConstr(min_group_size >= (ell * (len(profile) / len(committee))))
-    model.addConstr(min_group_size <= (ell * (len(profile) / len(committee))) + 1 - 1e-8)
-
-    # constraint: size of ell-cohesive group should be appropriate wrt ell
-    model.addConstr(gb.quicksum(in_group) >= min_group_size)
+    # constraint: size of ell-cohesive group should be appropriate wrt. ell
+    model.addConstr(gb.quicksum(in_group) >= ell * len(profile) / len(committee))
 
     # constraints based on binary indicator variables:
     # if voter is in ell-cohesive group, then the voter should have
@@ -639,7 +632,6 @@ def _check_PJR_gurobi(profile, committee):
     -------
     bool
     """
-
     if not gurobipy_available:
         raise ImportError("Gurobi (gurobipy) not available.")
 
@@ -677,15 +669,8 @@ def _check_PJR_gurobi(profile, committee):
     model.addConstr(ell >= 1)
     model.addConstr(ell <= len(committee))
 
-    # model the value ceil(ell * (len(profile) / len(committee))) using auxiliary
-    # integer variable min_group_size
-    # source: https://support.gurobi.com/hc/en-us/community/posts/360054499471-Linear-program-with-ceiling-or-floor-functions-HOW-
-    min_group_size = model.addVar(vtype=gb.GRB.INTEGER, name="min_group_size")
-    model.addConstr(min_group_size >= (ell * (len(profile) / len(committee))))
-    model.addConstr(min_group_size <= (ell * (len(profile) / len(committee))) + 1 - 1e-8)
-
     # constraint: size of ell-cohesive group should be appropriate wrt ell
-    model.addConstr(gb.quicksum(in_group) >= min_group_size)
+    model.addConstr(gb.quicksum(in_group) >= ell * len(profile) / len(committee))
 
     # binary variables: indicate whether a candidate is in the interesection
     # of approved candidates over voters inside the group
@@ -759,8 +744,9 @@ def _check_PJR_gurobi(profile, committee):
 
 def _check_JR(profile, committee):
     """
-    Test whether a committee satisfies JR, using polynomial time algorithm proposed
-    by Aziz et.al (2017).
+    Test whether a committee satisfies JR.
+
+    Uses the polynomial-time algorithm proposed by Aziz et.al (2017).
 
     Parameters
     ----------

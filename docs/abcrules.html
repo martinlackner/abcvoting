@@ -111,7 +111,7 @@
 <dt class="sig sig-object py" id="abcvoting.abcrules.MAIN_RULE_IDS">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">MAIN_RULE_IDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['av',</span> <span class="pre">'sav',</span> <span class="pre">'pav',</span> <span class="pre">'slav',</span> <span class="pre">'cc',</span> <span class="pre">'lexcc',</span> <span class="pre">'geom2',</span> <span class="pre">'seqpav',</span> <span class="pre">'revseqpav',</span> <span class="pre">'seqslav',</span> <span class="pre">'seqcc',</span> <span class="pre">'seqphragmen',</span> <span class="pre">'minimaxphragmen',</span> <span class="pre">'leximinphragmen',</span> <span class="pre">'monroe',</span> <span class="pre">'greedy-monroe',</span> <span class="pre">'minimaxav',</span> <span class="pre">'lexminimaxav',</span> <span class="pre">'rule-x',</span> <span class="pre">'phragmen-enestroem',</span> <span class="pre">'consensus-rule',</span> <span class="pre">'trivial',</span> <span class="pre">'rsd']</span></em><a class="headerlink" href="#abcvoting.abcrules.MAIN_RULE_IDS" title="Permalink to this definition"></a></dt>
 <dd><p>List of rule identifiers (<cite>rule_id</cite>) for the main ABC rules included in abcvoting.</p>
-<p>This selection is somewhat arbitrary. But all really important rules (that are implemented) 
+<p>This selection is somewhat arbitrary. But all really important rules (that are implemented)
 are contained in this list.</p>
 </dd></dl>
 
@@ -362,8 +362,9 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Approval Chamberlin-Courant (CC):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;cc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;ortools-cp&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;, &#39;mip-cbc&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;cc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>  
+<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;ortools-cp&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;,</span>
+<span class="go"> &#39;mip-cbc&#39;)</span>
 </pre></div>
 </div>
 </dd>

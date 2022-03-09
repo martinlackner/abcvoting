@@ -10,8 +10,9 @@ def read_readme():
 
 
 def read_version():
-    """This is not guaranteed to be a valid version string, but should work well enough.
+    """Read a version string.
 
+    This is not guaranteed to be a valid version string, but should work well enough.
     Tested with version strings as tag names of the following formats:
 
     2.0.0
@@ -22,7 +23,6 @@ def read_version():
     Version strings need to comply with PEP 440. Git tags are used, but for development versions
     the build number is appended. To comply with PEP 440 everything after the first dash is removed
     before appending the build number.
-
     """
 
     git_describe = subprocess.run(

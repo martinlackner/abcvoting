@@ -1,5 +1,5 @@
 """
-Compute all major implemented ABC rules for a profile
+Compute all major implemented ABC rules for a profile.
 """
 
 from abcvoting.preferences import Profile

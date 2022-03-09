@@ -1,5 +1,5 @@
 """
-Preference profiles and voters
+Preference profiles and voters.
 
 .. important::
 
@@ -24,7 +24,6 @@ class Profile(object):
 
     Parameters
     ----------
-
         num_cand : int
             Number of candidates in this profile.
 
@@ -39,7 +38,6 @@ class Profile(object):
 
     Attributes
     ----------
-
         candidates : list of int
 
             List of all candidates, i.e., the list containing `0`, ..., `profile.num_cand-1`.
@@ -70,9 +68,7 @@ class Profile(object):
 
     @property
     def num_cand(self):  # number of candidates
-        """
-        Number of candidates.
-        """
+        """Number of candidates."""
         return len(self.candidates)
 
     def approved_candidates(self):
@@ -278,7 +274,6 @@ class Voter:
 
         Parameters
         ----------
-
             cand_names : list of str or str, optional
                 List of symbolic names for every candidate.
 

@@ -1,5 +1,5 @@
 """
-Very simple example (compute PAV)
+Compute winning committees with PAV.
 """
 
 from abcvoting.preferences import Profile

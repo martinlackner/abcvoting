@@ -1,6 +1,9 @@
-"""Example 11 (Rule X, seq-Phragmen)
-from "Multi-Winner Voting with Approval Preferences"
+"""
+Example 2.12 (Rule X, seq-Phragmen).
+
+From "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
+https://arxiv.org/abs/2007.01795
 """
 
 from abcvoting import abcrules

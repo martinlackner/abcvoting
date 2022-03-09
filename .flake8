@@ -1,0 +1,13 @@
+[flake8]
+ignore = D202, W503, D103, D200, D105, D107, E203, D401, E731
+exclude =
+    .git,
+    __pycache__,
+    docs-source/conf.py,
+    venv*,
+    scratch*,
+    benchmark,
+    setup.py,
+    */__init__.py
+max-complexity = 100
+max-line-length = 99

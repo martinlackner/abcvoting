@@ -1,6 +1,9 @@
-"""Proposition A.4
-from "Multi-Winner Voting with Approval Preferences"
+"""
+Proposition A.4.
+
+From "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
+https://arxiv.org/abs/2007.01795
 """
 
 from abcvoting import abcrules

@@ -1,6 +1,9 @@
-"""Example 5 (PAV, seq-PAV, revseq-PAV)
-from "Multi-Winner Voting with Approval Preferences"
+"""
+Example 2.5 (PAV, seq-PAV, revseq-PAV).
+
+From "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
+https://arxiv.org/abs/2007.01795
 """
 
 from abcvoting import abcrules

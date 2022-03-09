@@ -410,15 +410,15 @@ def write_abcvoting_instance_to_yaml_file(
                 # check that the profile is the same as the main profile
                 if str(compute_instance["profile"]) != str(profile):
                     raise ValueError(
-                        f"Compute instance contained a profile different from"
-                        f"the main profile passed to write_abcvoting_instance_to_yaml_file()."
+                        "Compute instance contained a profile different from"
+                        "the main profile passed to write_abcvoting_instance_to_yaml_file()."
                     )
             if "committeesize" in compute_instance.keys():  # this is superfluous information
                 # check that the profile is the same as the main profile
                 if int(compute_instance["committeesize"]) != committeesize:
                     raise ValueError(
-                        f"Compute instance contained a committee size different from"
-                        f"the committee size passed to write_abcvoting_instance_to_yaml_file()."
+                        "Compute instance contained a committee size different from"
+                        "the committee size passed to write_abcvoting_instance_to_yaml_file()."
                     )
             for key in compute_instance.keys():
                 # add other parameters to dictionary

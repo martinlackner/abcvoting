@@ -1,5 +1,5 @@
 """
-Unit tests for: properties.py
+Unit tests for abcvoting/properties.py.
 """
 
 import pytest
@@ -7,11 +7,12 @@ import os
 
 import abcvoting.misc
 from abcvoting.output import DETAILS, output
-from abcvoting.preferences import Profile, Voter
+from abcvoting.preferences import Profile
 from abcvoting import abcrules, properties, fileio
 
 # set verbosity to DETAILS to increase unittest coverage
 output.set_verbosity(verbosity=DETAILS)
+
 
 # Test from literature: Lackner and Skowron 2020
 # With given input profile, committee returned by Monroe Rule

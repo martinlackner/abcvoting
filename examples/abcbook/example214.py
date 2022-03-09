@@ -1,6 +1,9 @@
-"""Example 13 (SAV)
-from "Multi-Winner Voting with Approval Preferences"
+"""
+Example 2.14 (SAV).
+
+From "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
+https://arxiv.org/abs/2007.01795
 """
 
 from abcvoting import abcrules

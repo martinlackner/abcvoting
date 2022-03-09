@@ -1,5 +1,5 @@
 """
-Unit tests for: abcrules.py, abcrules_gurobi.py, abcrules_mip.py and abcrules_cvxpy.py
+Unit tests for abcvoting/abcrules*.py.
 """
 import pytest
 import os
@@ -8,7 +8,7 @@ import random
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
 from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, DEBUG, output
 from abcvoting.preferences import Profile, Voter
-from abcvoting import abcrules, misc, scores, fileio
+from abcvoting import abcrules, misc, fileio
 from itertools import combinations
 
 MARKS = {
@@ -37,6 +37,7 @@ random.seed(24121838)
 class CollectRules:
     """
     Collect all ABC rules that are available for unittesting.
+
     Exclude Gurobi-based rules if Gurobi is not available
     """
 
@@ -76,7 +77,7 @@ class CollectRules:
                         self.rule_algorithm_onlyirresolute.append(instance_no_resolute_param)
 
 
-class CollectInstances:
+class _CollectInstances:
     def __init__(self):
         self.instances = []
         alltests = {}
@@ -616,7 +617,7 @@ def id_function(val):
 
 
 testrules = CollectRules()
-testinsts = CollectInstances()
+testinsts = _CollectInstances()
 
 
 def remove_solver_output(out):
@@ -1005,32 +1006,23 @@ def test_abcrules_correct_with_max_num_of_committees(
     committeesize,
     max_num_of_committees,
 ):
-    if rule_id.startswith("geom") and rule_id != "geom2":
-        return  # correctness tests only for geom2
-    if rule_id.startswith("seq") and rule_id not in ("seqpav", "seqslav", "seqcc"):
-        return  # correctness tests only for selected sequential rules
-    if rule_id.startswith("revseq") and rule_id != "revseqpav":
-        return  # correctness tests only for selected reverse sequential rules (only for revseqpav)
-    if rule_id == "rsd":
-        return  # correctness tests do not have much sense due to random nature of RSD
-    print(profile)
-    print(f"expected: {expected_result}")
-    for max_num_of_committees in [1, 2, 3]:
-        committees = abcrules.compute(
-            rule_id,
-            profile,
-            committeesize,
-            algorithm=algorithm,
-            resolute=resolute,
-            max_num_of_committees=max_num_of_committees,
-        )
-        print(f"with max_num_of_committees={max_num_of_committees} output: {committees}")
-        if resolute:
-            assert len(committees) == 1
-        else:
-            assert len(committees) == min(max_num_of_committees, len(expected_result))
-        for comm in committees:
-            assert comm in expected_result
+    if resolute:
+        return  # max_num_of_committees not compatible with resolute=True
+    committees = abcrules.compute(
+        rule_id,
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
+    print(f"with max_num_of_committees={max_num_of_committees} output: {committees}")
+    if resolute:
+        assert len(committees) == 1
+    else:
+        assert len(committees) == min(max_num_of_committees, len(expected_result))
+    for comm in committees:
+        assert comm in expected_result
 
 
 def test_seqphragmen_irresolute():
@@ -1272,10 +1264,10 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
             assert len(out) > 0
             rule = abcrules.get_rule(rule_id)
             start_output = misc.header(rule.longname) + "\n"
-            if resolute and rule.resolute_values[0] == False:
+            if resolute and rule.resolute_values[0] == False:  # noqa: E712
                 # only if irresolute is default but resolute is chosen
                 start_output += "Computing only one winning committee (resolute=True)\n\n"
-            if not resolute and rule.resolute_values[0] == True:
+            if not resolute and rule.resolute_values[0] == True:  # noqa: E712
                 # only if resolute is default but resolute=False is chosen
                 start_output += (
                     "Computing all possible winning committees for any tiebreaking order\n"
@@ -1331,7 +1323,7 @@ def test_resolute_and_max_num_of_committees(rule_id, algorithm, max_num_of_commi
 
 @pytest.mark.parametrize("rule_id, algorithm", testrules.rule_algorithm_onlyirresolute)
 @pytest.mark.parametrize("max_num_of_committees", [1, 3, 5, 7])
-def test_resolute_and_max_num_of_committees(rule_id, algorithm, max_num_of_committees):
+def test_max_num_of_committees(rule_id, algorithm, max_num_of_committees):
     num_cand = 5
     profile = Profile(num_cand)
     profile.add_voters([[cand] for cand in range(num_cand)])

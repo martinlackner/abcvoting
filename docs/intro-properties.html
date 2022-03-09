@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Properties of committees &mdash; abcvoting  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="abcvoting.abcrules" href="abcrules.html" />
+    <link rel="prev" title="Computing winning committees" href="intro-computing-winning-committees.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> abcvoting
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro-example.html">A simple example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-abcrules.html">ABC rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-computing-winning-committees.html">Computing winning committees</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Properties of committees</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="abcrules.html">abcvoting.abcrules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">abcvoting.fileio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genprofiles.html">abcvoting.genprofiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">abcvoting.misc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="properties.html">abcvoting.properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Backmatter:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="howtocite.html">How to cite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acks.html">Acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">abcvoting</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Properties of committees</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/intro-properties.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="properties-of-committees">
+<h1>Properties of committees<a class="headerlink" href="#properties-of-committees" title="Permalink to this headline"></a></h1>
+<p>ABC rules return committees and these committees may or may not have certain properties.
+For an overview of the many properties of committees, we refer to the survey by Lackner and Skowron <a class="footnote-reference brackets" href="#id5" id="id1">1</a>.
+Here, we see how one can test a given committee and find out which properties it satisfies.</p>
+<p>The following example (from <a class="footnote-reference brackets" href="#id6" id="id2">2</a>) shows that Phragmén’s Sequential Rule (seq-Phragmén) may output committees that fail
+Extended Justified Representation (EJR) <a class="footnote-reference brackets" href="#id7" id="id3">3</a>.
+In contrast, committees returned by seq-Phragmén always satisfy JR and PJR <a class="footnote-reference brackets" href="#id6" id="id4">2</a>.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">abcvoting.preferences</span> <span class="kn">import</span> <span class="n">Profile</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">abcvoting</span> <span class="kn">import</span> <span class="n">abcrules</span><span class="p">,</span> <span class="n">properties</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">abcvoting.output</span> <span class="kn">import</span> <span class="n">output</span><span class="p">,</span> <span class="n">INFO</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span> <span class="o">=</span> <span class="n">Profile</span><span class="p">(</span><span class="n">num_cand</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span><span class="o">.</span><span class="n">add_voters</span><span class="p">(</span>
+<span class="gp">... </span>      <span class="p">[{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">}]</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="gp">... </span>    <span class="o">+</span> <span class="p">[{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">}]</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="gp">... </span>    <span class="o">+</span> <span class="p">[{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">}]</span> <span class="o">*</span> <span class="mi">6</span>
+<span class="gp">... </span>    <span class="o">+</span> <span class="p">[{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">}]</span> <span class="o">*</span> <span class="mi">5</span>
+<span class="gp">... </span>    <span class="o">+</span> <span class="p">[{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">}]</span> <span class="o">*</span> <span class="mi">9</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">committees</span> <span class="o">=</span> <span class="n">abcrules</span><span class="o">.</span><span class="n">compute_seqphragmen</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">committeesize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span><span class="o">.</span><span class="n">set_verbosity</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span><span class="o">.</span><span class="n">full_analysis</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">committees</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">Pareto optimality                                  : True</span>
+<span class="go">Justified representation (JR)                      : True</span>
+<span class="go">Proportional justified representation (PJR)        : True</span>
+<span class="go">Extended justified representation (EJR)            : False</span>
+</pre></div>
+</div>
+<dl class="footnote brackets">
+<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Lackner, Martin, and Piotr Skowron.
+“Multi-Winner Voting with Approval Preferences”. arXiv preprint arXiv:2007.01795. 2020.
+<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a></p>
+</dd>
+<dt class="label" id="id6"><span class="brackets">2</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id4">2</a>)</span></dt>
+<dd><p>Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
+Phragmén’s Voting Methods and Justified Representation.
+In Proceedings of the 31st AAAI Conference on Artificial Intelligence (AAAI 2017), pages 406-413, AAAI Press, 2017.
+<a class="reference external" href="https://arxiv.org/abs/2102.12305">https://arxiv.org/abs/2102.12305</a></p>
+</dd>
+<dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dd><p>Aziz, H., Brill, M., Conitzer, V., Elkind, E., Freeman, R., &amp; Walsh, T. (2017).
+Justified representation in approval-based committee voting.
+Social Choice and Welfare, 48(2), 461-485.
+<a class="reference external" href="https://arxiv.org/abs/1407.8269">https://arxiv.org/abs/1407.8269</a></p>
+</dd>
+</dl>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="intro-computing-winning-committees.html" class="btn btn-neutral float-left" title="Computing winning committees" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="abcrules.html" class="btn btn-neutral float-right" title="abcvoting.abcrules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright MIT license.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 """
-Unit tests for misc.py
+Unit tests for abcvoting/misc.py.
 """
 
 import pytest

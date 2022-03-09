@@ -1,7 +1,4 @@
-"""
-Approval-based committee (ABC) rules implemented as a integer linear
-programs (ILPs) with Gurobi (https://www.gurobi.com/)
-"""
+"""ABC rules implemented as integer linear programs (ILPs) with Gurobi."""
 
 from abcvoting.misc import sorted_committees
 from abcvoting import scores
@@ -160,15 +157,15 @@ def _gurobi_thiele_methods(
     max_num_of_committees,
 ):
     def set_opt_model_func(model, in_committee):
-        # utility[(voter, l)] contains (intended binary) variables counting the number of approved
-        # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
+        # utility[(voter, x)] contains (intended binary) variables counting the number of approved
+        # candidates in the selected committee by `voter`. This utility[(voter, x)] is true for
         # exactly the number of candidates in the committee approved by `voter` for all
-        # l = 1...committeesize.
+        # x = 1...committeesize.
         #
-        # If marginal_scorefct(l) > 0 for l >= 1, we assume that marginal_scorefct is monotonic
+        # If marginal_scorefct(x) > 0 for x >= 1, we assume that marginal_scorefct is monotonic
         # decreasing and therefore in combination with the objective function the following
         # interpreation is valid:
-        # utility[(voter, l)] indicates whether `voter` approves at least l candidates in the
+        # utility[(voter, x)] indicates whether `voter` approves at least x candidates in the
         # committee (this is the case for scorefct_id "pav", "slav" or "geom").
 
         utility = {}
@@ -177,8 +174,8 @@ def _gurobi_thiele_methods(
         for i, voter in enumerate(profile):
             # maximum number of approved candidates that this voter can have in a committee
             max_in_committee[voter] = min(len(voter.approved), committeesize)
-            for l in range(1, max_in_committee[voter] + 1):
-                utility[(voter, l)] = model.addVar(vtype=gb.GRB.BINARY, name=f"utility({i,l})")
+            for x in range(1, max_in_committee[voter] + 1):
+                utility[(voter, x)] = model.addVar(vtype=gb.GRB.BINARY, name=f"utility({i,x})")
 
         # constraint: the committee has the required size
         model.addConstr(gb.quicksum(in_committee) == committeesize)
@@ -186,23 +183,23 @@ def _gurobi_thiele_methods(
         # constraint: utilities are consistent with actual committee
         for voter in profile:
             model.addConstr(
-                gb.quicksum(utility[voter, l] for l in range(1, max_in_committee[voter] + 1))
+                gb.quicksum(utility[voter, x] for x in range(1, max_in_committee[voter] + 1))
                 == gb.quicksum(in_committee[cand] for cand in voter.approved)
             )
 
         # objective: the Thiele score of the committee
         model.setObjective(
             gb.quicksum(
-                float(marginal_scorefct(l)) * voter.weight * utility[(voter, l)]
+                float(marginal_scorefct(x)) * voter.weight * utility[(voter, x)]
                 for voter in profile
-                for l in range(1, max_in_committee[voter] + 1)
+                for x in range(1, max_in_committee[voter] + 1)
             ),
             gb.GRB.MAXIMIZE,
         )
 
     marginal_scorefct = scores.get_marginal_scorefct(scorefct_id, committeesize)
 
-    score_values = [marginal_scorefct(l) for l in range(1, committeesize + 1)]
+    score_values = [marginal_scorefct(x) for x in range(1, committeesize + 1)]
     if not all(
         first > second or first == second == 0
         for first, second in zip(score_values, score_values[1:])
@@ -229,10 +226,10 @@ def _gurobi_thiele_methods(
 
 def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
     def set_opt_model_func(model, in_committee):
-        # utility[(voter, l)] contains (intended binary) variables counting the number of approved
-        # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
+        # utility[(voter, x)] contains (intended binary) variables counting the number of approved
+        # candidates in the selected committee by `voter`. This utility[(voter, x)] is true for
         # exactly the number of candidates in the committee approved by `voter` for all
-        # l = 1...committeesize.
+        # x = 1...committeesize.
 
         utility = {}
         iteration = len(satisfaction_constraints)
@@ -242,8 +239,8 @@ def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
         for i, voter in enumerate(profile):
             # maximum number of approved candidates that this voter can have in a committee
             max_in_committee[voter] = min(len(voter.approved), committeesize)
-            for l in range(1, max_in_committee[voter] + 1):
-                utility[(voter, l)] = model.addVar(vtype=gb.GRB.BINARY, name=f"utility({i, l})")
+            for x in range(1, max_in_committee[voter] + 1):
+                utility[(voter, x)] = model.addVar(vtype=gb.GRB.BINARY, name=f"utility({i, x})")
 
         # constraint: the committee has the required size
         model.addConstr(gb.quicksum(in_committee) == committeesize)
@@ -251,7 +248,7 @@ def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
         # constraint: utilities are consistent with actual committee
         for voter in profile:
             model.addConstr(
-                gb.quicksum(utility[voter, l] for l in range(1, max_in_committee[voter] + 1))
+                gb.quicksum(utility[voter, x] for x in range(1, max_in_committee[voter] + 1))
                 == gb.quicksum(in_committee[cand] for cand in voter.approved)
             )
 
@@ -259,19 +256,19 @@ def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
         for prev_iteration in range(0, iteration):
             model.addConstr(
                 gb.quicksum(
-                    float(scorefcts[prev_iteration](l)) * voter.weight * utility[(voter, l)]
+                    float(scorefcts[prev_iteration](x)) * voter.weight * utility[(voter, x)]
                     for voter in profile
-                    for l in range(1, max_in_committee[voter] + 1)
+                    for x in range(1, max_in_committee[voter] + 1)
                 )
                 >= satisfaction_constraints[prev_iteration] - ACCURACY
             )
 
-        # objective: the at-least-x score of the committee in iteration x
+        # objective: the at-least-y score of the committee in iteration y
         model.setObjective(
             gb.quicksum(
-                float(scorefcts[iteration](l)) * voter.weight * utility[(voter, l)]
+                float(scorefcts[iteration](x)) * voter.weight * utility[(voter, x)]
                 for voter in profile
-                for l in range(1, max_in_committee[voter] + 1)
+                for x in range(1, max_in_committee[voter] + 1)
             ),
             gb.GRB.MAXIMIZE,
         )
@@ -300,7 +297,7 @@ def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
         committeesize=committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
-        name=f"lexcc-final",
+        name="lexcc-final",
         committeescorefct=functools.partial(scores.thiele_score, f"atleast{committeesize}"),
     )
     satisfaction_constraints.append(
@@ -561,7 +558,7 @@ def _gurobi_leximinphragmen(profile, committeesize, resolute, max_num_of_committ
         committeesize=committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
-        name=f"leximinphragmen-final",
+        name="leximinphragmen-final",
     )
 
     return sorted_committees(committees)
@@ -633,7 +630,7 @@ def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees
                     # trivially satisfied
                     continue
                 model.addConstr(
-                    (voteratmostdistances[(i, dist)] == True)
+                    (voteratmostdistances[(i, dist)] == 1)
                     >> (
                         gb.quicksum(1 - in_committee[cand] for cand in voter.approved)
                         + gb.quicksum(in_committee[cand] for cand in not_approved)

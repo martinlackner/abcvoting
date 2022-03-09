@@ -55,9 +55,7 @@ def random_urn_profile(num_cand, num_voters, setsize, replace):
 
 
 def random_IC_profile(num_cand, num_voters, setsize):
-    """
-    Generates profile with random assignment of candidates to the fix size of setsize.
-    """
+    """Generates profile with random assignment of candidates to the fix size of setsize."""
     approval_sets = []
     for _ in range(num_voters):
         randset = random.sample(range(num_cand), setsize)
@@ -131,9 +129,7 @@ def __compute_mallows_insert_distributions(num_cand, dispersion):
 
 
 def __select_pos(distribution):
-    """
-    Returns a randomly selected value with the help of the distribution.
-    """
+    """Returns a randomly selected value with the help of the distribution."""
     if round(sum(distribution), 10) != 1.0:
         raise Exception("Invalid Distribution", distribution, "sum:", sum(distribution))
     r = round(random.random(), 10)  # or random.uniform(0, 1)
@@ -178,9 +174,7 @@ def __euclidean(p1, p2):
 
 
 def __get_profile_from_points(voters, cands, voter_points, cand_points, approval_threshold):
-    """
-    Generates a list of approval sets from 2d points according to approval_threshold.
-    """
+    """Generates a list of approval sets from 2d points according to approval_threshold."""
     profile = {}
     for v in voters:
         distances = {cand: __euclidean(voter_points[v], cand_points[cand]) for cand in cands}

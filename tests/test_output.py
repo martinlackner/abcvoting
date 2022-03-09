@@ -1,3 +1,7 @@
+"""
+Unit tests for abcvoting/output.py.
+"""
+
 import io
 import logging
 import pytest

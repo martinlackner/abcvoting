@@ -1,6 +1,5 @@
 """
-Approval-based committee (ABC) rules implemented as constraint
- satisfaction programs with OR-Tools.
+ABC rules implemented as constraint satisfaction programs with OR-Tools.
 """
 
 from ortools.sat.python import cp_model
@@ -18,8 +17,8 @@ def _optimize_rule_ortools(
     name,
     committeescorefct,
 ):
-    """Compute ABC rules, which are given in the form of an integer optimization problem,
-    using the OR-Tools CP-SAT Solver.
+    """
+    Compute ABC rules using the OR-Tools CP-SAT Solver.
 
     Parameters
     ----------

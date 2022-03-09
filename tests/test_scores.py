@@ -1,5 +1,5 @@
 """
-Unit tests for scoring_functions.py
+Unit tests for abcvoting/scores.py.
 """
 
 import pytest

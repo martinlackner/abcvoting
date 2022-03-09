@@ -1,3 +1,7 @@
+"""
+Example for reading and writing Preflib files.
+"""
+
 import os
 from abcvoting import fileio
 from abcvoting import abcrules

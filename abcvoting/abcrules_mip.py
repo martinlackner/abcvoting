@@ -1,12 +1,9 @@
-"""
-Approval-based committee (ABC) rules implemented as (mixed) integer linear programs (ILPs)
- with Python MIP.
-"""
+"""ABC rules implemented as (mixed) integer linear programs (ILPs) with Python MIP."""
 
 import mip
 from abcvoting.misc import sorted_committees
 from abcvoting import scores
-from abcvoting.output import output, DEBUG
+from abcvoting.output import output
 import functools
 import itertools
 
@@ -176,23 +173,23 @@ def _mip_thiele_methods(
     solver_id,
 ):
     def set_opt_model_func(model, profile, in_committee, committeesize):
-        # utility[(voter, l)] contains (intended binary) variables counting the number of approved
-        # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
+        # utility[(voter, x)] contains (intended binary) variables counting the number of approved
+        # candidates in the selected committee by `voter`. This utility[(voter, x)] is true for
         # exactly the number of candidates in the committee approved by `voter` for all
-        # l = 1...committeesize.
+        # x = 1...committeesize.
         #
-        # If marginal_scorefct(l) > 0 for l >= 1, we assume that marginal_scorefct is monotonic decreasing and
-        # therefore in combination with the objective function the following interpreation is
-        # valid:
-        # utility[(voter, l)] indicates whether `voter` approves at least l candidates in the
+        # If marginal_scorefct(x) > 0 for x >= 1, we assume that marginal_scorefct is monotonic
+        # decreasing and therefore in combination with the objective function the following
+        # interpreation is valid:
+        # utility[(voter, x)] indicates whether `voter` approves at least x candidates in the
         # committee (this is the case for marginal_scorefct "pav", "slav" or "geom").
         utility = {}
 
         max_in_committee = {}
         for i, voter in enumerate(profile):
             max_in_committee[voter] = min(len(voter.approved), committeesize)
-            for l in range(1, max_in_committee[voter] + 1):
-                utility[(voter, l)] = model.add_var(var_type=mip.BINARY, name=f"utility-v{i}-l{l}")
+            for x in range(1, max_in_committee[voter] + 1):
+                utility[(voter, x)] = model.add_var(var_type=mip.BINARY, name=f"utility({i},{x})")
 
         # constraint: the committee has the required size
         model += mip.xsum(in_committee) == committeesize
@@ -200,21 +197,21 @@ def _mip_thiele_methods(
         # constraint: utilities are consistent with actual committee
         for voter in profile:
             model += mip.xsum(
-                utility[voter, l] for l in range(1, max_in_committee[voter] + 1)
+                utility[voter, x] for x in range(1, max_in_committee[voter] + 1)
             ) == mip.xsum(in_committee[cand] for cand in voter.approved)
 
         # objective: the Thiele score of the committee
         model.objective = mip.maximize(
             mip.xsum(
-                float(marginal_scorefct(l)) * voter.weight * utility[(voter, l)]
+                float(marginal_scorefct(x)) * voter.weight * utility[(voter, x)]
                 for voter in profile
-                for l in range(1, max_in_committee[voter] + 1)
+                for x in range(1, max_in_committee[voter] + 1)
             )
         )
 
     marginal_scorefct = scores.get_marginal_scorefct(scorefct_id, committeesize)
 
-    score_values = [marginal_scorefct(l) for l in range(1, committeesize + 1)]
+    score_values = [marginal_scorefct(x) for x in range(1, committeesize + 1)]
     if not all(
         first > second or first == second == 0
         for first, second in zip(score_values, score_values[1:])
@@ -242,10 +239,10 @@ def _mip_thiele_methods(
 
 def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_id):
     def set_opt_model_func(model, profile, in_committee, committeesize):
-        # utility[(voter, l)] contains (intended binary) variables counting the number of approved
-        # candidates in the selected committee by `voter`. This utility[(voter, l)] is true for
+        # utility[(voter, x)] contains (intended binary) variables counting the number of approved
+        # candidates in the selected committee by `voter`. This utility[(voter, x)] is true for
         # exactly the number of candidates in the committee approved by `voter` for all
-        # l = 1...committeesize.
+        # x = 1...committeesize.
 
         utility = {}
         iteration = len(satisfaction_constraints)
@@ -257,8 +254,8 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
         for i, voter in enumerate(profile):
             # maximum number of approved candidates that this voter can have in a committee
             max_in_committee[voter] = min(len(voter.approved), committeesize)
-            for l in range(1, max_in_committee[voter] + 1):
-                utility[(voter, l)] = model.add_var(var_type=mip.BINARY, name=f"utility({i},{l})")
+            for x in range(1, max_in_committee[voter] + 1):
+                utility[(voter, x)] = model.add_var(var_type=mip.BINARY, name=f"utility({i},{x})")
 
         # constraint: the committee has the required size
         model += mip.xsum(in_committee) == committeesize
@@ -266,28 +263,28 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
         # constraint: utilities are consistent with actual committee
         for voter in profile:
             model += mip.xsum(
-                utility[voter, l] for l in range(1, max_in_committee[voter] + 1)
+                utility[voter, x] for x in range(1, max_in_committee[voter] + 1)
             ) == mip.xsum(in_committee[cand] for cand in voter.approved)
 
         # additional constraints from previous iterations
         for prev_iteration in range(0, iteration):
             model += (
                 mip.xsum(
-                    float(marginal_scorefcts[prev_iteration](l))
+                    float(marginal_scorefcts[prev_iteration](x))
                     * voter.weight
-                    * utility[(voter, l)]
+                    * utility[(voter, x)]
                     for voter in profile
-                    for l in range(1, max_in_committee[voter] + 1)
+                    for x in range(1, max_in_committee[voter] + 1)
                 )
                 >= satisfaction_constraints[prev_iteration] - ACCURACY
             )
 
-        # objective: the at-least-x score of the committee in iteration x
+        # objective: the at-least-y score of the committee in iteration y
         model.objective = mip.maximize(
             mip.xsum(
-                float(marginal_scorefcts[iteration](l)) * voter.weight * utility[(voter, l)]
+                float(marginal_scorefcts[iteration](x)) * voter.weight * utility[(voter, x)]
                 for voter in profile
-                for l in range(1, max_in_committee[voter] + 1)
+                for x in range(1, max_in_committee[voter] + 1)
             )
         )
 
@@ -322,7 +319,7 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         solver_id=solver_id,
-        name=f"lexcc-final",
+        name="lexcc-final",
         committeescorefct=functools.partial(scores.thiele_score, f"atleast{committeesize}"),
         reuse_model=False,  # slower, but apparently necessary
     )

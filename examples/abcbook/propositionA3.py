@@ -1,6 +1,9 @@
-"""Proposition A.3
-from "Multi-Winner Voting with Approval Preferences"
+"""
+Proposition A.3.
+
+From "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
+https://arxiv.org/abs/2007.01795
 """
 
 from abcvoting import abcrules
@@ -17,7 +20,8 @@ cand_names = "abcdefgh"
 
 MonotonicityInstance = namedtuple(
     "MonotonicityInstance",
-    "rule_id committeesize approval_sets with_additional_voter mod_approval_set committees_first committees_after",
+    "rule_id committeesize approval_sets with_additional_voter mod_approval_set "
+    "committees_first committees_after",
 )
 
 monotonicity_instances = [

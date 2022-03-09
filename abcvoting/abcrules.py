@@ -49,7 +49,7 @@ MAIN_RULE_IDS = [
 """
 List of rule identifiers (`rule_id`) for the main ABC rules included in abcvoting.
 
-This selection is somewhat arbitrary. But all really important rules (that are implemented) 
+This selection is somewhat arbitrary. But all really important rules (that are implemented)
 are contained in this list.
 """
 
@@ -94,7 +94,7 @@ The  maximum number of committees that is returned by an ABC voting rule.
 
 If `MAX_NUM_OF_COMMITTEES_DEFAULT` ist set to `None`, then there is no constraint
 on the maximum number of committees.
-Can be overridden with the parameter `max_num_of_committees` in any `compute` function. 
+Can be overridden with the parameter `max_num_of_committees` in any `compute` function.
 """
 
 
@@ -200,7 +200,6 @@ class Rule:
 
         Parameters
         ----------
-
             profile : abcvoting.preferences.Profile
                 A profile.
 
@@ -229,7 +228,7 @@ class Rule:
                 bool
         """
         if committeesize < 1:
-            raise ValueError(f"Parameter `committeesize` must be a positive integer.")
+            raise ValueError("Parameter `committeesize` must be a positive integer.")
 
         if committeesize > profile.num_cand:
             raise ValueError(
@@ -248,9 +247,16 @@ class Rule:
                 f"ABC rule {self.rule_id} does not support resolute={resolute}."
             )
 
-        if max_num_of_committees is not None and max_num_of_committees < 1:
+        if (max_num_of_committees is not None and not isinstance(max_num_of_committees, int)) or (
+            max_num_of_committees is not None and max_num_of_committees < 1
+        ):
             raise ValueError(
                 "Parameter `max_num_of_committees` must be None or a positive integer."
+            )
+
+        if max_num_of_committees is not None and resolute:
+            raise ValueError(
+                "Parameter `max_num_of_committees` cannot be used when `resolute` is set to True."
             )
 
 
@@ -1056,8 +1062,9 @@ def compute_cc(
 
             .. doctest::
 
-                >>> get_rule("cc").algorithms
-                ('gurobi', 'mip-gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force', 'mip-cbc')
+                >>> get_rule("cc").algorithms  # doctest: +NORMALIZE_WHITESPACE
+                ('gurobi', 'mip-gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force',
+                 'mip-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -1184,7 +1191,7 @@ def compute_lexcc(
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-    output.details(f"At-least-ell scores:")
+    output.details("At-least-ell scores:")
     output.details(
         "\n".join(
             f" at-least-{ell+1}: {score}"
@@ -2622,7 +2629,9 @@ def compute_greedy_monroe(
     rule = get_rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
-    rule.verify_compute_parameters(profile, committeesize, algorithm, resolute)
+    rule.verify_compute_parameters(
+        profile, committeesize, algorithm, resolute, max_num_of_committees
+    )
 
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
@@ -2880,7 +2889,6 @@ def _seqphragmen_resolute(
     load = start_load
     if load is None:
         load = [0 for _ in range(len(profile))]
-    max_start_load = max(load)
     committee = partial_committee
     if partial_committee is None:
         committee = []  # build committees starting with the empty set
@@ -4082,7 +4090,9 @@ def compute_rsd(
     rule = get_rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
-    rule.verify_compute_parameters(profile, committeesize, algorithm, resolute)
+    rule.verify_compute_parameters(
+        profile, committeesize, algorithm, resolute, max_num_of_committees
+    )
 
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only implemented for unit weights (weight=1).")

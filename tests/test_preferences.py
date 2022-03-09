@@ -1,5 +1,5 @@
 """
-Unit tests for preferences.py
+Unit tests for abcvoting/preferences.py.
 """
 
 import pytest

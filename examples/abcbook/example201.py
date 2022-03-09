@@ -1,6 +1,9 @@
-"""Example 1 (approval profile for running example)
-from "Multi-Winner Voting with Approval Preferences"
+"""
+Example 2.1 (approval profile for running example).
+
+From "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
+https://arxiv.org/abs/2007.01795
 """
 
 from abcvoting.preferences import Profile

@@ -1,3 +1,7 @@
+"""
+Unit tests for examples/*.
+"""
+
 import pytest
 from pathlib import Path
 
@@ -27,9 +31,11 @@ def remove_algorithm_info(out):
 
 @pytest.fixture
 def check_output(capfd, request):
-    """Pytest fixture to compare output (stdout) with stored text file. Output might depend on
-    installed packages, might need to be adjusted to make test work on all platforms.
+    """
+    Pytest fixture to compare output (stdout) with stored text file.
 
+    Output might depend on
+    installed packages, might need to be adjusted to make test work on all platforms.
     If a test fails, the actual output is copied to a file called <testname>.new, so it should
     be easy to accept changes by `mv expected_output/<testname>.new expected_output/<testname>`.
     """
@@ -63,106 +69,104 @@ def check_output(capfd, request):
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example01_py(check_output):
-    from examples.abcbook import example01
+    from examples.abcbook import example201  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example02_py(check_output):
-    from examples.abcbook import example02
+    from examples.abcbook import example202  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example03_py(check_output):
-    from examples.abcbook import example03
+    from examples.abcbook import example203  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example04_py(check_output):
-    from examples.abcbook import example04
+    from examples.abcbook import example204  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example05_py(check_output):
-    from examples.abcbook import example05
+    from examples.abcbook import example205  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example06_py(check_output):
-    from examples.abcbook import example06
+    from examples.abcbook import example206  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example07_py(check_output):
-    from examples.abcbook import example07
+    from examples.abcbook import example207  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example08_py(check_output):
-    from examples.abcbook import example08
+    from examples.abcbook import example208  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example09_py(check_output):
-    from examples.abcbook import example09
+    from examples.abcbook import example209  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example10_py(check_output):
-    from examples.abcbook import example10
+    from examples.abcbook import example210  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example11_py(check_output):
-    from examples.abcbook import example11
+    from examples.abcbook import example211  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example12_py(check_output):
-    from examples.abcbook import example12
+    from examples.abcbook import example212  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example13_py(check_output):
-    from examples.abcbook import example13
+    from examples.abcbook import example213  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_example14_py(check_output):
-    from examples.abcbook import example14
+    from examples.abcbook import example214  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_remark02_py(check_output):
-    from examples.abcbook import remark02
+    from examples.abcbook import remark02  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_propositionA2_py(check_output):
-    from examples.abcbook import propositionA2
+    from examples.abcbook import propositionA2  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_abcbook_propositionA3_py(check_output):
-    from examples.abcbook import propositionA3
+    from examples.abcbook import propositionA3  # noqa: F401
 
 
 @pytest.mark.gurobi
-# noinspection PyUnresolvedReferences
 def test_abcbook_propositionA4_py(check_output):
-    from examples.abcbook import propositionA4
+    from examples.abcbook import propositionA4  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_simple_py(check_output):
-    from examples import simple
+    from examples import simple  # noqa: F401
 
 
 @pytest.mark.gurobi
-# noinspection PyUnresolvedReferences
 def test_allrules_py(check_output):
-    from examples import allrules
+    from examples import allrules  # noqa: F401
 
 
 # noinspection PyUnresolvedReferences
 def test_preflib_py(check_output):
-    from examples import handling_preflib_files
+    from examples import handling_preflib_files  # noqa: F401

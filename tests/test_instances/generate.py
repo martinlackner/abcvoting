@@ -1,3 +1,7 @@
+"""
+Generates instances for unit tests.
+"""
+
 import random
 from itertools import product
 import os.path

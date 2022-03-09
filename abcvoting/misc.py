@@ -9,7 +9,6 @@ class CandidateSet(set):
 
     Parameters
     ----------
-
         candidates : iterable
             An iterable of candidates (positive integers).
 
@@ -55,7 +54,6 @@ class CandidateSet(set):
 
         Parameters
         ----------
-
             cand_names : list of str or str, optional
                 List of symbolic names for every candidate.
 
@@ -96,7 +94,6 @@ def str_set_of_candidates(candset, cand_names=None):
 
     Parameters
     ----------
-
         candset : iterable of int
             An iteratble of candidates.
 
@@ -133,7 +130,6 @@ def str_sets_of_candidates(sets_of_candidates, cand_names=None):
 
     Parameters
     ----------
-
         sets_of_candidates : list of iterable of int
             A list of iterables that contain candidates (i.e., non-negative integers).
 
@@ -169,7 +165,6 @@ def str_committees_with_header(committees, cand_names=None, winning=False):
 
     Parameters
     ----------
-
         committees : list of iterable of int
             A list of committees (set of positive integers).
 

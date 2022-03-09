@@ -1,5 +1,5 @@
 """
-Unit tests for genprofiles.py
+Unit tests for abcvoting/genprofiles.py.
 """
 
 import pytest

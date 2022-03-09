@@ -16,8 +16,6 @@ Similar to the Python logging module. Also meant to be used as Singleton.
 
 """
 
-import logging
-
 # should match the values defined in the logging module!
 CRITICAL = 50
 ERROR = 40
@@ -47,7 +45,6 @@ class Output:
 
     Parameters
     ----------
-
         verbosity : int
             Verbosity level.
 
@@ -77,7 +74,6 @@ class Output:
 
         Parameters
         ----------
-
             verbosity : int
                 Verbosity level.
         """
