@@ -91,7 +91,7 @@ For an overview of the many properties of committees, we refer to the survey by 
 Here, we see how one can test a given committee and find out which properties it satisfies.</p>
 <p>The following example (from <a class="footnote-reference brackets" href="#id6" id="id2">2</a>) shows that Phragmén’s Sequential Rule (seq-Phragmén) may output committees that fail
 Extended Justified Representation (EJR) <a class="footnote-reference brackets" href="#id7" id="id3">3</a>.
-In contrast, committees returned by seq-Phragmén always satisfy JR and PJR <a class="footnote-reference brackets" href="#id6" id="id4">2</a>.</p>
+We first compute the winning committee …</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">abcvoting.preferences</span> <span class="kn">import</span> <span class="n">Profile</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">abcvoting</span> <span class="kn">import</span> <span class="n">abcrules</span><span class="p">,</span> <span class="n">properties</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">abcvoting.output</span> <span class="kn">import</span> <span class="n">output</span><span class="p">,</span> <span class="n">INFO</span>
@@ -105,7 +105,11 @@ In contrast, committees returned by seq-Phragmén always satisfy JR and PJR <a c
 <span class="gp">... </span>    <span class="o">+</span> <span class="p">[{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">}]</span> <span class="o">*</span> <span class="mi">9</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">committees</span> <span class="o">=</span> <span class="n">abcrules</span><span class="o">.</span><span class="n">compute_seqphragmen</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">committeesize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">output</span><span class="o">.</span><span class="n">set_verbosity</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>… and then analyze this committee. We set the verbosity to <cite>INFO</cite> so that the result of <cite>properties.full_analysis</cite>
+is printed.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">output</span><span class="o">.</span><span class="n">set_verbosity</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">properties</span><span class="o">.</span><span class="n">full_analysis</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">committees</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="go">Pareto optimality                                  : True</span>
 <span class="go">Justified representation (JR)                      : True</span>
@@ -113,6 +117,8 @@ In contrast, committees returned by seq-Phragmén always satisfy JR and PJR <a c
 <span class="go">Extended justified representation (EJR)            : False</span>
 </pre></div>
 </div>
+<p>In contrast, committees returned by seq-Phragmén always satisfy JR and PJR <a class="footnote-reference brackets" href="#id6" id="id4">2</a>.
+Pareto optimality is not necessarily satisfied by seq-Phragmén, but it is satisfied in this instance.</p>
 <dl class="footnote brackets">
 <dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>Lackner, Martin, and Piotr Skowron.

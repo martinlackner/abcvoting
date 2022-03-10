@@ -12,7 +12,7 @@ Here, we see how one can test a given committee and find out which properties it
 
 The following example (from [2]_) shows that Phragmén's Sequential Rule (seq-Phragmén) may output committees that fail
 Extended Justified Representation (EJR) [3]_.
-In contrast, committees returned by seq-Phragmén always satisfy JR and PJR [2]_.
+We first compute the winning committee ...
 
 .. doctest::
 
@@ -29,12 +29,21 @@ In contrast, committees returned by seq-Phragmén always satisfy JR and PJR [2]_
     ...     + [{4, 5, 6, 7, 8, 9, 10, 11, 12, 13}] * 9
     ... )
     >>> committees = abcrules.compute_seqphragmen(profile, committeesize=12)
+
+... and then analyze this committee. We set the verbosity to `INFO` so that the result of `properties.full_analysis`
+is printed.
+
+.. doctest::
+
     >>> output.set_verbosity(INFO)
     >>> properties.full_analysis(profile, committees[0])
     Pareto optimality                                  : True
     Justified representation (JR)                      : True
     Proportional justified representation (PJR)        : True
     Extended justified representation (EJR)            : False
+
+In contrast, committees returned by seq-Phragmén always satisfy JR and PJR [2]_.
+Pareto optimality is not necessarily satisfied by seq-Phragmén, but it is satisfied in this instance.
 
 .. testcleanup::
 
