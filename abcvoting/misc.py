@@ -2,6 +2,8 @@
 Miscellaneous functions for committees (i.e., subsets of candidates).
 """
 
+import numpy as np
+
 
 class CandidateSet(set):
     """
@@ -27,7 +29,7 @@ class CandidateSet(set):
             raise ValueError(f"CandidateSet initialized with duplicate elements ({candidates}).")
 
         for cand in candidates:
-            if not isinstance(cand, int):
+            if not isinstance(cand, (int, np.integer)):
                 raise TypeError(
                     f"Object of type {str(type(cand))} not suitable as candidate, "
                     f"only positive integers allowed."
