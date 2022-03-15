@@ -306,7 +306,7 @@ monotonicity_instances = [
 
 
 for inst in monotonicity_instances:
-    print(misc.header(abcrules.get_rule(inst.rule_id).longname, "-"))
+    print(misc.header(abcrules.Rule(inst.rule_id).longname, "-"))
 
     profile = Profile(num_cand, cand_names=cand_names)
     profile.add_voters(inst.approval_sets)
@@ -364,7 +364,7 @@ for inst in monotonicity_instances:
         committees == inst.committees_after
     ), f"({inst.rule_id}) {committees} != {inst.committees_after}"
 
-    print(f"{abcrules.get_rule(inst.rule_id).shortname} fails ", end="")
+    print(f"{abcrules.Rule(inst.rule_id).shortname} fails ", end="")
     if inst.with_additional_voter:
         if len(inst.mod_approval_set) == 1:
             print("candidate", end="")

@@ -149,7 +149,7 @@ manipulations = [
 ]
 
 for inst in manipulations:
-    print(misc.header(abcrules.get_rule(inst.rule_id).longname, "-"))
+    print(misc.header(abcrules.Rule(inst.rule_id).longname, "-"))
 
     profile = Profile(num_cand, cand_names=cand_names)
     profile.add_voters(inst.approval_sets)
@@ -184,7 +184,7 @@ for inst in manipulations:
     profile = Profile(num_cand, cand_names=cand_names)
     profile.add_voters(inst.approval_sets)
 
-    if "brute-force" in abcrules.get_rule(inst.rule_id).available_algorithms:
+    if "brute-force" in abcrules.Rule(inst.rule_id).available_algorithms:
         algorithm = "brute-force"  # correct tie-breaking between candidates
     else:
         algorithm = "fastest"

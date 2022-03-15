@@ -46,7 +46,7 @@ class CollectRules:
         self.rule_algorithm_onlyresolute = []
         self.rule_algorithm_onlyirresolute = []
         for rule_id in abcrules.MAIN_RULE_IDS:
-            rule = abcrules.get_rule(rule_id)
+            rule = abcrules.Rule(rule_id)
             for algorithm in list(rule.algorithms) + ["fastest"]:
                 for resolute in rule.resolute_values:
                     if algorithm in MARKS:
@@ -554,7 +554,7 @@ def _list_abc_yaml_compute_instances():
     ]
     for filename in filenames:
         for rule_id in abcrules.MAIN_RULE_IDS:
-            rule = abcrules.get_rule(rule_id)
+            rule = abcrules.Rule(rule_id)
             for algorithm in rule.algorithms:
                 if "instanceS" in filename:
                     marks = []  # small instances, rather fast
@@ -641,7 +641,7 @@ def remove_solver_output(out):
 
 @pytest.mark.parametrize("rule_id", abcrules.MAIN_RULE_IDS)
 def test_resolute_parameter(rule_id):
-    rule = abcrules.get_rule(rule_id)
+    rule = abcrules.Rule(rule_id)
     for algorithm in rule.algorithms:
         resolute_values = rule.resolute_values
         assert len(resolute_values) in [1, 2]
@@ -661,7 +661,7 @@ def test_resolute_parameter(rule_id):
 
 @pytest.mark.parametrize("rule_id", abcrules.MAIN_RULE_IDS)
 def test_resolute_parameter_default(rule_id):
-    rule = abcrules.get_rule(rule_id)
+    rule = abcrules.Rule(rule_id)
     resolute_values = rule.resolute_values
     profile = Profile(5)
     committeesize = 1
@@ -675,7 +675,7 @@ def test_resolute_parameter_default(rule_id):
             rule_id, profile, committeesize  # using default value for resolute
         )
     except abcrules.NoAvailableAlgorithm:
-        pytest.skip("no supported algorithms for " + abcrules.get_rule(rule_id).shortname)
+        pytest.skip("no supported algorithms for " + abcrules.Rule(rule_id).shortname)
 
     if rule_id == "rsd":
         assert len(committees1) == len(committees2)  # RSD is randomized
@@ -691,7 +691,7 @@ def test_abcrules_toofewcandidates(rule_id, algorithm, resolute):
     approval_sets = [{0, 1, 2}, {1}, {2}, {0}]
     profile.add_voters(approval_sets)
 
-    committees = abcrules.get_rule(rule_id).compute(
+    committees = abcrules.Rule(rule_id).compute(
         profile,
         committeesize,
         algorithm=algorithm,
@@ -711,7 +711,7 @@ def test_abcrules_toofewcandidates(rule_id, algorithm, resolute):
 @pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)
 def test_abcrules_noapprovedcandidates(rule_id, algorithm, resolute):
     def _check(profile):
-        committees = abcrules.get_rule(rule_id).compute(
+        committees = abcrules.Rule(rule_id).compute(
             profile,
             committeesize=4,
             algorithm=algorithm,
@@ -799,6 +799,15 @@ def test_abcrules_correct_simple(rule_id, algorithm, resolute):
     simple_checks(committees)
 
     # call abcrules function differently, results should be the same
+    committees = abcrules.Rule(rule_id).compute(
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+    )
+    simple_checks(committees)
+
+    # this is yet another (deprecated!) way, results should be the same
     committees = abcrules.get_rule(rule_id).compute(
         profile,
         committeesize,
@@ -870,7 +879,7 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute):
     "algorithm",
     [
         pytest.param(algorithm, marks=MARKS[algorithm])
-        for algorithm in abcrules.get_rule("monroe").algorithms
+        for algorithm in abcrules.Rule("monroe").algorithms
     ],
 )
 def test_monroe_indivisible(algorithm):
@@ -888,7 +897,7 @@ def test_monroe_indivisible(algorithm):
     "algorithm",
     [
         pytest.param(algorithm, marks=MARKS[algorithm])
-        for algorithm in abcrules.get_rule("geom2").algorithms
+        for algorithm in abcrules.Rule("geom2").algorithms
     ],
 )
 def test_geom_rules_special_instance(rule_id, algorithm):
@@ -940,7 +949,7 @@ def test_geom_rules_special_instance(rule_id, algorithm):
     "algorithm",
     [
         pytest.param(algorithm, marks=MARKS[algorithm])
-        for algorithm in abcrules.get_rule("minimaxphragmen").algorithms
+        for algorithm in abcrules.Rule("minimaxphragmen").algorithms
     ],
 )
 def test_minimaxphragmen_does_not_use_lexicographic_optimization(algorithm):
@@ -1055,7 +1064,7 @@ def test_seqpav_irresolute():
     [
         pytest.param(prefix, algorithm, marks=MARKS[algorithm])
         for prefix in ["", "seq", "revseq"]
-        for algorithm in abcrules.get_rule(prefix + "geom2").algorithms
+        for algorithm in abcrules.Rule(prefix + "geom2").algorithms
     ],
 )
 def test_geometric_rules_with_arbitrary_parameter(parameter, prefix, algorithm, resolute):
@@ -1072,7 +1081,7 @@ def test_geometric_rules_with_arbitrary_parameter(parameter, prefix, algorithm, 
     else:
         assert len(committees) == 6
 
-    rule = abcrules.get_rule(rule_id)
+    rule = abcrules.Rule(rule_id)
     committees = rule.compute(profile, committeesize, algorithm=algorithm, resolute=resolute)
     if resolute:
         assert len(committees) == 1
@@ -1119,7 +1128,7 @@ def test_consensus_fails_lower_quota():
     [
         pytest.param(rule_id, algorithm, marks=MARKS[algorithm])
         for rule_id in ["phragmen-enestroem", "seqphragmen", "pav", "seqpav", "revseqpav"]
-        for algorithm in abcrules.get_rule(rule_id).algorithms
+        for algorithm in abcrules.Rule(rule_id).algorithms
     ],
 )
 def test_jansonexamples(rule_id, algorithm):
@@ -1146,7 +1155,7 @@ def test_jansonexamples(rule_id, algorithm):
 @pytest.mark.parametrize("rule_id", abcrules.MAIN_RULE_IDS)
 @pytest.mark.parametrize("resolute", [True, False])
 def test_unspecified_algorithms(rule_id, resolute):
-    rule = abcrules.get_rule(rule_id)
+    rule = abcrules.Rule(rule_id)
     if resolute not in rule.resolute_values:
         return
     profile = Profile(3)
@@ -1167,10 +1176,10 @@ def test_fastest_available_algorithm(rule_id):
     profile.add_voters([[0, 1], [1, 2], [0, 2, 3]])
     committeesize = 2
     try:
-        algorithm = abcrules.get_rule(rule_id).fastest_available_algorithm()
+        algorithm = abcrules.Rule(rule_id).fastest_available_algorithm()
     except abcrules.NoAvailableAlgorithm:
-        pytest.skip("no supported algorithms for " + abcrules.get_rule(rule_id).shortname)
-    for resolute in abcrules.get_rule(rule_id).resolute_values:
+        pytest.skip("no supported algorithms for " + abcrules.Rule(rule_id).shortname)
+    for resolute in abcrules.Rule(rule_id).resolute_values:
         abcrules.compute(rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute)
     # second possibility
     abcrules.compute(rule_id, profile, committeesize, algorithm="fastest")
@@ -1262,7 +1271,7 @@ def test_output(capfd, rule_id, algorithm, resolute, verbosity):
             assert out == ""
         else:
             assert len(out) > 0
-            rule = abcrules.get_rule(rule_id)
+            rule = abcrules.Rule(rule_id)
             start_output = misc.header(rule.longname) + "\n"
             if resolute and rule.resolute_values[0] == False:  # noqa: E712
                 # only if irresolute is default but resolute is chosen

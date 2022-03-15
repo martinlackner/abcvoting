@@ -106,44 +106,224 @@ class Rule:
     ----------
         rule_id : str
             The rule identifier.
-
-        shortname : str
-            The name of the ABC rule (shortened).
-
-        longname : str
-            The full name of the ABC rule.
-
-        compute_fct : func
-            Function used to compute this rule.
-
-        algorithms : tuple of str
-            List of algorithms that compute this rule.
-
-        resolute_values : tuple of bool
-            Values that the `resolute` can take.
     """
+
+    _THIELE_ALGORITHMS = (
+        # algorithms sorted by speed
+        "gurobi",
+        "mip-gurobi",
+        "mip-cbc",
+        "branch-and-bound",
+        "brute-force",
+    )
+    _RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES = (False, True)
+    _RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES = (True, False)
 
     def __init__(
         self,
         rule_id,
-        shortname,
-        longname,
-        compute_fct,
-        algorithms,
-        resolute_values,  # A list containing True, False, or both.
-        # The value at position 0 is the default.
-        # (e.g., False for optimization-based rules, True for sequential rules.)
     ):
         self.rule_id = rule_id
-        self.shortname = shortname
-        self.longname = longname
-        self._compute_fct = compute_fct
-        self.algorithms = algorithms
-        self.resolute_values = resolute_values
+        if rule_id == "av":
+            self.shortname = "AV"
+            self.longname = "Approval Voting (AV)"
+            self.compute_fct = compute_av
+            self.algorithms = ("standard",)
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "sav":
+            self.shortname = "SAV"
+            self.longname = "Satisfaction Approval Voting (SAV)"
+            self.compute_fct = compute_sav
+            self.algorithms = ("standard",)
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "pav":
+            self.shortname = "PAV"
+            self.longname = "Proportional Approval Voting (PAV)"
+            self.compute_fct = compute_pav
+            self.algorithms = self._THIELE_ALGORITHMS
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "slav":
+            self.shortname = "SLAV"
+            self.longname = "Sainte-Laguë Approval Voting (SLAV)"
+            self.compute_fct = compute_slav
+            self.algorithms = self._THIELE_ALGORITHMS
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "cc":
+            self.shortname = "CC"
+            self.longname = "Approval Chamberlin-Courant (CC)"
+            self.compute_fct = compute_cc
+            self.algorithms = (
+                # algorithms sorted by speed
+                "gurobi",
+                "mip-gurobi",
+                "ortools-cp",
+                "branch-and-bound",
+                "brute-force",
+                "mip-cbc",
+            )
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "lexcc":
+            self.shortname = "lex-CC"
+            self.longname = "Lexicographic Chamberlin-Courant (lex-CC)"
+            self.compute_fct = compute_lexcc
+            # algorithms sorted by speed
+            self.algorithms = ("gurobi", "mip-gurobi", "brute-force", "mip-cbc")
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "seqpav":
+            self.shortname = "seq-PAV"
+            self.longname = "Sequential Proportional Approval Voting (seq-PAV)"
+            self.compute_fct = compute_seqpav
+            self.algorithms = ("standard",)
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+        elif rule_id == "revseqpav":
+            self.shortname = "revseq-PAV"
+            self.longname = "Reverse Sequential Proportional Approval Voting (revseq-PAV)"
+            self.compute_fct = compute_revseqpav
+            self.algorithms = ("standard",)
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+        elif rule_id == "seqslav":
+            self.shortname = "seq-SLAV"
+            self.longname = "Sequential Sainte-Laguë Approval Voting (seq-SLAV)"
+            self.compute_fct = compute_seqslav
+            self.algorithms = ("standard",)
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+        elif rule_id == "seqcc":
+            self.shortname = "seq-CC"
+            self.longname = "Sequential Approval Chamberlin-Courant (seq-CC)"
+            self.compute_fct = compute_seqcc
+            self.algorithms = ("standard",)
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+        elif rule_id == "seqphragmen":
+            self.shortname = "seq-Phragmén"
+            self.longname = "Phragmén's Sequential Rule (seq-Phragmén)"
+            self.compute_fct = compute_seqphragmen
+            self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+        elif rule_id == "minimaxphragmen":
+            self.shortname = "minimax-Phragmén"
+            self.longname = "Phragmén's Minimax Rule (minimax-Phragmén)"
+            self.compute_fct = compute_minimaxphragmen
+            self.algorithms = ("gurobi", "mip-gurobi", "mip-cbc")
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "leximinphragmen":
+            self.shortname = "leximin-Phragmén"
+            self.longname = "Phragmén's Leximin Rule (leximin-Phragmén)"
+            self.compute_fct = compute_leximinphragmen
+            self.algorithms = ("gurobi",)  # TODO: "mip-gurobi", "mip-cbc"),
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "monroe":
+            self.shortname = "Monroe"
+            self.longname = "Monroe's Approval Rule (Monroe)"
+            self.compute_fct = compute_monroe
+            self.algorithms = (
+                # algorithms sorted by speed
+                "gurobi",
+                "mip-gurobi",
+                "mip-cbc",
+                "ortools-cp",
+                "brute-force",
+            )
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "greedy-monroe":
+            self.shortname = "Greedy Monroe"
+            self.longname = "Greedy Monroe"
+            self.compute_fct = compute_greedy_monroe
+            self.algorithms = ("standard",)
+            self.resolute_values = (True,)
+        elif rule_id == "minimaxav":
+            self.shortname = "minimaxav"
+            self.longname = "Minimax Approval Voting (MAV)"
+            self.compute_fct = compute_minimaxav
+            self.algorithms = ("gurobi", "mip-gurobi", "ortools-cp", "mip-cbc", "brute-force")
+            # algorithms sorted by speed. however, for small profiles with a small committee size,
+            # brute-force is often the fastest
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "lexminimaxav":
+            self.shortname = "lex-MAV"
+            self.longname = "Lexicographic Minimax Approval Voting (lex-MAV)"
+            self.compute_fct = compute_lexminimaxav
+            self.algorithms = ("gurobi", "brute-force")
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "rule-x":
+            self.shortname = "Rule X"
+            self.longname = "Rule X (aka Method of Equal Shares)"
+            self.compute_fct = compute_rule_x
+            self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+        elif rule_id == "rule-x-without-phragmen-phase":
+            self.shortname = "Rule X without Phragmén phase"
+            self.longname = "Rule X without the Phragmén phase (second phase)"
+            self.compute_fct = functools.partial(compute_rule_x, skip_phragmen_phase=True)
+            self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+        elif rule_id == "phragmen-enestroem":
+            self.shortname = "Phragmén-Eneström"
+            self.longname = "Method of Phragmén-Eneström"
+            self.compute_fct = compute_phragmen_enestroem
+            self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+        elif rule_id == "consensus-rule":
+            self.shortname = "Consensus Rule"
+            self.longname = "Consensus Rule"
+            self.compute_fct = compute_consensus_rule
+            self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+        elif rule_id == "trivial":
+            self.shortname = "Trivial Rule"
+            self.longname = "Trivial Rule"
+            self.compute_fct = compute_trivial_rule
+            self.algorithms = ("standard",)
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "rsd":
+            self.shortname = "Random Serial Dictator"
+            self.longname = "Random Serial Dictator"
+            self.compute_fct = compute_rsd
+            self.algorithms = ("standard",)
+            self.resolute_values = (True,)
+        elif rule_id.startswith("geom"):
+            parameter = rule_id[4:]
+            self.shortname = f"{parameter}-Geometric"
+            self.longname = f"{parameter}-Geometric Rule"
+            self.compute_fct = functools.partial(compute_thiele_method, rule_id)
+            self.algorithms = self._THIELE_ALGORITHMS
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id.startswith("seq") or rule_id.startswith("revseq"):
+            # handle sequential and reverse sequential Thiele methods
+            # that are not explicitly included in the list above
+            if rule_id.startswith("seq"):
+                scorefct_id = rule_id[3:]  # score function id of Thiele method
+            else:
+                scorefct_id = rule_id[6:]  # score function id of Thiele method
+
+            try:
+                scores.get_marginal_scorefct(scorefct_id)
+            except scores.UnknownScoreFunctionError:
+                raise UnknownRuleIDError(rule_id)
+
+            if rule_id == "av":
+                raise UnknownRuleIDError(rule_id)  # seq-AV and revseq-AV are equivalent to AV
+
+            # sequential Thiele methods
+            optrule = Rule(scorefct_id)
+            if rule_id.startswith("seq"):
+                self.shortname = f"seq-{optrule.shortname}"
+                self.longname = f"Sequential {optrule.longname}"
+                self.compute_fct = functools.partial(compute_seq_thiele_method, scorefct_id)
+                self.algorithms = ("standard",)
+                self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+            # reverse sequential Thiele methods
+            elif rule_id.startswith("revseq"):
+                self.shortname = f"revseq-{optrule.shortname}"
+                self.longname = f"Reverse Sequential {optrule.longname}"
+                self.compute_fct = functools.partial(compute_revseq_thiele_method, scorefct_id)
+                self.algorithms = ("standard",)
+                self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+        else:
+            raise UnknownRuleIDError(rule_id)
 
         # find all *available* algorithms for this ABC rule
         self.available_algorithms = []
-        for algorithm in algorithms:
+        for algorithm in self.algorithms:
             if algorithm in available_algorithms:
                 self.available_algorithms.append(algorithm)
 
@@ -185,7 +365,7 @@ class Rule:
             list of CandidateSet
                 A list of winning committees.
         """
-        return self._compute_fct(profile, committeesize, **kwargs)
+        return self.compute_fct(profile, committeesize, **kwargs)
 
     def verify_compute_parameters(
         self,
@@ -344,6 +524,9 @@ def get_rule(rule_id):
     """
     Get instance of `Rule` for the ABC rule specified by `rule_id`.
 
+    .. deprecated:: 2.3.0
+       Function `get_rule(rule_id)` is deprecated, use `Rule(rule_id)` instead.
+
     Parameters
     ----------
         rule_id : str
@@ -354,290 +537,7 @@ def get_rule(rule_id):
         Rule
             A corresponding `Rule` object.
     """
-    _THIELE_ALGORITHMS = (
-        # algorithms sorted by speed
-        "gurobi",
-        "mip-gurobi",
-        "mip-cbc",
-        "branch-and-bound",
-        "brute-force",
-    )
-    _RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES = (False, True)
-    _RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES = (True, False)
-    if rule_id == "av":
-        return Rule(
-            rule_id=rule_id,
-            shortname="AV",
-            longname="Approval Voting (AV)",
-            compute_fct=compute_av,
-            algorithms=("standard",),
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "sav":
-        return Rule(
-            rule_id=rule_id,
-            shortname="SAV",
-            longname="Satisfaction Approval Voting (SAV)",
-            compute_fct=compute_sav,
-            algorithms=("standard",),
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "pav":
-        return Rule(
-            rule_id=rule_id,
-            shortname="PAV",
-            longname="Proportional Approval Voting (PAV)",
-            compute_fct=compute_pav,
-            algorithms=_THIELE_ALGORITHMS,
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "slav":
-        return Rule(
-            rule_id=rule_id,
-            shortname="SLAV",
-            longname="Sainte-Laguë Approval Voting (SLAV)",
-            compute_fct=compute_slav,
-            algorithms=_THIELE_ALGORITHMS,
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "cc":
-        return Rule(
-            rule_id=rule_id,
-            shortname="CC",
-            longname="Approval Chamberlin-Courant (CC)",
-            compute_fct=compute_cc,
-            algorithms=(
-                # algorithms sorted by speed
-                "gurobi",
-                "mip-gurobi",
-                "ortools-cp",
-                "branch-and-bound",
-                "brute-force",
-                "mip-cbc",
-            ),
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "lexcc":
-        return Rule(
-            rule_id=rule_id,
-            shortname="lex-CC",
-            longname="Lexicographic Chamberlin-Courant (lex-CC)",
-            compute_fct=compute_lexcc,
-            # algorithms sorted by speed
-            algorithms=("gurobi", "mip-gurobi", "brute-force", "mip-cbc"),
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "seqpav":
-        return Rule(
-            rule_id=rule_id,
-            shortname="seq-PAV",
-            longname="Sequential Proportional Approval Voting (seq-PAV)",
-            compute_fct=compute_seqpav,
-            algorithms=("standard",),
-            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
-        )
-    if rule_id == "revseqpav":
-        return Rule(
-            rule_id=rule_id,
-            shortname="revseq-PAV",
-            longname="Reverse Sequential Proportional Approval Voting (revseq-PAV)",
-            compute_fct=compute_revseqpav,
-            algorithms=("standard",),
-            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
-        )
-    if rule_id == "seqslav":
-        return Rule(
-            rule_id=rule_id,
-            shortname="seq-SLAV",
-            longname="Sequential Sainte-Laguë Approval Voting (seq-SLAV)",
-            compute_fct=compute_seqslav,
-            algorithms=("standard",),
-            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
-        )
-    if rule_id == "seqcc":
-        return Rule(
-            rule_id=rule_id,
-            shortname="seq-CC",
-            longname="Sequential Approval Chamberlin-Courant (seq-CC)",
-            compute_fct=compute_seqcc,
-            algorithms=("standard",),
-            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
-        )
-    if rule_id == "seqphragmen":
-        return Rule(
-            rule_id=rule_id,
-            shortname="seq-Phragmén",
-            longname="Phragmén's Sequential Rule (seq-Phragmén)",
-            compute_fct=compute_seqphragmen,
-            algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
-            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
-        )
-    if rule_id == "minimaxphragmen":
-        return Rule(
-            rule_id=rule_id,
-            shortname="minimax-Phragmén",
-            longname="Phragmén's Minimax Rule (minimax-Phragmén)",
-            compute_fct=compute_minimaxphragmen,
-            algorithms=("gurobi", "mip-gurobi", "mip-cbc"),
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "leximinphragmen":
-        return Rule(
-            rule_id=rule_id,
-            shortname="leximin-Phragmén",
-            longname="Phragmén's Leximin Rule (leximin-Phragmén)",
-            compute_fct=compute_leximinphragmen,
-            algorithms=("gurobi",),  # TODO: "mip-gurobi", "mip-cbc"),
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "monroe":
-        return Rule(
-            rule_id=rule_id,
-            shortname="Monroe",
-            longname="Monroe's Approval Rule (Monroe)",
-            compute_fct=compute_monroe,
-            algorithms=(
-                # algorithms sorted by speed
-                "gurobi",
-                "mip-gurobi",
-                "mip-cbc",
-                "ortools-cp",
-                "brute-force",
-            ),
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "greedy-monroe":
-        return Rule(
-            rule_id=rule_id,
-            shortname="Greedy Monroe",
-            longname="Greedy Monroe",
-            compute_fct=compute_greedy_monroe,
-            algorithms=("standard",),
-            resolute_values=(True,),
-        )
-    if rule_id == "minimaxav":
-        return Rule(
-            rule_id=rule_id,
-            shortname="minimaxav",
-            longname="Minimax Approval Voting (MAV)",
-            compute_fct=compute_minimaxav,
-            algorithms=("gurobi", "mip-gurobi", "ortools-cp", "mip-cbc", "brute-force"),
-            # algorithms sorted by speed. however, for small profiles with a small committee size,
-            # brute-force is often the fastest
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "lexminimaxav":
-        return Rule(
-            rule_id=rule_id,
-            shortname="lex-MAV",
-            longname="Lexicographic Minimax Approval Voting (lex-MAV)",
-            compute_fct=compute_lexminimaxav,
-            algorithms=("gurobi", "brute-force"),
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "rule-x":
-        return Rule(
-            rule_id=rule_id,
-            shortname="Rule X",
-            longname="Rule X (aka Method of Equal Shares)",
-            compute_fct=compute_rule_x,
-            algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
-            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
-        )
-    if rule_id == "rule-x-without-phragmen-phase":
-        return Rule(
-            rule_id=rule_id,
-            shortname="Rule X without Phragmén phase",
-            longname="Rule X without the Phragmén phase (second phase)",
-            compute_fct=functools.partial(compute_rule_x, skip_phragmen_phase=True),
-            algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
-            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
-        )
-    if rule_id == "phragmen-enestroem":
-        return Rule(
-            rule_id=rule_id,
-            shortname="Phragmén-Eneström",
-            longname="Method of Phragmén-Eneström",
-            compute_fct=compute_phragmen_enestroem,
-            algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
-            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
-        )
-    if rule_id == "consensus-rule":
-        return Rule(
-            rule_id=rule_id,
-            shortname="Consensus Rule",
-            longname="Consensus Rule",
-            compute_fct=compute_consensus_rule,
-            algorithms=("float-fractions", "gmpy2-fractions", "standard-fractions"),
-            resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
-        )
-    if rule_id == "trivial":
-        return Rule(
-            rule_id=rule_id,
-            shortname="Trivial Rule",
-            longname="Trivial Rule",
-            compute_fct=compute_trivial_rule,
-            algorithms=("standard",),
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-    if rule_id == "rsd":
-        return Rule(
-            rule_id=rule_id,
-            shortname="Random Serial Dictator",
-            longname="Random Serial Dictator",
-            compute_fct=compute_rsd,
-            algorithms=("standard",),
-            resolute_values=(True,),
-        )
-    if rule_id.startswith("geom"):
-        parameter = rule_id[4:]
-        return Rule(
-            rule_id=rule_id,
-            shortname=f"{parameter}-Geometric",
-            longname=f"{parameter}-Geometric Rule",
-            compute_fct=functools.partial(compute_thiele_method, rule_id),
-            algorithms=_THIELE_ALGORITHMS,
-            resolute_values=_RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES,
-        )
-
-    # handle sequential and reverse sequential Thiele methods
-    # that are not explicitly included in the list above
-    if rule_id.startswith("seq") or rule_id.startswith("revseq"):
-        if rule_id.startswith("seq"):
-            scorefct_id = rule_id[3:]  # score function id of Thiele method
-        else:
-            scorefct_id = rule_id[6:]  # score function id of Thiele method
-
-        try:
-            scores.get_marginal_scorefct(scorefct_id)
-        except scores.UnknownScoreFunctionError:
-            raise UnknownRuleIDError(rule_id)
-
-        if rule_id == "av":
-            raise UnknownRuleIDError(rule_id)  # seq-AV and revseq-AV are equivalent to AV
-
-        # sequential Thiele methods
-        if rule_id.startswith("seq"):
-            return Rule(
-                rule_id=rule_id,
-                shortname=f"seq-{get_rule(scorefct_id).shortname}",
-                longname=f"Sequential {get_rule(scorefct_id).longname}",
-                compute_fct=functools.partial(compute_seq_thiele_method, scorefct_id),
-                algorithms=("standard",),
-                resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
-            )
-        # reverse sequential Thiele methods
-        if rule_id.startswith("revseq"):
-            return Rule(
-                rule_id=rule_id,
-                shortname=f"revseq-{get_rule(scorefct_id).shortname}",
-                longname=f"Reverse Sequential {get_rule(scorefct_id).longname}",
-                compute_fct=functools.partial(compute_revseq_thiele_method, scorefct_id),
-                algorithms=("standard",),
-                resolute_values=_RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES,
-            )
-
-    raise UnknownRuleIDError(rule_id)
+    return Rule(rule_id)
 
 
 ########################################################################
@@ -674,7 +574,7 @@ def compute(rule_id, profile, committeesize, result=None, **kwargs):
 
             If `resolute=True`, the list contains only one winning committee.
     """
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     committees = rule.compute(profile=profile, committeesize=committeesize, **kwargs)
     if result is not None:
         # verify that the parameter `result` is indeed the result of computing the ABC rule
@@ -745,7 +645,7 @@ def compute_thiele_method(
 
             If `resolute=True`, the list contains only one winning committee.
     """
-    rule = get_rule(scorefct_id)
+    rule = Rule(scorefct_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -935,7 +835,7 @@ def compute_pav(
 
             .. doctest::
 
-                >>> get_rule("pav").algorithms
+                >>> Rule("pav").algorithms
                 ('gurobi', 'mip-gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
@@ -999,7 +899,7 @@ def compute_slav(
 
             .. doctest::
 
-                >>> get_rule("slav").algorithms
+                >>> Rule("slav").algorithms
                 ('gurobi', 'mip-gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
@@ -1062,7 +962,7 @@ def compute_cc(
 
             .. doctest::
 
-                >>> get_rule("cc").algorithms  # doctest: +NORMALIZE_WHITESPACE
+                >>> Rule("cc").algorithms  # doctest: +NORMALIZE_WHITESPACE
                 ('gurobi', 'mip-gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force',
                  'mip-cbc')
 
@@ -1128,7 +1028,7 @@ def compute_lexcc(
 
             .. doctest::
 
-                >>> get_rule("lexcc").algorithms
+                >>> Rule("lexcc").algorithms
                 ('gurobi', 'mip-gurobi', 'brute-force', 'mip-cbc')
 
         resolute : bool, optional
@@ -1150,7 +1050,7 @@ def compute_lexcc(
             A list of winning committees.
     """
     rule_id = "lexcc"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -1284,7 +1184,7 @@ def compute_seq_thiele_method(
     """
     scores.get_marginal_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
     rule_id = "seq" + scorefct_id
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -1457,7 +1357,7 @@ def compute_seqpav(
 
             .. doctest::
 
-                >>> get_rule("seqpav").algorithms
+                >>> Rule("seqpav").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -1519,7 +1419,7 @@ def compute_seqslav(
 
             .. doctest::
 
-                >>> get_rule("seqslav").algorithms
+                >>> Rule("seqslav").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -1580,7 +1480,7 @@ def compute_seqcc(
 
             .. doctest::
 
-                >>> get_rule("seqcc").algorithms
+                >>> Rule("seqcc").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -1661,7 +1561,7 @@ def compute_revseq_thiele_method(
     """
     scores.get_marginal_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
     rule_id = "revseq" + scorefct_id
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -1836,7 +1736,7 @@ def compute_revseqpav(
 
             .. doctest::
 
-                >>> get_rule("revseqpav").algorithms
+                >>> Rule("revseqpav").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -1902,7 +1802,7 @@ def compute_separable_rule(
 
             .. doctest::
 
-                >>> get_rule("av").algorithms
+                >>> Rule("av").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -1923,7 +1823,7 @@ def compute_separable_rule(
         list of CandidateSet
             A list of winning committees.
     """
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -2073,7 +1973,7 @@ def compute_sav(
 
             .. doctest::
 
-                >>> get_rule("sav").algorithms
+                >>> Rule("sav").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -2138,7 +2038,7 @@ def compute_av(
 
             .. doctest::
 
-                >>> get_rule("av").algorithms
+                >>> Rule("av").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -2199,7 +2099,7 @@ def compute_minimaxav(
 
             .. doctest::
 
-                >>> get_rule("minimaxav").algorithms
+                >>> Rule("minimaxav").algorithms
                 ('gurobi', 'mip-gurobi', 'ortools-cp', 'mip-cbc', 'brute-force')
 
         resolute : bool, optional
@@ -2221,7 +2121,7 @@ def compute_minimaxav(
             A list of winning committees.
     """
     rule_id = "minimaxav"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -2341,7 +2241,7 @@ def compute_lexminimaxav(
 
             .. doctest::
 
-                >>> get_rule("lexminimaxav").algorithms
+                >>> Rule("lexminimaxav").algorithms
                 ('gurobi', 'brute-force')
 
         resolute : bool, optional
@@ -2363,7 +2263,7 @@ def compute_lexminimaxav(
             A list of winning committees.
     """
     rule_id = "lexminimaxav"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -2469,7 +2369,7 @@ def compute_monroe(
 
             .. doctest::
 
-                >>> get_rule("monroe").algorithms
+                >>> Rule("monroe").algorithms
                 ('gurobi', 'mip-gurobi', 'mip-cbc', 'ortools-cp', 'brute-force')
 
         resolute : bool, optional
@@ -2491,7 +2391,7 @@ def compute_monroe(
             A list of winning committees.
     """
     rule_id = "monroe"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -2603,7 +2503,7 @@ def compute_greedy_monroe(
 
             .. doctest::
 
-                >>> get_rule("greedy-monroe").algorithms
+                >>> Rule("greedy-monroe").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -2625,7 +2525,7 @@ def compute_greedy_monroe(
             A list of winning committees.
     """
     rule_id = "greedy-monroe"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -2764,7 +2664,7 @@ def compute_seqphragmen(
 
             .. doctest::
 
-                >>> get_rule("seqphragmen").algorithms
+                >>> Rule("seqphragmen").algorithms
                 ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
 
         resolute : bool, optional
@@ -2786,7 +2686,7 @@ def compute_seqphragmen(
             A list of winning committees.
     """
     rule_id = "seqphragmen"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -3074,7 +2974,7 @@ def compute_rule_x(
 
             .. doctest::
 
-                >>> get_rule("rule-x").algorithms
+                >>> Rule("rule-x").algorithms
                 ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
 
         resolute : bool, optional
@@ -3104,7 +3004,7 @@ def compute_rule_x(
         rule_id = "rule-x-without-phragmen-phase"
     else:
         rule_id = "rule-x"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -3418,7 +3318,7 @@ def compute_minimaxphragmen(
 
             .. doctest::
 
-                >>> get_rule("minimaxphragmen").algorithms
+                >>> Rule("minimaxphragmen").algorithms
                 ('gurobi', 'mip-gurobi', 'mip-cbc')
 
         resolute : bool, optional
@@ -3440,7 +3340,7 @@ def compute_minimaxphragmen(
             A list of winning committees.
     """
     rule_id = "minimaxphragmen"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -3514,7 +3414,7 @@ def compute_leximinphragmen(
 
             .. doctest::
 
-                >>> get_rule("leximinphragmen").algorithms
+                >>> Rule("leximinphragmen").algorithms
                 ('gurobi',)
 
         resolute : bool, optional
@@ -3545,7 +3445,7 @@ def compute_leximinphragmen(
             A list of winning committees.
     """
     rule_id = "leximinphragmen"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -3632,7 +3532,7 @@ def compute_phragmen_enestroem(
 
             .. doctest::
 
-                >>> get_rule("phragmen-enestroem").algorithms
+                >>> Rule("phragmen-enestroem").algorithms
                 ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
 
         resolute : bool, optional
@@ -3654,7 +3554,7 @@ def compute_phragmen_enestroem(
             A list of winning committees.
     """
     rule_id = "phragmen-enestroem"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -3805,7 +3705,7 @@ def compute_consensus_rule(
 
             .. doctest::
 
-                >>> get_rule("consensus-rule").algorithms
+                >>> Rule("consensus-rule").algorithms
                 ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
 
         resolute : bool, optional
@@ -3827,7 +3727,7 @@ def compute_consensus_rule(
             A list of winning committees.
     """
     rule_id = "consensus-rule"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -3974,7 +3874,7 @@ def compute_trivial_rule(
 
             .. doctest::
 
-                >>> get_rule("trivial").algorithms
+                >>> Rule("trivial").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -3996,7 +3896,7 @@ def compute_trivial_rule(
             A list of winning committees.
     """
     rule_id = "trivial"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(
@@ -4064,7 +3964,7 @@ def compute_rsd(
 
             .. doctest::
 
-                >>> get_rule("rsd").algorithms
+                >>> Rule("rsd").algorithms
                 ('standard',)
 
         resolute : bool, optional
@@ -4086,7 +3986,7 @@ def compute_rsd(
             A list of winning committees.
     """
     rule_id = "rsd"
-    rule = get_rule(rule_id)
+    rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
     rule.verify_compute_parameters(

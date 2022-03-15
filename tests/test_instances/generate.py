@@ -5,7 +5,7 @@ Generates instances for unit tests.
 import random
 from itertools import product
 import os.path
-from abcvoting import genprofiles
+from abcvoting import generate
 from operator import itemgetter
 from abcvoting import abcrules
 from abcvoting import fileio
@@ -13,17 +13,17 @@ from abcvoting import fileio
 
 def generate_profile(num_voters, num_cand, committeesize, prob_distribution, setsize):
     if prob_distribution == "IC":
-        return genprofiles.random_IC_profile(num_cand, num_voters, setsize)
+        return generate.random_IC_profile(num_cand, num_voters, setsize)
     elif prob_distribution.startswith("Mallows"):
         dispersion = float(prob_distribution[7:])
-        return genprofiles.random_mallows_profile(
-            num_cand, num_voters, setsize, dispersion=dispersion
+        return generate.random_mallows_profile(
+            num_voters, num_cand, setsize, dispersion=dispersion
         )
     elif prob_distribution.startswith("Urn"):
         replace = float(prob_distribution[3:])
-        return genprofiles.random_urn_profile(num_cand, num_voters, setsize, replace=replace)
+        return generate.random_urn_profile(num_voters, num_cand, setsize, replace=replace)
     elif prob_distribution == "IC-party":
-        return genprofiles.random_IC_party_list_profile(num_cand, num_voters, num_parties=3)
+        return generate.random_IC_party_list_profile(num_cand, num_voters, num_parties=3)
     else:
         raise ValueError
 
@@ -79,7 +79,7 @@ def generate_abc_yaml_testinstances(
 
         rule_instances = []
         for rule_id in abcrules.MAIN_RULE_IDS:
-            rule = abcrules.get_rule(rule_id)
+            rule = abcrules.Rule(rule_id)
 
             # if irresolute (resolute = False) is supported, then "result" should be
             # the list of committees returned for resolute=False.

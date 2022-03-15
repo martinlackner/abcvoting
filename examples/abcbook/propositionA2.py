@@ -36,7 +36,7 @@ for rule_id in ["pav", "cc", "monroe", "minimaxphragmen", "minimaxav"]:
     comm2 = abcrules.compute(rule_id, profile, 2, resolute=True)[0]
     print(
         " "
-        + abcrules.get_rule(rule_id).shortname
+        + abcrules.Rule(rule_id).shortname
         + ": "
         + misc.str_set_of_candidates(comm1, cand_names)
         + " vs "
@@ -64,7 +64,7 @@ for rule_id in ["greedy-monroe"]:
     comm1 = abcrules.compute(rule_id, profile, 2, resolute=True)[0]
     comm2 = abcrules.compute(rule_id, profile, 3, resolute=True)[0]
     print(
-        f" {abcrules.get_rule(rule_id).shortname}: "
+        f" {abcrules.Rule(rule_id).shortname}: "
         f"{misc.str_set_of_candidates(comm1, cand_names)} vs "
         f"{misc.str_set_of_candidates(comm2, cand_names)}"
     )
@@ -87,7 +87,7 @@ print("winning committees for k=3 and k=4:")
 comm1 = abcrules.compute("rule-x", profile, 3, resolute=True, algorithm="standard-fractions")[0]
 comm2 = abcrules.compute("rule-x", profile, 4, resolute=True, algorithm="standard-fractions")[0]
 print(
-    f" {abcrules.get_rule('rule-x').shortname}: "
+    f" {abcrules.Rule('rule-x').shortname}: "
     f"{misc.str_set_of_candidates(comm1, cand_names)} vs "
     f"{misc.str_set_of_candidates(comm2, cand_names)}"
 )
