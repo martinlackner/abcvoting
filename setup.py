@@ -104,6 +104,7 @@ setuptools.setup(
             "Sphinx>=4.4.0",
             "sphinx-rtd-theme>=1.0.0",
             "numpydoc>=1.2",
+            "sphinx-codeautolink>=0.10",
         ]
     },
 )
