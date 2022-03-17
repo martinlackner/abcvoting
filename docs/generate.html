@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+
+<html class="writer-html5" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>abcvoting.generate — abcvoting  documentation</title>
+<link href="_static/pygments.css" rel="stylesheet" type="text/css"/>
+<link href="_static/css/theme.css" rel="stylesheet" type="text/css"/>
+<link href="_static/plot_directive.css" rel="stylesheet" type="text/css"/>
+<link href="_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
+<!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+<script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+<script src="_static/jquery.js"></script>
+<script src="_static/underscore.js"></script>
+<script src="_static/doctools.js"></script>
+<script src="_static/js/theme.js"></script>
+<link href="genindex.html" rel="index" title="Index"/>
+<link href="search.html" rel="search" title="Search"/>
+<link href="misc.html" rel="next" title="abcvoting.misc"/>
+<link href="fileio.html" rel="prev" title="abcvoting.fileio"/>
+</head>
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search">
+<a class="icon icon-home" href="index.html"> abcvoting
+          </a>
+<div role="search">
+<form action="search.html" class="wy-form" id="rtd-search-form" method="get">
+<input name="q" placeholder="Search docs" type="text"/>
+<input name="check_keywords" type="hidden" value="yes"/>
+<input name="area" type="hidden" value="default"/>
+</form>
+</div>
+</div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro-example.html">A simple example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-abcrules.html">ABC rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-computing-winning-committees.html">Computing winning committees</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-properties.html">Properties of committees</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="abcrules.html">abcvoting.abcrules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">abcvoting.fileio</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">abcvoting.generate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc.html">abcvoting.misc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="properties.html">abcvoting.properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scores.html">abcvoting.scores</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Backmatter:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="howtocite.html">How to cite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acks.html">Acknowledgements</a></li>
+</ul>
+</div>
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="Mobile navigation menu" class="wy-nav-top">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="index.html">abcvoting</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content">
+<div aria-label="Page navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a class="icon icon-home" href="index.html"></a> »</li>
+<li>abcvoting.generate</li>
+<li class="wy-breadcrumbs-aside">
+<a href="_sources/generate.rst.txt" rel="nofollow"> View page source</a>
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div itemprop="articleBody">
+<div class="section" id="abcvoting-generate">
+<h1>abcvoting.generate<a class="headerlink" href="#abcvoting-generate" title="Permalink to this headline"></a></h1>
+<span class="target" id="module-abcvoting.generate"></span><p>Random generation of approval profiles.</p>
+<dl class="simple">
+<dt>This module is based on the paper</dt><dd><p><em>How to Sample Approval Elections?</em>
+Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
+Krzysztof Sornat, Nimrod Talmon.
+TODO: URL</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="abcvoting.generate.PointProbabilityDistribution">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">PointProbabilityDistribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.PointProbabilityDistribution" title="Permalink to this definition"></a></dt>
+<dd><p>Class for specifying a probability distribution generating points.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Name (identifier) of the probability distribution. See example below.</p>
+</dd>
+<dt><strong>center_point</strong><span class="classifier">tuple or float, optional</span></dt><dd><p>Center point of the distribution.</p>
+<p>This can be either a point (tuple) or a float. If it is a float, it is assumed
+that the point has this value in all coordinates.</p>
+</dd>
+<dt><strong>sigma</strong><span class="classifier">float, optional</span></dt><dd><p>Standard deviation (only required for Gaussian distributions).</p>
+</dd>
+<dt><strong>width</strong><span class="classifier">float</span></dt><dd><p>Width of the geometric shape that constrains the probability distribution.</p>
+<p>This parameter is used for <cite>“1d_interval”</cite>, <cite>“2d_square”</cite>, <cite>“2d_disc”</cite>, and
+<cite>“2d_gaussian_disc”</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Here is a visual representation of the different probability distributions available.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># distributions to generate points in 1- and 2-dimensional space</span>
+<span class="n">distributions</span> <span class="o">=</span> <span class="p">[</span>
+    <a class="sphinx-codeautolink-a" href="generate.html#abcvoting.generate.PointProbabilityDistribution" title="abcvoting.generate.PointProbabilityDistribution"><span class="n">PointProbabilityDistribution</span></a><span class="p">(</span><span class="s2">"1d_interval"</span><span class="p">,</span> <span class="n">center_point</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+    <a class="sphinx-codeautolink-a" href="generate.html#abcvoting.generate.PointProbabilityDistribution" title="abcvoting.generate.PointProbabilityDistribution"><span class="n">PointProbabilityDistribution</span></a><span class="p">(</span><span class="s2">"1d_gaussian"</span><span class="p">,</span> <span class="n">center_point</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">]),</span>
+    <a class="sphinx-codeautolink-a" href="generate.html#abcvoting.generate.PointProbabilityDistribution" title="abcvoting.generate.PointProbabilityDistribution"><span class="n">PointProbabilityDistribution</span></a><span class="p">(</span><span class="s2">"1d_gaussian_interval"</span><span class="p">,</span> <span class="n">center_point</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+    <a class="sphinx-codeautolink-a" href="generate.html#abcvoting.generate.PointProbabilityDistribution" title="abcvoting.generate.PointProbabilityDistribution"><span class="n">PointProbabilityDistribution</span></a><span class="p">(</span><span class="s2">"2d_square"</span><span class="p">,</span> <span class="n">center_point</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span>
+    <a class="sphinx-codeautolink-a" href="generate.html#abcvoting.generate.PointProbabilityDistribution" title="abcvoting.generate.PointProbabilityDistribution"><span class="n">PointProbabilityDistribution</span></a><span class="p">(</span><span class="s2">"2d_disc"</span><span class="p">,</span> <span class="n">center_point</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span>
+    <a class="sphinx-codeautolink-a" href="generate.html#abcvoting.generate.PointProbabilityDistribution" title="abcvoting.generate.PointProbabilityDistribution"><span class="n">PointProbabilityDistribution</span></a><span class="p">(</span><span class="s2">"2d_gaussian"</span><span class="p">,</span> <span class="n">center_point</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.25</span><span class="p">),</span>
+    <a class="sphinx-codeautolink-a" href="generate.html#abcvoting.generate.PointProbabilityDistribution" title="abcvoting.generate.PointProbabilityDistribution"><span class="n">PointProbabilityDistribution</span></a><span class="p">(</span><span class="s2">"2d_gaussian_disc"</span><span class="p">,</span> <span class="n">center_point</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.25</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href=".//generate-1.py">Source code</a>, <a class="reference external" href=".//generate-1.png">png</a>, <a class="reference external" href=".//generate-1.hires.png">hires.png</a>, <a class="reference external" href=".//generate-1.pdf">pdf</a>)</p>
+<div class="figure align-default">
+<img alt="_images/generate-1.png" class="plot-directive" src="_images/generate-1.png"/>
+</div>
+<p><details><summary>Expand for references to <a class="reference internal" href="#abcvoting.generate.PointProbabilityDistribution" title="abcvoting.generate.PointProbabilityDistribution"><code class="xref py py-class docutils literal notranslate"><span class="pre">abcvoting.generate.PointProbabilityDistribution</span></code></a></summary><table class="docutils align-default">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generate.html#abcvoting-generate">abcvoting.generate</a></p></td>
+</tr>
+</tbody>
+</table>
+</details></p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_disjoint_resampling_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_disjoint_resampling_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_disjoint_resampling_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>(p,phi,g)-Disjoint Resampling</em> probability model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>p, phi</strong><span class="classifier">float in [0, 1]</span></dt><dd><p>Parameters of (p,phi,g)-Disjoint Resampling.</p>
+</dd>
+<dt><strong>num_groups</strong><span class="classifier">int, optional</span></dt><dd><p>Corresponds to the parameter g in (p,phi,g)-Disjoint Resampling.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p><em>How to Sample Approval Elections?</em>
+Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
+Krzysztof Sornat, Nimrod Talmon.
+TODO: URL</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_euclidean_fixed_size_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_euclidean_fixed_size_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voter_probdist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_probdist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voter_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_euclidean_fixed_size_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>Euclidean VCR (Voter Candidate Range)</em> probability model.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>voter_probdist</strong><span class="classifier">PointProbabilityDistribution or None</span></dt><dd><p>A probability distribution used to generate voter points.</p>
+</dd>
+<dt><strong>candidate_probdist</strong><span class="classifier">PointProbabilityDistribution or None</span></dt><dd><p>A probability distribution used to generate candidate points.</p>
+</dd>
+<dt><strong>setsize</strong><span class="classifier">int</span></dt><dd><p>Number of candidates that each voter approves.</p>
+</dd>
+<dt><strong>voter_points</strong><span class="classifier">iterable</span></dt><dd><p>A list of points.</p>
+<p>The length of this list must be <cite>num_voters</cite>. The dimension of the points must be
+the same as the points in <cite>candiddate_points</cite> or as specified by <cite>candidate_probdist</cite>.
+This parameter is only used if <cite>voter_probdist</cite> is <cite>None</cite>.</p>
+</dd>
+<dt><strong>candidate_points</strong><span class="classifier">iterable</span></dt><dd><p>A list of points.</p>
+<p>The length of this list must be <cite>num_cand</cite>. The dimension of the points must be
+the same as the points in <cite>voter_points</cite> or as specified by <cite>voter_probdist</cite>.
+This parameter is only used if <cite>candidate_probdist</cite> is <cite>None</cite>.</p>
+</dd>
+<dt><strong>return_points</strong><span class="classifier">bool, optional</span></dt><dd><p>If true, also return the list of voter points and a list of candidate points.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_euclidean_threshold_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_euclidean_threshold_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voter_probdist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_probdist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voter_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_euclidean_threshold_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>Euclidean Threshold</em> probability model.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>voter_probdist</strong><span class="classifier">PointProbabilityDistribution or None</span></dt><dd><p>A probability distribution used to generate voter points.</p>
+</dd>
+<dt><strong>candidate_probdist</strong><span class="classifier">PointProbabilityDistribution or None</span></dt><dd><p>A probability distribution used to generate candidate points.</p>
+</dd>
+<dt><strong>threshold</strong><span class="classifier">float</span></dt><dd><p>Voters’ tolerance for approving candidates. This is a float &gt;= 1.</p>
+<p>A voter approves all candididates that have at a distance of at most <cite>threshold</cite> * <cite>d</cite>,
+where <cite>d</cite> is the minimum distance between this voter and any candidate.
+Setting <cite>threshold</cite> to 1 means that only the closest candidate is approved (there
+might be more than one).</p>
+</dd>
+<dt><strong>voter_points</strong><span class="classifier">iterable</span></dt><dd><p>A list of points.</p>
+<p>The length of this list must be <cite>num_voters</cite>. The dimension of the points must be
+the same as the points in <cite>candiddate_points</cite> or as specified by <cite>candidate_probdist</cite>.
+This parameter is only used if <cite>voter_probdist</cite> is <cite>None</cite>.</p>
+</dd>
+<dt><strong>candidate_points</strong><span class="classifier">iterable</span></dt><dd><p>A list of points.</p>
+<p>The length of this list must be <cite>num_cand</cite>. The dimension of the points must be
+the same as the points in <cite>voter_points</cite> or as specified by <cite>voter_probdist</cite>.
+This parameter is only used if <cite>candidate_probdist</cite> is <cite>None</cite>.</p>
+</dd>
+<dt><strong>return_points</strong><span class="classifier">bool, optional</span></dt><dd><p>If true, also return the list of voter points and a list of candidate points.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_euclidean_vcr_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_euclidean_vcr_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voter_probdist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_probdist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voter_radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voter_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidate_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_euclidean_vcr_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>Euclidean VCR (Voter Candidate Range)</em> probability model.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>voter_probdist</strong><span class="classifier">PointProbabilityDistribution or None</span></dt><dd><p>A probability distribution used to generate voter points.</p>
+</dd>
+<dt><strong>candidate_probdist</strong><span class="classifier">PointProbabilityDistribution or None</span></dt><dd><p>A probability distribution used to generate candidate points.</p>
+</dd>
+<dt><strong>voter_radius, candidate_radius</strong><span class="classifier">float or list of float</span></dt><dd><p>Radius of candidates and voters to determine approval ballots.</p>
+<p>If a float is given, this radius applies to all voters/candidates.
+If a list of floats is given, this specifies the radius for each voter/candidate
+individually. In this case, the length of <cite>voter_radius</cite>/<cite>candidate_radius</cite> must
+be <cite>num_voters</cite>/<cite>num_cand</cite>.</p>
+<p>A voter approves a candidate if their distance is &lt;= the voter’s radius + the
+candidate’s radius.</p>
+</dd>
+<dt><strong>voter_points</strong><span class="classifier">iterable</span></dt><dd><p>A list of points.</p>
+<p>The length of this list must be <cite>num_voters</cite>. The dimension of the points must be
+the same as the points in <cite>candiddate_points</cite> or as specified by <cite>candidate_probdist</cite>.
+This parameter is only used if <cite>voter_probdist</cite> is <cite>None</cite>.</p>
+</dd>
+<dt><strong>candidate_points</strong><span class="classifier">iterable</span></dt><dd><p>A list of points.</p>
+<p>The length of this list must be <cite>num_cand</cite>. The dimension of the points must be
+the same as the points in <cite>voter_points</cite> or as specified by <cite>voter_probdist</cite>.
+This parameter is only used if <cite>candidate_probdist</cite> is <cite>None</cite>.</p>
+</dd>
+<dt><strong>return_points</strong><span class="classifier">bool, optional</span></dt><dd><p>If true, also return the list of voter points and a list of candidate points.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p><em>How to Sample Approval Elections?</em>
+Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
+Krzysztof Sornat, Nimrod Talmon.
+TODO: URL</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_ic_fixed_size_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_ic_fixed_size_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setsize</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_ic_fixed_size_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>IC with fixed-size approval sets</em> model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>setsize</strong><span class="classifier">int</span></dt><dd><p>Number of candidates that each voter approves.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_ic_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_ic_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_ic_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>Independent Culture (IC)</em> probability model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>p</strong><span class="classifier">float in [0, 1]</span></dt><dd><p>Probability of approving a candidate.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>Corresponds to <em>p-IC</em> in:</p>
+<p><em>How to Sample Approval Elections?</em>
+Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
+Krzysztof Sornat, Nimrod Talmon.
+TODO: URL</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_mallows_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_mallows_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dispersion</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_mallows_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>Truncated Mallows</em> probability model.</p>
+<p>After the definition for
+repeated insertion  mode (RIM) in
+<a class="reference external" href="https://icml.cc/2011/papers/135_icmlpaper.pdf">https://icml.cc/2011/papers/135_icmlpaper.pdf</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>setsize</strong><span class="classifier">int</span></dt><dd><p>Number of candidates that each voter approves.</p>
+</dd>
+<dt><strong>dispersion</strong><span class="classifier">float in [0, 1]</span></dt><dd><p>Dispersion parameter of the Mallows model.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_noise_model_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_noise_model_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hamming'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_noise_model_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>Random Noise</em> probability model.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>p, phi</strong><span class="classifier">float in [0, 1]</span></dt><dd><p>Parameters.</p>
+</dd>
+<dt><strong>distance</strong><span class="classifier">str, optional</span></dt><dd><p>The used distance measure.</p>
+<p>The default is Hamming distance (“hamming”). Other possibilities are “jaccard”,
+“zelinka”, and “bunke-shearer”.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p><em>How to Sample Approval Elections?</em>
+Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
+Krzysztof Sornat, Nimrod Talmon.
+TODO: URL</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_point">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probdist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_point" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a point in space according to a given probability distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>probdist</strong><span class="classifier">PointProbabilityDistribution</span></dt><dd><p>A probability distribution (see <a class="reference internal" href="#abcvoting.generate.PointProbabilityDistribution" title="abcvoting.generate.PointProbabilityDistribution"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointProbabilityDistribution</span></code></a>).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prob_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the probability model <cite>prob_model</cite>.</p>
+<p>The following probability models are supported:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">PROBABILITY_MODELS_IDS</span>  
+<span class="go">('IC fixed-size', 'IC', 'Truncated Mallows', 'Urn fixed-size', 'Urn',</span>
+<span class="go">'Truncated Urn', 'Euclidean VCR', 'Euclidean fixed-size', 'Euclidean Threshold',</span>
+<span class="go">'Resampling', 'Disjoint Resampling', 'Noise')</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>prob_model</strong><span class="classifier">str</span></dt><dd><p>A probability model.</p>
+</dd>
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Further arguments for the probability model <cite>prob_model</cite>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Generate a profile via the Independent Culture (IC) distribution with a probability of <cite>0.5</cite>.</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="generate.html#abcvoting.generate.random_profile" title="abcvoting.generate.random_profile"><span class="n">random_profile</span></a><span class="p">(</span><span class="n">prob_model</span><span class="o">=</span><span class="s2">"IC"</span><span class="p">,</span> <span class="n">num_voters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">num_cand</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+<span class="go">profile with 5 votes and 5 candidates:</span>
+<span class="go"> {1, 2},</span>
+<span class="go"> {0, 1, 2},</span>
+<span class="go"> {3, 4},</span>
+<span class="go"> {0, 4},</span>
+<span class="go"> {2, 4}</span>
+</pre></div>
+</div>
+<p><details><summary>Expand for references to <a class="reference internal" href="#abcvoting.generate.random_profile" title="abcvoting.generate.random_profile"><code class="xref py py-class docutils literal notranslate"><span class="pre">abcvoting.generate.random_profile</span></code></a></summary><table class="docutils align-default">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generate.html#abcvoting-generate">abcvoting.generate</a></p></td>
+</tr>
+</tbody>
+</table>
+</details></p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_resampling_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_resampling_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_resampling_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>Resampling</em> probability model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>p, phi</strong><span class="classifier">float in [0, 1]</span></dt><dd><p>Parameters of (p,phi)-Resampling.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p><em>How to Sample Approval Elections?</em>
+Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
+Krzysztof Sornat, Nimrod Talmon.
+TODO: URL</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_truncated_urn_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_truncated_urn_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_truncated_urn_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>Truncated Polya Urn</em> probability model.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>setsize</strong><span class="classifier">int</span></dt><dd><p>Number of candidates that each voter approves (top entries from a ranking).</p>
+</dd>
+<dt><strong>replace</strong><span class="classifier">float</span></dt><dd><p>New balls added to the urn in each iteration, relative to the original number.</p>
+<p>The urn starts with <cite>num_cand</cite> factorial balls, each representing a ranking
+of candidates. This quantity is normalized to <cite>1.0</cite>.
+The <cite>replace</cite> value is a float that indicates how many balls are added using this
+normalization. Specifically, <cite>replace</cite> *  (<cite>num_cand</cite> factorial) are added
+in each iteration.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p><em>How to Sample Approval Elections?</em>
+Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
+Krzysztof Sornat, Nimrod Talmon.
+TODO: URL</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_urn_fixed_size_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_urn_fixed_size_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setsize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_urn_fixed_size_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>Polya Urn with fixed-size approval sets</em> model.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>setsize</strong><span class="classifier">int</span></dt><dd><p>Number of candidates that each voter approves.</p>
+</dd>
+<dt><strong>replace</strong><span class="classifier">float</span></dt><dd><p>New balls added to the urn in each iteration, relative to the original number.</p>
+<p>The urn starts with (<cite>num_cand</cite> choose <cite>setsize</cite>) balls, each representing a set
+of candidates with size <cite>setsize</cite>. This quantity is normalized to <cite>1.0</cite>.
+The <cite>replace</cite> value is a float that indicates how many balls are added using this
+normalization. Specifically, <cite>replace</cite> *  (<cite>num_cand</cite> choose <cite>setsize</cite>) are added
+in each iteration.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.generate.random_urn_profile">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.generate.</span></span><span class="sig-name descname"><span class="pre">random_urn_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_voters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.generate.random_urn_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a random profile using the <em>Polya Urn</em> probability model.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>num_voters</strong><span class="classifier">int</span></dt><dd><p>The desired number of voters in the profile.</p>
+</dd>
+<dt><strong>num_cand</strong><span class="classifier">int</span></dt><dd><p>The desired number of candidates in the profile.</p>
+</dd>
+<dt><strong>p</strong><span class="classifier">float in [0, 1]</span></dt><dd><p>If a new vote is generated, each candidate is approved with likelihood <cite>p</cite>.</p>
+</dd>
+<dt><strong>replace</strong><span class="classifier">float</span></dt><dd><p>New balls added to the urn in each iteration, relative to the original number.</p>
+<p>A value of <cite>1.0</cite> means that in the second iteration, there is a chance of 0.5 that
+the ballot of the first iteration is chosen and a chance of 0.5 that a new ballot is
+drawn from p-IC.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>abcvoting.preferences.Profile</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+</div>
+</div>
+</div>
+<footer><div aria-label="Footer" class="rst-footer-buttons" role="navigation">
+<a accesskey="p" class="btn btn-neutral float-left" href="fileio.html" rel="prev" title="abcvoting.fileio"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
+<a accesskey="n" class="btn btn-neutral float-right" href="misc.html" rel="next" title="abcvoting.misc">Next <span aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
+</div>
+<hr/>
+<div role="contentinfo">
+<p>© Copyright MIT license.</p>
+</div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+</div>
+</div>
+</section>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+</body>
+</html>

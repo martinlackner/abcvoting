@@ -1,42 +1,43 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>abcvoting.abcrules &mdash; abcvoting  documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>abcvoting.abcrules — abcvoting  documentation</title>
+<link href="_static/pygments.css" rel="stylesheet" type="text/css"/>
+<link href="_static/css/theme.css" rel="stylesheet" type="text/css"/>
+<link href="_static/plot_directive.css" rel="stylesheet" type="text/css"/>
+<link href="_static/sphinx-codeautolink.css" rel="stylesheet" type="text/css"/>
+<!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="abcvoting.fileio" href="fileio.html" />
-    <link rel="prev" title="Properties of committees" href="intro-properties.html" /> 
+<script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+<script src="_static/jquery.js"></script>
+<script src="_static/underscore.js"></script>
+<script src="_static/doctools.js"></script>
+<script src="_static/js/theme.js"></script>
+<link href="genindex.html" rel="index" title="Index"/>
+<link href="search.html" rel="search" title="Search"/>
+<link href="fileio.html" rel="next" title="abcvoting.fileio"/>
+<link href="intro-properties.html" rel="prev" title="Properties of committees"/>
 </head>
-
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> abcvoting
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+<nav class="wy-nav-side" data-toggle="wy-nav-shift">
+<div class="wy-side-scroll">
+<div class="wy-side-nav-search">
+<a class="icon icon-home" href="index.html"> abcvoting
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+<form action="search.html" class="wy-form" id="rtd-search-form" method="get">
+<input name="q" placeholder="Search docs" type="text"/>
+<input name="check_keywords" type="hidden" value="yes"/>
+<input name="area" type="hidden" value="default"/>
+</form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+</div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro-example.html">A simple example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro-abcrules.html">ABC rules</a></li>
@@ -47,7 +48,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">abcvoting.abcrules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fileio.html">abcvoting.fileio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="genprofiles.html">abcvoting.genprofiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">abcvoting.generate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="misc.html">abcvoting.misc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
@@ -59,62 +60,78 @@
 <li class="toctree-l1"><a class="reference internal" href="howtocite.html">How to cite</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acks.html">Acknowledgements</a></li>
 </ul>
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">abcvoting</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>abcvoting.abcrules</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/abcrules.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
-  <div class="section" id="abcvoting-abcrules">
+</div>
+</nav>
+<section class="wy-nav-content-wrap" data-toggle="wy-nav-shift"><nav aria-label="Mobile navigation menu" class="wy-nav-top">
+<i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+<a href="index.html">abcvoting</a>
+</nav>
+<div class="wy-nav-content">
+<div class="rst-content">
+<div aria-label="Page navigation" role="navigation">
+<ul class="wy-breadcrumbs">
+<li><a class="icon icon-home" href="index.html"></a> »</li>
+<li>abcvoting.abcrules</li>
+<li class="wy-breadcrumbs-aside">
+<a href="_sources/abcrules.rst.txt" rel="nofollow"> View page source</a>
+</li>
+</ul>
+<hr/>
+</div>
+<div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+<div itemprop="articleBody">
+<div class="section" id="abcvoting-abcrules">
 <h1>abcvoting.abcrules<a class="headerlink" href="#abcvoting-abcrules" title="Permalink to this headline"></a></h1>
 <span class="target" id="module-abcvoting.abcrules"></span><p>Approval-based committee (ABC) voting rules.</p>
+<p><details><summary>Expand for references to <a class="reference internal" href="#module-abcvoting.abcrules" title="abcvoting.abcrules"><code class="xref py py-class docutils literal notranslate"><span class="pre">abcvoting.abcrules</span></code></a></summary><table class="docutils align-default">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="intro-computing-winning-committees.html#first-steps">Computing winning committees / First steps</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="intro-example.html#a-simple-example">A simple example</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="intro-properties.html#properties-of-committees">Properties of committees</a></p></td>
+</tr>
+</tbody>
+</table>
+</details></p>
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.ALGORITHM_NAMES">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">ALGORITHM_NAMES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'branch-and-bound':</span> <span class="pre">'branch-and-bound',</span> <span class="pre">'brute-force':</span> <span class="pre">'brute-force',</span> <span class="pre">'float-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">floats</span> <span class="pre">instead</span> <span class="pre">of</span> <span class="pre">fractions)',</span> <span class="pre">'gmpy2-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">gmpy2</span> <span class="pre">fractions)',</span> <span class="pre">'gurobi':</span> <span class="pre">'Gurobi</span> <span class="pre">ILP</span> <span class="pre">solver',</span> <span class="pre">'mip-cbc':</span> <span class="pre">'CBC</span> <span class="pre">ILP</span> <span class="pre">solver</span> <span class="pre">via</span> <span class="pre">Python</span> <span class="pre">MIP</span> <span class="pre">library',</span> <span class="pre">'mip-gurobi':</span> <span class="pre">'Gurobi</span> <span class="pre">ILP</span> <span class="pre">solver</span> <span class="pre">via</span> <span class="pre">Python</span> <span class="pre">MIP</span> <span class="pre">library',</span> <span class="pre">'ortools-cp':</span> <span class="pre">'OR-Tools</span> <span class="pre">CP-SAT</span> <span class="pre">solver',</span> <span class="pre">'standard':</span> <span class="pre">'Standard</span> <span class="pre">algorithm',</span> <span class="pre">'standard-fractions':</span> <span class="pre">'Standard</span> <span class="pre">algorithm</span> <span class="pre">(using</span> <span class="pre">standard</span> <span class="pre">Python</span> <span class="pre">fractions)'}</span></em><a class="headerlink" href="#abcvoting.abcrules.ALGORITHM_NAMES" title="Permalink to this definition"></a></dt>
 <dd><p>A dictionary containing mapping all valid algorithm identifiers to full names (i.e., descriptions).</p>
 </dd></dl>
-
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.FLOAT_ISCLOSE_ABS_TOL">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">FLOAT_ISCLOSE_ABS_TOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-12</span></em><a class="headerlink" href="#abcvoting.abcrules.FLOAT_ISCLOSE_ABS_TOL" title="Permalink to this definition"></a></dt>
 <dd><p>The absolute tolerance when comparing floats.</p>
 <p>See also: <a class="reference external" href="https://docs.python.org/3/library/math.html#math.isclose">math.isclose()</a>.</p>
 </dd></dl>
-
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.FLOAT_ISCLOSE_REL_TOL">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">FLOAT_ISCLOSE_REL_TOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-12</span></em><a class="headerlink" href="#abcvoting.abcrules.FLOAT_ISCLOSE_REL_TOL" title="Permalink to this definition"></a></dt>
 <dd><p>The relative tolerance when comparing floats.</p>
 <p>See also: <a class="reference external" href="https://docs.python.org/3/library/math.html#math.isclose">math.isclose()</a>.</p>
 </dd></dl>
-
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.MAIN_RULE_IDS">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">MAIN_RULE_IDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['av',</span> <span class="pre">'sav',</span> <span class="pre">'pav',</span> <span class="pre">'slav',</span> <span class="pre">'cc',</span> <span class="pre">'lexcc',</span> <span class="pre">'geom2',</span> <span class="pre">'seqpav',</span> <span class="pre">'revseqpav',</span> <span class="pre">'seqslav',</span> <span class="pre">'seqcc',</span> <span class="pre">'seqphragmen',</span> <span class="pre">'minimaxphragmen',</span> <span class="pre">'leximinphragmen',</span> <span class="pre">'monroe',</span> <span class="pre">'greedy-monroe',</span> <span class="pre">'minimaxav',</span> <span class="pre">'lexminimaxav',</span> <span class="pre">'rule-x',</span> <span class="pre">'phragmen-enestroem',</span> <span class="pre">'consensus-rule',</span> <span class="pre">'trivial',</span> <span class="pre">'rsd']</span></em><a class="headerlink" href="#abcvoting.abcrules.MAIN_RULE_IDS" title="Permalink to this definition"></a></dt>
 <dd><p>List of rule identifiers (<cite>rule_id</cite>) for the main ABC rules included in abcvoting.</p>
 <p>This selection is somewhat arbitrary. But all really important rules (that are implemented)
 are contained in this list.</p>
+<p><details><summary>Expand for references to <a class="reference internal" href="#abcvoting.abcrules.MAIN_RULE_IDS" title="abcvoting.abcrules.MAIN_RULE_IDS"><code class="xref py py-class docutils literal notranslate"><span class="pre">abcvoting.abcrules.MAIN_RULE_IDS</span></code></a></summary><table class="docutils align-default">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="intro-abcrules.html#abc-rules">ABC rules</a></p></td>
+</tr>
+</tbody>
+</table>
+</details></p>
 </dd></dl>
-
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.MAX_NUM_OF_COMMITTEES_DEFAULT">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">MAX_NUM_OF_COMMITTEES_DEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#abcvoting.abcrules.MAX_NUM_OF_COMMITTEES_DEFAULT" title="Permalink to this definition"></a></dt>
@@ -123,7 +140,6 @@ are contained in this list.</p>
 on the maximum number of committees.
 Can be overridden with the parameter <cite>max_num_of_committees</cite> in any <cite>compute</cite> function.</p>
 </dd></dl>
-
 <dl class="py exception">
 <dt class="sig sig-object py" id="abcvoting.abcrules.NoAvailableAlgorithm">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">NoAvailableAlgorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithms</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.NoAvailableAlgorithm" title="Permalink to this definition"></a></dt>
@@ -140,29 +156,28 @@ Can be overridden with the parameter <cite>max_num_of_committees</cite> in any <
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="abcvoting.abcrules.Rule">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">Rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_fct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute_values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.Rule" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">Rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.Rule" title="Permalink to this definition"></a></dt>
 <dd><p>A class that contains the main information about an ABC rule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>rule_id</strong><span class="classifier">str</span></dt><dd><p>The rule identifier.</p>
 </dd>
-<dt><strong>shortname</strong><span class="classifier">str</span></dt><dd><p>The name of the ABC rule (shortened).</p>
-</dd>
-<dt><strong>longname</strong><span class="classifier">str</span></dt><dd><p>The full name of the ABC rule.</p>
-</dd>
-<dt><strong>compute_fct</strong><span class="classifier">func</span></dt><dd><p>Function used to compute this rule.</p>
-</dd>
-<dt><strong>algorithms</strong><span class="classifier">tuple of str</span></dt><dd><p>List of algorithms that compute this rule.</p>
-</dd>
-<dt><strong>resolute_values</strong><span class="classifier">tuple of bool</span></dt><dd><p>Values that the <cite>resolute</cite> can take.</p>
-</dd>
 </dl>
 </dd>
 </dl>
+<p><details><summary>Expand for references to <a class="reference internal" href="#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">abcvoting.abcrules.Rule</span></code></a></summary><table class="docutils align-default">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="abcrules.html#abcvoting-abcrules">abcvoting.abcrules</a></p></td>
+</tr>
+</tbody>
+</table>
+</details></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.abcrules.Rule.compute">
 <span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.Rule.compute" title="Permalink to this definition"></a></dt>
@@ -186,7 +201,6 @@ Can be overridden with the parameter <cite>max_num_of_committees</cite> in any <
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.abcrules.Rule.fastest_available_algorithm">
 <span class="sig-name descname"><span class="pre">fastest_available_algorithm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.Rule.fastest_available_algorithm" title="Permalink to this definition"></a></dt>
@@ -202,7 +216,6 @@ for abcvoting.</p>
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="abcvoting.abcrules.Rule.verify_compute_parameters">
 <span class="sig-name descname"><span class="pre">verify_compute_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.Rule.verify_compute_parameters" title="Permalink to this definition"></a></dt>
@@ -235,9 +248,7 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 </dd></dl>
-
 <dl class="py exception">
 <dt class="sig sig-object py" id="abcvoting.abcrules.UnknownAlgorithm">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">UnknownAlgorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.UnknownAlgorithm" title="Permalink to this definition"></a></dt>
@@ -253,7 +264,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py exception">
 <dt class="sig sig-object py" id="abcvoting.abcrules.UnknownRuleIDError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">UnknownRuleIDError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.UnknownRuleIDError" title="Permalink to this definition"></a></dt>
@@ -267,7 +277,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute" title="Permalink to this definition"></a></dt>
@@ -297,8 +306,21 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dl>
 </dd>
 </dl>
+<p><details><summary>Expand for references to <a class="reference internal" href="#abcvoting.abcrules.compute" title="abcvoting.abcrules.compute"><code class="xref py py-class docutils literal notranslate"><span class="pre">abcvoting.abcrules.compute</span></code></a></summary><table class="docutils align-default">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="intro-computing-winning-committees.html#first-steps">Computing winning committees / First steps</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="intro-computing-winning-committees.html#number-of-winning-committees">Computing winning committees / Number of winning committees</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="intro-example.html#a-simple-example">A simple example</a></p></td>
+</tr>
+</tbody>
+</table>
+</details></p>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_av">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_av</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_av" title="Permalink to this definition"></a></dt>
@@ -319,8 +341,8 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for AV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;av&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;standard&#39;,)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"av"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('standard',)</span>
 </pre></div>
 </div>
 </dd>
@@ -343,7 +365,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_cc">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_cc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_cc" title="Permalink to this definition"></a></dt>
@@ -362,9 +383,9 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Approval Chamberlin-Courant (CC):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;cc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>  
-<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;ortools-cp&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;,</span>
-<span class="go"> &#39;mip-cbc&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"cc"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>  
+<span class="go">('gurobi', 'mip-gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force',</span>
+<span class="go"> 'mip-cbc')</span>
 </pre></div>
 </div>
 </dd>
@@ -387,7 +408,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_consensus_rule">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_consensus_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_consensus_rule" title="Permalink to this definition"></a></dt>
@@ -404,8 +424,8 @@ In Proceedings of the 34th AAAI Conference on Artificial Intelligence (AAAI 2020
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for the Consensus rule:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;consensus-rule&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;float-fractions&#39;, &#39;gmpy2-fractions&#39;, &#39;standard-fractions&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"consensus-rule"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('float-fractions', 'gmpy2-fractions', 'standard-fractions')</span>
 </pre></div>
 </div>
 </dd>
@@ -428,7 +448,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_greedy_monroe">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_greedy_monroe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_greedy_monroe" title="Permalink to this definition"></a></dt>
@@ -446,8 +465,8 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Greedy Monroe:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;greedy-monroe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;standard&#39;,)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"greedy-monroe"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('standard',)</span>
 </pre></div>
 </div>
 </dd>
@@ -470,7 +489,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_lexcc">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_lexcc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_lexcc" title="Permalink to this definition"></a></dt>
@@ -482,6 +500,10 @@ committee with most voters having at least two approved candidates in the commit
 tie-breaking continues with values of 3, 4, .., k if necessary.</p>
 <p>This rule can be seen as an analogue to the leximin social welfare ordering for utility
 functions.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Very slow due to lexicographic optimization.</p>
+</div>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
@@ -491,8 +513,8 @@ functions.</p>
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Lexicographic Chamberlin-Courant (lex-CC):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;lexcc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;brute-force&#39;, &#39;mip-cbc&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"lexcc"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('gurobi', 'mip-gurobi', 'brute-force', 'mip-cbc')</span>
 </pre></div>
 </div>
 </dd>
@@ -515,7 +537,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_leximinphragmen">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_leximinphragmen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lexicographic_tiebreaking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_leximinphragmen" title="Permalink to this definition"></a></dt>
@@ -525,6 +546,10 @@ Details in
 Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
 Phragmen’s Voting Methods and Justified Representation.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2102.12305">https://arxiv.org/abs/2102.12305</a>&gt;</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Very slow due to lexicographic optimization.</p>
+</div>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
@@ -534,8 +559,8 @@ Phragmen’s Voting Methods and Justified Representation.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Phragmen’s leximin rule (leximin-Phragmen):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;leximinphragmen&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;gurobi&#39;,)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"leximinphragmen"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('gurobi',)</span>
 </pre></div>
 </div>
 </dd>
@@ -565,7 +590,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_lexminimaxav">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_lexminimaxav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_lexminimaxav" title="Permalink to this definition"></a></dt>
@@ -578,6 +602,10 @@ Martin Lackner and Piotr Skowron.
 <p>If <cite>lexicographic_tiebreaking</cite> is True, compute all winning committees and choose the
 lexicographically smallest. This is a deterministic form of tiebreaking; if only resolute=True,
 it is not guaranteed how ties are broken.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Very slow due to lexicographic optimization.</p>
+</div>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
@@ -587,8 +615,8 @@ it is not guaranteed how ties are broken.</p>
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Lexicographic Minimax AV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;lexminimaxav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;gurobi&#39;, &#39;brute-force&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"lexminimaxav"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('gurobi', 'brute-force')</span>
 </pre></div>
 </div>
 </dd>
@@ -611,7 +639,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_minimaxav">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_minimaxav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_minimaxav" title="Permalink to this definition"></a></dt>
@@ -629,8 +656,8 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Minimax AV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;minimaxav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;ortools-cp&#39;, &#39;mip-cbc&#39;, &#39;brute-force&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"minimaxav"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('gurobi', 'mip-gurobi', 'ortools-cp', 'mip-cbc', 'brute-force')</span>
 </pre></div>
 </div>
 </dd>
@@ -653,7 +680,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_minimaxphragmen">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_minimaxphragmen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_minimaxphragmen" title="Permalink to this definition"></a></dt>
@@ -663,15 +689,13 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 “Multi-Winner Voting with Approval Preferences”.
 Martin Lackner and Piotr Skowron.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2007.01795">https://arxiv.org/abs/2007.01795</a>&gt;</p>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Warning: does not include the lexicographic optimization as specified
+<p>Does not include the lexicographic optimization as specified
 in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
 Phragmen’s Voting Methods and Justified Representation.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2102.12305">https://arxiv.org/abs/2102.12305</a>&gt;
 Instead: minimizes the maximum load (without consideration of the second-,
-third-, …-largest load</p>
-</div>
+third-, …-largest load.
+The lexicographic method is this one: <a class="reference internal" href="#abcvoting.abcrules.compute_leximinphragmen" title="abcvoting.abcrules.compute_leximinphragmen"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_leximinphragmen()</span></code></a>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
@@ -681,8 +705,8 @@ third-, …-largest load</p>
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Phragmen’s minimax rule (minimax-Phragmen):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;minimaxphragmen&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"minimaxphragmen"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('gurobi', 'mip-gurobi', 'mip-cbc')</span>
 </pre></div>
 </div>
 </dd>
@@ -705,7 +729,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_monroe">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_monroe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_monroe" title="Permalink to this definition"></a></dt>
@@ -723,8 +746,8 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Monroe:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;monroe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;, &#39;ortools-cp&#39;, &#39;brute-force&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"monroe"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('gurobi', 'mip-gurobi', 'mip-cbc', 'ortools-cp', 'brute-force')</span>
 </pre></div>
 </div>
 </dd>
@@ -747,7 +770,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_pav">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_pav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_pav" title="Permalink to this definition"></a></dt>
@@ -766,8 +788,8 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for PAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;pav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"pav"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('gurobi', 'mip-gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')</span>
 </pre></div>
 </div>
 </dd>
@@ -789,8 +811,17 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dl>
 </dd>
 </dl>
+<p><details><summary>Expand for references to <a class="reference internal" href="#abcvoting.abcrules.compute_pav" title="abcvoting.abcrules.compute_pav"><code class="xref py py-class docutils literal notranslate"><span class="pre">abcvoting.abcrules.compute_pav</span></code></a></summary><table class="docutils align-default">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="intro-example.html#a-simple-example">A simple example</a></p></td>
+</tr>
+</tbody>
+</table>
+</details></p>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_phragmen_enestroem">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_phragmen_enestroem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_phragmen_enestroem" title="Permalink to this definition"></a></dt>
@@ -811,8 +842,8 @@ Phragmén’s and Thiele’s election methods
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Phragmen-Enestroem:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;phragmen-enestroem&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;float-fractions&#39;, &#39;gmpy2-fractions&#39;, &#39;standard-fractions&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"phragmen-enestroem"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('float-fractions', 'gmpy2-fractions', 'standard-fractions')</span>
 </pre></div>
 </div>
 </dd>
@@ -835,7 +866,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_revseq_thiele_method">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_revseq_thiele_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scorefct_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_revseq_thiele_method" title="Permalink to this definition"></a></dt>
@@ -874,7 +904,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_revseqpav">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_revseqpav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_revseqpav" title="Permalink to this definition"></a></dt>
@@ -892,8 +921,8 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Reverse Sequential PAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;revseqpav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;standard&#39;,)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"revseqpav"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('standard',)</span>
 </pre></div>
 </div>
 </dd>
@@ -916,7 +945,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_rsd">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_rsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_rsd" title="Permalink to this definition"></a></dt>
@@ -939,8 +967,8 @@ can be added to the winning committee. In this case, as many as possible are add
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Random Serial Dictator:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;rsd&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;standard&#39;,)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"rsd"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('standard',)</span>
 </pre></div>
 </div>
 </dd>
@@ -963,7 +991,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_rule_x">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_rule_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_phragmen_phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_rule_x" title="Permalink to this definition"></a></dt>
@@ -982,8 +1009,8 @@ See also &lt;<a class="reference external" href="https://arxiv.org/pdf/1911.1174
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Rule X (aka Method of Equal Shares):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;rule-x&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;float-fractions&#39;, &#39;gmpy2-fractions&#39;, &#39;standard-fractions&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"rule-x"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('float-fractions', 'gmpy2-fractions', 'standard-fractions')</span>
 </pre></div>
 </div>
 </dd>
@@ -1009,7 +1036,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_sav">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_sav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_sav" title="Permalink to this definition"></a></dt>
@@ -1027,8 +1053,8 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for SAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;sav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;standard&#39;,)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"sav"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('standard',)</span>
 </pre></div>
 </div>
 </dd>
@@ -1051,7 +1077,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_separable_rule">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_separable_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_separable_rule" title="Permalink to this definition"></a></dt>
@@ -1072,8 +1097,8 @@ Social Choice and Welfare, 48(3):599–632, 2017.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for AV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;av&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;standard&#39;,)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"av"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('standard',)</span>
 </pre></div>
 </div>
 </dd>
@@ -1096,7 +1121,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_seq_thiele_method">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_seq_thiele_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scorefct_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_seq_thiele_method" title="Permalink to this definition"></a></dt>
@@ -1135,7 +1159,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_seqcc">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_seqcc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_seqcc" title="Permalink to this definition"></a></dt>
@@ -1153,8 +1176,8 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Sequential CC:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqcc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;standard&#39;,)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"seqcc"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('standard',)</span>
 </pre></div>
 </div>
 </dd>
@@ -1177,7 +1200,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_seqpav">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_seqpav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_seqpav" title="Permalink to this definition"></a></dt>
@@ -1195,8 +1217,8 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Sequential PAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqpav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;standard&#39;,)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"seqpav"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('standard',)</span>
 </pre></div>
 </div>
 </dd>
@@ -1219,7 +1241,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_seqphragmen">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_seqphragmen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_seqphragmen" title="Permalink to this definition"></a></dt>
@@ -1237,8 +1258,8 @@ Martin Lackner and Piotr Skowron.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Phragmen’s sequential rule (seq-Phragmen):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqphragmen&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;float-fractions&#39;, &#39;gmpy2-fractions&#39;, &#39;standard-fractions&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"seqphragmen"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('float-fractions', 'gmpy2-fractions', 'standard-fractions')</span>
 </pre></div>
 </div>
 </dd>
@@ -1260,8 +1281,17 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dl>
 </dd>
 </dl>
+<p><details><summary>Expand for references to <a class="reference internal" href="#abcvoting.abcrules.compute_seqphragmen" title="abcvoting.abcrules.compute_seqphragmen"><code class="xref py py-class docutils literal notranslate"><span class="pre">abcvoting.abcrules.compute_seqphragmen</span></code></a></summary><table class="docutils align-default">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="intro-properties.html#properties-of-committees">Properties of committees</a></p></td>
+</tr>
+</tbody>
+</table>
+</details></p>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_seqslav">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_seqslav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_seqslav" title="Permalink to this definition"></a></dt>
@@ -1280,8 +1310,8 @@ In Artificial Intelligence, 288: 103366, 2020.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for Sequential SLAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;seqslav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;standard&#39;,)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"seqslav"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('standard',)</span>
 </pre></div>
 </div>
 </dd>
@@ -1304,7 +1334,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_slav">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_slav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_slav" title="Permalink to this definition"></a></dt>
@@ -1324,8 +1353,8 @@ In Artificial Intelligence, 288: 103366, 2020.
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for SLAV:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;slav&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;gurobi&#39;, &#39;mip-gurobi&#39;, &#39;mip-cbc&#39;, &#39;branch-and-bound&#39;, &#39;brute-force&#39;)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"slav"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('gurobi', 'mip-gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')</span>
 </pre></div>
 </div>
 </dd>
@@ -1348,7 +1377,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_thiele_method">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_thiele_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scorefct_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_thiele_method" title="Permalink to this definition"></a></dt>
@@ -1394,7 +1422,6 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.compute_trivial_rule">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_trivial_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_trivial_rule" title="Permalink to this definition"></a></dt>
@@ -1408,8 +1435,8 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for the trivial rule:</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_rule</span><span class="p">(</span><span class="s2">&quot;trivial&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
-<span class="go">(&#39;standard&#39;,)</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"trivial"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('standard',)</span>
 </pre></div>
 </div>
 </dd>
@@ -1432,11 +1459,13 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dd>
 </dl>
 </dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.abcrules.get_rule">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">get_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.get_rule" title="Permalink to this definition"></a></dt>
 <dd><p>Get instance of <cite>Rule</cite> for the ABC rule specified by <cite>rule_id</cite>.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2.3.0: </span>Function <cite>get_rule(rule_id)</cite> is deprecated, use <cite>Rule(rule_id)</cite> instead.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -1451,23 +1480,32 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dl>
 </dd>
 </dl>
+<p><details><summary>Expand for references to <a class="reference internal" href="#abcvoting.abcrules.get_rule" title="abcvoting.abcrules.get_rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">abcvoting.abcrules.get_rule</span></code></a></summary><table class="docutils align-default">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="intro-abcrules.html#abc-rules">ABC rules</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="intro-computing-winning-committees.html#algorithms">Computing winning committees / Algorithms</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="intro-computing-winning-committees.html#number-of-winning-committees">Computing winning committees / Number of winning committees</a></p></td>
+</tr>
+</tbody>
+</table>
+</details></p>
 </dd></dl>
-
 </div>
-
-
-           </div>
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="intro-properties.html" class="btn btn-neutral float-left" title="Properties of committees" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="fileio.html" class="btn btn-neutral float-right" title="abcvoting.fileio" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright MIT license.</p>
-  </div>
+</div>
+</div>
+<footer><div aria-label="Footer" class="rst-footer-buttons" role="navigation">
+<a accesskey="p" class="btn btn-neutral float-left" href="intro-properties.html" rel="prev" title="Properties of committees"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
+<a accesskey="n" class="btn btn-neutral float-right" href="fileio.html" rel="next" title="abcvoting.fileio">Next <span aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
+</div>
+<hr/>
+<div role="contentinfo">
+<p>© Copyright MIT license.</p>
+</div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
@@ -1475,15 +1513,14 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
    
 
 </footer>
-        </div>
-      </div>
-    </section>
-  </div>
-  <script>
+</div>
+</div>
+</section>
+</div>
+<script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
-
+  </script>
 </body>
 </html>

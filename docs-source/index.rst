@@ -21,7 +21,7 @@ approval-based committee (ABC) rules.
 
    abcrules.rst
    fileio.rst
-   genprofiles.rst
+   generate.rst
    misc.rst
    output.rst
    preferences.rst

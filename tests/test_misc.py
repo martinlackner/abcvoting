@@ -60,3 +60,18 @@ def test_dominate():
     assert not misc.dominate(profile, {0, 2}, {0, 2})
     assert not misc.dominate(profile, {1}, {2})
     assert not misc.dominate(profile, {2}, {1})
+
+
+def test_verify_expected_committees_equals_actual_committees():
+    with pytest.raises(RuntimeError):
+        misc.verify_expected_committees_equals_actual_committees(
+            [[1], [2]], [[1], [2]], resolute=True, shortname="Rule"
+        )
+    with pytest.raises(ValueError):
+        misc.verify_expected_committees_equals_actual_committees(
+            [[1], [2]], [[1], [2], [3]], resolute=False, shortname="Rule"
+        )
+    with pytest.raises(ValueError):
+        misc.verify_expected_committees_equals_actual_committees(
+            [[0]], [[1], [2], [3]], resolute=True, shortname="Rule"
+        )

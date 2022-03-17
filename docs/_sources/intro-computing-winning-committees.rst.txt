@@ -19,6 +19,7 @@ In the following, we use the simple example used :doc:`previously <intro-example
 .. testsetup::
 
     from abcvoting import abcrules
+    from abcvoting.misc import CandidateSet
     abcrules.available_algorithms = ["brute-force", "standard", "standard-fractions"]
 
 .. doctest::
@@ -32,8 +33,8 @@ In the following, we use the simple example used :doc:`previously <intro-example
     >>> print(abcrules.compute("pav", profile, committeesize=3))
     [CandidateSet({0, 1, 3}), CandidateSet({0, 1, 4})]
 
-The output of all ABC is rules is a list of `CandidateSet`. `CandidateSet` is a sub class of set and represents
-a set of candidates.
+The output of all ABC is rules is a list of `CandidateSet` (:class:`abcvoting.misc.CandidateSet`). This is a subclass
+of set and represents a set of candidates.
 
 Number of winning committees
 ----------------------------

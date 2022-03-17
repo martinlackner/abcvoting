@@ -6,6 +6,8 @@
   <title>Index &mdash; abcvoting  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sphinx-codeautolink.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -45,7 +47,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="abcrules.html">abcvoting.abcrules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fileio.html">abcvoting.fileio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="genprofiles.html">abcvoting.genprofiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">abcvoting.generate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="misc.html">abcvoting.misc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output.html">abcvoting.output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preferences.html">abcvoting.preferences</a></li>
@@ -86,6 +88,7 @@
 
 <div class="genindex-jumpbox">
  <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
@@ -125,10 +128,10 @@
 </li>
       </ul></li>
       <li>
-    abcvoting.genprofiles
+    abcvoting.generate
 
       <ul>
-        <li><a href="genprofiles.html#module-abcvoting.genprofiles">module</a>
+        <li><a href="generate.html#module-abcvoting.generate">module</a>
 </li>
       </ul></li>
       <li>
@@ -179,6 +182,14 @@
       <li><a href="scores.html#abcvoting.scores.at_least_ell_fct">at_least_ell_fct() (in module abcvoting.scores)</a>
 </li>
       <li><a href="scores.html#abcvoting.scores.av_score_fct">av_score_fct() (in module abcvoting.scores)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="misc.html#abcvoting.misc.binom">binom() (in module abcvoting.misc)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -370,7 +381,7 @@
 </li>
         <li><a href="fileio.html#module-abcvoting.fileio">abcvoting.fileio</a>
 </li>
-        <li><a href="genprofiles.html#module-abcvoting.genprofiles">abcvoting.genprofiles</a>
+        <li><a href="generate.html#module-abcvoting.generate">abcvoting.generate</a>
 </li>
         <li><a href="misc.html#module-abcvoting.misc">abcvoting.misc</a>
 </li>
@@ -421,6 +432,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="scores.html#abcvoting.scores.pav_score_fct">pav_score_fct() (in module abcvoting.scores)</a>
 </li>
+      <li><a href="generate.html#abcvoting.generate.PointProbabilityDistribution">PointProbabilityDistribution (class in abcvoting.generate)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="fileio.html#abcvoting.fileio.PreflibException">PreflibException</a>
@@ -433,17 +446,35 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="genprofiles.html#abcvoting.genprofiles.random_2d_points_profile">random_2d_points_profile() (in module abcvoting.genprofiles)</a>
+      <li><a href="generate.html#abcvoting.generate.random_disjoint_resampling_profile">random_disjoint_resampling_profile() (in module abcvoting.generate)</a>
 </li>
-      <li><a href="genprofiles.html#abcvoting.genprofiles.random_IC_profile">random_IC_profile() (in module abcvoting.genprofiles)</a>
+      <li><a href="generate.html#abcvoting.generate.random_euclidean_fixed_size_profile">random_euclidean_fixed_size_profile() (in module abcvoting.generate)</a>
 </li>
-      <li><a href="genprofiles.html#abcvoting.genprofiles.random_mallows_profile">random_mallows_profile() (in module abcvoting.genprofiles)</a>
+      <li><a href="generate.html#abcvoting.generate.random_euclidean_threshold_profile">random_euclidean_threshold_profile() (in module abcvoting.generate)</a>
 </li>
-      <li><a href="genprofiles.html#abcvoting.genprofiles.random_profile">random_profile() (in module abcvoting.genprofiles)</a>
+      <li><a href="generate.html#abcvoting.generate.random_euclidean_vcr_profile">random_euclidean_vcr_profile() (in module abcvoting.generate)</a>
+</li>
+      <li><a href="generate.html#abcvoting.generate.random_ic_fixed_size_profile">random_ic_fixed_size_profile() (in module abcvoting.generate)</a>
+</li>
+      <li><a href="generate.html#abcvoting.generate.random_ic_profile">random_ic_profile() (in module abcvoting.generate)</a>
+</li>
+      <li><a href="generate.html#abcvoting.generate.random_mallows_profile">random_mallows_profile() (in module abcvoting.generate)</a>
+</li>
+      <li><a href="generate.html#abcvoting.generate.random_noise_model_profile">random_noise_model_profile() (in module abcvoting.generate)</a>
+</li>
+      <li><a href="generate.html#abcvoting.generate.random_point">random_point() (in module abcvoting.generate)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="genprofiles.html#abcvoting.genprofiles.random_urn_profile">random_urn_profile() (in module abcvoting.genprofiles)</a>
+      <li><a href="generate.html#abcvoting.generate.random_profile">random_profile() (in module abcvoting.generate)</a>
+</li>
+      <li><a href="generate.html#abcvoting.generate.random_resampling_profile">random_resampling_profile() (in module abcvoting.generate)</a>
+</li>
+      <li><a href="generate.html#abcvoting.generate.random_truncated_urn_profile">random_truncated_urn_profile() (in module abcvoting.generate)</a>
+</li>
+      <li><a href="generate.html#abcvoting.generate.random_urn_fixed_size_profile">random_urn_fixed_size_profile() (in module abcvoting.generate)</a>
+</li>
+      <li><a href="generate.html#abcvoting.generate.random_urn_profile">random_urn_profile() (in module abcvoting.generate)</a>
 </li>
       <li><a href="fileio.html#abcvoting.fileio.read_abcvoting_yaml_file">read_abcvoting_yaml_file() (in module abcvoting.fileio)</a>
 </li>

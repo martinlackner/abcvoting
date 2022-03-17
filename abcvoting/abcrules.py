@@ -1013,6 +1013,10 @@ def compute_lexcc(
     This rule can be seen as an analogue to the leximin social welfare ordering for utility
     functions.
 
+    .. important::
+
+        Very slow due to lexicographic optimization.
+
     Parameters
     ----------
         profile : abcvoting.preferences.Profile
@@ -1182,7 +1186,7 @@ def compute_seq_thiele_method(
         list of CandidateSet
             A list of winning committees.
     """
-    scores.get_marginal_scorefct(scorefct_id, committeesize)  # check that scorefct_id is valid
+    scores.get_marginal_scorefct(scorefct_id, committeesize)  # check that `scorefct_id` is valid
     rule_id = "seq" + scorefct_id
     rule = Rule(rule_id)
     if algorithm == "fastest":
@@ -1655,7 +1659,7 @@ def _revseq_thiele_resolute(scorefct_id, profile, committeesize):
         marg_util_cand = scores.marginal_thiele_scores_remove(
             marginal_scorefct, profile, committee
         )
-        # find smallest elements in marg_util_cand and return indices
+        # find smallest elements in `marg_util_cand` and return indices
         cands_to_remove = [
             cand for cand in profile.candidates if marg_util_cand[cand] == min(marg_util_cand)
         ]
@@ -1689,7 +1693,7 @@ def _revseq_thiele_irresolute(scorefct_id, profile, committeesize, max_num_of_co
                 marginal_scorefct, profile, committee
             )
             score_reduction = min(marg_util_cand)
-            # find smallest elements in marg_util_cand and return indices
+            # find smallest elements in `marg_util_cand` and return indices
             cands_to_remove = [
                 cand for cand in profile.candidates if marg_util_cand[cand] == min(marg_util_cand)
             ]
@@ -2225,6 +2229,10 @@ def compute_lexminimaxav(
     If `lexicographic_tiebreaking` is True, compute all winning committees and choose the
     lexicographically smallest. This is a deterministic form of tiebreaking; if only resolute=True,
     it is not guaranteed how ties are broken.
+
+    .. important::
+
+        Very slow due to lexicographic optimization.
 
     Parameters
     ----------
@@ -2815,7 +2823,6 @@ def _seqphragmen_resolute(
         for cand in profile.candidates:
             if cand in committee:
                 new_maxload[cand] = committeesize + 2  # that's larger than any possible value
-        # find smallest maxload
         opt = min(new_maxload)
         if algorithm == "float-fractions":
             tied_cands = [
@@ -3184,8 +3191,7 @@ def _rule_x_algorithm(
             )
         winning_committees.update([tuple(sorted(committee)) for committee in committees])
         detailed_info["phragmen_phase"] = detailed_info_phragmen
-        # after filling the remaining spots these committees
-        # have size `committeesize`
+        # after filling the remaining spots these committees have size `committeesize`
 
     if algorithm == "float-fractions":
         division = lambda x, y: x / y  # standard float division
@@ -3294,14 +3300,13 @@ def compute_minimaxphragmen(
     Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
 
-    .. important::
-
-        Warning: does not include the lexicographic optimization as specified
-        in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
-        Phragmen's Voting Methods and Justified Representation.
-        <https://arxiv.org/abs/2102.12305>
-        Instead: minimizes the maximum load (without consideration of the second-,
-        third-, ...-largest load
+    Does not include the lexicographic optimization as specified
+    in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
+    Phragmen's Voting Methods and Justified Representation.
+    <https://arxiv.org/abs/2102.12305>
+    Instead: minimizes the maximum load (without consideration of the second-,
+    third-, ...-largest load.
+    The lexicographic method is this one: :func:`compute_leximinphragmen`.
 
     Parameters
     ----------
@@ -3398,6 +3403,10 @@ def compute_leximinphragmen(
     Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
     Phragmen's Voting Methods and Justified Representation.
     <https://arxiv.org/abs/2102.12305>
+
+    .. important::
+
+        Very slow due to lexicographic optimization.
 
     Parameters
     ----------

@@ -33,6 +33,8 @@ extensions = [
     # "sphinx.ext.coverage",
     # "sphinx.ext.napoleon",
     "numpydoc",
+    "matplotlib.sphinxext.plot_directive",
+    "sphinx_codeautolink",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -54,3 +56,16 @@ doctest_path = [".."]
 
 numpydoc_validation_checks = {"all", "SA01", "EX01", "ES01", "RT03"}
 numpydoc_show_class_members = False
+
+codeautolink_custom_blocks = {
+    "python3": None,
+    "pycon3": "sphinx_codeautolink.clean_pycon",
+}
+codeautolink_autodoc_inject = True
+codeautolink_global_preface = (
+    "from abcvoting.abcrules import *;"
+    "from abcvoting.misc import *;"
+    "from abcvoting.generate import *;"
+    "from abcvoting.preferences import *;"
+    "from abcvoting import abcrules, misc, generate, preferences, output, properties"
+)

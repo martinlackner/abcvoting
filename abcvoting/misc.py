@@ -3,6 +3,7 @@ Miscellaneous functions for committees (i.e., subsets of candidates).
 """
 
 import numpy as np
+import math
 
 
 class CandidateSet(set):
@@ -360,3 +361,23 @@ def dominate(profile, committee1, committee2):
     # If function has still not returned by now, then it means that `committee1` does not
     # dominate `committee2`.
     return False
+
+
+def binom(n, k):
+    """
+    Compute a binomial coefficient (n choose k).
+
+    Parameters
+    ----------
+        n, k : int
+            Positive integers.
+
+    Returns
+    -------
+        int
+    """
+    # could be replace by math.comb(n, k) in Python >= 3.8
+    try:
+        return math.factorial(n) // math.factorial(k) // math.factorial(n - k)
+    except ValueError:
+        return 0
