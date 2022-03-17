@@ -3,7 +3,8 @@ ignore = D202, W503, D103, D200, D105, D107, E203, D401, E731
 exclude =
     .git,
     __pycache__,
-    docs-source/conf.py,
+    docs-source/,
+    docs/,
     venv*,
     scratch*,
     benchmark,
@@ -11,5 +12,5 @@ exclude =
     */__init__.py,
     .eggs,
     .github
-max-complexity = 100
+max-complexity = 35
 max-line-length = 99
