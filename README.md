@@ -11,9 +11,15 @@
 
 ## Python implementations of approval-based committee (multi-winner) rules
 
-- **Documentation**: https://martinlackner.github.io/abcvoting/
-- **How to cite**: [Citing the abcvoting library in a research paper](https://martinlackner.github.io/abcvoting/howtocite.html)
-- **Acknowledgements**: [contributors](https://martinlackner.github.io/abcvoting/acks.html)
+---
+
+Important links:
+- [**Documentation**](https://martinlackner.github.io/abcvoting/)
+- [**Installation**](https://martinlackner.github.io/abcvoting/installation.html)  
+- [**How to cite the abcvoting library**](https://martinlackner.github.io/abcvoting/howtocite.html)
+- [**Acknowledgements and contributors**](https://martinlackner.github.io/abcvoting/acks.html)
+
+---
 
 **A**pproval-**b**ased **c**ommittee rules (ABC rules) are voting methods for selecting a committee, i.e., a fixed-size subset of candidates.
 ABC rules are also known as apsproval-based multi-winner rules.
@@ -56,29 +62,13 @@ The following ABC rules are implemented:
 
 ## Installation
 
-Using pip:
+As simple as:
 
 ```bash
 pip install abcvoting
 ```
 
-Latest development version from source:
-
-```bash
-git clone https://github.com/martinlackner/abcvoting/
-python setup.py install
-```
-
-Requirements:
-* Python 3.7+
-* see [setup.py](setup.py) for 3rd party dependencies
-
-Optional requirements:
-* [gmpy2](https://pypi.org/project/gmpy2/): Some functions use fractions (e.g., `compute_seqphragmen`). These compute significantly faster if the module [gmpy2](https://gmpy2.readthedocs.io/) is available. If gmpy2 is not available, the much slower Python module [fractions](https://docs.python.org/2/library/fractions.html) is used.
-* [Gurobi (gurobipy)](https://www.gurobi.com/): Most computationally hard rules are also implemented via the ILP solver Gurobi. The corresponding functions require [gurobipy](https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html).
-  If Gurobi is not available, the open-source solver [CBC](https://github.com/coin-or/Cbc) is a (slower) alternative.
-
-<!-- TODO: add instructions for installation of solvers -->
+Further details can be found [here](https://martinlackner.github.io/abcvoting/installation.html).
 
 ## Development
 

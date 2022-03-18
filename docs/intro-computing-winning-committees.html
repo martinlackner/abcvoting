@@ -39,6 +39,7 @@
 </div><div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro-example.html">A simple example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro-abcrules.html">ABC rules</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Computing winning committees</a><ul>
@@ -64,6 +65,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="howtocite.html">How to cite</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acks.html">Acknowledgements</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User reference II:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">PyTango API</a></li>
 </ul>
 </div>
 </div>
@@ -99,7 +104,7 @@ identifiers. Say we are interested in Proportional Approval Voting, short: PAV. 
 have a profile and a desired committee size, we can compute the ABC rule.
 In the following, we use the simple example used <a class="reference internal" href="intro-example.html"><span class="doc">previously</span></a>.</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="preferences.html#module-abcvoting.preferences" title="abcvoting.preferences"><span class="nn">abcvoting.preferences</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="preferences.html#abcvoting.preferences.Profile" title="abcvoting.preferences.Profile"><span class="n">Profile</span></a>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">abcvoting</span> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="abcrules.html#module-abcvoting.abcrules" title="abcvoting.abcrules"><span class="n">abcrules</span></a>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <a class="sphinx-codeautolink-a" href="overview.html#module-abcvoting" title="abcvoting"><span class="nn">abcvoting</span></a> <span class="kn">import</span> <a class="sphinx-codeautolink-a" href="abcrules.html#module-abcvoting.abcrules" title="abcvoting.abcrules"><span class="n">abcrules</span></a>
 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rule_id</span> <span class="o">=</span> <span class="s2">"pav"</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="preferences.html#abcvoting.preferences.Profile" title="abcvoting.preferences.Profile"><span class="n">Profile</span></a><span class="p">(</span><span class="n">num_cand</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>

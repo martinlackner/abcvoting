@@ -40,6 +40,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro-example.html">A simple example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro-abcrules.html">ABC rules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro-computing-winning-committees.html">Computing winning committees</a></li>
@@ -60,6 +61,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="howtocite.html">How to cite</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acks.html">Acknowledgements</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User reference II:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">PyTango API</a></li>
 </ul>
 
         </div>
@@ -90,17 +95,17 @@
 <span id="abcvoting-output"></span><h1>abcvoting.output<a class="headerlink" href="#module-abcvoting.output" title="Permalink to this headline"></a></h1>
 <p>Print messages to terminal depending on a given verbosity level.</p>
 <p>Similar to the Python logging module. Also meant to be used as Singleton.</p>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>The verbosity levels are:
-- CRITICAL
-- ERROR
-- WARNING
-- INFO
-- DETAILS
-- DEBUG
-- DEBUG2</p>
-</div>
+<p>The verbosity levels are:</p>
+<ul class="simple">
+<li><p>CRITICAL</p></li>
+<li><p>ERROR</p></li>
+<li><p>WARNING</p></li>
+<li><p>INFO</p></li>
+<li><p>DETAILS</p></li>
+<li><p>DEBUG</p></li>
+<li><p>DEBUG2</p></li>
+</ul>
+<p>The default verbosity is <cite>WARNING</cite>.</p>
 <p><details><summary>Expand for references to <a class="reference internal" href="#module-abcvoting.output" title="abcvoting.output"><code class="xref py py-class docutils literal notranslate"><span class="pre">abcvoting.output</span></code></a></summary><table class="docutils align-default">
 <colgroup>
 <col style="width: 100%" />

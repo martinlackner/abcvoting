@@ -3,16 +3,17 @@ Print messages to terminal depending on a given verbosity level.
 
 Similar to the Python logging module. Also meant to be used as Singleton.
 
-.. important::
+The verbosity levels are:
 
-    The verbosity levels are:
-    - CRITICAL
-    - ERROR
-    - WARNING
-    - INFO
-    - DETAILS
-    - DEBUG
-    - DEBUG2
+- CRITICAL
+- ERROR
+- WARNING
+- INFO
+- DETAILS
+- DEBUG
+- DEBUG2
+
+The default verbosity is `WARNING`.
 
 """
 

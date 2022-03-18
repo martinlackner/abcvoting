@@ -13,6 +13,7 @@ scientific questions (in alphabetic order):
 - `Martin Lackner <http://martin.lackner.xyz/>`_,
 - `Dominik Peters <http://dominik-peters.de/>`_,
 - `Peter Regner <https://github.com/lumbric>`_,
-- `Piotr Skowron <https://www.mimuw.edu.pl/~ps219737/>`_.
+- `Piotr Skowron <https://www.mimuw.edu.pl/~ps219737/>`_,
+- `Stanisław Szufa <http://ww2.ii.uj.edu.pl/~szufa/>`_.
 
 The development of this module has been supported by the Austrian Science Fund FWF, grant P31890.

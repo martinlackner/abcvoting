@@ -1,0 +1,16 @@
+
+.. currentmodule:: abcvoting
+
+===========
+PyTango API
+===========
+
+.. automodule:: abcvoting
+
+.. toctree::
+    :maxdepth: 3
+
+    abcrules
+    properties
+    generate
+

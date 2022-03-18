@@ -35,6 +35,7 @@ extensions = [
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
     "sphinx_codeautolink",
+    "sphinx.ext.autosummary",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -69,3 +70,8 @@ codeautolink_global_preface = (
     "from abcvoting.preferences import *;"
     "from abcvoting import abcrules, misc, generate, preferences, output, properties"
 )
+
+# html_logo = "_static/logo.png"
+
+autodoc_default_flags = ["members"]
+autosummary_generate = True
