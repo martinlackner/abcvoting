@@ -36,15 +36,6 @@ approval-based committee (ABC) rules.
    howtocite.rst
    acks.rst
 
-test
-====
-
-.. toctree::
-   :maxdepth: 3
-   :caption: User reference II:
-
-   overview.rst
-
 Indices and tables
 ==================
 

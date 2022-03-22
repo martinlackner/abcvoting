@@ -948,7 +948,7 @@ class PointProbabilityDistribution:
                 for _ in range(100):
                     points.append([generate.random_point(dist), 0])
                 title_coord = [dist.center_point[0], 0.2]
-            title = dist.name + '\n'
+            title = dist.name + "\n"
             if dist.width != 1.0:
                 title += f"(width={dist.width})"
             plt.annotate(title, title_coord, ha="center")
