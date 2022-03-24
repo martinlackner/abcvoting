@@ -278,6 +278,14 @@ class _CollectInstances:
                 set(committee)
                 for committee in combinations(profiles[name].candidates, committeesize)
             ],
+            "eph": [
+                {0, 1, 4, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
+            ],
         }
 
         # first profile now with reversed list of voters
@@ -336,6 +344,7 @@ class _CollectInstances:
                 set(committee)
                 for committee in combinations(profiles[name].candidates, committeesize)
             ],
+            "eph": [{0, 1, 3}],
         }
 
         # and a third profile
@@ -439,6 +448,7 @@ class _CollectInstances:
                 set(committee)
                 for committee in combinations(profiles[name].candidates, committeesize)
             ],
+            "eph": [{0, 1, 2, 4}, {0, 2, 3, 4}],
         }
 
         # and a fourth profile
@@ -476,11 +486,12 @@ class _CollectInstances:
                 set(committee)
                 for committee in combinations(profiles[name].candidates, committeesize)
             ],
+            "eph": [{0, 1}, {0, 3}],
         }
 
         # add a fifth profile
         # this tests a corner case of minimax
-        name = "profile4"
+        name = "profile5"
         profiles[name] = Profile(10)
         committeesize = 2
         approval_sets = [range(5), range(5, 10)]
@@ -516,6 +527,7 @@ class _CollectInstances:
                 set(committee)
                 for committee in combinations(profiles[name].candidates, committeesize)
             ],
+            "eph": all_possibilities,
         }
 
         for (rule_id, algorithm, resolute), marks, _ in testrules.rule_algorithm_resolute:
@@ -525,7 +537,7 @@ class _CollectInstances:
                 if rule_id not in tests:
                     if rule_id == "rsd":
                         continue  # randomized results
-                    raise RuntimeError(f"rule {rule_id} not considered in {name}")
+                    raise RuntimeError(f"no results available for rule {rule_id} in {name}.")
                 if rule_id == "leximinphragmen" and (
                     name in ["profile2", "profile3"] or (name == "profile1" and not resolute)
                 ):

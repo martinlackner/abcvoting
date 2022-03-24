@@ -6,6 +6,21 @@ import numpy as np
 import math
 
 
+FLOAT_ISCLOSE_REL_TOL = 1e-12
+"""
+The relative tolerance when comparing floats.
+
+See also: `math.isclose() <https://docs.python.org/3/library/math.html#math.isclose>`_.
+"""
+
+FLOAT_ISCLOSE_ABS_TOL = 1e-12
+"""
+The absolute tolerance when comparing floats.
+
+See also: `math.isclose() <https://docs.python.org/3/library/math.html#math.isclose>`_.
+"""
+
+
 class CandidateSet(set):
     """
     A set of candidates, that is, a set of positive integers.
@@ -381,3 +396,19 @@ def binom(n, k):
         return math.factorial(n) // math.factorial(k) // math.factorial(n - k)
     except ValueError:
         return 0
+
+
+def isclose(x, y):
+    """
+    Compare two floats using the abcvoting default values for absolute and relative tolerance.
+
+    Parameters
+    ----------
+        x, y : float
+            Two floats.
+
+    Returns
+    -------
+        bool
+    """
+    return math.isclose(x, y, rel_tol=FLOAT_ISCLOSE_REL_TOL, abs_tol=FLOAT_ISCLOSE_ABS_TOL)

@@ -48,6 +48,7 @@ The main ABC rules implemented in `abcvoting` are the following:
     consensus-rule      Consensus Rule
     trivial             Trivial Rule
     rsd                 Random Serial Dictator
+    eph                 E Pluribus Hugo (EPH)
 
 The short identifiers on the left side are the respective `rule_id`'s.
 

@@ -19,7 +19,7 @@ def remove_algorithm_info(out):
     filter_patterns = (
         "Algorithm: .*\n",
         "----------------------\nRandom Serial Dictator\n----------------------"
-        + "\n\n1 winning committee:\n {., ., ., .}",
+        + "\n\n1 winning committee:\n {., ., ., .}\n\n",
     )
 
     for filter_pattern in filter_patterns:

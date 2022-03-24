@@ -9,7 +9,6 @@ from abcvoting.misc import str_committees_with_header, header, str_set_of_candid
 from abcvoting.misc import sorted_committees, CandidateSet
 from abcvoting import scores
 from fractions import Fraction
-import math
 import random
 
 gmpy2_available = True
@@ -45,6 +44,7 @@ MAIN_RULE_IDS = [
     "consensus-rule",
     "trivial",
     "rsd",
+    "eph",
 ]
 """
 List of rule identifiers (`rule_id`) for the main ABC rules included in abcvoting.
@@ -73,20 +73,6 @@ ALGORITHM_NAMES = {
 A dictionary containing mapping all valid algorithm identifiers to full names (i.e., descriptions).
 """
 
-
-FLOAT_ISCLOSE_REL_TOL = 1e-12
-"""
-The relative tolerance when comparing floats.
-
-See also: `math.isclose() <https://docs.python.org/3/library/math.html#math.isclose>`_.
-"""
-
-FLOAT_ISCLOSE_ABS_TOL = 1e-12
-"""
-The absolute tolerance when comparing floats.
-
-See also: `math.isclose() <https://docs.python.org/3/library/math.html#math.isclose>`_.
-"""
 
 MAX_NUM_OF_COMMITTEES_DEFAULT = None
 """
@@ -280,6 +266,12 @@ class Rule:
             self.compute_fct = compute_rsd
             self.algorithms = ("standard",)
             self.resolute_values = (True,)
+        elif rule_id == "eph":
+            self.shortname = "E Pluribus Hugo"
+            self.longname = "E Pluribus Hugo (EPH)"
+            self.compute_fct = compute_eph
+            self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
+            self.resolute_values = (False, True)
         elif rule_id.startswith("geom"):
             parameter = rule_id[4:]
             self.shortname = f"{parameter}-Geometric"
@@ -424,7 +416,7 @@ class Rule:
 
         if resolute not in self.resolute_values:
             raise NotImplementedError(
-                f"ABC rule {self.rule_id} does not support resolute={resolute}."
+                f'ABC rule with rule_id "{self.rule_id}" does not support resolute={resolute}.'
             )
 
         if (max_num_of_committees is not None and not isinstance(max_num_of_committees, int)) or (
@@ -2826,14 +2818,7 @@ def _seqphragmen_resolute(
         opt = min(new_maxload)
         if algorithm == "float-fractions":
             tied_cands = [
-                cand
-                for cand in profile.candidates
-                if math.isclose(
-                    new_maxload[cand],
-                    opt,
-                    rel_tol=FLOAT_ISCLOSE_REL_TOL,
-                    abs_tol=FLOAT_ISCLOSE_ABS_TOL,
-                )
+                cand for cand in profile.candidates if misc.isclose(new_maxload[cand], opt)
             ]
         else:
             tied_cands = [cand for cand in profile.candidates if new_maxload[cand] == opt]
@@ -2912,12 +2897,7 @@ def _seqphragmen_irresolute(
         new_committee_load_pairs = []
         for cand in profile.candidates:
             if algorithm == "float-fractions":
-                select_cand = math.isclose(
-                    new_maxload[cand],
-                    min(new_maxload),
-                    rel_tol=FLOAT_ISCLOSE_REL_TOL,
-                    abs_tol=FLOAT_ISCLOSE_ABS_TOL,
-                )
+                select_cand = misc.isclose(new_maxload[cand], min(new_maxload))
             else:
                 select_cand = new_maxload[cand] <= min(new_maxload)
 
@@ -3126,24 +3106,16 @@ def _rule_x_algorithm(
         poor = set()
         while len(rich) > 0:
             poor_budget = sum(budget[v] for v in poor)
-            q = division(1 - poor_budget, len(rich))
+            _q = division(1 - poor_budget, len(rich))
             if algorithm == "float-fractions":
                 # due to float imprecision, values very close to `q` count as `q`
                 new_poor = set(
-                    v
-                    for v in rich
-                    if budget[v] < q
-                    and not math.isclose(
-                        budget[v],
-                        q,
-                        rel_tol=FLOAT_ISCLOSE_REL_TOL,
-                        abs_tol=FLOAT_ISCLOSE_ABS_TOL,
-                    )
+                    v for v in rich if budget[v] < _q and not misc.isclose(budget[v], _q)
                 )
             else:
-                new_poor = set([v for v in rich if budget[v] < q])
+                new_poor = set([v for v in rich if budget[v] < _q])
             if len(new_poor) == 0:
-                return q
+                return _q
             rich -= new_poor
             poor.update(new_poor)
         return None  # not sufficient budget available
@@ -3151,14 +3123,7 @@ def _rule_x_algorithm(
     def find_minimum_dict_entries(dictx):
         if algorithm == "float-fractions":
             min_entries = [
-                cand
-                for cand in dictx.keys()
-                if math.isclose(
-                    dictx[cand],
-                    min(dictx.values()),
-                    rel_tol=FLOAT_ISCLOSE_REL_TOL,
-                    abs_tol=FLOAT_ISCLOSE_ABS_TOL,
-                )
+                cand for cand in dictx.keys() if misc.isclose(dictx[cand], min(dictx.values()))
             ]
         else:
             min_entries = [cand for cand in dictx.keys() if dictx[cand] == min(dictx.values())]
@@ -3643,14 +3608,7 @@ def _phragmen_enestroem_algorithm(
         max_support = max(support.values())
         if algorithm == "float-fractions":
             tied_cands = [
-                cand
-                for cand, supp in support.items()
-                if math.isclose(
-                    supp,
-                    max_support,
-                    rel_tol=FLOAT_ISCLOSE_REL_TOL,
-                    abs_tol=FLOAT_ISCLOSE_ABS_TOL,
-                )
+                cand for cand, supp in support.items() if misc.isclose(supp, max_support)
             ]
         else:
             tied_cands = sorted([cand for cand, supp in support.items() if supp == max_support])
@@ -3804,15 +3762,7 @@ def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_n
         support = {cand: 0 for cand in available_candidates}
         supporters = {cand: [] for cand in available_candidates}
         for i, voter in enumerate(profile):
-            if (budget[i] <= 0) or (
-                algorithm == "float-fractions"
-                and math.isclose(
-                    budget[i],
-                    0,
-                    rel_tol=FLOAT_ISCLOSE_REL_TOL,
-                    abs_tol=FLOAT_ISCLOSE_ABS_TOL,
-                )
-            ):
+            if (budget[i] <= 0) or (algorithm == "float-fractions" and misc.isclose(budget[i], 0)):
                 continue
             for cand in voter.approved:
                 if cand in available_candidates:
@@ -3821,14 +3771,7 @@ def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_n
         max_support = max(support.values())
         if algorithm == "float-fractions":
             tied_cands = [
-                cand
-                for cand, supp in support.items()
-                if math.isclose(
-                    supp,
-                    max_support,
-                    rel_tol=FLOAT_ISCLOSE_REL_TOL,
-                    abs_tol=FLOAT_ISCLOSE_ABS_TOL,
-                )
+                cand for cand, supp in support.items() if misc.isclose(supp, max_support)
             ]
         else:
             tied_cands = sorted([cand for cand, supp in support.items() if supp == max_support])
@@ -4004,6 +3947,7 @@ def compute_rsd(
 
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only implemented for unit weights (weight=1).")
+        # Todo: fix
 
     if algorithm == "standard":
         approval_sets = [sorted(voter.approved) for voter in profile]
@@ -4038,3 +3982,135 @@ def compute_rsd(
     # end of optional output
 
     return sorted_committees(committees)
+
+
+def compute_eph(
+    profile, committeesize, algorithm="float-fractions", resolute=False, max_num_of_committees=None
+):
+    """
+    Compute winning committees with the "E Pluribus Hugo" (EPH) voting rule.
+
+    This rule is used by the Hugo Awards as a shortlisting voting rule. It is described in the
+    following paper under the name "Single Divisible Vote with Least-Popular Elimination
+    (SDV-LPE)":
+    "A proportional voting system for awards nominations resistant to voting blocs."
+    Jameson Quinn, and Bruce Schneier.
+    <https://www.schneier.com/wp-content/uploads/2016/05/Proportional_Voting_System.pdf>
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for Random Serial Dictator:
+
+            .. doctest::
+
+                >>> Rule("eph").algorithms
+                ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of CandidateSet
+            A list of winning committees.
+    """
+    rule_id = "eph"
+    rule = Rule(rule_id)
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm()
+    rule.verify_compute_parameters(
+        profile, committeesize, algorithm, resolute, max_num_of_committees
+    )
+
+    committees, detailed_info = _eph_algorithm(
+        rule_id=rule_id,
+        profile=profile,
+        algorithm=algorithm,
+        committeesize=committeesize,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
+
+    # optional output
+    output.info(header(rule.longname))
+    if resolute:
+        output.info("Computing only one winning committee (resolute=True)\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
+    # end of optional output
+
+    return sorted_committees(committees)
+
+
+def _eph_algorithm(rule_id, profile, algorithm, committeesize, resolute, max_num_of_committees):
+    """Algorithm for computing the "E Pluribus Hugo" (EPH) voting rule."""
+
+    if algorithm == "float-fractions":
+        division = lambda x, y: x / y  # standard float division
+    elif algorithm == "standard-fractions":
+        division = Fraction  # using Python built-in fractions
+    elif algorithm == "gmpy2-fractions":
+        if not gmpy2_available:
+            raise ImportError(
+                'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
+            )
+        division = mpq  # using gmpy2 fractions
+    else:
+        raise UnknownAlgorithm(rule_id, algorithm)
+
+    if resolute:
+        max_num_of_committees = 1  # same algorithm for resolute==True and resolute==False
+
+    remaining_candidates = set(profile.candidates)
+    while True:
+        sdv_score = {cand: 0 for cand in remaining_candidates}
+        av_score = {cand: 0 for cand in remaining_candidates}
+        for voter in profile:
+            remaining_approved = [cand for cand in remaining_candidates if cand in voter.approved]
+            for cand in remaining_approved:
+                sdv_score[cand] += division(voter.weight, len(remaining_approved))
+                av_score[cand] += voter.weight
+
+        cutoff_sdv = sorted(sdv_score.values())[1]  # 2nd smallest value
+        elimination_cands = [
+            cand
+            for cand in remaining_candidates
+            if (sdv_score[cand] <= cutoff_sdv)
+            or (algorithm == "float-fractions" and misc.isclose(sdv_score[cand], cutoff_sdv))
+        ]
+        cutoff_av = min(av_score[cand] for cand in elimination_cands)
+        elimination_cands = [cand for cand in elimination_cands if (av_score[cand] <= cutoff_av)]
+        if len(remaining_candidates) - len(elimination_cands) <= committeesize:
+            num_cands_to_be_eliminated = len(remaining_candidates) - committeesize
+            committees = sorted_committees(
+                [
+                    (remaining_candidates - set(selection))
+                    for selection in itertools.combinations(
+                        elimination_cands, num_cands_to_be_eliminated
+                    )
+                ]
+            )
+            detailed_info = {}
+            return committees[:max_num_of_committees], detailed_info
+        remaining_candidates -= set(elimination_cands)

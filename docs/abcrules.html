@@ -105,20 +105,8 @@
 <dd><p>A dictionary containing mapping all valid algorithm identifiers to full names (i.e., descriptions).</p>
 </dd></dl>
 <dl class="py data">
-<dt class="sig sig-object py" id="abcvoting.abcrules.FLOAT_ISCLOSE_ABS_TOL">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">FLOAT_ISCLOSE_ABS_TOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-12</span></em><a class="headerlink" href="#abcvoting.abcrules.FLOAT_ISCLOSE_ABS_TOL" title="Permalink to this definition"></a></dt>
-<dd><p>The absolute tolerance when comparing floats.</p>
-<p>See also: <a class="reference external" href="https://docs.python.org/3/library/math.html#math.isclose">math.isclose()</a>.</p>
-</dd></dl>
-<dl class="py data">
-<dt class="sig sig-object py" id="abcvoting.abcrules.FLOAT_ISCLOSE_REL_TOL">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">FLOAT_ISCLOSE_REL_TOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-12</span></em><a class="headerlink" href="#abcvoting.abcrules.FLOAT_ISCLOSE_REL_TOL" title="Permalink to this definition"></a></dt>
-<dd><p>The relative tolerance when comparing floats.</p>
-<p>See also: <a class="reference external" href="https://docs.python.org/3/library/math.html#math.isclose">math.isclose()</a>.</p>
-</dd></dl>
-<dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.MAIN_RULE_IDS">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">MAIN_RULE_IDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['av',</span> <span class="pre">'sav',</span> <span class="pre">'pav',</span> <span class="pre">'slav',</span> <span class="pre">'cc',</span> <span class="pre">'lexcc',</span> <span class="pre">'geom2',</span> <span class="pre">'seqpav',</span> <span class="pre">'revseqpav',</span> <span class="pre">'seqslav',</span> <span class="pre">'seqcc',</span> <span class="pre">'seqphragmen',</span> <span class="pre">'minimaxphragmen',</span> <span class="pre">'leximinphragmen',</span> <span class="pre">'monroe',</span> <span class="pre">'greedy-monroe',</span> <span class="pre">'minimaxav',</span> <span class="pre">'lexminimaxav',</span> <span class="pre">'rule-x',</span> <span class="pre">'phragmen-enestroem',</span> <span class="pre">'consensus-rule',</span> <span class="pre">'trivial',</span> <span class="pre">'rsd']</span></em><a class="headerlink" href="#abcvoting.abcrules.MAIN_RULE_IDS" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">MAIN_RULE_IDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['av',</span> <span class="pre">'sav',</span> <span class="pre">'pav',</span> <span class="pre">'slav',</span> <span class="pre">'cc',</span> <span class="pre">'lexcc',</span> <span class="pre">'geom2',</span> <span class="pre">'seqpav',</span> <span class="pre">'revseqpav',</span> <span class="pre">'seqslav',</span> <span class="pre">'seqcc',</span> <span class="pre">'seqphragmen',</span> <span class="pre">'minimaxphragmen',</span> <span class="pre">'leximinphragmen',</span> <span class="pre">'monroe',</span> <span class="pre">'greedy-monroe',</span> <span class="pre">'minimaxav',</span> <span class="pre">'lexminimaxav',</span> <span class="pre">'rule-x',</span> <span class="pre">'phragmen-enestroem',</span> <span class="pre">'consensus-rule',</span> <span class="pre">'trivial',</span> <span class="pre">'rsd',</span> <span class="pre">'eph']</span></em><a class="headerlink" href="#abcvoting.abcrules.MAIN_RULE_IDS" title="Permalink to this definition"></a></dt>
 <dd><p>List of rule identifiers (<cite>rule_id</cite>) for the main ABC rules included in abcvoting.</p>
 <p>This selection is somewhat arbitrary. But all really important rules (that are implemented)
 are contained in this list.</p>
@@ -426,6 +414,49 @@ In Proceedings of the 34th AAAI Conference on Artificial Intelligence (AAAI 2020
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
 <p>The following algorithms are available for the Consensus rule:</p>
 <div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"consensus-rule"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<span class="go">('float-fractions', 'gmpy2-fractions', 'standard-fractions')</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>resolute</strong><span class="classifier">bool, optional</span></dt><dd><p>Return only one winning committee.</p>
+<p>If <cite>resolute=False</cite>, all winning committees are computed (subject to
+<cite>max_num_of_committees</cite>).</p>
+</dd>
+<dt><strong>max_num_of_committees</strong><span class="classifier">int, optional</span></dt><dd><p>At most <cite>max_num_of_committees</cite> winning committees are computed.</p>
+<p>If <cite>max_num_of_committees=None</cite>, the number of winning committees is not restricted.
+The default value of <cite>max_num_of_committees</cite> can be modified via the constant
+<cite>MAX_NUM_OF_COMMITTEES_DEFAULT</cite>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>list of CandidateSet</dt><dd><p>A list of winning committees.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.abcrules.compute_eph">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_eph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'float-fractions'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_eph" title="Permalink to this definition"></a></dt>
+<dd><p>Compute winning committees with the “E Pluribus Hugo” (EPH) voting rule.</p>
+<p>This rule is used by the Hugo Awards as a shortlisting voting rule. It is described in the
+following paper under the name “Single Divisible Vote with Least-Popular Elimination
+(SDV-LPE)”:
+“A proportional voting system for awards nominations resistant to voting blocs.”
+Jameson Quinn, and Bruce Schneier.
+&lt;<a class="reference external" href="https://www.schneier.com/wp-content/uploads/2016/05/Proportional_Voting_System.pdf">https://www.schneier.com/wp-content/uploads/2016/05/Proportional_Voting_System.pdf</a>&gt;</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>profile</strong><span class="classifier">abcvoting.preferences.Profile</span></dt><dd><p>A profile.</p>
+</dd>
+<dt><strong>committeesize</strong><span class="classifier">int</span></dt><dd><p>The desired committee size.</p>
+</dd>
+<dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
+<p>The following algorithms are available for Random Serial Dictator:</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"eph"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">('float-fractions', 'gmpy2-fractions', 'standard-fractions')</span>
 </pre></div>
 </div>

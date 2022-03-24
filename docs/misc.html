@@ -130,6 +130,18 @@ numbers <cite>&gt;= num_cand</cite>.</p>
 </dl>
 </dd></dl>
 </dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="abcvoting.misc.FLOAT_ISCLOSE_ABS_TOL">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">FLOAT_ISCLOSE_ABS_TOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-12</span></em><a class="headerlink" href="#abcvoting.misc.FLOAT_ISCLOSE_ABS_TOL" title="Permalink to this definition"></a></dt>
+<dd><p>The absolute tolerance when comparing floats.</p>
+<p>See also: <a class="reference external" href="https://docs.python.org/3/library/math.html#math.isclose">math.isclose()</a>.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="abcvoting.misc.FLOAT_ISCLOSE_REL_TOL">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">FLOAT_ISCLOSE_REL_TOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1e-12</span></em><a class="headerlink" href="#abcvoting.misc.FLOAT_ISCLOSE_REL_TOL" title="Permalink to this definition"></a></dt>
+<dd><p>The relative tolerance when comparing floats.</p>
+<p>See also: <a class="reference external" href="https://docs.python.org/3/library/math.html#math.isclose">math.isclose()</a>.</p>
+</dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="abcvoting.misc.binom">
 <span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">binom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.binom" title="Permalink to this definition"></a></dt>
@@ -249,6 +261,24 @@ or, equivalently, the usual Hamming distance when sets are viewed as 0-1-strings
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
 <dt>str</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="abcvoting.misc.isclose">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.misc.</span></span><span class="sig-name descname"><span class="pre">isclose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.misc.isclose" title="Permalink to this definition"></a></dt>
+<dd><p>Compare two floats using the abcvoting default values for absolute and relative tolerance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x, y</strong><span class="classifier">float</span></dt><dd><p>Two floats.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>bool</dt><dd></dd>
 </dl>
 </dd>
 </dl>

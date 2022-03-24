@@ -384,7 +384,7 @@ def write_abcvoting_instance_to_yaml_file(
     """
     if not profile.has_unit_weights():
         raise NotImplementedError(
-            "write_abcvoting_instance_to_yaml_file() cannot handle " "profiles with weights yet."
+            "write_abcvoting_instance_to_yaml_file() cannot handle profiles with weights yet."
         )  # TODO: implement!
     data = {}
     if description is not None:
