@@ -10,10 +10,8 @@ import math
 
 try:
     import gurobipy as gb
-
-    gurobipy_available = True
 except ImportError:
-    gurobipy_available = False
+    gb = None
 
 
 ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
@@ -59,7 +57,7 @@ def _optimize_rule_gurobi(
 
     """
 
-    if not gurobipy_available:
+    if not gb:
         raise ImportError("Gurobi (gurobipy) not available.")
 
     maxscore = None

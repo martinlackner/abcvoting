@@ -11,11 +11,10 @@ from abcvoting import scores
 from fractions import Fraction
 import random
 
-gmpy2_available = True
 try:
     from gmpy2 import mpq
 except ImportError:
-    gmpy2_available = False
+    mpq = None
 
 ########################################################################
 
@@ -498,10 +497,10 @@ def _available_algorithms():
 
     for algorithm in ALGORITHM_NAMES.keys():
 
-        if "gurobi" in algorithm and not abcrules_gurobi.gurobipy_available:
+        if "gurobi" in algorithm and not abcrules_gurobi.gb:
             continue
 
-        if algorithm == "gmpy2-fractions" and not gmpy2_available:
+        if algorithm == "gmpy2-fractions" and not mpq:
             continue
 
         available_algorithms.append(algorithm)
@@ -2774,7 +2773,7 @@ def _seqphragmen_resolute(
     elif algorithm == "standard-fractions":
         division = Fraction  # using Python built-in fractions
     elif algorithm == "gmpy2-fractions":
-        if not gmpy2_available:
+        if not mpq:
             raise ImportError(
                 'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
             )
@@ -2852,7 +2851,7 @@ def _seqphragmen_irresolute(
     elif algorithm == "standard-fractions":
         division = Fraction  # using Python built-in fractions
     elif algorithm == "gmpy2-fractions":
-        if not gmpy2_available:
+        if not mpq:
             raise ImportError(
                 'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
             )
@@ -3163,7 +3162,7 @@ def _rule_x_algorithm(
     elif algorithm == "standard-fractions":
         division = Fraction  # using Python built-in fractions
     elif algorithm == "gmpy2-fractions":
-        if not gmpy2_available:
+        if not mpq:
             raise ImportError(
                 'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
             )
@@ -3577,7 +3576,7 @@ def _phragmen_enestroem_algorithm(
     elif algorithm == "standard-fractions":
         division = Fraction  # using Python built-in fractions
     elif algorithm == "gmpy2-fractions":
-        if not gmpy2_available:
+        if not mpq:
             raise ImportError(
                 'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
             )
@@ -3738,7 +3737,7 @@ def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_n
     elif algorithm == "standard-fractions":
         division = Fraction  # using Python built-in fractions
     elif algorithm == "gmpy2-fractions":
-        if not gmpy2_available:
+        if not mpq:
             raise ImportError(
                 'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
             )
@@ -4071,7 +4070,7 @@ def _eph_algorithm(rule_id, profile, algorithm, committeesize, resolute, max_num
     elif algorithm == "standard-fractions":
         division = Fraction  # using Python built-in fractions
     elif algorithm == "gmpy2-fractions":
-        if not gmpy2_available:
+        if not mpq:
             raise ImportError(
                 'Module gmpy2 not available, required for algorithm "gmpy2-fractions"'
             )
