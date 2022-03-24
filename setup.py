@@ -105,6 +105,7 @@ setuptools.setup(
             "sphinx-rtd-theme>=1.0.0",
             "numpydoc>=1.2",
             "sphinx-codeautolink>=0.10",
+            "matplotlib>=3.4.3",
         ]
     },
 )
