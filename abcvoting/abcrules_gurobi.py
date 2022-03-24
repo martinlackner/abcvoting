@@ -164,7 +164,7 @@ def _gurobi_thiele_methods(
         #
         # If marginal_scorefct(x) > 0 for x >= 1, we assume that marginal_scorefct is monotonic
         # decreasing and therefore in combination with the objective function the following
-        # interpreation is valid:
+        # interpretation is valid:
         # utility[(voter, x)] indicates whether `voter` approves at least x candidates in the
         # committee (this is the case for scorefct_id "pav", "slav" or "geom").
 
@@ -616,7 +616,7 @@ def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees
                     # distances are always <= len(voter.approved) + committeesize
                     voteratmostdistances[(i, dist)] = 1
                 if dist < abs(len(voter.approved) - committeesize):
-                    # distancs are never < abs(len(voter.approved) - committeesize)
+                    # distances are never < abs(len(voter.approved) - committeesize)
                     voteratmostdistances[(i, dist)] = 0
 
         # constraint: the committee has the required size
@@ -660,7 +660,7 @@ def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees
     # all voters have at most this distance
     hammingdistance_constraints = {maxdistance: len(profile)}
     for distance in range(maxdistance - 1, -1, -1):
-        # in interation `distance` we maximize the number of voters that have at
+        # in iteration `distance` we maximize the number of voters that have at
         # most a Hamming distance of `distance` to the committee
         if distance == 0:
             # last iteration

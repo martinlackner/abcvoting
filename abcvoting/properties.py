@@ -104,7 +104,7 @@ def check_pareto_optimality(profile, committee, algorithm="fastest"):
         output.info(f"Committee {str_set_of_candidates(committee)} is Pareto optimal.")
     else:
         output.info(f"Committee {str_set_of_candidates(committee)} is not Pareto optimal.")
-        # TODO: detailed ouput with output.details() showing
+        # TODO: detailed output with output.details() showing
         #  - which committee is Pareto dominating
         #  - which voters have a better satisfaction with the new committee
 
@@ -330,7 +330,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
         )
 
     # constraint: the condition of having strictly more approved candidates in
-    # dominating commitee will be satisifed for at least one voter
+    # dominating committee will be satisfied for at least one voter
     model.addConstr(gb.quicksum(condition_strictly_more) >= 1)
 
     # loop through all variables in the condition_strictly_more array (there is one for each voter)
@@ -672,7 +672,7 @@ def _check_PJR_gurobi(profile, committee):
     # constraint: size of ell-cohesive group should be appropriate wrt ell
     model.addConstr(gb.quicksum(in_group) >= ell * len(profile) / len(committee))
 
-    # binary variables: indicate whether a candidate is in the interesection
+    # binary variables: indicate whether a candidate is in the intersection
     # of approved candidates over voters inside the group
     in_cut = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_cut")
 
