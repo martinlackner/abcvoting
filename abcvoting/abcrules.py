@@ -34,7 +34,7 @@ MAIN_RULE_IDS = [
     "seqcc",
     "seqphragmen",
     "minimaxphragmen",
-    "leximinphragmen",  # TODO: called leximax-Phragmen in https://arxiv.org/abs/2102.12305
+    "leximaxphragmen",
     "monroe",
     "greedy-monroe",
     "minimaxav",
@@ -191,10 +191,10 @@ class Rule:
             self.compute_fct = compute_minimaxphragmen
             self.algorithms = ("gurobi", "mip-gurobi", "mip-cbc")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
-        elif rule_id == "leximinphragmen":
-            self.shortname = "leximin-Phragmén"
-            self.longname = "Phragmén's Leximin Rule (leximin-Phragmén)"
-            self.compute_fct = compute_leximinphragmen
+        elif rule_id == "leximaxphragmen":
+            self.shortname = "leximax-Phragmén"
+            self.longname = "Phragmén's Leximax Rule (leximax-Phragmén)"
+            self.compute_fct = compute_leximaxphragmen
             self.algorithms = ("gurobi",)  # TODO: "mip-gurobi", "mip-cbc"),
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "monroe":
@@ -3271,7 +3271,7 @@ def compute_minimaxphragmen(
     <https://arxiv.org/abs/2102.12305>
     Instead: minimizes the maximum load (without consideration of the second-,
     third-, ...-largest load.
-    The lexicographic method is this one: :func:`compute_leximinphragmen`.
+    The lexicographic method is this one: :func:`compute_leximaxphragmen`.
 
     Parameters
     ----------
@@ -3352,7 +3352,7 @@ def compute_minimaxphragmen(
     return committees
 
 
-def compute_leximinphragmen(
+def compute_leximaxphragmen(
     profile,
     committeesize,
     algorithm="fastest",
@@ -3361,9 +3361,9 @@ def compute_leximinphragmen(
     lexicographic_tiebreaking=False,
 ):
     """
-    Compute winning committees with Phragmen's leximin rule (leximin-Phragmen).
+    Compute winning committees with Phragmen's leximax rule (leximax-Phragmen).
 
-    Lexicographically minimizes loads.
+    Lexicographically minimize the maximum loads.
     Details in
     Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
     Phragmen's Voting Methods and Justified Representation.
@@ -3384,11 +3384,11 @@ def compute_leximinphragmen(
         algorithm : str, optional
             The algorithm to be used.
 
-            The following algorithms are available for Phragmen's leximin rule (leximin-Phragmen):
+            The following algorithms are available for Phragmen's leximax rule (leximax-Phragmen):
 
             .. doctest::
 
-                >>> Rule("leximinphragmen").algorithms
+                >>> Rule("leximaxphragmen").algorithms
                 ('gurobi',)
 
         resolute : bool, optional
@@ -3418,7 +3418,7 @@ def compute_leximinphragmen(
         list of CandidateSet
             A list of winning committees.
     """
-    rule_id = "leximinphragmen"
+    rule_id = "leximaxphragmen"
     rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
@@ -3439,14 +3439,14 @@ def compute_leximinphragmen(
         resolute = False  # compute all committees to break ties correctly
 
     if algorithm == "gurobi":
-        committees = abcrules_gurobi._gurobi_leximinphragmen(
+        committees = abcrules_gurobi._gurobi_leximaxphragmen(
             profile,
             committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
     # elif algorithm.startswith("mip-"):
-    #     committees = abcrules_mip._mip_leximinphragmen(
+    #     committees = abcrules_mip._mip_leximaxphragmen(
     #         profile,
     #         committeesize,
     #         resolute=resolute,

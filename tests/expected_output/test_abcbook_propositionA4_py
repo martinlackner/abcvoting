@@ -169,7 +169,7 @@ winning committee after manipulation:
  {b, c}
 
 ------------------------------------------
-Phragmén's Leximin Rule (leximin-Phragmén)
+Phragmén's Leximax Rule (leximax-Phragmén)
 ------------------------------------------
 
 profile with 4 votes and 6 candidates:

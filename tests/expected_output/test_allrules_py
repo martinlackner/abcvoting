@@ -145,7 +145,7 @@ Phragmén's Minimax Rule (minimax-Phragmén)
  {0, 1, 2, 3}
 
 ------------------------------------------
-Phragmén's Leximin Rule (leximin-Phragmén)
+Phragmén's Leximax Rule (leximax-Phragmén)
 ------------------------------------------
 
 1 winning committee:

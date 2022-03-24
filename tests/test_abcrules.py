@@ -198,7 +198,7 @@ class _CollectInstances:
                 {2, 3, 4, 5},
             ],
             "minimaxphragmen": [{0, 1, 2, 3}],
-            "leximinphragmen": [{0, 1, 2, 3}],
+            "leximaxphragmen": [{0, 1, 2, 3}],
             "cc": [{0, 1, 2, 3}],
             "lexcc": [{0, 1, 2, 3}],
             "seqcc": [
@@ -327,7 +327,7 @@ class _CollectInstances:
             "lexminimaxav": [{0, 1, 3}],
             "seqphragmen": [{0, 1, 3}],
             "minimaxphragmen": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
-            "leximinphragmen": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
+            "leximaxphragmen": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
             "cc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
             "lexcc": [{0, 1, 3}],
             "seqcc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
@@ -384,7 +384,7 @@ class _CollectInstances:
                 {1, 2, 3, 5},
                 {1, 2, 4, 5},
             ],
-            "leximinphragmen": [
+            "leximaxphragmen": [
                 {0, 1, 2, 3},
                 {0, 1, 2, 4},
                 {0, 1, 2, 5},
@@ -469,7 +469,7 @@ class _CollectInstances:
             "lexminimaxav": [{0, 3}],
             "seqphragmen": [{0, 3}],
             "minimaxphragmen": [{0, 3}, {1, 3}],
-            "leximinphragmen": [{0, 3}, {1, 3}],
+            "leximaxphragmen": [{0, 3}, {1, 3}],
             "cc": [{0, 2}, {0, 3}, {1, 3}],
             "lexcc": [{0, 3}],
             "seqcc": [{0, 2}, {0, 3}],
@@ -510,7 +510,7 @@ class _CollectInstances:
             "lexminimaxav": one_each,
             "seqphragmen": one_each,
             "minimaxphragmen": one_each,
-            "leximinphragmen": one_each,
+            "leximaxphragmen": one_each,
             "cc": one_each,
             "lexcc": one_each,
             "seqcc": one_each,
@@ -538,7 +538,7 @@ class _CollectInstances:
                     if rule_id == "rsd":
                         continue  # randomized results
                     raise RuntimeError(f"no results available for rule {rule_id} in {name}.")
-                if rule_id == "leximinphragmen" and (
+                if rule_id == "leximaxphragmen" and (
                     name in ["profile2", "profile3"] or (name == "profile1" and not resolute)
                 ):
                     marks += [pytest.mark.slow]
@@ -576,7 +576,7 @@ def _list_abc_yaml_compute_instances():
                     marks = [pytest.mark.slow, pytest.mark.veryslow]  # very large instances
                 elif rule_id == "monroe" and algorithm in ["mip-cbc"]:
                     marks = [pytest.mark.slow, pytest.mark.veryslow]
-                elif rule_id == "leximinphragmen":
+                elif rule_id == "leximaxphragmen":
                     marks = [pytest.mark.slow, pytest.mark.veryslow]
                 else:
                     marks = [pytest.mark.slow]

@@ -115,7 +115,7 @@ manipulations = [
         committees_after=[{1, 2}],
     ),
     ManipulationInstance(
-        rule_id="leximinphragmen",
+        rule_id="leximaxphragmen",
         committeesize=3,
         approval_sets=[{a, b}] + [{b, c, d}] + [{b, c, d}] + [{b, c, d}],
         manipulated_vote={a},
@@ -157,7 +157,7 @@ for inst in manipulations:
     print(profile.str_compact())
 
     parameters = {}
-    if inst.rule_id == "leximinphragmen":
+    if inst.rule_id == "leximaxphragmen":
         parameters["lexicographic_tiebreaking"] = True
 
     committees = abcrules.compute(

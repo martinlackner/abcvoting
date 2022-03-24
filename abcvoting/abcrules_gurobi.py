@@ -451,7 +451,7 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute, max_num_of_committ
     return sorted_committees(committees)
 
 
-def _gurobi_leximinphragmen(profile, committeesize, resolute, max_num_of_committees):
+def _gurobi_leximaxphragmen(profile, committeesize, resolute, max_num_of_committees):
     def set_opt_model_func(model, in_committee):
         load = {}
         loadbound_constraint = {}
@@ -545,7 +545,7 @@ def _gurobi_leximinphragmen(profile, committeesize, resolute, max_num_of_committ
             committeesize=committeesize,
             resolute=True,
             max_num_of_committees=None,
-            name=f"leximinphragmen-iteration{iteration}",
+            name=f"leximaxphragmen-iteration{iteration}",
         )
         if math.isclose(neg_loadbound, 0, rel_tol=CMP_ACCURACY, abs_tol=CMP_ACCURACY):
             # all other voters have a load of zero, no further loadbounds constraints required
@@ -558,7 +558,7 @@ def _gurobi_leximinphragmen(profile, committeesize, resolute, max_num_of_committ
         committeesize=committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
-        name="leximinphragmen-final",
+        name="leximaxphragmen-final",
     )
 
     return sorted_committees(committees)

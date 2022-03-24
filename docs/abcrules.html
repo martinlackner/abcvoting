@@ -106,7 +106,7 @@
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.abcrules.MAIN_RULE_IDS">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">MAIN_RULE_IDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['av',</span> <span class="pre">'sav',</span> <span class="pre">'pav',</span> <span class="pre">'slav',</span> <span class="pre">'cc',</span> <span class="pre">'lexcc',</span> <span class="pre">'geom2',</span> <span class="pre">'seqpav',</span> <span class="pre">'revseqpav',</span> <span class="pre">'seqslav',</span> <span class="pre">'seqcc',</span> <span class="pre">'seqphragmen',</span> <span class="pre">'minimaxphragmen',</span> <span class="pre">'leximinphragmen',</span> <span class="pre">'monroe',</span> <span class="pre">'greedy-monroe',</span> <span class="pre">'minimaxav',</span> <span class="pre">'lexminimaxav',</span> <span class="pre">'rule-x',</span> <span class="pre">'phragmen-enestroem',</span> <span class="pre">'consensus-rule',</span> <span class="pre">'trivial',</span> <span class="pre">'rsd',</span> <span class="pre">'eph']</span></em><a class="headerlink" href="#abcvoting.abcrules.MAIN_RULE_IDS" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">MAIN_RULE_IDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['av',</span> <span class="pre">'sav',</span> <span class="pre">'pav',</span> <span class="pre">'slav',</span> <span class="pre">'cc',</span> <span class="pre">'lexcc',</span> <span class="pre">'geom2',</span> <span class="pre">'seqpav',</span> <span class="pre">'revseqpav',</span> <span class="pre">'seqslav',</span> <span class="pre">'seqcc',</span> <span class="pre">'seqphragmen',</span> <span class="pre">'minimaxphragmen',</span> <span class="pre">'leximaxphragmen',</span> <span class="pre">'monroe',</span> <span class="pre">'greedy-monroe',</span> <span class="pre">'minimaxav',</span> <span class="pre">'lexminimaxav',</span> <span class="pre">'rule-x',</span> <span class="pre">'phragmen-enestroem',</span> <span class="pre">'consensus-rule',</span> <span class="pre">'trivial',</span> <span class="pre">'rsd',</span> <span class="pre">'eph']</span></em><a class="headerlink" href="#abcvoting.abcrules.MAIN_RULE_IDS" title="Permalink to this definition"></a></dt>
 <dd><p>List of rule identifiers (<cite>rule_id</cite>) for the main ABC rules included in abcvoting.</p>
 <p>This selection is somewhat arbitrary. But all really important rules (that are implemented)
 are contained in this list.</p>
@@ -570,10 +570,10 @@ The default value of <cite>max_num_of_committees</cite> can be modified via the 
 </dl>
 </dd></dl>
 <dl class="py function">
-<dt class="sig sig-object py" id="abcvoting.abcrules.compute_leximinphragmen">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_leximinphragmen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lexicographic_tiebreaking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_leximinphragmen" title="Permalink to this definition"></a></dt>
-<dd><p>Compute winning committees with Phragmen’s leximin rule (leximin-Phragmen).</p>
-<p>Lexicographically minimizes loads.
+<dt class="sig sig-object py" id="abcvoting.abcrules.compute_leximaxphragmen">
+<span class="sig-prename descclassname"><span class="pre">abcvoting.abcrules.</span></span><span class="sig-name descname"><span class="pre">compute_leximaxphragmen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">committeesize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_of_committees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lexicographic_tiebreaking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#abcvoting.abcrules.compute_leximaxphragmen" title="Permalink to this definition"></a></dt>
+<dd><p>Compute winning committees with Phragmen’s leximax rule (leximax-Phragmen).</p>
+<p>Lexicographically minimize the maximum loads.
 Details in
 Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.
 Phragmen’s Voting Methods and Justified Representation.
@@ -590,8 +590,8 @@ Phragmen’s Voting Methods and Justified Representation.
 <dt><strong>committeesize</strong><span class="classifier">int</span></dt><dd><p>The desired committee size.</p>
 </dd>
 <dt><strong>algorithm</strong><span class="classifier">str, optional</span></dt><dd><p>The algorithm to be used.</p>
-<p>The following algorithms are available for Phragmen’s leximin rule (leximin-Phragmen):</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"leximinphragmen"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
+<p>The following algorithms are available for Phragmen’s leximax rule (leximax-Phragmen):</p>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><a class="sphinx-codeautolink-a" href="abcrules.html#abcvoting.abcrules.Rule" title="abcvoting.abcrules.Rule"><span class="n">Rule</span></a><span class="p">(</span><span class="s2">"leximaxphragmen"</span><span class="p">)</span><span class="o">.</span><span class="n">algorithms</span>
 <span class="go">('gurobi',)</span>
 </pre></div>
 </div>
@@ -727,7 +727,7 @@ Phragmen’s Voting Methods and Justified Representation.
 &lt;<a class="reference external" href="https://arxiv.org/abs/2102.12305">https://arxiv.org/abs/2102.12305</a>&gt;
 Instead: minimizes the maximum load (without consideration of the second-,
 third-, …-largest load.
-The lexicographic method is this one: <a class="reference internal" href="#abcvoting.abcrules.compute_leximinphragmen" title="abcvoting.abcrules.compute_leximinphragmen"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_leximinphragmen()</span></code></a>.</p>
+The lexicographic method is this one: <a class="reference internal" href="#abcvoting.abcrules.compute_leximaxphragmen" title="abcvoting.abcrules.compute_leximaxphragmen"><code class="xref py py-func docutils literal notranslate"><span class="pre">compute_leximaxphragmen()</span></code></a>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
