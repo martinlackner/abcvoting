@@ -5,7 +5,7 @@ Unit tests for abcvoting/fileio.py.
 import pytest
 from abcvoting import fileio, abcrules
 import os
-from abcvoting.preferences import Profile
+from abcvoting.preferences import Profile, Voter
 
 
 @pytest.mark.parametrize("filename", ["test1.toi", "test2.soi", "test3.toc"])
@@ -62,7 +62,7 @@ def test_readfile_setsize_with_ties(filename, setsize, expected):
 )
 def test_readfile_corrupt(filename):
     currdir = os.path.dirname(os.path.abspath(__file__))
-    with pytest.raises(fileio.PreflibException):
+    with pytest.raises(fileio.MalformattedFileException):
         profile = fileio.read_preflib_file(currdir + "/data-fail/" + filename, setsize=2)
         print(str(profile))
 
@@ -132,7 +132,9 @@ def test_read_special_abc_yaml_file1():
     filename = currdir + "/data/test7.abc.yaml"
 
     profile1 = Profile(6)
-    profile1.add_voters([[3], [4, 1, 5], [0, 2], [], [0, 1, 2, 3, 4, 5], [5], [1], [1]])
+    profile1.add_voter(Voter([3], weight=1.3))
+    profile1.add_voters([[4, 1, 5], [0, 2], [], [0, 1, 2, 3, 4, 5], [5]])
+    profile1.add_voter(Voter([1], weight=2))
     fileio.write_abcvoting_instance_to_yaml_file(filename, profile1, description="just a profile")
 
     profile2, committeesize, compute_instances2, data2 = fileio.read_abcvoting_yaml_file(filename)
@@ -153,3 +155,11 @@ def test_read_special_abc_yaml_file2():
     assert committeesize == 2
     assert len(compute_instances) == 1
     assert abcrules.compute(**compute_instances[0]) == [{1, 3}]
+
+
+@pytest.mark.parametrize("filename", ["test1.abc.yaml", "test2.abc.yaml", "test3.abc.yaml"])
+def test_read_corrupt_abc_yaml_file(filename):
+    currdir = os.path.dirname(os.path.abspath(__file__))
+    with pytest.raises(fileio.MalformattedFileException):
+        profile = fileio.read_abcvoting_yaml_file(currdir + "/data-fail/" + filename)
+        print(str(profile))

@@ -15,11 +15,18 @@ import ruamel.yaml
 from abcvoting.output import output
 
 #: Valid keys for .abc.yaml files.
-ABC_YAML_VALID_KEYS = ["profile", "num_cand", "committeesize", "compute", "description"]
+ABC_YAML_VALID_KEYS = [
+    "profile",
+    "num_cand",
+    "committeesize",
+    "compute",
+    "voter_weights",
+    "description",
+]
 
 
-class PreflibException(Exception):
-    """Malformatted preflib file."""
+class MalformattedFileException(Exception):
+    """Malformatted file (Preflib or .abc.yaml)."""
 
     pass
 
@@ -78,24 +85,30 @@ def _approval_set_from_preflib_datastructures(num_appr, ranking, candidate_map):
                 tied = True
                 rank = rank[1:]
             else:
-                raise PreflibException("Invalid format for tied candidates: " + str(ranking))
+                raise MalformattedFileException(
+                    "Invalid format for tied candidates: " + str(ranking)
+                )
         if rank.endswith("}"):
             if tied:
                 tied = False
                 rank = rank[:-1]
             else:
-                raise PreflibException("Invalid format for tied candidates: " + str(ranking))
+                raise MalformattedFileException(
+                    "Invalid format for tied candidates: " + str(ranking)
+                )
         rank = rank.strip()
         if len(rank) > 0:
             try:
                 cand = int(rank)
             except ValueError:
-                raise PreflibException(f"Expected candidate number but encountered {rank}")
+                raise MalformattedFileException(
+                    f"Expected candidate number but encountered {rank}"
+                )
             approval_set.add(cand)
         if len(approval_set) >= num_appr and not tied:
             break
     if tied:
-        raise PreflibException("Invalid format for tied candidates: " + str(ranking))
+        raise MalformattedFileException("Invalid format for tied candidates: " + str(ranking))
     if len(approval_set) < num_appr:
         # all candidates approved
         approval_set = set(candidate_map.keys())
@@ -154,14 +167,14 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
         try:
             voter_count, _, unique_orders = [int(p.strip()) for p in parts]
         except ValueError:
-            raise PreflibException(
+            raise MalformattedFileException(
                 f"Number of voters ill specified ({str(parts)}), should be triple of integers"
             )
 
         approval_sets = []
         lines = [line.strip() for line in f.readlines() if line.strip()]
         if len(lines) != unique_orders:
-            raise PreflibException(
+            raise MalformattedFileException(
                 f"Expected {unique_orders} lines that specify voters in the input, "
                 f"encountered {len(lines)}"
             )
@@ -173,10 +186,10 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
         try:
             count = int(parts[0])
         except ValueError:
-            raise PreflibException(f"Each ranking must start with count/weight ({line})")
+            raise MalformattedFileException(f"Each ranking must start with count/weight ({line})")
         ranking = parts[1:]  # ranking starts after count
         if len(ranking) == 0:
-            raise PreflibException("Empty ranking: " + str(line))
+            raise MalformattedFileException("Empty ranking: " + str(line))
         if relative_setsize:
             num_appr = int(ceil(len(ranking) * relative_setsize))
         else:
@@ -203,10 +216,10 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
             profile.add_voters([normalized_approval_set] * count)
     if use_weights:
         if len(profile) != unique_orders:
-            raise PreflibException("Number of voters wrongly specified in preflib file.")
+            raise MalformattedFileException("Number of voters wrongly specified in preflib file.")
     else:
         if len(profile) != voter_count:
-            raise PreflibException("Number of voters wrongly specified in preflib file.")
+            raise MalformattedFileException("Number of voters wrongly specified in preflib file.")
     return profile
 
 
@@ -319,13 +332,23 @@ def read_abcvoting_yaml_file(filename):
     with open(filename) as inputfile:
         data = yaml.load(inputfile)
     if "profile" not in data.keys():
-        raise ValueError(f"{filename} does not contain a profile")
+        raise MalformattedFileException(f"{filename} does not contain a profile.")
     if "num_cand" in data.keys():
         num_cand = int(data["num_cand"])
     else:
         num_cand = max(cand for approval_set in data["profile"] for cand in approval_set) + 1
     profile = Profile(num_cand)
-    profile.add_voters(data["profile"])
+    approval_sets = data["profile"]
+    if "voter_weights" in data.keys():
+        weights = data["voter_weights"]
+        if len(weights) != len(approval_sets):
+            raise MalformattedFileException(
+                f"{filename}: the number of voters differs from the number of voter weights."
+            )
+        for appr_set, weight in zip(approval_sets, weights):
+            profile.add_voter(Voter(appr_set, weight=weight))
+    else:
+        profile.add_voters(approval_sets)
 
     if "committeesize" in data.keys():
         committeesize = int(data["committeesize"])
@@ -338,7 +361,7 @@ def read_abcvoting_yaml_file(filename):
         compute_instances = []
     for compute_instance in compute_instances:
         if "rule_id" not in compute_instance.keys():
-            raise ValueError('Each rule instance (dict) requires key "rule_id".')
+            raise MalformattedFileException('Each rule instance (dict) requires key "rule_id".')
         compute_instance["profile"] = profile
         compute_instance["committeesize"] = committeesize
         if "result" in compute_instance.keys():
@@ -350,9 +373,7 @@ def read_abcvoting_yaml_file(filename):
 
     for key in data.keys():
         if key not in ABC_YAML_VALID_KEYS:
-            output.warning(
-                f'Reading {filename}: key "{key}" is not valid and consequently ignored.'
-            )
+            raise MalformattedFileException(f'Key "{key}" is not valid (undefined).')
 
     return profile, committeesize, compute_instances, data
 
@@ -382,14 +403,12 @@ def write_abcvoting_instance_to_yaml_file(
         description : str, optional
             An optional description of the data.
     """
-    if not profile.has_unit_weights():
-        raise NotImplementedError(
-            "write_abcvoting_instance_to_yaml_file() cannot handle profiles with weights yet."
-        )  # TODO: implement!
     data = {}
     if description is not None:
         data["description"] = description
     data["profile"] = _yaml_flow_style_list([list(voter.approved) for voter in profile])
+    if not profile.has_unit_weights():
+        data["voter_weights"] = _yaml_flow_style_list([voter.weight for voter in profile])
     data["num_cand"] = profile.num_cand
     if committeesize is not None:
         data["committeesize"] = committeesize
@@ -428,9 +447,6 @@ def write_abcvoting_instance_to_yaml_file(
             modified_computed_instances.append(mod_compute_instance)
 
         data["compute"] = modified_computed_instances
-
-    if not filename.endswith(".abc.yaml"):
-        raise ValueError('ABCVoting yaml files should have ".abc.yaml" as filename extension.')
 
     yaml = ruamel.yaml.YAML()
     yaml.width = 120
