@@ -6,6 +6,7 @@
 [![Build badge](https://github.com/martinlackner/abcvoting/workflows/Build/badge.svg)](https://github.com/martinlackner/abcvoting/actions)
 [![Unittests badge](https://github.com/martinlackner/abcvoting/workflows/Unittests/badge.svg)](https://github.com/martinlackner/abcvoting/actions)
 [![codecov](https://codecov.io/gh/martinlackner/abcvoting/branch/master/graph/badge.svg)](https://codecov.io/gh/martinlackner/abcvoting)
+[![docs](https://readthedocs.org/projects/abcvoting/badge/?version=latest&style=plastic)](https://abcvoting.readthedocs.io/en/latest/)
 
 # abcvoting
 
@@ -14,10 +15,10 @@
 ---
 
 Important links:
-- [**Documentation**](https://martinlackner.github.io/abcvoting/)
-- [**Installation**](https://martinlackner.github.io/abcvoting/installation.html)  
-- [**How to cite the abcvoting library**](https://martinlackner.github.io/abcvoting/howtocite.html)
-- [**Acknowledgements and contributors**](https://martinlackner.github.io/abcvoting/acks.html)
+- [**Documentation**](https://abcvoting.readthedocs.io/)
+- [**Installation**](https://abcvoting.readthedocs.io/en/latest/installation.html)  
+- [**How to cite the abcvoting library**](https://abcvoting.readthedocs.io/en/latest/howtocite.html)
+- [**Acknowledgements and contributors**](https://abcvoting.readthedocs.io/en/latest/acks.html)
 
 ---
 
@@ -68,7 +69,7 @@ As simple as:
 pip install abcvoting
 ```
 
-Further details can be found [here](https://martinlackner.github.io/abcvoting/installation.html).
+Further details can be found [here](https://abcvoting.readthedocs.io/en/latest/installation.html).
 
 ## Development
 
