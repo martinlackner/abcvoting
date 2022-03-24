@@ -95,14 +95,14 @@
 2. .abc.yaml files (more expressive than Preflib files).</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="abcvoting.fileio.ABC_YAML_VALID_KEYS">
-<span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">ABC_YAML_VALID_KEYS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['profile',</span> <span class="pre">'num_cand',</span> <span class="pre">'committeesize',</span> <span class="pre">'compute',</span> <span class="pre">'description']</span></em><a class="headerlink" href="#abcvoting.fileio.ABC_YAML_VALID_KEYS" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">ABC_YAML_VALID_KEYS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['profile',</span> <span class="pre">'num_cand',</span> <span class="pre">'committeesize',</span> <span class="pre">'compute',</span> <span class="pre">'voter_weights',</span> <span class="pre">'description']</span></em><a class="headerlink" href="#abcvoting.fileio.ABC_YAML_VALID_KEYS" title="Permalink to this definition"></a></dt>
 <dd><p>Valid keys for .abc.yaml files.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="abcvoting.fileio.PreflibException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">PreflibException</span></span><a class="headerlink" href="#abcvoting.fileio.PreflibException" title="Permalink to this definition"></a></dt>
-<dd><p>Malformatted preflib file.</p>
+<dt class="sig sig-object py" id="abcvoting.fileio.MalformattedFileException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abcvoting.fileio.</span></span><span class="sig-name descname"><span class="pre">MalformattedFileException</span></span><a class="headerlink" href="#abcvoting.fileio.MalformattedFileException" title="Permalink to this definition"></a></dt>
+<dd><p>Malformatted file (Preflib or .abc.yaml).</p>
 </dd></dl>
 
 <dl class="py function">
