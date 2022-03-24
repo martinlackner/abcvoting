@@ -1,4 +1,4 @@
-description: profile generated via prob_distribution=IC, num_voters=8, num_cand=6, setsize=2
+description: "profile generated via prob_model=IC fixed-size, num_voters=8, num_cand=6, kwargs={'setsize': 2}"
 profile: [[4, 5], [1, 2], [0, 4], [0, 4], [0, 2], [2, 4], [3, 4], [1, 4]]
 num_cand: 6
 committeesize: 3
@@ -81,10 +81,10 @@ compute:
 - rule_id: minimaxphragmen
   result: [[0, 2, 4]]
   resolute: true
-- rule_id: leximinphragmen
+- rule_id: leximaxphragmen
   result: [[0, 2, 4]]
   resolute: false
-- rule_id: leximinphragmen
+- rule_id: leximaxphragmen
   result: [[0, 2, 4]]
   resolute: true
 - rule_id: monroe
@@ -136,4 +136,10 @@ compute:
   resolute: true
 - rule_id: rsd
   result:
+  resolute: true
+- rule_id: eph
+  result: [[0, 2, 4]]
+  resolute: false
+- rule_id: eph
+  result: [[0, 2, 4]]
   resolute: true

@@ -1,147 +1,153 @@
-description: profile generated via prob_distribution=IC, num_voters=10, num_cand=7, setsize=3
-profile: [[3, 4, 5], [3, 4, 6], [2, 3, 4], [1, 2, 6], [0, 2, 4], [3, 4, 6], [0, 2, 5], [0, 3, 6], [1, 3, 6], [1, 3, 4]]
-num_cand: 7
-committeesize: 3
+description: "profile generated via prob_model=IC fixed-size, num_voters=9, num_cand=6, kwargs={'setsize': 3}"
+profile: [[0, 4, 5], [0, 4, 5], [0, 1, 2], [1, 2, 4], [1, 2, 3], [3, 4, 5], [0, 1, 3], [0, 2, 3], [1, 2, 3]]
+num_cand: 6
+committeesize: 4
 compute:
 - rule_id: av
-  result: [[3, 4, 6]]
+  result: [[0, 1, 2, 3]]
   resolute: false
 - rule_id: av
-  result: [[3, 4, 6]]
+  result: [[0, 1, 2, 3]]
   resolute: true
 - rule_id: sav
-  result: [[3, 4, 6]]
+  result: [[0, 1, 2, 3]]
   resolute: false
 - rule_id: sav
-  result: [[3, 4, 6]]
+  result: [[0, 1, 2, 3]]
   resolute: true
 - rule_id: pav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: pav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: slav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: slav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: cc
-  result: [[0, 1, 3], [0, 1, 4], [0, 2, 3], [0, 3, 6], [0, 4, 6], [1, 2, 3], [2, 3, 4], [2, 3, 5], [2, 3, 6], [2, 4, 6], [
-      4, 5, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
+    [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]]
   resolute: false
 - rule_id: cc
-  result: [[0, 1, 3], [0, 1, 4], [0, 2, 3], [0, 3, 6], [0, 4, 6], [1, 2, 3], [2, 3, 4], [2, 3, 5], [2, 3, 6], [2, 4, 6], [
-      4, 5, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
+    [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]]
   resolute: true
 - rule_id: lexcc
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: lexcc
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: geom2
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: geom2
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: seqpav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: seqpav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: revseqpav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: revseqpav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: seqslav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: seqslav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: seqcc
-  result: [[0, 2, 3], [1, 2, 3], [2, 3, 4], [2, 3, 5], [2, 3, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
+    [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]]
   resolute: true
 - rule_id: seqcc
-  result: [[0, 2, 3], [1, 2, 3], [2, 3, 4], [2, 3, 5], [2, 3, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
+    [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]]
   resolute: false
 - rule_id: seqphragmen
-  result: [[2, 3, 4], [3, 4, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: seqphragmen
-  result: [[2, 3, 4], [3, 4, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: minimaxphragmen
-  result: [[2, 3, 4], [2, 3, 6], [2, 4, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 2, 3, 4], [0, 2, 3, 5], [1, 2, 3, 4],
+    [1, 2, 3, 5]]
   resolute: false
 - rule_id: minimaxphragmen
-  result: [[2, 3, 4], [2, 3, 6], [2, 4, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 2, 3, 4], [0, 2, 3, 5], [1, 2, 3, 4],
+    [1, 2, 3, 5]]
   resolute: true
-- rule_id: leximinphragmen
+- rule_id: leximaxphragmen
   result:
   resolute: false
-- rule_id: leximinphragmen
+- rule_id: leximaxphragmen
   result:
   resolute: true
 - rule_id: monroe
-  result: [[0, 1, 3], [0, 1, 4], [0, 3, 6], [0, 4, 6], [1, 2, 3], [2, 3, 4], [2, 3, 6], [2, 4, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
+    [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]]
   resolute: false
 - rule_id: monroe
-  result: [[0, 1, 3], [0, 1, 4], [0, 3, 6], [0, 4, 6], [1, 2, 3], [2, 3, 4], [2, 3, 6], [2, 4, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
+    [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]]
   resolute: true
 - rule_id: greedy-monroe
-  result: [[0, 1, 3]]
+  result: [[0, 1, 2, 3]]
   resolute: true
 - rule_id: minimaxav
-  result: [[0, 1, 3], [0, 1, 4], [0, 2, 3], [0, 3, 6], [0, 4, 6], [1, 2, 3], [2, 3, 4], [2, 3, 5], [2, 3, 6], [2, 4, 6], [
-      4, 5, 6]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: minimaxav
-  result: [[0, 1, 3], [0, 1, 4], [0, 2, 3], [0, 3, 6], [0, 4, 6], [1, 2, 3], [2, 3, 4], [2, 3, 5], [2, 3, 6], [2, 4, 6], [
-      4, 5, 6]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: lexminimaxav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: lexminimaxav
-  result: [[2, 3, 4]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: rule-x
-  result: [[3, 4, 6]]
+  result: [[0, 1, 2, 4], [0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: rule-x
-  result: [[3, 4, 6]]
+  result: [[0, 1, 2, 4], [0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: phragmen-enestroem
-  result: [[3, 4, 6]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: phragmen-enestroem
-  result: [[3, 4, 6]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: consensus-rule
-  result: [[2, 3, 4], [2, 3, 6]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true
 - rule_id: consensus-rule
-  result: [[2, 3, 4], [2, 3, 6]]
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: false
 - rule_id: trivial
-  result: [[0, 1, 2], [0, 1, 3], [0, 1, 4], [0, 1, 5], [0, 1, 6], [0, 2, 3], [0, 2, 4], [0, 2, 5], [0, 2, 6], [0, 3, 4], [
-      0, 3, 5], [0, 3, 6], [0, 4, 5], [0, 4, 6], [0, 5, 6], [1, 2, 3], [1, 2, 4], [1, 2, 5], [1, 2, 6], [1, 3, 4], [1, 3,
-      5], [1, 3, 6], [1, 4, 5], [1, 4, 6], [1, 5, 6], [2, 3, 4], [2, 3, 5], [2, 3, 6], [2, 4, 5], [2, 4, 6], [2, 5, 6], [
-      3, 4, 5], [3, 4, 6], [3, 5, 6], [4, 5, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
+    [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]]
   resolute: false
 - rule_id: trivial
-  result: [[0, 1, 2], [0, 1, 3], [0, 1, 4], [0, 1, 5], [0, 1, 6], [0, 2, 3], [0, 2, 4], [0, 2, 5], [0, 2, 6], [0, 3, 4], [
-      0, 3, 5], [0, 3, 6], [0, 4, 5], [0, 4, 6], [0, 5, 6], [1, 2, 3], [1, 2, 4], [1, 2, 5], [1, 2, 6], [1, 3, 4], [1, 3,
-      5], [1, 3, 6], [1, 4, 5], [1, 4, 6], [1, 5, 6], [2, 3, 4], [2, 3, 5], [2, 3, 6], [2, 4, 5], [2, 4, 6], [2, 5, 6], [
-      3, 4, 5], [3, 4, 6], [3, 5, 6], [4, 5, 6]]
+  result: [[0, 1, 2, 3], [0, 1, 2, 4], [0, 1, 2, 5], [0, 1, 3, 4], [0, 1, 3, 5], [0, 1, 4, 5], [0, 2, 3, 4], [0, 2, 3, 5],
+    [0, 2, 4, 5], [0, 3, 4, 5], [1, 2, 3, 4], [1, 2, 3, 5], [1, 2, 4, 5], [1, 3, 4, 5], [2, 3, 4, 5]]
   resolute: true
 - rule_id: rsd
   result:
+  resolute: true
+- rule_id: eph
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
+  resolute: false
+- rule_id: eph
+  result: [[0, 1, 3, 4], [0, 2, 3, 4]]
   resolute: true

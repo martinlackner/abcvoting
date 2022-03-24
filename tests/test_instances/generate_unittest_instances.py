@@ -11,49 +11,30 @@ from abcvoting import abcrules
 from abcvoting import fileio
 
 
-def generate_profile(num_voters, num_cand, committeesize, prob_distribution, setsize):
-    if prob_distribution == "IC":
-        return generate.random_IC_profile(num_cand, num_voters, setsize)
-    elif prob_distribution.startswith("Mallows"):
-        dispersion = float(prob_distribution[7:])
-        return generate.random_mallows_profile(
-            num_voters, num_cand, setsize, dispersion=dispersion
-        )
-    elif prob_distribution.startswith("Urn"):
-        replace = float(prob_distribution[3:])
-        return generate.random_urn_profile(num_voters, num_cand, setsize, replace=replace)
-    elif prob_distribution == "IC-party":
-        return generate.random_IC_party_list_profile(num_cand, num_voters, num_parties=3)
-    else:
-        raise ValueError
-
-
 def generate_abc_yaml_testinstances(
     batchname,
     committeesizes,
     num_voters_values,
     num_cand_values,
     prob_distributions,
-    approval_setsizes,
     av_neq_pav=False,
 ):
     random.seed(24121838)
 
     parameter_tuples = []
-    for committeesize, num_voters, num_cand, prob_distribution, setsize in product(
-        committeesizes, num_voters_values, num_cand_values, prob_distributions, approval_setsizes
+    for committeesize, num_voters, num_cand, prob_distribution in product(
+        committeesizes, num_voters_values, num_cand_values, prob_distributions
     ):
         if committeesize >= num_cand:
             continue
-        if setsize == "committeesize":
-            setsize = committeesize
-        parameter_tuples.append((committeesize, num_voters, num_cand, prob_distribution, setsize))
+        prob_model, kwargs = prob_distribution
+        parameter_tuples.append((num_voters, num_cand, prob_model, kwargs, committeesize))
     parameter_tuples.sort(key=itemgetter(2))
 
     print(f"Generating {len(parameter_tuples)} instances for batch {batchname}...")
     num_instances = 0
 
-    for index, (committeesize, num_voters, num_cand, prob_distribution, setsize) in enumerate(
+    for index, (num_voters, num_cand, prob_model, kwargs, committeesize) in enumerate(
         parameter_tuples
     ):
         num_instances += 1
@@ -62,11 +43,9 @@ def generate_abc_yaml_testinstances(
         currdir = os.path.dirname(os.path.abspath(__file__))
         filename = currdir + f"/instance{batchname}{index:04d}.abc.yaml"
 
-        print(f"generating {filename} ({prob_distribution})")
+        print(f"generating {filename} ({prob_model} {kwargs})")
         while True:
-            profile = generate_profile(
-                num_voters, num_cand, committeesize, prob_distribution, setsize
-            )
+            profile = generate.random_profile(prob_model, num_voters, num_cand, **kwargs)
             committees_av = abcrules.compute("av", profile, committeesize, resolute=False)
             committees_pav = abcrules.compute("pav", profile, committeesize, resolute=False)
             if not av_neq_pav:
@@ -90,7 +69,7 @@ def generate_abc_yaml_testinstances(
 
             if rule_id == "rsd":
                 committees = None  # result is random, not sensible for unit tests
-            elif rule_id == "leximinphragmen" and (num_cand > 7 or num_voters > 8):
+            elif rule_id == "leximaxphragmen" and (num_cand > 7 or num_voters > 8):
                 committees = None  # too slow
             else:
                 committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)
@@ -105,10 +84,10 @@ def generate_abc_yaml_testinstances(
             profile,
             committeesize=committeesize,
             description=(
-                f"profile generated via prob_distribution={prob_distribution}, "
+                f"profile generated via prob_model={prob_model}, "
                 f"num_voters={num_voters}, "
                 f"num_cand={num_cand}, "
-                f"setsize={setsize}"
+                f"kwargs={kwargs}"
             ),
             compute_instances=rule_instances,
         )
@@ -121,15 +100,13 @@ if __name__ == "__main__":
     committeesizes = [3, 4]
     num_voters_values = [8, 9]
     num_cand_values = [6]
-    prob_distributions = ["IC"]
-    approval_setsizes = [3]
+    prob_distributions = [("IC", {"p": 0.5})]
     generate_abc_yaml_testinstances(
         batch,
         committeesizes,
         num_voters_values,
         num_cand_values,
         prob_distributions,
-        approval_setsizes,
         av_neq_pav=True,
     )
 
@@ -137,15 +114,13 @@ if __name__ == "__main__":
     committeesizes = [3, 4]
     num_voters_values = [8, 9, 10, 11]
     num_cand_values = [6, 7]
-    prob_distributions = ["IC"]
-    approval_setsizes = [2, 3]
+    prob_distributions = [("IC fixed-size", {"setsize": 2}), ("IC fixed-size", {"setsize": 3})]
     generate_abc_yaml_testinstances(
         batch,
         committeesizes,
         num_voters_values,
         num_cand_values,
         prob_distributions,
-        approval_setsizes,
         av_neq_pav=True,
     )
 
@@ -153,7 +128,21 @@ if __name__ == "__main__":
     committeesizes = [3, 4, 5, 6]
     num_voters_values = [8, 12, 15]
     num_cand_values = [6, 8, 9]
-    prob_distributions = ["IC", "Mallows0.8", "Urn0.5"]
+    prob_distributions = [
+        ("IC fixed-size", {"setsize": 2}),
+        ("IC fixed-size", {"setsize": 3}),
+        ("Truncated Mallows", {"setsize": 2, "dispersion": 0.2}),
+        ("Truncated Mallows", {"setsize": 3, "dispersion": 0.2}),
+        ("Truncated Mallows", {"setsize": 4, "dispersion": 0.2}),
+        ("Truncated Mallows", {"setsize": 2, "dispersion": 0.5}),
+        ("Truncated Mallows", {"setsize": 3, "dispersion": 0.5}),
+        ("Truncated Mallows", {"setsize": 4, "dispersion": 0.5}),
+        ("Truncated Mallows", {"setsize": 2, "dispersion": 0.8}),
+        ("Truncated Mallows", {"setsize": 3, "dispersion": 0.8}),
+        ("Truncated Mallows", {"setsize": 4, "dispersion": 0.8}),
+        ("Urn fixed-size", {"setsize": 2, "replace": 0.5}),
+        ("Urn fixed-size", {"setsize": 3, "replace": 0.5}),
+    ]
     approval_setsizes = [2, 3]
     generate_abc_yaml_testinstances(
         batch,
@@ -161,39 +150,6 @@ if __name__ == "__main__":
         num_voters_values,
         num_cand_values,
         prob_distributions,
-        approval_setsizes,
-        av_neq_pav=False,
-    )
-
-    batch = "Mallow"
-    committeesizes = [5, 6]
-    num_voters_values = [13, 16]
-    num_cand_values = [8, 9]
-    prob_distributions = ["Mallows0.2", "Mallows0.5", "Mallows0.8"]
-    approval_setsizes = [2, 3, 4]
-    generate_abc_yaml_testinstances(
-        batch,
-        committeesizes,
-        num_voters_values,
-        num_cand_values,
-        prob_distributions,
-        approval_setsizes,
-        av_neq_pav=False,
-    )
-
-    batch = "P"
-    committeesizes = [3, 4, 5]
-    num_voters_values = [12, 15]
-    num_cand_values = [5, 6]
-    prob_distributions = ["IC-party"]
-    approval_setsizes = [None]
-    generate_abc_yaml_testinstances(
-        batch,
-        committeesizes,
-        num_voters_values,
-        num_cand_values,
-        prob_distributions,
-        approval_setsizes,
         av_neq_pav=False,
     )
 
@@ -201,14 +157,25 @@ if __name__ == "__main__":
     committeesizes = [6]
     num_voters_values = [24, 25]
     num_cand_values = [8, 9]
-    prob_distributions = ["IC", "Mallows0.5", "Mallows0.8", "Urn0.5"]
-    approval_setsizes = [2, 3, 5]
+    prob_distributions = [
+        ("IC", {"p": 0.3}),
+        ("IC", {"p": 0.4}),
+        ("IC", {"p": 0.5}),
+        ("Truncated Mallows", {"setsize": 2, "dispersion": 0.5}),
+        ("Truncated Mallows", {"setsize": 3, "dispersion": 0.5}),
+        ("Truncated Mallows", {"setsize": 5, "dispersion": 0.5}),
+        ("Truncated Mallows", {"setsize": 2, "dispersion": 0.8}),
+        ("Truncated Mallows", {"setsize": 3, "dispersion": 0.8}),
+        ("Truncated Mallows", {"setsize": 5, "dispersion": 0.8}),
+        ("Urn fixed-size", {"setsize": 2, "replace": 0.5}),
+        ("Urn fixed-size", {"setsize": 3, "replace": 0.5}),
+        ("Urn fixed-size", {"setsize": 5, "replace": 0.5}),
+    ]
     generate_abc_yaml_testinstances(
         batch,
         committeesizes,
         num_voters_values,
         num_cand_values,
         prob_distributions,
-        approval_setsizes,
         av_neq_pav=False,
     )
