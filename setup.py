@@ -68,7 +68,7 @@ setuptools.setup(
     version=read_version(),
     author="Martin Lackner",
     author_email="unexpected@sent.at",
-    description="Python implementations of approval-based committee (multi-winner) rules",
+    description="A Python library of approval-based committee (ABC) rules",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/martinlackner/abcvoting/",

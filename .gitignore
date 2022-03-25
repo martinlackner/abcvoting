@@ -76,7 +76,7 @@ gurobi.log
 *.run.xml
 
 # Sphinx
-docs-source/_build
+docs/_build
 
 # Other
 excluded

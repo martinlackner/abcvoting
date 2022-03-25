@@ -3,7 +3,6 @@ ignore = D202, W503, D103, D200, D105, D107, E203, D401, E731
 exclude =
     .git,
     __pycache__,
-    docs-source/,
     docs/,
     venv*,
     scratch*,

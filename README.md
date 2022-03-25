@@ -10,20 +10,18 @@
 
 # abcvoting
 
-## Python implementations of approval-based committee (multi-winner) rules
-
+---
+> - [**Documentation**](https://abcvoting.readthedocs.io/)
+> - [**Installation**](https://abcvoting.readthedocs.io/en/latest/installation.html)  
+> - [**How to cite the abcvoting library**](https://abcvoting.readthedocs.io/en/latest/howtocite.html)
+> - [**Acknowledgements and contributors**](https://abcvoting.readthedocs.io/en/latest/acks.html)
 ---
 
-Important links:
-- [**Documentation**](https://abcvoting.readthedocs.io/)
-- [**Installation**](https://abcvoting.readthedocs.io/en/latest/installation.html)  
-- [**How to cite the abcvoting library**](https://abcvoting.readthedocs.io/en/latest/howtocite.html)
-- [**Acknowledgements and contributors**](https://abcvoting.readthedocs.io/en/latest/acks.html)
 
----
+## A Python library of approval-based committee (ABC) rules
 
 **A**pproval-**b**ased **c**ommittee rules (ABC rules) are voting methods for selecting a committee, i.e., a fixed-size subset of candidates.
-ABC rules are also known as apsproval-based multi-winner rules.
+ABC rules are also known as approval-based multi-winner rules.
 The input of such rules are
 [approval ballots](https://en.wikipedia.org/wiki/Approval_voting#/media/File:Approval_ballot.svg).
 We recommend the book
@@ -55,7 +53,7 @@ The following ABC rules are implemented:
 
 * Greedy Monroe
 
-* Rule X
+* Rule X (Method of Equal Shares)
 
 * Phragmén's First Method (Enestr&ouml;m's Method)
 

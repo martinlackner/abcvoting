@@ -12,7 +12,6 @@ from abcvoting.preferences import Profile, Voter
 from math import ceil
 from abcvoting import misc
 import ruamel.yaml
-from abcvoting.output import output
 
 #: Valid keys for .abc.yaml files.
 ABC_YAML_VALID_KEYS = [
