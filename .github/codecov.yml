@@ -28,3 +28,7 @@ comment:
 
 ignore:
     - "abcvoting/abcrules_gurobi.py"
+    - "abcvoting/abcrules_ortools.py"
+    - "examples/**/*"
+    - "tests/**/*"
+    - "setup.py"
