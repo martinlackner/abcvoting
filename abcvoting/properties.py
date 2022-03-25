@@ -9,10 +9,22 @@ from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate
 
 try:
     import gurobipy as gb
-
-    gurobipy_available = True
 except ImportError:
-    gurobipy_available = False
+    gb = None
+
+
+ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
+
+
+def _set_gurobi_model_parameters(model):
+    model.setParam("OutputFlag", False)
+    model.setParam("FeasibilityTol", ACCURACY)
+    model.setParam("OptimalityTol", ACCURACY)
+    model.setParam("IntFeasTol", ACCURACY)
+    model.setParam("MIPGap", ACCURACY)
+    model.setParam("PoolSearchMode", 0)
+    model.setParam("MIPFocus", 2)  # focus more attention on proving optimality
+    model.setParam("IntegralityFocus", 1)
 
 
 def full_analysis(profile, committee):
@@ -80,21 +92,50 @@ def check_pareto_optimality(profile, committee, algorithm="fastest"):
     Multi-Winner Voting with Approval Preferences.
     Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
+
+    Examples
+    --------
+    .. doctest::
+
+        >>> from abcvoting.preferences import Profile
+        >>> from abcvoting.output import output, DETAILS
+
+        >>> profile = Profile(3)
+        >>> profile.add_voters([[0], [0, 2], [1, 2], [1, 2]])
+        >>> print(profile)
+        profile with 4 voters and 3 candidates:
+         voter 0:   {0},
+         voter 1:   {0, 2},
+         voter 2:   {1, 2},
+         voter 3:   {1, 2}
+
+        >>> output.set_verbosity(DETAILS)  # enable output for check_pareto_optimality
+        >>> result = check_pareto_optimality(profile, committee={0, 1})
+        Committee {0, 1} is not Pareto optimal.
+        (It is dominated by the committee {0, 2}.)
+        >>> result = check_pareto_optimality(profile, committee={0, 2})
+        Committee {0, 2} is Pareto optimal.
+
+    .. testcleanup::
+
+        output.set_verbosity()
+
+    We see that the committee {0, 2} is Pareto optimal, but not the committee {0, 1}.
     """
 
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
     if algorithm == "fastest":
-        if gurobipy_available:
+        if gb:
             algorithm = "gurobi"
         else:
             algorithm = "brute-force"
 
     if algorithm == "brute-force":
-        result = _check_pareto_optimality_brute_force(profile, committee)
+        result, detailed_information = _check_pareto_optimality_brute_force(profile, committee)
     elif algorithm == "gurobi":
-        result = _check_pareto_optimality_gurobi(profile, committee)
+        result, detailed_information = _check_pareto_optimality_gurobi(profile, committee)
     else:
         raise NotImplementedError(
             "Algorithm " + str(algorithm) + " not specified for check_pareto_optimality"
@@ -104,9 +145,10 @@ def check_pareto_optimality(profile, committee, algorithm="fastest"):
         output.info(f"Committee {str_set_of_candidates(committee)} is Pareto optimal.")
     else:
         output.info(f"Committee {str_set_of_candidates(committee)} is not Pareto optimal.")
-        # TODO: detailed output with output.details() showing
-        #  - which committee is Pareto dominating
-        #  - which voters have a better satisfaction with the new committee
+        dominating_committee = detailed_information["dominating_committee"]
+        output.details(
+            f"(It is dominated by the committee {str_set_of_candidates(dominating_committee)}.)"
+        )
 
     return result
 
@@ -134,21 +176,53 @@ def check_EJR(profile, committee, algorithm="fastest"):
     Justified representation in approval-based committee voting.
     Social Choice and Welfare, 48(2), 461-485.
     https://arxiv.org/abs/1407.8269
+
+    Examples
+    --------
+    .. doctest::
+
+        >>> from abcvoting.preferences import Profile
+        >>> from abcvoting.output import output, DETAILS
+
+        >>> profile = Profile(5)
+        >>> profile.add_voters([[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2], [3, 4], [3, 4]])
+        >>> print(profile)
+        profile with 6 voters and 5 candidates:
+         voter 0:   {0, 1, 2},
+         voter 1:   {0, 1, 2},
+         voter 2:   {0, 1, 2},
+         voter 3:   {0, 1, 2},
+         voter 4:   {3, 4},
+         voter 5:   {3, 4}
+
+        >>> output.set_verbosity(DETAILS)  # enable output for check_EJR
+        >>> result = check_EJR(profile, committee={0, 3, 4})
+        Committee {0, 3, 4} does not satisfy EJR.
+         (The 2-cohesive group of voters {0, 1, 2, 3} (66.7% of all voters)
+         jointly approve the candidates {0, 1, 2}, but none of them approves 2
+         candidates in the committee.)
+
+        >>> result = check_EJR(profile, committee={1, 2, 3})
+        Committee {1, 2, 3} satisfies EJR.
+
+    .. testcleanup::
+
+        output.set_verbosity()
     """
 
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
     if algorithm == "fastest":
-        if gurobipy_available:
+        if gb:
             algorithm = "gurobi"
         else:
             algorithm = "brute-force"
 
     if algorithm == "brute-force":
-        result = _check_EJR_brute_force(profile, committee)
+        result, detailed_information = _check_EJR_brute_force(profile, committee)
     elif algorithm == "gurobi":
-        result = _check_EJR_gurobi(profile, committee)
+        result, detailed_information = _check_EJR_gurobi(profile, committee)
     else:
         raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for check_EJR")
 
@@ -156,6 +230,16 @@ def check_EJR(profile, committee, algorithm="fastest"):
         output.info(f"Committee {str_set_of_candidates(committee)} satisfies EJR.")
     else:
         output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy EJR.")
+        ell = detailed_information["ell"]
+        cands = detailed_information["joint_candidates"]
+        cohesive_group = detailed_information["cohesive_group"]
+        output.details(
+            f"(The {ell}-cohesive group of voters {str_set_of_candidates(cohesive_group)}"
+            f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
+            f" jointly approve the candidates {str_set_of_candidates(cands)}, but none of them "
+            f"approves {ell} candidates in the committee.)",
+            indent=" ",
+        )
 
     return result
 
@@ -184,21 +268,53 @@ def check_PJR(profile, committee, algorithm="fastest"):
     Proportional justified representation.
     In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 31, No. 1).
     https://arxiv.org/abs/1611.09928
+
+    Examples
+    --------
+    .. doctest::
+
+        >>> from abcvoting.preferences import Profile
+        >>> from abcvoting.output import output, DETAILS
+
+        >>> profile = Profile(5)
+        >>> profile.add_voters([[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2], [3, 4], [3, 4]])
+        >>> print(profile)
+        profile with 6 voters and 5 candidates:
+         voter 0:   {0, 1, 2},
+         voter 1:   {0, 1, 2},
+         voter 2:   {0, 1, 2},
+         voter 3:   {0, 1, 2},
+         voter 4:   {3, 4},
+         voter 5:   {3, 4}
+
+        >>> output.set_verbosity(DETAILS)  # enable output for check_PJR
+        >>> result = check_PJR(profile, committee={0, 3, 4})
+        Committee {0, 3, 4} does not satisfy PJR.
+        (The 2-cohesive group of voters {0, 1, 2, 3} (66.7% of all voters)
+        jointly approve the candidates {0, 1, 2}, but they approve fewer than
+        2 candidates in the committee.)
+
+        >>> result = check_PJR(profile, committee={1, 2, 3})
+        Committee {1, 2, 3} satisfies PJR.
+
+    .. testcleanup::
+
+        output.set_verbosity()
     """
 
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
     if algorithm == "fastest":
-        if gurobipy_available:
+        if gb:
             algorithm = "gurobi"
         else:
             algorithm = "brute-force"
 
     if algorithm == "brute-force":
-        result = _check_PJR_brute_force(profile, committee)
+        result, detailed_information = _check_PJR_brute_force(profile, committee)
     elif algorithm == "gurobi":
-        result = _check_PJR_gurobi(profile, committee)
+        result, detailed_information = _check_PJR_gurobi(profile, committee)
     else:
         raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for check_PJR")
 
@@ -206,6 +322,15 @@ def check_PJR(profile, committee, algorithm="fastest"):
         output.info(f"Committee {str_set_of_candidates(committee)} satisfies PJR.")
     else:
         output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy PJR.")
+        ell = detailed_information["ell"]
+        cands = detailed_information["joint_candidates"]
+        cohesive_group = detailed_information["cohesive_group"]
+        output.details(
+            f"(The {ell}-cohesive group of voters {str_set_of_candidates(cohesive_group)}"
+            f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
+            f" jointly approve the candidates {str_set_of_candidates(cands)}, but they "
+            f"approve fewer than {ell} candidates in the committee.)"
+        )
 
     return result
 
@@ -231,17 +356,57 @@ def check_JR(profile, committee):
     Justified representation in approval-based committee voting.
     Social Choice and Welfare, 48(2), 461-485.
     https://arxiv.org/abs/1407.8269
+
+    Examples
+    --------
+    .. doctest::
+
+        >>> from abcvoting.preferences import Profile
+        >>> from abcvoting.output import output, DETAILS
+
+        >>> profile = Profile(4)
+        >>> profile.add_voters([[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2], [3], [3]])
+        >>> print(profile)
+        profile with 6 voters and 4 candidates:
+         voter 0:   {0, 1, 2},
+         voter 1:   {0, 1, 2},
+         voter 2:   {0, 1, 2},
+         voter 3:   {0, 1, 2},
+         voter 4:   {3},
+         voter 5:   {3}
+
+        >>> output.set_verbosity(DETAILS)  # enable output for check_JR
+        >>> result = check_JR(profile, committee={0, 1, 2})
+        Committee {0, 1, 2} does not satisfy JR.
+        (The 1-cohesive group of voters {4, 5} (33.3% of all voters) jointly
+        approve candidate 3, but none of them approve a candidate in the
+        committee.)
+
+        >>> result = check_JR(profile, committee={1, 2, 3})
+        Committee {1, 2, 3} satisfies JR.
+
+    .. testcleanup::
+
+        output.set_verbosity()
     """
 
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
-    result = _check_JR(profile, committee)
+    result, detailed_information = _check_JR(profile, committee)
 
     if result:
         output.info(f"Committee {str_set_of_candidates(committee)} satisfies JR.")
     else:
         output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy JR.")
+        cand = detailed_information["joint_candidate"]
+        cohesive_group = detailed_information["cohesive_group"]
+        output.details(
+            f"(The 1-cohesive group of voters {str_set_of_candidates(cohesive_group)}"
+            f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
+            f" jointly approve candidate {profile.cand_names[cand]}, but none of them "
+            "approve a candidate in the committee.)"
+        )
 
     return result
 
@@ -266,10 +431,12 @@ def _check_pareto_optimality_brute_force(profile, committee):
         if dominate(profile, other_committee, committee):
             # if a generated committee dominates the "query" committee,
             # then it is not Pareto optimal
-            return False
+            detailed_information = {"dominating_committee": other_committee}
+            return False, detailed_information
     # If function has not returned up until now, then no other committee dominates it.
     # It is thus Pareto optimal.
-    return True
+    detailed_information = {}
+    return True, detailed_information
 
 
 def _check_pareto_optimality_gurobi(profile, committee):
@@ -289,7 +456,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
     -------
     bool
     """
-    if not gurobipy_available:
+    if not gb:
         raise ImportError("Gurobi (gurobipy) not available.")
 
     # array to store number of approved candidates per voter in the query committee
@@ -356,16 +523,19 @@ def _check_pareto_optimality_gurobi(profile, committee):
         gb.GRB.MAXIMIZE,
     )
 
-    # optimize the model
+    _set_gurobi_model_parameters(model)
     model.optimize()
 
     # return value based on status code
     # status code 2 means model was solved to optimality, thus a dominating committee was found
     if model.Status == 2:
-        return False
+        committee = set(cand for cand in profile.candidates if in_committee[cand].Xn >= 0.9)
+        detailed_information = {"dominating_committee": committee}
+        return False, detailed_information
     # status code 3 means that model is infeasible, thus no dominating committee was found
     elif model.Status == 3:
-        return True
+        detailed_information = {}
+        return True, detailed_information
     else:
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
@@ -426,12 +596,18 @@ def _check_EJR_brute_force(profile, committee):
             if len(cut) >= ell:
                 # we have found combination to be an ell-cohesive set, with no voter having
                 # at least ell approved candidates in committee. Thus EJR fails
-                return False
+                detailed_information = {
+                    "cohesive_group": voters_less_than_ell_approved_candidates,
+                    "ell": ell,
+                    "joint_candidates": cut,
+                }
+                return False, detailed_information
 
     # if function has not returned by now, then it means that for all ell,
     # no ell-cohesive group was found among candidates with less than ell
     # approved candidates in committee. Thus committee satisfies EJR
-    return True
+    detailed_information = {}
+    return True, detailed_information
 
 
 def _check_EJR_gurobi(profile, committee):
@@ -450,14 +626,13 @@ def _check_EJR_gurobi(profile, committee):
     bool
     """
 
-    if not gurobipy_available:
+    if not gb:
         raise ImportError("Gurobi (gurobipy) not available.")
 
     # compute matrix-dictionary for voters approval
     # approval_matrix[(voter, cand)] = 1 if cand is in voter's approval set
     # approval_matrix[(voter, cand)] = 0 otherwise
     approval_matrix = {}
-
     for voter in profile:
         for cand in profile.candidates:
             if cand in voter.approved:
@@ -492,62 +667,35 @@ def _check_EJR_gurobi(profile, committee):
     # the voters in group should agree on at least ell candidates
     model.addConstr(gb.quicksum(in_cut) >= ell)
 
-    # if a candidate is in the cut, then matrix[voter, cand] = 1 for all voters inside the group
-    # thus the following product should match the sum:
-    model.addConstr(
-        gb.quicksum(in_cut) * gb.quicksum(in_group)
-        == sum(
-            (
-                sum(
-                    (approval_matrix[(voter, cand)] * in_group[voter_index])
-                    for voter_index, voter in enumerate(profile)
-                )
-                * in_cut[cand]
-                for cand in profile.candidates
-            )
-        )
-    )
+    # if a candidate is in the cut, then `approval_matrix[(voter, cand)]` *must be* 1 for all
+    # voters inside the group
+    for voter_index, voter in enumerate(profile):
+        for cand in profile.candidates:
+            if approval_matrix[(voter, cand)] == 0:
+                model.addConstr(in_cut[cand] + in_group[voter_index] <= 1.5)  # not both true
 
-    # -----------------------------------------------------------------------------------------
-    # The following lines can be alternatively used, instead of the constraint above
-    # for much improved readability, but worse run time
-    # -----------------------------------------------------------------------------------------
+    # model.setObjective(ell, gb.GRB.MINIMIZE)
 
-    # add auxiliary binary variables for each voter-cand pair
-    # in_group_in_cut = model.addVars(range(len(profile)), profile.candidates,
-    #                                 vtype=gb.GRB.BINARY, name="in_group_in_cut")
-
-    # # compute value of auxiliary variables
-    # for voter in range(len(profile)):
-    #     for cand in profile.candidates:
-    #         model.addConstr(
-    #             in_group_in_cut[voter, cand] == gb.and_(in_group[voter], in_cut[cand]))
-
-    # # if both in_group[voter] = 1 AND in_cut[cand] = 1
-    # # then the entry approval_matrix[voter, cand] = 1
-    # for voter_index, voter in enumerate(profile):
-    #     for cand in profile.candidates:
-    #         model.addGenConstrIndicator(in_group_in_cut[voter_index, cand], 1,
-    #                                     approval_matrix[voter, cand], gb.GRB.EQUAL, 1)
-
-    # -----------------------------------------------------------------------------------------
-    # -----------------------------------------------------------------------------------------
-
-    # add objective function
-    model.setObjective(ell, gb.GRB.MINIMIZE)
-
-    # optimize the model
+    _set_gurobi_model_parameters(model)
     model.optimize()
 
     # return value based on status code
     # status code 2 means model was solved to optimality, thus an ell-cohesive group
     # that satisfies the condition of EJR was found
     if model.Status == 2:
-        return False
+        cohesive_group = set(vi for vi, _ in enumerate(profile) if in_group[vi].Xn >= 0.9)
+        joint_candidates = set(cand for cand in profile.candidates if in_cut[cand].Xn >= 0.9)
+        detailed_information = {
+            "cohesive_group": cohesive_group,
+            "ell": round(ell.Xn),
+            "joint_candidates": joint_candidates,
+        }
+        return False, detailed_information
     # status code 3 means that model is infeasible, thus no ell-cohesive group
     # that satisfies the condition of EJR was found
     elif model.Status == 3:
-        return True
+        detailed_information = {}
+        return True, detailed_information
     else:
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
@@ -609,12 +757,18 @@ def _check_PJR_brute_force(profile, committee):
                 # if intersection of approved_cands_union with committee yields a set of size
                 # strictly less than ell, then this ell-cohesive group violates PJR
                 if len(approved_cands_union & committee) < ell:
-                    return False
+                    detailed_information = {
+                        "cohesive_group": voters_less_than_ell_approved_candidates,
+                        "ell": ell,
+                        "joint_candidates": cut,
+                    }
+                    return False, detailed_information
 
     # if function has not returned by now, then it means that for all ell,
     # no ell-cohesive group was found among candidates with less than ell
     # approved candidates in committee. Thus committee satisfies PJR
-    return True
+    detailed_information = {}
+    return True, detailed_information
 
 
 def _check_PJR_gurobi(profile, committee):
@@ -632,7 +786,7 @@ def _check_PJR_gurobi(profile, committee):
     -------
     bool
     """
-    if not gurobipy_available:
+    if not gb:
         raise ImportError("Gurobi (gurobipy) not available.")
 
     # compute matrix-dictionary for voters approval
@@ -679,21 +833,12 @@ def _check_PJR_gurobi(profile, committee):
     # the voters in group should agree on at least ell candidates
     model.addConstr(gb.quicksum(in_cut) >= ell)
 
-    # if a candidate is in the cut, then matrix[voter, cand] = 1 for all voters inside the group
-    # thus the following product should match the sum:
-    model.addConstr(
-        gb.quicksum(in_cut) * gb.quicksum(in_group)
-        == sum(
-            (
-                sum(
-                    (approval_matrix[(voter, cand)] * in_group[voter_index])
-                    for voter_index, voter in enumerate(profile)
-                )
-                * in_cut[cand]
-                for cand in profile.candidates
-            )
-        )
-    )
+    # if a candidate is in the cut, then `approval_matrix[(voter, cand)]` *must be* 1 for all
+    # voters inside the group
+    for voter_index, voter in enumerate(profile):
+        for cand in profile.candidates:
+            if approval_matrix[(voter, cand)] == 0:
+                model.addConstr(in_cut[cand] + in_group[voter_index] <= 1.5)  # not both true
 
     # binary variables: indicate whether a candidate is inside the union
     # of approved candidates, taken over voters that are in the ell-cohesive group
@@ -704,40 +849,34 @@ def _check_PJR_gurobi(profile, committee):
         for cand in profile[voter_index].approved:
             model.addConstr((in_group[voter_index] == 1) >> (in_union[cand] == 1))
 
-    # -----------------------------------------------------------------------------------------
-    # The following constraint can be omitted from the model for improved run time.
-    # The solver will tend to have as few candidates in union as possible,
-    # because this increases the chance of finding an ell-cohesive group
-    # that satisfies the condition of PJR
-    # -----------------------------------------------------------------------------------------
-    # constraint to ensure that no in_union variable is wrongly set to 1
-    # for cand in profile.candidates:
-    #     model.addConstr((gb.quicksum(in_group[voter_index] * approval_matrix[voter, cand]
-    #     for voter_index, voter in enumerate(profile)) - in_union[cand] >= 0)
-    # -----------------------------------------------------------------------------------------
-    # -----------------------------------------------------------------------------------------
-
     # constraint to ensure that the intersection between candidates that are in union
     # intersected with the input committee, has size strictly less than ell
     model.addConstr(
         gb.quicksum(in_union[cand] * in_committee[cand] for cand in profile.candidates) + 1 <= ell
     )
 
-    # add objective function
-    model.setObjective(ell, gb.GRB.MINIMIZE)
+    # model.setObjective(ell, gb.GRB.MINIMIZE)
 
-    # optimize the model
+    _set_gurobi_model_parameters(model)
     model.optimize()
 
     # return value based on status code
     # status code 2 means model was solved to optimality, thus an ell-cohesive group
     # that satisfies the condition of PJR was found
     if model.Status == 2:
-        return False
+        cohesive_group = set(vi for vi, _ in enumerate(profile) if in_group[vi].Xn >= 0.9)
+        joint_candidates = set(cand for cand in profile.candidates if in_cut[cand].Xn >= 0.9)
+        detailed_information = {
+            "cohesive_group": cohesive_group,
+            "ell": round(ell.Xn),
+            "joint_candidates": joint_candidates,
+        }
+        return False, detailed_information
     # status code 3 means that model is infeasible, thus no ell-cohesive group
     # that satisfies the condition of PJR was found
     elif model.Status == 3:
-        return True
+        detailed_information = {}
+        return True, detailed_information
     else:
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
@@ -760,23 +899,19 @@ def _check_JR(profile, committee):
     bool
     """
 
-    # consider all candidates one by one
     for cand in profile.candidates:
-        # variable to store number of approval ballots a candidate appears in,
-        # such that these approval ballots do not intersect with input committee
-        sum_appearances = 0
-
-        for voter in profile:
+        group = set()
+        for vi, voter in enumerate(profile):
             # if current candidate appears in this voter's ballot AND
             # this voter's approval ballot does NOT intersect with input committee
             if (cand in voter.approved) and (len(voter.approved & committee) == 0):
-                sum_appearances += 1
+                group.add(vi)
 
-        # if current candidate has >= appearances than (n/k) then this committee
-        # does not satisfy JR
-        if sum_appearances >= math.ceil(len(profile) / len(committee)):
-            return False
+        if len(group) * len(committee) >= len(profile):  # |group| >= num_voters / |committee|
+            detailed_information = {"cohesive_group": group, "joint_candidate": cand}
+            return False, detailed_information
 
     # if function has not yet returned by now, then this means no such candidate
     # exists. Then input committee must satisfy JR wrt the input profile
-    return True
+    detailed_information = {}
+    return True, detailed_information
