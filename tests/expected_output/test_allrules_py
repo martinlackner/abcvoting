@@ -1,12 +1,12 @@
-Input: profile with 8 votes and 6 candidates:
- {0, 4, 5},
- {0},
- {1, 4, 5},
- {1},
- {2, 4, 5},
- {2},
- {3, 4, 5},
- {3}
+Input: profile with 8 voters and 6 candidates:
+ voter 0:   {0, 4, 5},
+ voter 1:   {0},
+ voter 2:   {1, 4, 5},
+ voter 3:   {1},
+ voter 4:   {2, 4, 5},
+ voter 5:   {2},
+ voter 6:   {3, 4, 5},
+ voter 7:   {3}
 
 --------------------
 Approval Voting (AV)

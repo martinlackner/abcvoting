@@ -9,7 +9,7 @@ Using opt-Phragmen instead (without lexicographic order).
 Input (election instance from Example 1):
 -----------------------------------------
 
-profile with 12 votes and 8 candidates:
+profile with 12 voters and 8 candidates:
  3 x {a, b},
  3 x {a, c},
  2 x {a, d},

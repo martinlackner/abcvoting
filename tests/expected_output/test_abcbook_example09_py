@@ -6,7 +6,7 @@ Example 9
 Input (election instance from Example 1):
 -----------------------------------------
 
-profile with 12 votes and 8 candidates:
+profile with 12 voters and 8 candidates:
  3 x {a, b},
  3 x {a, c},
  2 x {a, d},
@@ -30,21 +30,25 @@ adding candidate number 2: b
  load distribution:
   (11/32, 11/32, 11/32, 1/8, 1/8, 1/8, 1/8, 1/8, 11/32, 0, 0, 0)
  tie broken in favor of b,
- candidates {b, c} are tied (for all those new maximum load = 11/32).
+ candidates {b, c} are tied
+ (for all those new maximum load = 11/32).
 
 adding candidate number 3: c
  maximum load increased to 55/128
  load distribution:
-  (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 1/8, 1/8, 55/128, 0, 0, 0)
+  (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 1/8, 1/8, 55/128, 0,
+  0, 0)
 
 adding candidate number 4: d
  maximum load increased to 5/8
  load distribution:
-  (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 5/8, 5/8, 55/128, 0, 0, 0)
+  (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 5/8, 5/8, 55/128, 0,
+  0, 0)
 
 1 winning committee:
  {a, b, c, d}
 
 corresponding load distribution:
-{a, b, c, d}: (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 5/8, 5/8, 55/128, 0, 0, 0)
+{a, b, c, d}: (11/32, 11/32, 11/32, 55/128, 55/128, 55/128, 5/8, 5/8,
+55/128, 0, 0, 0)
 

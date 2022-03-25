@@ -6,7 +6,7 @@ Proposition A.4
 Approval Chamberlin-Courant (CC)
 --------------------------------
 
-profile with 5 votes and 6 candidates:
+profile with 5 voters and 6 candidates:
  1 x {a, b},
  3 x {a},
  1 x {c}
@@ -23,7 +23,7 @@ winning committee after manipulation:
 Proportional Approval Voting (PAV)
 ----------------------------------
 
-profile with 6 votes and 6 candidates:
+profile with 6 voters and 6 candidates:
  1 x {c, d, e},
  1 x {a, b},
  1 x {b, f},
@@ -43,7 +43,7 @@ winning committee after manipulation:
 Sequential Proportional Approval Voting (seq-PAV)
 -------------------------------------------------
 
-profile with 6 votes and 6 candidates:
+profile with 6 voters and 6 candidates:
  1 x {a, b},
  1 x {b, d},
  1 x {c, f},
@@ -63,7 +63,7 @@ winning committee after manipulation:
 Sequential Approval Chamberlin-Courant (seq-CC)
 -----------------------------------------------
 
-profile with 12 votes and 6 candidates:
+profile with 12 voters and 6 candidates:
  1 x {b, e, f},
  1 x {a, b},
  1 x {d, e, f},
@@ -89,7 +89,7 @@ winning committee after manipulation:
 Reverse Sequential Proportional Approval Voting (revseq-PAV)
 ------------------------------------------------------------
 
-profile with 5 votes and 6 candidates:
+profile with 5 voters and 6 candidates:
  1 x {a, b, c},
  1 x {b, d},
  1 x {b, c},
@@ -108,7 +108,7 @@ winning committee after manipulation:
 Monroe's Approval Rule (Monroe)
 -------------------------------
 
-profile with 12 votes and 6 candidates:
+profile with 12 voters and 6 candidates:
  1 x {b, d},
  1 x {a, b, c},
  1 x {b, e},
@@ -134,7 +134,7 @@ winning committee after manipulation:
 Greedy Monroe
 -------------
 
-profile with 4 votes and 6 candidates:
+profile with 4 voters and 6 candidates:
  1 x {a, b},
  1 x {a, c, f},
  1 x {a, c, d},
@@ -152,7 +152,7 @@ winning committee after manipulation:
 Phragmén's Sequential Rule (seq-Phragmén)
 -----------------------------------------
 
-profile with 6 votes and 6 candidates:
+profile with 6 voters and 6 candidates:
  1 x {a, b, c},
  1 x {a, b},
  1 x {b, f},
@@ -172,7 +172,7 @@ winning committee after manipulation:
 Phragmén's Leximax Rule (leximax-Phragmén)
 ------------------------------------------
 
-profile with 4 votes and 6 candidates:
+profile with 4 voters and 6 candidates:
  1 x {a, b},
  3 x {b, c, d}
 
@@ -188,7 +188,7 @@ winning committee after manipulation:
 Rule X (aka Method of Equal Shares)
 -----------------------------------
 
-profile with 6 votes and 6 candidates:
+profile with 6 voters and 6 candidates:
  1 x {b, c, d},
  1 x {a, b},
  1 x {b, d},
@@ -207,7 +207,7 @@ winning committee after manipulation:
 Minimax Approval Voting (MAV)
 -----------------------------
 
-profile with 6 votes and 6 candidates:
+profile with 6 voters and 6 candidates:
  1 x {a, b, c},
  1 x {b, d},
  2 x {a, b, e},
@@ -226,7 +226,7 @@ winning committee after manipulation:
 Satisfaction Approval Voting (SAV)
 ----------------------------------
 
-profile with 2 votes and 6 candidates:
+profile with 2 voters and 6 candidates:
  1 x {a, b, c},
  1 x {d, e}
 

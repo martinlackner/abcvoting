@@ -691,7 +691,7 @@ def compute_thiele_method(
         raise UnknownAlgorithm(scorefct_id, algorithm)
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
@@ -1082,18 +1082,13 @@ def compute_lexcc(
         raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.details("At-least-ell scores:")
-    output.details(
-        "\n".join(
-            f" at-least-{ell+1}: {score}"
-            for ell, score in enumerate(detailed_info["opt_score_vector"])
-        )
-        + "\n"
-    )
+    for ell, score in enumerate(detailed_info["opt_score_vector"]):
+        output.details(f"at-least-{ell+1}: {score}", indent=" ")
     output.info(
         str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
     )
@@ -1201,12 +1196,10 @@ def compute_seq_thiele_method(
         raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if not resolute:
-        output.info(
-            "Computing all possible winning committees for any tiebreaking order\n"
-            " (aka parallel universes tiebreaking) (resolute=False)\n"
-        )
+        output.info("Computing all possible winning committees for any tiebreaking order")
+        output.info(" (aka parallel universes tiebreaking) (resolute=False)\n")
     if output.verbosity <= DETAILS:  # skip thiele_score() calculations if not necessary
         output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
         if resolute:
@@ -1221,15 +1214,20 @@ def compute_seq_thiele_method(
                 committee.append(next_cand)
                 output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
                 output.details(
-                    f" score increases by {delta_score} to"
-                    f" a total of {scores.thiele_score(scorefct_id, profile, committee)}"
+                    f"score increases by {delta_score} to"
+                    f" a total of {scores.thiele_score(scorefct_id, profile, committee)}",
+                    indent=" ",
                 )
                 if len(tied_cands) > 1:
-                    output.details(f" tie broken in favor of {next_cand},\n")
+                    output.details(f"tie broken in favor of {next_cand},\n", indent=" ")
                     output.details(
-                        f" candidates "
+                        f"candidates "
                         f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)} "
-                        f"are tied (all would increase the score by the same amount {delta_score})"
+                        "are tied"
+                    )
+                    output.details(
+                        f"(all would increase the score by the same amount {delta_score})",
+                        indent=" ",
                     )
                 output.details("")
     output.info(
@@ -1240,8 +1238,9 @@ def compute_seq_thiele_method(
         output.details(scorefct_id.upper() + "-score of winning committee(s):")
         for committee in committees:
             output.details(
-                f" {str_set_of_candidates(committee, cand_names=profile.cand_names)}: "
-                f"{scores.thiele_score(scorefct_id, profile, committee)}"
+                f"{str_set_of_candidates(committee, cand_names=profile.cand_names)}: "
+                f"{scores.thiele_score(scorefct_id, profile, committee)}",
+                indent=" ",
             )
         output.details("\n")
     # end of optional output
@@ -1585,12 +1584,10 @@ def compute_revseq_thiele_method(
         raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if not resolute:
-        output.info(
-            "Computing all possible winning committees for any tiebreaking order\n"
-            " (aka parallel universes tiebreaking) (resolute=False)\n"
-        )
+        output.info("Computing all possible winning committees for any tiebreaking order")
+        output.info(" (aka parallel universes tiebreaking) (resolute=False)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     if resolute:
@@ -1608,15 +1605,20 @@ def compute_revseq_thiele_method(
                 f"{profile.cand_names[next_cand]}"
             )
             output.details(
-                f" score decreases by {delta_score} to a total of "
-                f"{scores.thiele_score(scorefct_id, profile, committee)}"
+                f"score decreases by {delta_score} to a total of "
+                f"{scores.thiele_score(scorefct_id, profile, committee)}",
+                indent=" ",
             )
             if len(tied_cands) > 1:
-                output.details(f" tie broken to the disadvantage of {next_cand},\n")
+                output.details(f"tie broken to the disadvantage of {next_cand},", indent=" ")
                 output.details(
-                    f" candidates "
+                    f"candidates "
                     f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
-                    f" are tied (all would decrease the score by the same amount {delta_score})"
+                    " are tied",
+                    indent=" ",
+                )
+                output.details(
+                    "(all would decrease the score by the same amount {delta_score})", indent=" "
                 )
             output.details("")
     output.info(
@@ -1841,7 +1843,7 @@ def compute_separable_rule(
         raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
@@ -2161,7 +2163,7 @@ def compute_minimaxav(
         raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
@@ -2295,7 +2297,7 @@ def compute_lexminimaxav(
 
     # optional output
     opt_distances = detailed_info["opt_distances"]
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
@@ -2437,7 +2439,7 @@ def compute_monroe(
         raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
@@ -2540,7 +2542,7 @@ def compute_greedy_monroe(
         raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     remaining_voters = detailed_info["remaining_voters"]
     assignment = detailed_info["assignment"]
@@ -2711,12 +2713,10 @@ def compute_seqphragmen(
         )
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if not resolute:
-        output.info(
-            "Computing all possible winning committees for any tiebreaking order\n"
-            " (aka parallel universes tiebreaking) (resolute=False)\n"
-        )
+        output.info("Computing all possible winning committees for any tiebreaking order")
+        output.info(" (aka parallel universes tiebreaking) (resolute=False)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     if resolute:
@@ -2726,23 +2726,31 @@ def compute_seqphragmen(
             max_load = detailed_info["max_load"][i]
             load = detailed_info["load"][i]
             committee.append(next_cand)
+            output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
             output.details(
-                f"adding candidate number {i+1}: {profile.cand_names[next_cand]}\n"
-                f" maximum load increased to {max_load}"
+                f"maximum load increased to {max_load}",
+                indent=" "
                 # f"\n (continuous model: time t_{i+1} = {max_load})"
             )
             output.details(" load distribution:")
-            msg = "  ("
+            msg = "("
             for v, _ in enumerate(profile):
                 msg += str(load[v]) + ", "
-            output.details(msg[:-2] + ")")
+            output.details(msg[:-2] + ")", indent="  ")
             if len(tied_cands) > 1:
-                msg = " tie broken in favor of " + profile.cand_names[next_cand]
-                msg += ",\n candidates " + str_set_of_candidates(
-                    tied_cands, cand_names=profile.cand_names
+                output.details(
+                    f"tie broken in favor of {profile.cand_names[next_cand]},", indent=" "
                 )
-                msg += f" are tied (for all those new maximum load = {max_load})."
-                output.details(msg)
+                output.details(
+                    "candidates "
+                    f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
+                    f" are tied",
+                    indent=" ",
+                )
+                output.details(
+                    f"(for all those new maximum load = {max_load}).",
+                    indent=" ",
+                )
             output.details("")
     output.info(
         str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
@@ -3014,12 +3022,10 @@ def compute_rule_x(
     )
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if not resolute:
-        output.info(
-            "Computing all possible winning committees for any tiebreaking order\n"
-            " (aka parallel universes tiebreaking) (resolute=False)\n"
-        )
+        output.info("Computing all possible winning committees for any tiebreaking order")
+        output.info(" (aka parallel universes tiebreaking) (resolute=False)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
     if resolute:
@@ -3037,30 +3043,33 @@ def compute_rule_x(
             budget = detailed_info["budget"][i]
             cost = detailed_info["cost"][i]
             tied_cands = detailed_info["tied_cands"][i]
-            msg = f"adding candidate number {i+1}: {profile.cand_names[next_cand]}\n"
-            msg += f" with maxmimum cost per voter q = {cost}"
-            output.details(msg)
+            output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
+            output.details(f"with maxmimum cost per voter q = {cost}", indent=" ")
             output.details(" remaining budget:")
-            msg = "  ("
+            msg = "("
             for v, _ in enumerate(profile):
                 msg += str(budget[v]) + ", "
-            output.details(msg[:-2] + ")")
+            output.details(msg[:-2] + ")", indent="  ")
             if len(tied_cands) > 1:
-                msg = " tie broken in favor of "
-                msg += profile.cand_names[next_cand] + ","
-                msg += "\n candidates "
-                msg += str_set_of_candidates(tied_cands, cand_names=profile.cand_names)
-                msg += f" are tied (all would impose a maximum cost of {cost})."
-                output.details(msg)
+                output.details(
+                    f"tie broken in favor of {profile.cand_names[next_cand]},", indent=" "
+                )
+                output.details(
+                    "candidates "
+                    f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
+                    f" are tied",
+                    indent=" ",
+                )
+                output.details(f"(all would impose a maximum cost of {cost}).", indent=" ")
             output.details("")
 
         if detailed_info["phragmen_start_load"]:  # the second phase (seq-Phragmen) was used
             output.details("Phase 2 (seq-Phragmén):\n")
             output.details("starting loads (= budget spent):")
-            msg = "  ("
+            msg = "("
             for v, _ in enumerate(profile):
                 msg += str(detailed_info["phragmen_start_load"][v]) + ", "
-            output.details(msg[:-2] + ")\n")
+            output.details(msg[:-2] + ")\n", indent="  ")
 
             detailed_info_phragmen = detailed_info["phragmen_phase"]
             for i, next_cand in enumerate(detailed_info_phragmen["next_cand"]):
@@ -3069,22 +3078,31 @@ def compute_rule_x(
                 load = detailed_info_phragmen["load"][i]
                 committee.append(next_cand)
                 output.details(
-                    f"adding candidate number {len(committee)}: {profile.cand_names[next_cand]}\n"
-                    f" maximum load increased to {max_load}"
+                    f"adding candidate number {len(committee)}: {profile.cand_names[next_cand]}"
+                )
+                output.details(
+                    f"maximum load increased to {max_load}",
+                    indent=" "
                     # f"\n (continuous model: time t_{len(committee)} = {max_load})"
                 )
                 output.details(" load distribution:")
-                msg = "  ("
+                msg = "("
                 for v, _ in enumerate(profile):
                     msg += str(load[v]) + ", "
-                output.details(msg[:-2] + ")")
+                output.details(msg[:-2] + ")", indent="  ")
                 if len(tied_cands) > 1:
                     output.details(
-                        f" tie broken in favor of {profile.cand_names[next_cand]},\n"
-                        f" candidates "
+                        f"tie broken in favor of {profile.cand_names[next_cand]},", indent=" "
+                    )
+                    output.details(
+                        "candidates "
                         f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)}"
-                        f" are tied"
-                        f" (for any of those, the new maximum load would be {max_load})."
+                        " are tied",
+                        indent=" ",
+                    )
+                    output.details(
+                        f"(for any of those, the new maximum load would be {max_load}).",
+                        indent=" ",
                     )
                 output.details("")
     output.info(
@@ -3339,7 +3357,7 @@ def compute_minimaxphragmen(
         raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
@@ -3459,7 +3477,7 @@ def compute_leximaxphragmen(
         committees = sorted_committees(committees)[:1]
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
@@ -3550,12 +3568,10 @@ def compute_phragmen_enestroem(
     )
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if not resolute:
-        output.info(
-            "Computing all possible winning committees for any tiebreaking order\n"
-            " (aka parallel universes tiebreaking) (resolute=False)\n"
-        )
+        output.info("Computing all possible winning committees for any tiebreaking order")
+        output.info(" (aka parallel universes tiebreaking) (resolute=False)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.info(
         str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
@@ -3713,12 +3729,10 @@ def compute_consensus_rule(
     )
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if not resolute:
-        output.info(
-            "Computing all possible winning committees for any tiebreaking order\n"
-            " (aka parallel universes tiebreaking) (resolute=False)\n"
-        )
+        output.info("Computing all possible winning committees for any tiebreaking order")
+        output.info(" (aka parallel universes tiebreaking) (resolute=False)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.info(
         str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
@@ -3872,7 +3886,7 @@ def compute_trivial_rule(
         raise UnknownAlgorithm(rule_id, algorithm)
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
@@ -3973,7 +3987,7 @@ def compute_rsd(
     committees = [committee]
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.info(
         str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
@@ -4050,7 +4064,7 @@ def compute_eph(
     )
 
     # optional output
-    output.info(header(rule.longname))
+    output.info(header(rule.longname), wrap=False)
     if resolute:
         output.info("Computing only one winning committee (resolute=True)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")

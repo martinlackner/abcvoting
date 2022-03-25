@@ -6,7 +6,7 @@ Example 5
 Input:
 ------
 
-profile with 23 votes and 4 candidates:
+profile with 23 voters and 4 candidates:
  3 x {a, b},
  6 x {a, d},
  4 x {b},
@@ -71,7 +71,7 @@ Example from Janson's survey (Example 13.3) / Thiele:
 Input:
 ------
 
-weighted profile with 10 votes and 4 candidates:
+weighted profile with 10 voters and 4 candidates:
  960 x {a, c, d},
  3000 x {b, c, d},
  520 x {b, c},

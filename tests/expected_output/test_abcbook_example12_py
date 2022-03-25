@@ -6,7 +6,7 @@ Example 12
 Input:
 ------
 
-profile with 8 votes and 4 candidates:
+profile with 8 voters and 4 candidates:
  3 x {c, d},
  2 x {a, b},
  2 x {a, c},

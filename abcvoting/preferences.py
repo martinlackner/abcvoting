@@ -175,17 +175,17 @@ class Profile(object):
 
     def __str__(self):
         if self.has_unit_weights():
-            output = f"profile with {len(self._voters)} votes and {self.num_cand} candidates:\n"
-            for voter in self._voters:
-                output += " " + voter.str_with_names(self.cand_names) + ",\n"
+            output = f"profile with {len(self._voters)} voters and {self.num_cand} candidates:\n"
         else:
             output = (
-                f"weighted profile with {len(self._voters)} votes"
+                f"weighted profile with {len(self._voters)} voters"
                 f" and {self.num_cand} candidates:\n"
             )
-            for voter in self._voters:
-                output += f" {voter.weight} * "
-                output += f"{misc.str_set_of_candidates(voter.approved, self.cand_names)} ,\n"
+        for vi, voter in enumerate(self._voters):
+            output += f" voter {str(vi) + ':':4s} "
+            if not self.has_unit_weights():
+                output += f"{voter.weight} * "
+            output += f"{misc.str_set_of_candidates(voter.approved, self.cand_names)},\n"
         return output[:-2]
 
     def is_party_list(self):
@@ -222,7 +222,7 @@ class Profile(object):
             output = ""
         else:
             output = "weighted "
-        output += "profile with %d votes and %d candidates:\n" % (len(self._voters), self.num_cand)
+        output += f"profile with {len(self._voters)} voters and {self.num_cand} candidates:\n"
         for approval_set in compact:
             output += (
                 f" {compact[approval_set]} x "

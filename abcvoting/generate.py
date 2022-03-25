@@ -60,12 +60,12 @@ def random_profile(prob_model, num_voters, num_cand, **kwargs):
 
         >>> profile = random_profile(prob_model="IC", num_voters=5, num_cand=5, p=0.5)
         >>> print(profile)
-        profile with 5 votes and 5 candidates:
-         {1, 2},
-         {0, 1, 2},
-         {3, 4},
-         {0, 4},
-         {2, 4}
+        profile with 5 voters and 5 candidates:
+         voter 0:   {1, 2},
+         voter 1:   {0, 1, 2},
+         voter 2:   {3, 4},
+         voter 3:   {0, 4},
+         voter 4:   {2, 4}
     """
     if prob_model not in PROBABILITY_MODELS_IDS:
         raise ValueError(f"Probability model {prob_model} unknown.")

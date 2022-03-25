@@ -18,6 +18,17 @@ ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
 CMP_ACCURACY = 10 * ACCURACY  # when comparing float numbers obtained from a MIP
 
 
+def _set_gurobi_model_parameters(model):
+    model.setParam("OutputFlag", False)
+    model.setParam("FeasibilityTol", ACCURACY)
+    model.setParam("OptimalityTol", ACCURACY)
+    model.setParam("IntFeasTol", ACCURACY)
+    model.setParam("MIPGap", ACCURACY)
+    model.setParam("PoolSearchMode", 0)
+    model.setParam("MIPFocus", 2)  # focus more attention on proving optimality
+    model.setParam("IntegralityFocus", 1)
+
+
 def _optimize_rule_gurobi(
     set_opt_model_func,
     profile,
@@ -69,15 +80,7 @@ def _optimize_rule_gurobi(
     in_committee = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_committee")
 
     set_opt_model_func(model, in_committee)
-
-    model.setParam("OutputFlag", False)
-    model.setParam("FeasibilityTol", ACCURACY)
-    model.setParam("OptimalityTol", ACCURACY)
-    model.setParam("IntFeasTol", ACCURACY)
-    model.setParam("MIPGap", ACCURACY)
-    model.setParam("PoolSearchMode", 0)
-    model.setParam("MIPFocus", 2)  # focus more attention on proving optimality
-    model.setParam("IntegralityFocus", 1)
+    _set_gurobi_model_parameters(model)
 
     while True:
         model.optimize()

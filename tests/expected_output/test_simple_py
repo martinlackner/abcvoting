@@ -1,12 +1,12 @@
 Computing winning committees of size 3
 with the Proportional Approval Voting (PAV) rule
-given the following profile with 6 votes and 5 candidates:
- {0, 1, 2},
- {0, 1},
- {0, 1},
- {1, 2},
- {3, 4},
- {3, 4}
+given the following profile with 6 voters and 5 candidates:
+ voter 0:   {0, 1, 2},
+ voter 1:   {0, 1},
+ voter 2:   {0, 1},
+ voter 3:   {1, 2},
+ voter 4:   {3, 4},
+ voter 5:   {3, 4}
 ----------------------------------
 Proportional Approval Voting (PAV)
 ----------------------------------
