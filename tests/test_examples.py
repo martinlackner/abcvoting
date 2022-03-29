@@ -168,5 +168,11 @@ def test_allrules_py(check_output):
 
 
 # noinspection PyUnresolvedReferences
-def test_preflib_py(check_output):
+def test_handling_preflib_files_py(check_output):
     from examples import handling_preflib_files  # noqa: F401
+
+
+# noinspection PyUnresolvedReferences
+@pytest.mark.slow
+def test_generating_random_profiles_py(check_output):
+    from examples import generating_random_profiles  # noqa: F401

@@ -3,13 +3,12 @@
 
 import functools
 import itertools
+import random
 from abcvoting.output import output, DETAILS
-from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, misc
+from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, misc, scores
 from abcvoting.misc import str_committees_with_header, header, str_set_of_candidates
 from abcvoting.misc import sorted_committees, CandidateSet
-from abcvoting import scores
 from fractions import Fraction
-import random
 
 try:
     from gmpy2 import mpq

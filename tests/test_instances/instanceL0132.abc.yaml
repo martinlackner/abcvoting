@@ -1,87 +1,86 @@
-description: "profile generated via prob_model=Truncated Mallows, num_voters=15, num_cand=8, kwargs={'setsize': 2, 'dispersion':\
-  \ 0.5}"
-profile: [[4, 7], [2, 4], [2, 6], [2, 7], [2, 6], [2, 4], [2, 4], [2, 4], [0, 2], [2, 4], [4, 7], [4, 7], [4, 7], [2, 4],
-  [4, 6]]
+description: "profile generated via prob_distribution={'id': 'IC fixed-size', 'setsize': 2}, num_voters=15, num_cand=8"
+profile: [[1, 5], [6, 7], [1, 4], [1, 7], [2, 5], [2, 7], [1, 6], [2, 4], [1, 3], [0, 7], [1, 4], [1, 6], [2, 7], [3, 7],
+  [1, 4]]
 num_cand: 8
 committeesize: 3
 compute:
 - rule_id: av
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7], [1, 4, 7]]
   resolute: false
 - rule_id: av
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7], [1, 4, 7]]
   resolute: true
 - rule_id: sav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7], [1, 4, 7]]
   resolute: false
 - rule_id: sav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7], [1, 4, 7]]
   resolute: true
 - rule_id: pav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: pav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: slav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: slav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: cc
-  result: [[0, 2, 4], [1, 2, 4], [2, 3, 4], [2, 4, 5], [2, 4, 6], [2, 4, 7], [2, 6, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: cc
-  result: [[0, 2, 4], [1, 2, 4], [2, 3, 4], [2, 4, 5], [2, 4, 6], [2, 4, 7], [2, 6, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: lexcc
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: lexcc
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: geom2
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: geom2
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: seqpav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: seqpav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: revseqpav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: revseqpav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: seqslav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: seqslav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: seqcc
-  result: [[0, 2, 4], [1, 2, 4], [2, 3, 4], [2, 4, 5], [2, 4, 6], [2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: seqcc
-  result: [[0, 2, 4], [1, 2, 4], [2, 3, 4], [2, 4, 5], [2, 4, 6], [2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: seqphragmen
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7], [1, 4, 7]]
   resolute: true
 - rule_id: seqphragmen
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7], [1, 4, 7]]
   resolute: false
 - rule_id: minimaxphragmen
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7], [1, 4, 7]]
   resolute: false
 - rule_id: minimaxphragmen
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7], [1, 4, 7]]
   resolute: true
 - rule_id: leximaxphragmen
   result:
@@ -90,43 +89,43 @@ compute:
   result:
   resolute: true
 - rule_id: monroe
-  result: [[2, 4, 7]]
+  result: [[1, 4, 7]]
   resolute: false
 - rule_id: monroe
-  result: [[2, 4, 7]]
+  result: [[1, 4, 7]]
   resolute: true
 - rule_id: greedy-monroe
-  result: [[2, 4, 7]]
+  result: [[1, 4, 7]]
   resolute: true
 - rule_id: minimaxav
-  result: [[0, 2, 4], [1, 2, 4], [2, 3, 4], [2, 4, 5], [2, 4, 6], [2, 4, 7], [2, 6, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: minimaxav
-  result: [[0, 2, 4], [1, 2, 4], [2, 3, 4], [2, 4, 5], [2, 4, 6], [2, 4, 7], [2, 6, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: lexminimaxav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: lexminimaxav
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: rule-x
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: rule-x
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: phragmen-enestroem
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: phragmen-enestroem
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: consensus-rule
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: true
 - rule_id: consensus-rule
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7]]
   resolute: false
 - rule_id: trivial
   result: [[0, 1, 2], [0, 1, 3], [0, 1, 4], [0, 1, 5], [0, 1, 6], [0, 1, 7], [0, 2, 3], [0, 2, 4], [0, 2, 5], [0, 2, 6], [
@@ -148,8 +147,8 @@ compute:
   result:
   resolute: true
 - rule_id: eph
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7], [1, 4, 7]]
   resolute: false
 - rule_id: eph
-  result: [[2, 4, 7]]
+  result: [[1, 2, 7], [1, 4, 7]]
   resolute: true

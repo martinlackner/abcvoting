@@ -18,7 +18,7 @@ profile.add_voters([{0, 1}, {1, 3, 4}, {2}, {3}, {3}])
 fileio.write_profile_to_preflib_toi_file(currdir + "/toi-files/new_example.toi", profile)
 
 
-# Read a directory of preflib files (using parameter relative_setsize)
+# Read a directory of Preflib files (using parameter `relative_setsize`)
 profiles = fileio.read_preflib_files_from_dir(currdir + "/toi-files/", relative_setsize=0.7)
 # Compute PAV for each profile
 committeesize = 2
@@ -32,7 +32,7 @@ for profile in profiles.values():
     print("****************************************")
 
 
-# Read a preflib file (using parameter setsize)
+# Read a Preflib file (using parameter `setsize`)
 profile = fileio.read_preflib_file(currdir + "/toi-files/example.toi", setsize=1)
 # Compute Phragmen's sequential rule for this profile
 print("Computing a committee of size", committeesize, end=" ")

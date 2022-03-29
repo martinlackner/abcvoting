@@ -9,40 +9,36 @@ This module is based on the paper
     TODO: URL
 """
 
-
-import random
 from abcvoting.preferences import Profile
 from abcvoting import misc
 import numpy as np
+from numpy.random import default_rng
 import math
 
 
-def random_profile(prob_model, num_voters, num_cand, **kwargs):
+def random_profile(num_voters, num_cand, prob_distribution):
     """
-    Generate a random profile using the probability model `prob_model`.
+    Generate a random profile using the probability distribution `prob_distribution`.
 
-    The following probability models are supported:
+    The following probability distributions are supported:
 
     .. doctest::
 
-        >>> PROBABILITY_MODELS_IDS  # doctest: +NORMALIZE_WHITESPACE
+        >>> PROBABILITY_DISTRIBUTION_IDS  # doctest: +NORMALIZE_WHITESPACE
         ('IC fixed-size', 'IC', 'Truncated Mallows', 'Urn fixed-size', 'Urn',
         'Truncated Urn', 'Euclidean VCR', 'Euclidean fixed-size', 'Euclidean Threshold',
         'Resampling', 'Disjoint Resampling', 'Noise')
 
     Parameters
     ----------
-        prob_model : str
-            A probability model.
-
         num_voters : int
             The desired number of voters in the profile.
 
         num_cand : int
             The desired number of candidates in the profile.
 
-        **kwargs : dict
-            Further arguments for the probability model `prob_model`.
+        prob_distribution : dict
+            Specification of the probability distribution.
 
     Returns
     -------
@@ -54,27 +50,31 @@ def random_profile(prob_model, num_voters, num_cand, **kwargs):
 
     .. testsetup::
 
-        np.random.seed(24121838)
+        generate.rng = np.random.default_rng(24121838)
 
     .. doctest::
 
-        >>> profile = random_profile(prob_model="IC", num_voters=5, num_cand=5, p=0.5)
+        >>> prob_distribution = {"id": "IC", "p": 0.5}
+        >>> profile = random_profile(num_voters=5, num_cand=5, prob_distribution=prob_distribution)
         >>> print(profile)
         profile with 5 voters and 5 candidates:
-         voter 0:   {1, 2},
-         voter 1:   {0, 1, 2},
-         voter 2:   {3, 4},
-         voter 3:   {0, 4},
-         voter 4:   {2, 4}
+         voter 0:   {0, 1, 2, 3},
+         voter 1:   {0, 2, 4},
+         voter 2:   {1, 3},
+         voter 3:   {0, 3, 4},
+         voter 4:   {0}
     """
-    if prob_model not in PROBABILITY_MODELS_IDS:
-        raise ValueError(f"Probability model {prob_model} unknown.")
-    return _probability_models[prob_model](num_voters, num_cand, **kwargs)
+    if "id" not in prob_distribution:
+        raise KeyError('Probability distribution requires key "id".')
+    if prob_distribution["id"] not in PROBABILITY_DISTRIBUTION_IDS:
+        raise ValueError(f"Probability distribution id {prob_distribution} unknown.")
+    kwargs = {key: value for key, value in prob_distribution.items() if key != "id"}
+    return PROBABILITY_DISTRIBUTIONS[prob_distribution["id"]](num_voters, num_cand, **kwargs)
 
 
 def random_urn_fixed_size_profile(num_voters, num_cand, setsize, replace):
     """
-    Generate a random profile using the *Polya Urn with fixed-size approval sets* model.
+    Generate a random profile using the *Polya Urn with fixed-size approval sets* distribution.
 
     Parameters
     ----------
@@ -105,10 +105,12 @@ def random_urn_fixed_size_profile(num_voters, num_cand, setsize, replace):
     replacedsets = {}
 
     for _ in range(num_voters):
-        r = random.random() * currsize
+        r = rng.random() * currsize
         if r < 1.0:
             # base case: sample uniformly at random
-            randset = random.sample(range(num_cand), setsize)
+            randset = list(range(num_cand))
+            rng.shuffle(randset)
+            randset = randset[:setsize]
             approval_sets.append(randset)
             key = tuple(set(randset))
             if key in replacedsets:
@@ -118,7 +120,7 @@ def random_urn_fixed_size_profile(num_voters, num_cand, setsize, replace):
             currsize += replace
         else:
             # sample from one of the replaced ballots
-            r = random.randint(0, sum(replacedsets.values()))
+            r = rng.integers(0, sum(replacedsets.values()))
             for approval_set in replacedsets:
                 count = replacedsets[approval_set]
                 if r <= count:
@@ -133,7 +135,7 @@ def random_urn_fixed_size_profile(num_voters, num_cand, setsize, replace):
 
 def random_ic_fixed_size_profile(num_voters, num_cand, setsize):
     """
-    Generate a random profile using the *IC with fixed-size approval sets* model.
+    Generate a random profile using the *IC with fixed-size approval sets* distribution.
 
     Parameters
     ----------
@@ -152,7 +154,9 @@ def random_ic_fixed_size_profile(num_voters, num_cand, setsize):
     """
     approval_sets = []
     for _ in range(num_voters):
-        randset = random.sample(range(num_cand), setsize)
+        randset = list(range(num_cand))
+        rng.shuffle(randset)
+        randset = randset[:setsize]
         approval_sets.append(randset)
     profile = Profile(num_cand)
     profile.add_voters(approval_sets)
@@ -161,10 +165,9 @@ def random_ic_fixed_size_profile(num_voters, num_cand, setsize):
 
 def random_mallows_profile(num_voters, num_cand, setsize, dispersion):
     """
-    Generate a random profile using the *Truncated Mallows* probability model.
+    Generate a random profile using the *Truncated Mallows* probability distribution.
 
-    After the definition for
-    repeated insertion  mode (RIM) in
+    Based on the definition for the repeated insertion model (RIM) in
     https://icml.cc/2011/papers/135_icmlpaper.pdf
 
     Parameters
@@ -190,7 +193,7 @@ def random_mallows_profile(num_voters, num_cand, setsize, dispersion):
         """Returns a randomly selected value with the help of the distribution."""
         if round(sum(distribution), 10) != 1.0:
             raise Exception("Invalid Distribution", distribution, "sum:", sum(distribution))
-        r = round(random.random(), 10)  # or random.uniform(0, 1)
+        r = round(rng.random(), 10)  # or random.uniform(0, 1)
         pos = -1
         s = 0
         for p in distribution:
@@ -204,7 +207,7 @@ def random_mallows_profile(num_voters, num_cand, setsize, dispersion):
     if not (0 < dispersion <= 1):
         raise Exception("Invalid dispersion, needs to be in (0, 1].")
     reference_ranking = list(range(num_cand))
-    random.shuffle(reference_ranking)
+    rng.shuffle(reference_ranking)
     insert_dist = _compute_mallows_insert_distributions(num_cand, dispersion)
     approval_sets = []
     for _ in range(num_voters):
@@ -239,7 +242,7 @@ def _compute_mallows_insert_distributions(num_cand, dispersion):
 # Impartial Culture
 def random_ic_profile(num_voters, num_cand, p=0.5):
     """
-    Generate a random profile using the *Independent Culture (IC)* probability model.
+    Generate a random profile using the *Independent Culture (IC)* probability distribution.
 
     Parameters
     ----------
@@ -268,7 +271,7 @@ def random_ic_profile(num_voters, num_cand, p=0.5):
     approval_sets = [set() for _ in range(num_voters)]
     for i in range(num_voters):
         for j in range(num_cand):
-            if np.random.random() <= p:
+            if rng.random() <= p:
                 approval_sets[i].add(j)
     profile = Profile(num_cand)
     profile.add_voters(approval_sets)
@@ -277,24 +280,23 @@ def random_ic_profile(num_voters, num_cand, p=0.5):
 
 def _ordinal_urn_profile(num_voters, num_cand, replace):
     """
-    Generate rankings according to the Urn probability model.
+    Generate rankings according to the Urn probability distribution.
     """
     rankings = []
     urn_size = 1.0
     for j in range(num_voters):
-        rho = np.random.uniform(0, urn_size)
+        rho = rng.uniform(0, urn_size)
         if rho <= 1.0:
-            rankings.append(np.random.permutation(num_cand))
+            rankings.append(rng.permutation(num_cand))
         else:
-            rankings.append(rankings[np.random.randint(0, j)])
+            rankings.append(rankings[rng.integers(0, j)])
         urn_size += replace
-    print(rankings)
     return rankings
 
 
 def random_urn_profile(num_voters, num_cand, p, replace):
     """
-    Generate a random profile using the *Polya Urn* probability model.
+    Generate a random profile using the *Polya Urn* probability distribution.
 
     Parameters
     ----------
@@ -321,15 +323,15 @@ def random_urn_profile(num_voters, num_cand, p, replace):
     approval_sets = []
     urn_size = 1.0
     for j in range(num_voters):
-        rho = np.random.uniform(0, urn_size)
+        rho = rng.uniform(0, urn_size)
         if rho <= 1.0:
             vote = set()
             for c in range(num_cand):
-                if np.random.random() <= p:
+                if rng.random() <= p:
                     vote.add(c)
             approval_sets.append(vote)
         else:
-            approval_sets.append(approval_sets[np.random.randint(0, j)])
+            approval_sets.append(approval_sets[rng.integers(0, j)])
         urn_size += replace
     profile = Profile(num_cand)
     profile.add_voters(approval_sets)
@@ -338,7 +340,7 @@ def random_urn_profile(num_voters, num_cand, p, replace):
 
 def random_truncated_urn_profile(num_voters, num_cand, setsize, replace):
     """
-    Generate a random profile using the *Truncated Polya Urn* probability model.
+    Generate a random profile using the *Truncated Polya Urn* probability distribution.
 
     Parameters
     ----------
@@ -383,7 +385,7 @@ def random_truncated_urn_profile(num_voters, num_cand, setsize, replace):
 # Resampling
 def random_resampling_profile(num_voters, num_cand, p, phi):
     """
-    Generate a random profile using the *Resampling* probability model.
+    Generate a random profile using the *Resampling* probability distribution.
 
     Parameters
     ----------
@@ -414,8 +416,8 @@ def random_resampling_profile(num_voters, num_cand, p, phi):
     for v in range(num_voters):
         vote = set()
         for c in range(num_cand):
-            if np.random.random() < phi:
-                if np.random.random() < p:
+            if rng.random() < phi:
+                if rng.random() < p:
                     vote.add(c)
             else:
                 if c in central_vote:
@@ -428,7 +430,7 @@ def random_resampling_profile(num_voters, num_cand, p, phi):
 
 def random_disjoint_resampling_profile(num_voters, num_cand, p, phi=None, num_groups=2):
     """
-    Generate a random profile using the *(p,phi,g)-Disjoint Resampling* probability model.
+    Generate a random profile using the *(p,phi,g)-Disjoint Resampling* probability distribution.
 
     Parameters
     ----------
@@ -458,11 +460,11 @@ def random_disjoint_resampling_profile(num_voters, num_cand, p, phi=None, num_gr
 
     def _uniform_in_simplex(n):
         """Return uniformly random vector in the n-simplex."""
-        k = np.random.exponential(scale=1.0, size=n)
+        k = rng.exponential(scale=1.0, size=n)
         return k / sum(k)
 
     if phi is None:
-        phi = np.random.random()
+        phi = rng.random()
     k = int(p * num_cand)
 
     sizes = _uniform_in_simplex(num_groups)
@@ -477,8 +479,8 @@ def random_disjoint_resampling_profile(num_voters, num_cand, p, phi=None, num_gr
         for v in range(int(sizes[g] * num_voters), int(sizes[g + 1] * num_voters)):
             vote = set()
             for c in range(num_cand):
-                if np.random.random() <= phi:
-                    if np.random.random() <= p:
+                if rng.random() <= phi:
+                    if rng.random() <= p:
                         vote.add(c)
                 else:
                     if c in central_vote:
@@ -489,10 +491,9 @@ def random_disjoint_resampling_profile(num_voters, num_cand, p, phi=None, num_gr
     return profile
 
 
-# Noise model
 def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming"):
     """
-    Generate a random profile using the *Random Noise* probability model.
+    Generate a random profile using the *Random Noise* probability distribution.
 
     Parameters
     ----------
@@ -557,10 +558,10 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
     # SAMPLE VOTES
     approval_sets = []
     for _ in range(num_voters):
-        _id = np.random.choice(range(len(choices)), 1, p=probabilites)[0]
+        _id = rng.choice(range(len(choices)), 1, p=probabilites)[0]
         x, y = choices[_id]
-        vote = set(np.random.choice(list(A), x, replace=False))
-        vote = vote.union(set(np.random.choice(list(B), y, replace=False)))
+        vote = set(rng.choice(list(A), x, replace=False))
+        vote = vote.union(set(rng.choice(list(B), y, replace=False)))
         approval_sets.append(vote)
     profile = Profile(num_cand)
     profile.add_voters(approval_sets)
@@ -570,15 +571,15 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
 def random_euclidean_fixed_size_profile(
     num_voters,
     num_cand,
-    voter_probdist,
-    candidate_probdist,
+    voter_prob_distribution,
+    candidate_prob_distribution,
     setsize,
     voter_points=None,
     candidate_points=None,
     return_points=False,
 ):
     """
-    Generate a random profile using the *Euclidean VCR (Voter Candidate Range)* probability model.
+    Generate a random profile using the *Euclidean VCR (Voter Candidate Range)* distribution.
 
     Parameters
     ----------
@@ -588,10 +589,10 @@ def random_euclidean_fixed_size_profile(
         num_cand : int
             The desired number of candidates in the profile.
 
-        voter_probdist : PointProbabilityDistribution or None
+        voter_prob_distribution : PointProbabilityDistribution or None
             A probability distribution used to generate voter points.
 
-        candidate_probdist : PointProbabilityDistribution or None
+        candidate_prob_distribution : PointProbabilityDistribution or None
             A probability distribution used to generate candidate points.
 
         setsize : int
@@ -601,15 +602,16 @@ def random_euclidean_fixed_size_profile(
             A list of points.
 
             The length of this list must be `num_voters`. The dimension of the points must be
-            the same as the points in `candiddate_points` or as specified by `candidate_probdist`.
-            This parameter is only used if `voter_probdist` is `None`.
+            the same as the points in `candiddate_points` or as specified by
+            `candidate_prob_distribution`. This parameter is only used if `voter_prob_distribution`
+            is `None`.
 
         candidate_points : iterable
             A list of points.
 
             The length of this list must be `num_cand`. The dimension of the points must be
-            the same as the points in `voter_points` or as specified by `voter_probdist`.
-            This parameter is only used if `candidate_probdist` is `None`.
+            the same as the points in `voter_points` or as specified by `voter_prob_distribution`.
+            This parameter is only used if `candidate_prob_distribution` is `None`.
 
         return_points : bool, optional
             If true, also return the list of voter points and a list of candidate points.
@@ -622,8 +624,8 @@ def random_euclidean_fixed_size_profile(
     voter_points, candidate_points = _voter_and_candidate_points(
         num_voters,
         num_cand,
-        voter_probdist,
-        candidate_probdist,
+        voter_prob_distribution,
+        candidate_prob_distribution,
         voter_points,
         candidate_points,
     )
@@ -647,15 +649,15 @@ def random_euclidean_fixed_size_profile(
 def random_euclidean_threshold_profile(
     num_voters,
     num_cand,
-    voter_probdist,
-    candidate_probdist,
+    voter_prob_distribution,
+    candidate_prob_distribution,
     threshold,
     voter_points=None,
     candidate_points=None,
     return_points=False,
 ):
     """
-    Generate a random profile using the *Euclidean Threshold* probability model.
+    Generate a random profile using the *Euclidean Threshold* probability distribution.
 
     Parameters
     ----------
@@ -665,10 +667,10 @@ def random_euclidean_threshold_profile(
         num_cand : int
             The desired number of candidates in the profile.
 
-        voter_probdist : PointProbabilityDistribution or None
+        voter_prob_distribution : PointProbabilityDistribution or None
             A probability distribution used to generate voter points.
 
-        candidate_probdist : PointProbabilityDistribution or None
+        candidate_prob_distribution : PointProbabilityDistribution or None
             A probability distribution used to generate candidate points.
 
         threshold : float
@@ -683,15 +685,16 @@ def random_euclidean_threshold_profile(
             A list of points.
 
             The length of this list must be `num_voters`. The dimension of the points must be
-            the same as the points in `candiddate_points` or as specified by `candidate_probdist`.
-            This parameter is only used if `voter_probdist` is `None`.
+            the same as the points in `candiddate_points` or as specified by
+            `candidate_prob_distribution`. This parameter is only used if `voter_prob_distribution`
+            is `None`.
 
         candidate_points : iterable
             A list of points.
 
             The length of this list must be `num_cand`. The dimension of the points must be
-            the same as the points in `voter_points` or as specified by `voter_probdist`.
-            This parameter is only used if `candidate_probdist` is `None`.
+            the same as the points in `voter_points` or as specified by `voter_prob_distribution`.
+            This parameter is only used if `candidate_prob_distribution` is `None`.
 
         return_points : bool, optional
             If true, also return the list of voter points and a list of candidate points.
@@ -707,8 +710,8 @@ def random_euclidean_threshold_profile(
     voter_points, candidate_points = _voter_and_candidate_points(
         num_voters,
         num_cand,
-        voter_probdist,
-        candidate_probdist,
+        voter_prob_distribution,
+        candidate_prob_distribution,
         voter_points,
         candidate_points,
     )
@@ -735,8 +738,8 @@ def random_euclidean_threshold_profile(
 def random_euclidean_vcr_profile(
     num_voters,
     num_cand,
-    voter_probdist,
-    candidate_probdist,
+    voter_prob_distribution,
+    candidate_prob_distribution,
     voter_radius,
     candidate_radius,
     voter_points=None,
@@ -744,7 +747,7 @@ def random_euclidean_vcr_profile(
     return_points=False,
 ):
     """
-    Generate a random profile using the *Euclidean VCR (Voter Candidate Range)* probability model.
+    Generate a random profile using the *Euclidean VCR (Voter Candidate Range)* distribution.
 
     Parameters
     ----------
@@ -754,10 +757,10 @@ def random_euclidean_vcr_profile(
         num_cand : int
             The desired number of candidates in the profile.
 
-        voter_probdist : PointProbabilityDistribution or None
+        voter_prob_distribution : PointProbabilityDistribution or None
             A probability distribution used to generate voter points.
 
-        candidate_probdist : PointProbabilityDistribution or None
+        candidate_prob_distribution : PointProbabilityDistribution or None
             A probability distribution used to generate candidate points.
 
         voter_radius, candidate_radius : float or list of float
@@ -775,15 +778,16 @@ def random_euclidean_vcr_profile(
             A list of points.
 
             The length of this list must be `num_voters`. The dimension of the points must be
-            the same as the points in `candiddate_points` or as specified by `candidate_probdist`.
-            This parameter is only used if `voter_probdist` is `None`.
+            the same as the points in `candiddate_points` or as specified by
+            `candidate_prob_distribution`.
+            This parameter is only used if `voter_prob_distribution` is `None`.
 
         candidate_points : iterable
             A list of points.
 
             The length of this list must be `num_cand`. The dimension of the points must be
-            the same as the points in `voter_points` or as specified by `voter_probdist`.
-            This parameter is only used if `candidate_probdist` is `None`.
+            the same as the points in `voter_points` or as specified by `voter_prob_distribution`.
+            This parameter is only used if `candidate_prob_distribution` is `None`.
 
         return_points : bool, optional
             If true, also return the list of voter points and a list of candidate points.
@@ -802,8 +806,8 @@ def random_euclidean_vcr_profile(
     voter_points, candidate_points = _voter_and_candidate_points(
         num_voters,
         num_cand,
-        voter_probdist,
-        candidate_probdist,
+        voter_prob_distribution,
+        candidate_prob_distribution,
         voter_points,
         candidate_points,
     )
@@ -823,7 +827,6 @@ def random_euclidean_vcr_profile(
     approval_sets = [set() for _ in range(num_voters)]
     for v in range(num_voters):
         for c in range(num_cand):
-            print(voter_points[v], candidate_points[c])
             if voter_range[v] + cand_range[c] >= np.linalg.norm(
                 voter_points[v] - candidate_points[c]
             ):
@@ -840,14 +843,14 @@ def random_euclidean_vcr_profile(
 def _voter_and_candidate_points(
     num_voters,
     num_cand,
-    voter_probdist,
-    candidate_probdist,
+    voter_prob_distribution,
+    candidate_prob_distribution,
     voter_points,
     candidate_points,
 ):
-    if voter_probdist is not None:
-        voter_points = np.array([random_point(voter_probdist) for _ in range(num_voters)])
-        voter_dimension = voter_probdist.dimension
+    if voter_prob_distribution is not None:
+        voter_points = np.array([random_point(voter_prob_distribution) for _ in range(num_voters)])
+        voter_dimension = voter_prob_distribution.dimension
     else:
         voter_dimension = set([len(p) for p in voter_points])
         if len(voter_dimension) != 1:
@@ -856,9 +859,11 @@ def _voter_and_candidate_points(
         if len(voter_points) != num_voters:
             raise ValueError("Length of `voters` is not the same as `num_voters`.")
         voter_dimension = min(voter_dimension)
-    if candidate_probdist is not None:
-        candidate_points = np.array([random_point(candidate_probdist) for _ in range(num_cand)])
-        candidate_dimension = candidate_probdist.dimension
+    if candidate_prob_distribution is not None:
+        candidate_points = np.array(
+            [random_point(candidate_prob_distribution) for _ in range(num_cand)]
+        )
+        candidate_dimension = candidate_prob_distribution.dimension
     else:
         candidate_dimension = set([len(p) for p in candidate_points])
         if len(candidate_dimension) != 1:
@@ -980,62 +985,67 @@ class PointProbabilityDistribution:
             self.center_point = np.array([center_point] * self.dimension)
 
 
-def random_point(probdist):
+def random_point(prob_distribution):
     """
     Generate a point in space according to a given probability distribution.
 
     Parameters
     ----------
-        probdist : PointProbabilityDistribution
+        prob_distribution : PointProbabilityDistribution
             A probability distribution (see :class:`PointProbabilityDistribution`).
 
     Returns
     -------
         abcvoting.preferences.Profile
     """
-    if probdist.name == "1d_interval":
-        return np.random.rand() * probdist.width + (probdist.center_point[0] - probdist.width / 2)
-    elif probdist.name == "1d_gaussian":
-        point = np.random.normal(probdist.center_point[0], probdist.sigma)
-    elif probdist.name == "1d_gaussian_interval":
+    if prob_distribution.name == "1d_interval":
+        offset = prob_distribution.center_point[0] - prob_distribution.width / 2
+        return rng.random() * prob_distribution.width + offset
+    elif prob_distribution.name == "1d_gaussian":
+        point = rng.normal(prob_distribution.center_point[0], prob_distribution.sigma)
+    elif prob_distribution.name == "1d_gaussian_interval":
         while True:
-            point = np.random.normal(probdist.center_point[0], probdist.sigma)
+            point = rng.normal(prob_distribution.center_point[0], prob_distribution.sigma)
             if (
-                probdist.center_point[0] - probdist.width / 2
+                prob_distribution.center_point[0] - prob_distribution.width / 2
                 <= point
-                <= probdist.center_point[0] + probdist.width / 2
+                <= prob_distribution.center_point[0] + prob_distribution.width / 2
             ):
                 break
-    elif probdist.name == "2d_disc":
-        phi = 2.0 * 180.0 * np.random.random()
-        radius = math.sqrt(np.random.random()) * probdist.width / 2
+    elif prob_distribution.name == "2d_disc":
+        phi = 2.0 * 180.0 * rng.random()
+        radius = math.sqrt(rng.random()) * prob_distribution.width / 2
         point = [
-            probdist.center_point[0] + radius * math.cos(phi),
-            probdist.center_point[1] + radius * math.sin(phi),
+            prob_distribution.center_point[0] + radius * math.cos(phi),
+            prob_distribution.center_point[1] + radius * math.sin(phi),
         ]
-    elif probdist.name == "2d_square":
-        point = np.random.random(2) * probdist.width + (probdist.center_point - probdist.width / 2)
-    elif probdist.name == "2d_gaussian":
+    elif prob_distribution.name == "2d_square":
+        offset = prob_distribution.center_point - prob_distribution.width / 2
+        point = rng.random(2) * prob_distribution.width + offset
+    elif prob_distribution.name == "2d_gaussian":
         point = [
-            np.random.normal(probdist.center_point[0], probdist.sigma),
-            np.random.normal(probdist.center_point[1], probdist.sigma),
+            rng.normal(prob_distribution.center_point[0], prob_distribution.sigma),
+            rng.normal(prob_distribution.center_point[1], prob_distribution.sigma),
         ]
-    elif probdist.name == "2d_gaussian_disc":
+    elif prob_distribution.name == "2d_gaussian_disc":
         while True:
             point = [
-                np.random.normal(probdist.center_point[0], probdist.sigma),
-                np.random.normal(probdist.center_point[1], probdist.sigma),
+                rng.normal(prob_distribution.center_point[0], prob_distribution.sigma),
+                rng.normal(prob_distribution.center_point[1], prob_distribution.sigma),
             ]
-            if np.linalg.norm(point - probdist.center_point) <= probdist.width / 2:
+            if (
+                np.linalg.norm(point - prob_distribution.center_point)
+                <= prob_distribution.width / 2
+            ):
                 break
-    elif probdist.name == "3d_cube":
-        point = np.random.random(3) * probdist.width + probdist.center_point
+    elif prob_distribution.name == "3d_cube":
+        point = rng.random(3) * prob_distribution.width + prob_distribution.center_point
     else:
-        raise ValueError(f"unknown name of point distribution: {probdist.name}")
+        raise ValueError(f"unknown name of point distribution: {prob_distribution.name}")
     return point
 
 
-_probability_models = {
+PROBABILITY_DISTRIBUTIONS = {
     "IC fixed-size": random_ic_fixed_size_profile,
     "IC": random_ic_profile,
     "Truncated Mallows": random_mallows_profile,
@@ -1049,4 +1059,6 @@ _probability_models = {
     "Disjoint Resampling": random_disjoint_resampling_profile,
     "Noise": random_noise_model_profile,
 }
-PROBABILITY_MODELS_IDS = tuple(_probability_models.keys())
+PROBABILITY_DISTRIBUTION_IDS = tuple(PROBABILITY_DISTRIBUTIONS.keys())
+
+rng = default_rng()  # random number generator
