@@ -532,12 +532,13 @@ def _check_pareto_optimality_gurobi(profile, committee):
         committee = set(cand for cand in profile.candidates if in_committee[cand].Xn >= 0.9)
         detailed_information = {"dominating_committee": committee}
         return False, detailed_information
+
     # status code 3 means that model is infeasible, thus no dominating committee was found
-    elif model.Status == 3:
+    if model.Status == 3:
         detailed_information = {}
         return True, detailed_information
-    else:
-        raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
+
+    raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
 def _check_EJR_brute_force(profile, committee):
@@ -568,8 +569,8 @@ def _check_EJR_brute_force(profile, committee):
         group_size = math.ceil(ell * (len(profile) / len(committee)))
 
         # compute list of candidates to consider
-        for i in range(len(profile)):
-            if len(profile[i].approved & committee) < ell:
+        for i, voter in enumerate(profile):
+            if len(voter.approved & committee) < ell:
                 voters_less_than_ell_approved_candidates.append(i)
 
         # check if an ell-cohesive group can be formed with considered candidates
@@ -659,8 +660,8 @@ def _check_EJR_gurobi(profile, committee):
     # constraints based on binary indicator variables:
     # if voter is in ell-cohesive group, then the voter should have
     # strictly less than ell approved candidates in committee
-    for i in range(len(profile)):
-        model.addConstr((in_group[i] == 1) >> (len(profile[i].approved & committee) + 1 <= ell))
+    for vi, voter in enumerate(profile):
+        model.addConstr((in_group[vi] == 1) >> (len(voter.approved & committee) + 1 <= ell))
 
     in_cut = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_cut")
 
@@ -691,13 +692,14 @@ def _check_EJR_gurobi(profile, committee):
             "joint_candidates": joint_candidates,
         }
         return False, detailed_information
+
     # status code 3 means that model is infeasible, thus no ell-cohesive group
     # that satisfies the condition of EJR was found
-    elif model.Status == 3:
+    if model.Status == 3:
         detailed_information = {}
         return True, detailed_information
-    else:
-        raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
+
+    raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
 def _check_PJR_brute_force(profile, committee):
@@ -727,9 +729,9 @@ def _check_PJR_brute_force(profile, committee):
         group_size = math.ceil(ell * (len(profile) / len(committee)))
 
         # compute list of candidates to consider
-        for i in range(len(profile)):
-            if len(profile[i].approved & committee) < ell:
-                voters_less_than_ell_approved_candidates.append(i)
+        for vi, voter in enumerate(profile):
+            if len(voter.approved & committee) < ell:
+                voters_less_than_ell_approved_candidates.append(vi)
 
         # check if an ell-cohesive group can be formed with considered candidates
         if len(voters_less_than_ell_approved_candidates) < group_size:
@@ -845,9 +847,9 @@ def _check_PJR_gurobi(profile, committee):
     in_union = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_union")
 
     # compute the in_union variables, depending on the values of in_cut
-    for voter_index in range(len(profile)):
-        for cand in profile[voter_index].approved:
-            model.addConstr((in_group[voter_index] == 1) >> (in_union[cand] == 1))
+    for vi, voter in enumerate(profile):
+        for cand in voter.approved:
+            model.addConstr((in_group[vi] == 1) >> (in_union[cand] == 1))
 
     # constraint to ensure that the intersection between candidates that are in union
     # intersected with the input committee, has size strictly less than ell
@@ -872,13 +874,14 @@ def _check_PJR_gurobi(profile, committee):
             "joint_candidates": joint_candidates,
         }
         return False, detailed_information
+
     # status code 3 means that model is infeasible, thus no ell-cohesive group
     # that satisfies the condition of PJR was found
-    elif model.Status == 3:
+    if model.Status == 3:
         detailed_information = {}
         return True, detailed_information
-    else:
-        raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
+
+    raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
 def _check_JR(profile, committee):

@@ -1,12 +1,12 @@
 """ABC rules implemented as integer linear programs (ILPs) with Gurobi."""
 
+import functools
+import itertools
+import math
 from abcvoting.misc import sorted_committees
 from abcvoting import scores
 from abcvoting import misc
-import functools
-import itertools
 from abcvoting.output import output
-import math
 
 try:
     import gurobipy as gb
@@ -93,7 +93,7 @@ def _optimize_rule_gurobi(
                 f"Gurobi returned an unexpected status code: {model.Status}"
                 f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
-        elif model.Status != 2:
+        if model.Status != 2:
             if len(committees) == 0:
                 # we are in the first round of searching for committees
                 # and Gurobi didn't find any
@@ -433,13 +433,14 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute, max_num_of_committ
             cand for cand in profile.candidates if cand not in approved_candidates
         ]
         num_missing_candidates = committeesize - len(approved_candidates)
+
         if resolute:
             return [approved_candidates | set(remaining_candidates[:num_missing_candidates])]
-        else:
-            return [
-                approved_candidates | set(extra)
-                for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
-            ]
+
+        return [
+            approved_candidates | set(extra)
+            for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
+        ]
 
     committees, _ = _optimize_rule_gurobi(
         set_opt_model_func=set_opt_model_func,
@@ -495,7 +496,7 @@ def _gurobi_leximaxphragmen(profile, committeesize, resolute, max_num_of_committ
                 >= in_committee[cand]
             )
 
-        for i, bound in enumerate(loadbounds):
+        for i, _ in enumerate(loadbounds):
             for j, voter in enumerate(profile):
                 model.addConstr(
                     gb.quicksum(load[(voter, cand)] for cand in voter.approved)
@@ -528,13 +529,14 @@ def _gurobi_leximaxphragmen(profile, committeesize, resolute, max_num_of_committ
             cand for cand in profile.candidates if cand not in approved_candidates
         ]
         num_missing_candidates = committeesize - len(approved_candidates)
+
         if resolute:
             return [approved_candidates | set(remaining_candidates[:num_missing_candidates])]
-        else:
-            return [
-                approved_candidates | set(extra)
-                for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
-            ]
+
+        return [
+            approved_candidates | set(extra)
+            for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
+        ]
 
     loadbounds = []
     for iteration in range(len(profile) - 1):

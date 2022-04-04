@@ -4,11 +4,11 @@
 import functools
 import itertools
 import random
+from fractions import Fraction
 from abcvoting.output import output, DETAILS
 from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, misc, scores
 from abcvoting.misc import str_committees_with_header, header, str_set_of_candidates
 from abcvoting.misc import sorted_committees, CandidateSet
-from fractions import Fraction
 
 try:
     from gmpy2 import mpq
@@ -287,8 +287,8 @@ class Rule:
 
             try:
                 scores.get_marginal_scorefct(scorefct_id)
-            except scores.UnknownScoreFunctionError:
-                raise UnknownRuleIDError(rule_id)
+            except scores.UnknownScoreFunctionError as error:
+                raise UnknownRuleIDError(rule_id) from error
 
             if rule_id == "av":
                 raise UnknownRuleIDError(rule_id)  # seq-AV and revseq-AV are equivalent to AV
@@ -332,8 +332,7 @@ class Rule:
         if self.available_algorithms:
             # This rests on the assumption that ``self.algorithms`` are sorted by speed.
             return self.available_algorithms[0]
-        else:
-            raise NoAvailableAlgorithm(self.rule_id, self.algorithms)
+        raise NoAvailableAlgorithm(self.rule_id, self.algorithms)
 
     def compute(self, profile, committeesize, **kwargs):
         """
@@ -441,8 +440,8 @@ class UnknownRuleIDError(ValueError):
     """
 
     def __init__(self, rule_id):
-        message = 'Rule ID "' + str(rule_id) + '" is not known.'
-        super(ValueError, self).__init__(message)
+        message = f'Rule ID "{rule_id}" is not known.'
+        super().__init__(message)
 
 
 class UnknownAlgorithm(ValueError):
@@ -460,7 +459,7 @@ class UnknownAlgorithm(ValueError):
 
     def __init__(self, rule_id, algorithm):
         message = f"Algorithm {algorithm} not specified for ABC rule {rule_id}."
-        super(ValueError, self).__init__(message)
+        super().__init__(message)
 
 
 class NoAvailableAlgorithm(ValueError):
@@ -484,7 +483,7 @@ class NoAvailableAlgorithm(ValueError):
             f"(because the solvers for the following algorithms are not installed: "
             f"{algorithms}) "
         )
-        super(ValueError, self).__init__(message)
+        super().__init__(message)
 
 
 def _available_algorithms():
@@ -492,19 +491,16 @@ def _available_algorithms():
 
     This is done by verifying that the required modules and solvers are available.
     """
-    available_algorithms = []
+    available = []
 
-    for algorithm in ALGORITHM_NAMES.keys():
-
+    for algorithm in ALGORITHM_NAMES:
         if "gurobi" in algorithm and not abcrules_gurobi.gb:
             continue
-
         if algorithm == "gmpy2-fractions" and not mpq:
             continue
+        available.append(algorithm)
 
-        available_algorithms.append(algorithm)
-
-    return available_algorithms
+    return available
 
 
 available_algorithms = _available_algorithms()
@@ -2320,10 +2316,10 @@ def _lexminimaxav_bruteforce(profile, committeesize, resolute, max_num_of_commit
         distances = sorted(
             [misc.hamming(voter.approved, set(committee)) for voter in profile], reverse=True
         )
-        for i in range(len(distances)):
-            if opt_distances[i] < distances[i]:
+        for i, dist in enumerate(distances):
+            if opt_distances[i] < dist:
                 break
-            if opt_distances[i] > distances[i]:
+            if opt_distances[i] > dist:
                 opt_distances = distances
                 opt_committees = [committee]
                 break
@@ -3063,11 +3059,12 @@ def compute_rule_x(
             output.details("")
 
         if detailed_info["phragmen_start_load"]:  # the second phase (seq-Phragmen) was used
+            phragmen_start_load = detailed_info["phragmen_start_load"]
             output.details("Phase 2 (seq-Phragmén):\n")
             output.details("starting loads (= budget spent):")
             msg = "("
             for v, _ in enumerate(profile):
-                msg += str(detailed_info["phragmen_start_load"][v]) + ", "
+                msg += str(phragmen_start_load[v]) + ", "
             output.details(msg[:-2] + ")\n", indent="  ")
 
             detailed_info_phragmen = detailed_info["phragmen_phase"]
@@ -3118,7 +3115,7 @@ def _rule_x_algorithm(
     """Algorithm for Rule X."""
 
     def _rule_x_get_min_q(profile, budget, cand, division):
-        rich = set([v for v, voter in enumerate(profile) if cand in voter.approved])
+        rich = {v for v, voter in enumerate(profile) if cand in voter.approved}
         poor = set()
         while len(rich) > 0:
             poor_budget = sum(budget[v] for v in poor)
@@ -3129,7 +3126,7 @@ def _rule_x_algorithm(
                     v for v in rich if budget[v] < _q and not misc.isclose(budget[v], _q)
                 )
             else:
-                new_poor = set([v for v in rich if budget[v] < _q])
+                new_poor = {v for v in rich if budget[v] < _q}
             if len(new_poor) == 0:
                 return _q
             rich -= new_poor
@@ -4112,7 +4109,7 @@ def _eph_algorithm(rule_id, profile, algorithm, committeesize, resolute, max_num
             or (algorithm == "float-fractions" and misc.isclose(sdv_score[cand], cutoff_sdv))
         ]
         cutoff_av = min(av_score[cand] for cand in elimination_cands)
-        elimination_cands = [cand for cand in elimination_cands if (av_score[cand] <= cutoff_av)]
+        elimination_cands = [cand for cand in elimination_cands if av_score[cand] <= cutoff_av]
         if len(remaining_candidates) - len(elimination_cands) <= committeesize:
             num_cands_to_be_eliminated = len(remaining_candidates) - committeesize
             committees = sorted_committees(

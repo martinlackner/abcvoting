@@ -2,10 +2,10 @@
 ABC rules implemented as constraint satisfaction programs with OR-Tools.
 """
 
+import functools
 from ortools.sat.python import cp_model
 from abcvoting.misc import sorted_committees
 from abcvoting import scores
-import functools
 
 
 def _optimize_rule_ortools(
@@ -70,7 +70,8 @@ def _optimize_rule_ortools(
                 f"OR-Tools returned an unexpected status code: {status}"
                 f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
-        elif status == cp_model.INFEASIBLE:
+
+        if status == cp_model.INFEASIBLE:
             if len(committees) == 0:
                 # we are in the first round of searching for committees
                 # and Gurobi didn't find any
@@ -161,11 +162,6 @@ def _ortools_cc(profile, committeesize, resolute, max_num_of_committees):
         committeescorefct=functools.partial(scores.thiele_score, "cc"),
     )
     return sorted_committees(committees)
-
-
-def _ortools_lexcc(profile, committeesize, resolute, max_num_of_committees):
-    pass
-    # TODO: write
 
 
 def _ortools_monroe(profile, committeesize, resolute, max_num_of_committees):

@@ -5,8 +5,8 @@ try:
 except ImportError:
     from fractions import Fraction
 import functools
-from abcvoting.bipartite_matching import matching
 import networkx as nx
+from abcvoting.bipartite_matching import matching
 from abcvoting.misc import hamming
 
 
@@ -22,7 +22,7 @@ class UnknownScoreFunctionError(ValueError):
 
     def __init__(self, scorefct_id):
         message = 'Thiele score function "' + str(scorefct_id) + '" is not known.'
-        super(ValueError, self).__init__(message)
+        super().__init__(message)
 
 
 def get_marginal_scorefct(scorefct_id, committeesize=None):
@@ -46,20 +46,20 @@ def get_marginal_scorefct(scorefct_id, committeesize=None):
     """
     if scorefct_id == "pav":
         return pav_score_fct
-    elif scorefct_id == "slav":
+    if scorefct_id == "slav":
         return slav_score_fct
-    elif scorefct_id == "cc":
+    if scorefct_id == "cc":
         return cc_score_fct
-    elif scorefct_id == "av":
+    if scorefct_id == "av":
         return av_score_fct
-    elif scorefct_id[:4] == "geom":
+    if scorefct_id[:4] == "geom":
         base = Fraction(scorefct_id[4:])
         return functools.partial(geometric_marginal_score_fct, base=base)
-    elif scorefct_id[:7] == "atleast":
+    if scorefct_id[:7] == "atleast":
         param = int(scorefct_id[7:])
         return functools.partial(at_least_ell_fct, ell=param)
-    else:
-        raise UnknownScoreFunctionError(scorefct_id)
+
+    raise UnknownScoreFunctionError(scorefct_id)
 
 
 def thiele_score(scorefct_id, profile, committee):
@@ -133,8 +133,7 @@ def geometric_marginal_score_fct(i, base):
     """
     if i == 0:
         return 0
-    else:
-        return Fraction(1, base ** (i - 1))
+    return Fraction(1, base ** (i - 1))
 
 
 def pav_score_fct(i):
@@ -156,8 +155,7 @@ def pav_score_fct(i):
     """
     if i == 0:
         return 0
-    else:
-        return Fraction(1, i)
+    return Fraction(1, i)
 
 
 def slav_score_fct(i):
@@ -185,8 +183,7 @@ def slav_score_fct(i):
     """
     if i == 0:
         return 0
-    else:
-        return Fraction(1, 2 * i - 1)
+    return Fraction(1, 2 * i - 1)
 
 
 def av_score_fct(i):
@@ -211,8 +208,7 @@ def av_score_fct(i):
     """
     if i >= 1:
         return 1
-    else:
-        return 0
+    return 0
 
 
 def cc_score_fct(i):
@@ -234,8 +230,7 @@ def cc_score_fct(i):
     """
     if i == 1:
         return 1
-    else:
-        return 0
+    return 0
 
 
 def at_least_ell_fct(i, ell):
@@ -263,8 +258,7 @@ def at_least_ell_fct(i, ell):
     """
     if i == ell:
         return 1
-    else:
-        return 0
+    return 0
 
 
 #
@@ -387,8 +381,8 @@ def monroescore(profile, committee):
     if len(profile) % len(committee) == 0:
         # faster
         return monroescore_matching(profile, committee)
-    else:
-        return monroescore_flowbased(profile, committee)
+
+    return monroescore_flowbased(profile, committee)
 
 
 def monroescore_matching(profile, committee):
@@ -420,8 +414,8 @@ def monroescore_matching(profile, committee):
     sizeofdistricts = len(profile) // len(committee)
     for cand in committee:
         interestedvoters = []
-        for i in range(len(profile)):
-            if cand in profile[i].approved:
+        for i, voter in enumerate(profile):
+            if cand in voter.approved:
                 interestedvoters.append(i)
         for j in range(sizeofdistricts):
             graph[str(cand) + "/" + str(j)] = interestedvoters

@@ -1,11 +1,11 @@
 """ABC rules implemented as (mixed) integer linear programs (ILPs) with Python MIP."""
 
+import functools
+import itertools
 import mip
 from abcvoting.misc import sorted_committees
 from abcvoting import scores
 from abcvoting.output import output
-import functools
-import itertools
 
 
 ACCURACY = 1e-8
@@ -107,7 +107,8 @@ def _optimize_rule_mip(
                 f"Python MIP returned an unexpected status code: {status}"
                 f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
-        elif status == mip.OptimizationStatus.INFEASIBLE:
+
+        if status == mip.OptimizationStatus.INFEASIBLE:
             if len(committees) == 0:
                 # we are in the first round of searching for committees
                 # and Gurobi didn't find any
@@ -308,8 +309,7 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
         if new_score == 0:
             satisfaction_constraints += [0] * (committeesize - 1 - len(satisfaction_constraints))
             break
-        else:
-            satisfaction_constraints.append(new_score)
+        satisfaction_constraints.append(new_score)
 
     iteration = committeesize
     committees = _optimize_rule_mip(
@@ -451,13 +451,14 @@ def _mip_minimaxphragmen(profile, committeesize, resolute, max_num_of_committees
             cand for cand in profile.candidates if cand not in approved_candidates
         ]
         num_missing_candidates = committeesize - len(approved_candidates)
+
         if resolute:
             return [approved_candidates | set(remaining_candidates[:num_missing_candidates])]
-        else:
-            return [
-                approved_candidates | set(extra)
-                for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
-            ]
+
+        return [
+            approved_candidates | set(extra)
+            for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
+        ]
 
     committees = _optimize_rule_mip(
         set_opt_model_func,

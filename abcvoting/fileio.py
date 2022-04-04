@@ -6,12 +6,12 @@ Two data formats are supported:
 2. .abc.yaml files (more expressive than Preflib files).
 """
 
-
 import os
-from abcvoting.preferences import Profile, Voter
 from math import ceil
-from abcvoting import misc
 import ruamel.yaml
+from abcvoting.preferences import Profile, Voter
+from abcvoting import misc
+
 
 #: Valid keys for .abc.yaml files.
 ABC_YAML_VALID_KEYS = [
@@ -26,8 +26,6 @@ ABC_YAML_VALID_KEYS = [
 
 class MalformattedFileException(Exception):
     """Malformatted file (Preflib or .abc.yaml)."""
-
-    pass
 
 
 def get_file_names(dir_name, filename_extensions=None):
@@ -59,7 +57,7 @@ def get_file_names(dir_name, filename_extensions=None):
         raise FileNotFoundError(f"No files found in {dir_name}")
     if filename_extensions:
         files = [
-            f for f in filenames if any(f.endswith(extension) for extension in filename_extensions)
+            f for f in files if any(f.endswith(extension) for extension in filename_extensions)
         ]
     return sorted(files)
 
@@ -77,8 +75,8 @@ def _approval_set_from_preflib_datastructures(num_appr, ranking, candidate_map):
 
     approval_set = set()
     tied = False
-    for i in range(len(ranking)):
-        rank = ranking[i].strip()
+    for rank in ranking:
+        rank = rank.strip()
         if rank.startswith("{"):
             if not tied:
                 tied = True
@@ -99,10 +97,10 @@ def _approval_set_from_preflib_datastructures(num_appr, ranking, candidate_map):
         if len(rank) > 0:
             try:
                 cand = int(rank)
-            except ValueError:
+            except ValueError as error:
                 raise MalformattedFileException(
                     f"Expected candidate number but encountered {rank}"
-                )
+                ) from error
             approval_set.add(cand)
         if len(approval_set) >= num_appr and not tied:
             break
@@ -165,10 +163,10 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
         parts = f.readline().split(",")
         try:
             voter_count, _, unique_orders = [int(p.strip()) for p in parts]
-        except ValueError:
+        except ValueError as error:
             raise MalformattedFileException(
                 f"Number of voters ill specified ({str(parts)}), should be triple of integers"
-            )
+            ) from error
 
         approval_sets = []
         lines = [line.strip() for line in f.readlines() if line.strip()]
@@ -184,8 +182,10 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
             continue
         try:
             count = int(parts[0])
-        except ValueError:
-            raise MalformattedFileException(f"Each ranking must start with count/weight ({line})")
+        except ValueError as error:
+            raise MalformattedFileException(
+                f"Each ranking must start with count/weight ({line})."
+            ) from error
         ranking = parts[1:]  # ranking starts after count
         if len(ranking) == 0:
             raise MalformattedFileException("Empty ranking: " + str(line))
@@ -199,8 +199,8 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
     # normalize candidates to 0, 1, 2, ...
     cand_names = []
     normalize_map = {}
-    for cand in candidate_map.keys():
-        cand_names.append(candidate_map[cand])
+    for cand, name in candidate_map.items():
+        cand_names.append(name)
         normalize_map[cand] = len(cand_names) - 1
 
     profile = Profile(num_cand, cand_names=cand_names)

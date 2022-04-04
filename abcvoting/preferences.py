@@ -15,7 +15,7 @@ from collections import OrderedDict
 from abcvoting import misc
 
 
-class Profile(object):
+class Profile:
     """
     Approval profiles.
 
@@ -262,7 +262,7 @@ class Voter:
         self.weight = weight
 
         # check weights
-        if not self.weight > 0:
+        if self.weight <= 0:
             raise ValueError("Weight should be a number > 0.")
 
     def __str__(self):

@@ -2,8 +2,8 @@
 Miscellaneous functions for committees (i.e., subsets of candidates).
 """
 
-import numpy as np
 import math
+import numpy as np
 
 
 FLOAT_ISCLOSE_REL_TOL = 1e-12
@@ -40,7 +40,7 @@ class CandidateSet(set):
     def __init__(self, candidates=(), num_cand=None):
         # note: empty approval sets are fine
 
-        super(CandidateSet, self).__init__(candidates)
+        super().__init__(candidates)
         if len(candidates) != len(self):
             raise ValueError(f"CandidateSet initialized with duplicate elements ({candidates}).")
 
@@ -200,8 +200,7 @@ def str_committees_with_header(committees, cand_names=None, winning=False):
     if committees is None or len(committees) < 1:
         if winning:
             return "No winning committees"
-        else:
-            return "No committees"
+        return "No committees"
     if winning:
         commstring = "winning committee"
     else:

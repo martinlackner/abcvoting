@@ -9,11 +9,11 @@ This module is based on the paper
     TODO: URL
 """
 
-from abcvoting.preferences import Profile
-from abcvoting import misc
+import math
 import numpy as np
 from numpy.random import default_rng
-import math
+from abcvoting.preferences import Profile
+from abcvoting import misc
 
 
 def random_profile(num_voters, num_cand, prob_distribution):
@@ -121,13 +121,11 @@ def random_urn_fixed_size_profile(num_voters, num_cand, setsize, replace):
         else:
             # sample from one of the replaced ballots
             r = rng.integers(0, sum(replacedsets.values()))
-            for approval_set in replacedsets:
-                count = replacedsets[approval_set]
+            for approval_set, count in replacedsets.items():
                 if r <= count:
                     approval_sets.append(list(approval_set))
                     break
-                else:
-                    r -= count
+                r -= count
     profile = Profile(num_cand)
     profile.add_voters(approval_sets)
     return profile
@@ -204,7 +202,7 @@ def random_mallows_profile(num_voters, num_cand, setsize, dispersion):
 
         return pos  # in case of rounding errors
 
-    if not (0 < dispersion <= 1):
+    if not 0 < dispersion <= 1:
         raise Exception("Invalid dispersion, needs to be in (0, 1].")
     reference_ranking = list(range(num_cand))
     rng.shuffle(reference_ranking)
@@ -410,7 +408,7 @@ def random_resampling_profile(num_voters, num_cand, p, phi):
     TODO: URL
     """
     k = int(p * num_cand)
-    central_vote = {i for i in range(k)}
+    central_vote = set(range(k))
 
     approval_sets = [set() for _ in range(num_voters)]
     for v in range(num_voters):
@@ -524,26 +522,26 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
     TODO: URL
     """
     k = int(p * num_cand)
-    A = {i for i in range(k)}
-    B = set(range(num_cand)) - A
+    set_a = set(range(k))
+    set_b = set(range(num_cand)) - set_a
 
     choices = []
     probabilites = []
 
     # PREPARE BUCKETS
-    for x in range(len(A) + 1):
-        num_options_in = misc.binom(len(A), x)
-        for y in range(len(B) + 1):
-            num_options_out = misc.binom(len(B), y)
+    for x in range(len(set_a) + 1):
+        num_options_in = misc.binom(len(set_a), x)
+        for y in range(len(set_b) + 1):
+            num_options_out = misc.binom(len(set_b), y)
 
             if distance == "hamming":
-                factor = phi ** (len(A) - x + y)  # Hamming
+                factor = phi ** (len(set_a) - x + y)  # Hamming
             elif distance == "jaccard":
-                factor = phi ** ((len(A) - x + y) / (len(A) + y))  # Jaccard
+                factor = phi ** ((len(set_a) - x + y) / (len(set_a) + y))  # Jaccard
             elif distance == "zelinka":
-                factor = phi ** max(len(A) - x, y)  # Zelinka
+                factor = phi ** max(len(set_a) - x, y)  # Zelinka
             elif distance == "bunke-shearer":
-                factor = phi ** (max(len(A) - x, y) / max(len(A), x + y))  # Bunke-Shearer
+                factor = phi ** (max(len(set_a) - x, y) / max(len(set_a), x + y))  # Bunke-Shearer
             else:
                 raise ValueError(f"Distance {distance} not known.")
 
@@ -560,8 +558,8 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
     for _ in range(num_voters):
         _id = rng.choice(range(len(choices)), 1, p=probabilites)[0]
         x, y = choices[_id]
-        vote = set(rng.choice(list(A), x, replace=False))
-        vote = vote.union(set(rng.choice(list(B), y, replace=False)))
+        vote = set(rng.choice(list(set_a), x, replace=False))
+        vote = vote.union(set(rng.choice(list(set_b), y, replace=False)))
         approval_sets.append(vote)
     profile = Profile(num_cand)
     profile.add_voters(approval_sets)
@@ -631,7 +629,7 @@ def random_euclidean_fixed_size_profile(
     )
     profile = Profile(num_cand)
     approval_sets = []
-    for v, voterpoint in enumerate(voter_points):
+    for voterpoint in voter_points:
         distances = {
             cand: np.linalg.norm(voterpoint - candidate_points[cand])
             for cand in profile.candidates
@@ -642,8 +640,8 @@ def random_euclidean_fixed_size_profile(
 
     if return_points:
         return profile, voter_points, candidate_points
-    else:
-        return profile
+
+    return profile
 
 
 def random_euclidean_threshold_profile(
@@ -718,7 +716,7 @@ def random_euclidean_threshold_profile(
 
     profile = Profile(num_cand)
     approval_sets = []
-    for v, voterpoint in enumerate(voter_points):
+    for voterpoint in voter_points:
         distances = {
             cand: np.linalg.norm(voterpoint - candidate_points[cand])
             for cand in profile.candidates
@@ -731,8 +729,8 @@ def random_euclidean_threshold_profile(
 
     if return_points:
         return profile, voter_points, candidate_points
-    else:
-        return profile
+
+    return profile
 
 
 def random_euclidean_vcr_profile(
@@ -836,8 +834,8 @@ def random_euclidean_vcr_profile(
 
     if return_points:
         return profile, voter_points, candidate_points
-    else:
-        return profile
+
+    return profile
 
 
 def _voter_and_candidate_points(
@@ -852,7 +850,7 @@ def _voter_and_candidate_points(
         voter_points = np.array([random_point(voter_prob_distribution) for _ in range(num_voters)])
         voter_dimension = voter_prob_distribution.dimension
     else:
-        voter_dimension = set([len(p) for p in voter_points])
+        voter_dimension = {len(p) for p in voter_points}
         if len(voter_dimension) != 1:
             raise ValueError("Voter points have different dimensions.")
         voter_points = np.array(voter_points)
@@ -865,7 +863,7 @@ def _voter_and_candidate_points(
         )
         candidate_dimension = candidate_prob_distribution.dimension
     else:
-        candidate_dimension = set([len(p) for p in candidate_points])
+        candidate_dimension = {len(p) for p in candidate_points}
         if len(candidate_dimension) != 1:
             raise ValueError("Candidate points have different dimensions.")
         candidate_points = np.array(candidate_points)
@@ -973,8 +971,10 @@ class PointProbabilityDistribution:
 
         try:
             self.dimension = int(name.split("d_")[0])
-        except ValueError:
-            raise ValueError(f"Could not extract dimension from probability distribution {name}.")
+        except ValueError as error:
+            raise ValueError(
+                f"Could not extract dimension from probability distribution {name}."
+            ) from error
 
         try:
             len(center_point)
@@ -1000,7 +1000,7 @@ def random_point(prob_distribution):
     """
     if prob_distribution.name == "1d_interval":
         offset = prob_distribution.center_point[0] - prob_distribution.width / 2
-        return rng.random() * prob_distribution.width + offset
+        point = rng.random() * prob_distribution.width + offset
     elif prob_distribution.name == "1d_gaussian":
         point = rng.normal(prob_distribution.center_point[0], prob_distribution.sigma)
     elif prob_distribution.name == "1d_gaussian_interval":
@@ -1042,6 +1042,7 @@ def random_point(prob_distribution):
         point = rng.random(3) * prob_distribution.width + prob_distribution.center_point
     else:
         raise ValueError(f"unknown name of point distribution: {prob_distribution.name}")
+
     return point
 
 
