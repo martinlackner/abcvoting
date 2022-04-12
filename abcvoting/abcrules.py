@@ -1613,7 +1613,7 @@ def compute_revseq_thiele_method(
                     indent=" ",
                 )
                 output.details(
-                    "(all would decrease the score by the same amount {delta_score})", indent=" "
+                    f"(all would decrease the score by the same amount {delta_score})", indent=" "
                 )
             output.details("")
     output.info(

@@ -112,7 +112,7 @@ def _optimize_rule_mip(
             if len(committees) == 0:
                 # we are in the first round of searching for committees
                 # and Gurobi didn't find any
-                raise RuntimeError("Python MIP found no solution (INFEASIBLE)  (model {name})")
+                raise RuntimeError(f"Python MIP found no solution (INFEASIBLE)  (model {name})")
             break
 
         committee = set(
@@ -268,7 +268,7 @@ def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_i
             ) == mip.xsum(in_committee[cand] for cand in voter.approved)
 
         # additional constraints from previous iterations
-        for prev_iteration in range(0, iteration):
+        for prev_iteration in range(iteration):
             model += (
                 mip.xsum(
                     float(marginal_scorefcts[prev_iteration](x))

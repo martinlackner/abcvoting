@@ -254,7 +254,7 @@ def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
             )
 
         # additional constraints from previous iterations
-        for prev_iteration in range(0, iteration):
+        for prev_iteration in range(iteration):
             model.addConstr(
                 gb.quicksum(
                     float(scorefcts[prev_iteration](x)) * voter.weight * utility[(voter, x)]
@@ -611,7 +611,7 @@ def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees
         voteratmostdistances = {}
 
         for i, voter in enumerate(profile):
-            for dist in range(0, profile.num_cand + 1):
+            for dist in range(profile.num_cand + 1):
                 voteratmostdistances[(i, dist)] = model.addVar(
                     vtype=gb.GRB.BINARY, name=f"atmostdistance({i, dist})"
                 )
@@ -628,7 +628,7 @@ def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees
         # constraint: distances are consistent with actual committee
         for i, voter in enumerate(profile):
             not_approved = [cand for cand in profile.candidates if cand not in voter.approved]
-            for dist in range(0, profile.num_cand + 1):
+            for dist in range(profile.num_cand + 1):
                 if isinstance(voteratmostdistances[(i, dist)], int):
                     # trivially satisfied
                     continue

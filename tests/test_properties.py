@@ -199,13 +199,11 @@ def test_JR_method(profile, committee, expected_result):
 
 def _list_abc_yaml_instances():
     currdir = os.path.dirname(os.path.abspath(__file__))
-    filenames = [
+    return [
         currdir + "/test_instances/" + filename
         for filename in os.listdir(currdir + "/test_instances/")
         if filename.endswith(".abc.yaml")
     ]
-
-    return filenames
 
 
 abc_yaml_filenames = _list_abc_yaml_instances()

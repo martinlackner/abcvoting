@@ -75,7 +75,7 @@ def _optimize_rule_ortools(
             if len(committees) == 0:
                 # we are in the first round of searching for committees
                 # and Gurobi didn't find any
-                raise RuntimeError("OR-Tools found no solution (INFEASIBLE)  (model {name})")
+                raise RuntimeError(f"OR-Tools found no solution (INFEASIBLE)  (model {name})")
             break
 
         committee = set(
