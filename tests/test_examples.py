@@ -51,7 +51,7 @@ def check_output(capfd, request):
     test_name = request.node.name
     fname = Path(__file__).parent / "expected_output" / test_name
     try:
-        with open(fname, "r", encoding="utf8") as file:
+        with open(fname, encoding="utf8") as file:
             expected_output = file.read()
         expected_output = remove_algorithm_info(str(expected_output))
     except FileNotFoundError:

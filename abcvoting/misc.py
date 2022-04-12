@@ -96,7 +96,7 @@ def sorted_committees(committees):
         list of CandidateSet
             A sorted list of committees.
     """
-    return sorted([CandidateSet(committee) for committee in committees], key=str)
+    return sorted((CandidateSet(committee) for committee in committees), key=str)
 
 
 def str_set_of_candidates(candset, cand_names=None):
@@ -125,7 +125,7 @@ def str_set_of_candidates(candset, cand_names=None):
     if cand_names is None:
         named = sorted(str(cand) for cand in candset)
     else:
-        named = sorted([str(cand_names[cand]) for cand in candset])
+        named = sorted(str(cand_names[cand]) for cand in candset)
     return "{" + ", ".join(named) + "}"
 
 

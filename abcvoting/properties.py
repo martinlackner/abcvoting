@@ -529,7 +529,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
     # return value based on status code
     # status code 2 means model was solved to optimality, thus a dominating committee was found
     if model.Status == 2:
-        committee = set(cand for cand in profile.candidates if in_committee[cand].Xn >= 0.9)
+        committee = {cand for cand in profile.candidates if in_committee[cand].Xn >= 0.9}
         detailed_information = {"dominating_committee": committee}
         return False, detailed_information
 
@@ -684,8 +684,8 @@ def _check_EJR_gurobi(profile, committee):
     # status code 2 means model was solved to optimality, thus an ell-cohesive group
     # that satisfies the condition of EJR was found
     if model.Status == 2:
-        cohesive_group = set(vi for vi, _ in enumerate(profile) if in_group[vi].Xn >= 0.9)
-        joint_candidates = set(cand for cand in profile.candidates if in_cut[cand].Xn >= 0.9)
+        cohesive_group = {vi for vi, _ in enumerate(profile) if in_group[vi].Xn >= 0.9}
+        joint_candidates = {cand for cand in profile.candidates if in_cut[cand].Xn >= 0.9}
         detailed_information = {
             "cohesive_group": cohesive_group,
             "ell": round(ell.Xn),
@@ -866,8 +866,8 @@ def _check_PJR_gurobi(profile, committee):
     # status code 2 means model was solved to optimality, thus an ell-cohesive group
     # that satisfies the condition of PJR was found
     if model.Status == 2:
-        cohesive_group = set(vi for vi, _ in enumerate(profile) if in_group[vi].Xn >= 0.9)
-        joint_candidates = set(cand for cand in profile.candidates if in_cut[cand].Xn >= 0.9)
+        cohesive_group = {vi for vi, _ in enumerate(profile) if in_group[vi].Xn >= 0.9}
+        joint_candidates = {cand for cand in profile.candidates if in_cut[cand].Xn >= 0.9}
         detailed_information = {
             "cohesive_group": cohesive_group,
             "ell": round(ell.Xn),

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Example 2.9 (seq-Phragmen).
 

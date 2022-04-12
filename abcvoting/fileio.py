@@ -152,7 +152,7 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
         raise ValueError("Parameter setsize must be > 0")
     if relative_setsize and (relative_setsize <= 0.0 or relative_setsize > 1.0):
         raise ValueError("Parameter relative_setsize not in interval (0, 1]")
-    with open(filename, "r") as f:
+    with open(filename) as f:
         line = f.readline()
         num_cand = int(line.strip())
         candidate_map = {}
@@ -162,7 +162,7 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
 
         parts = f.readline().split(",")
         try:
-            voter_count, _, unique_orders = [int(p.strip()) for p in parts]
+            voter_count, _, unique_orders = (int(p.strip()) for p in parts)
         except ValueError as error:
             raise MalformattedFileException(
                 f"Number of voters ill specified ({str(parts)}), should be triple of integers"

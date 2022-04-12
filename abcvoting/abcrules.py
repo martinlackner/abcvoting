@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Approval-based committee (ABC) voting rules."""
 
 import functools
@@ -2314,7 +2313,7 @@ def _lexminimaxav_bruteforce(profile, committeesize, resolute, max_num_of_commit
     opt_distances = [profile.num_cand + 1] * len(profile)
     for committee in itertools.combinations(profile.candidates, committeesize):
         distances = sorted(
-            [misc.hamming(voter.approved, set(committee)) for voter in profile], reverse=True
+            (misc.hamming(voter.approved, set(committee)) for voter in profile), reverse=True
         )
         for i, dist in enumerate(distances):
             if opt_distances[i] < dist:
@@ -3122,9 +3121,7 @@ def _rule_x_algorithm(
             _q = division(1 - poor_budget, len(rich))
             if algorithm == "float-fractions":
                 # due to float imprecision, values very close to `q` count as `q`
-                new_poor = set(
-                    v for v in rich if budget[v] < _q and not misc.isclose(budget[v], _q)
-                )
+                new_poor = {v for v in rich if budget[v] < _q and not misc.isclose(budget[v], _q)}
             else:
                 new_poor = {v for v in rich if budget[v] < _q}
             if len(new_poor) == 0:
@@ -3622,7 +3619,7 @@ def _phragmen_enestroem_algorithm(
                 cand for cand, supp in support.items() if misc.isclose(supp, max_support)
             ]
         else:
-            tied_cands = sorted([cand for cand, supp in support.items() if supp == max_support])
+            tied_cands = sorted(cand for cand, supp in support.items() if supp == max_support)
         assert tied_cands, "_phragmen_enestroem_algorithm: no candidate with max support (??)"
 
         new_committee_budget_pairs = []
@@ -3783,7 +3780,7 @@ def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_n
                 cand for cand, supp in support.items() if misc.isclose(supp, max_support)
             ]
         else:
-            tied_cands = sorted([cand for cand, supp in support.items() if supp == max_support])
+            tied_cands = sorted(cand for cand, supp in support.items() if supp == max_support)
         assert tied_cands, "_consensus_rule_algorithm: no candidate with max support (??)"
 
         new_committee_budget_pairs = []

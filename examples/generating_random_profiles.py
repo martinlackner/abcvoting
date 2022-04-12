@@ -61,7 +61,7 @@ for prob_distribution in prob_distributions:
 
 # print statistics
 print(f"Done. Generated {len(profiles)} profiles.")
-prob_dist_ids = sorted(set(prob_dist["id"] for prob_dist, profile in profiles))
+prob_dist_ids = sorted({prob_dist["id"] for prob_dist, profile in profiles})
 for prob_dist_id in prob_dist_ids:
     count = len([profile for prob_dist, profile in profiles if prob_dist["id"] == prob_dist_id])
     print(f" {count} profiles via {prob_dist_id}")

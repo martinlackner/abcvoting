@@ -78,9 +78,7 @@ def _optimize_rule_ortools(
                 raise RuntimeError(f"OR-Tools found no solution (INFEASIBLE)  (model {name})")
             break
 
-        committee = set(
-            cand for cand in profile.candidates if solver.Value(in_committee[cand]) >= 1
-        )
+        committee = {cand for cand in profile.candidates if solver.Value(in_committee[cand]) >= 1}
         if len(committee) != committeesize:
             raise RuntimeError(
                 f"_optimize_rule_ortools produced a committee with "

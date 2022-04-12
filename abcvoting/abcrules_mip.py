@@ -115,13 +115,13 @@ def _optimize_rule_mip(
                 raise RuntimeError(f"Python MIP found no solution (INFEASIBLE)  (model {name})")
             break
 
-        committee = set(
+        committee = {
             cand
             for cand in profile.candidates
             if in_committee[cand].x >= 0.9
             # this should be >= 1 - ACCURACY, but apparently it is not necessarily the case that
             # integers are only ACCURACY apart from either 0 or 1
-        )
+        }
         if len(committee) != committeesize:
             raise RuntimeError(
                 f"_optimize_rule_mip produced a committee with "
