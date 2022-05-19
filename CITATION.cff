@@ -24,9 +24,8 @@ authors:
     family-names: Szufa
   - given-names: Stefan Schlomo
     family-names: Forster
-identifiers:
-  - type: doi
-    value: 10.5281/zenodo.3904466
-repository-code: 'https://github.com/martinlackner/abcvoting'
-url: 'https://abcvoting.readthedocs.io/'
+doi: 10.5281/zenodo.3904466
+url: 'https://github.com/martinlackner/abcvoting'
 license: MIT
+version: 2.3.0
+date-released: 2022-03-31
