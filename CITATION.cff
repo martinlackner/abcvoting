@@ -1,0 +1,32 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  abcvoting: A Python library of approval-based
+  committee voting rules
+message: >-
+  If you would like to acknowledge our work in a
+  scientific paper, please use the following (or a
+  similar) citation:
+type: software
+authors:
+  - given-names: Martin
+    family-names: Lackner
+    orcid: 'https://orcid.org/0000-0003-2170-0770'
+  - given-names: Peter
+    family-names: Regner
+  - given-names: Benjamin
+    family-names: Krenn
+  - given-names: Elvi
+    family-names: Cela
+  - given-names: Stanisław
+    family-names: Szufa
+  - given-names: Stefan Schlomo
+    family-names: Forster
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.3904466
+repository-code: 'https://github.com/martinlackner/abcvoting'
+url: 'https://abcvoting.readthedocs.io/'
+license: MIT
