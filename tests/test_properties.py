@@ -18,7 +18,7 @@ output.set_verbosity(verbosity=DETAILS)
 # With given input profile, committee returned by Monroe Rule
 # is not Pareto optimal
 @pytest.mark.parametrize(
-    "algorithm", ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobi)]
+    "algorithm", ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobipy)]
 )
 def test_pareto_optimality_methods(algorithm):
     # profile with 4 candidates: a, b, c, d
@@ -107,7 +107,7 @@ EJR_instances.append((profile, committee, expected_result))
 
 
 @pytest.mark.parametrize(
-    "algorithm", ["brute-force", "fastest", pytest.param("gurobi", marks=pytest.mark.gurobi)]
+    "algorithm", ["brute-force", "fastest", pytest.param("gurobi", marks=pytest.mark.gurobipy)]
 )
 @pytest.mark.parametrize("profile, committee, expected_result", EJR_instances)
 def test_EJR_methods(algorithm, profile, committee, expected_result):
@@ -160,7 +160,7 @@ for profile, committee, expected_result in EJR_instances:
 
 
 @pytest.mark.parametrize(
-    "algorithm", ["brute-force", "fastest", pytest.param("gurobi", marks=pytest.mark.gurobi)]
+    "algorithm", ["brute-force", "fastest", pytest.param("gurobi", marks=pytest.mark.gurobipy)]
 )
 @pytest.mark.parametrize("profile, committee, expected_result", PJR_instances)
 def test_PJR_methods(algorithm, profile, committee, expected_result):
@@ -210,7 +210,7 @@ abc_yaml_filenames = _list_abc_yaml_instances()
 
 
 # to test the output of the brute-force vs gurobi counterparts
-@pytest.mark.gurobi
+@pytest.mark.gurobipy
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "abc_yaml_instance",
@@ -240,7 +240,7 @@ def test_matching_output_different_approaches(abc_yaml_instance):
     ) == properties.check_PJR(profile, input_committee, algorithm="gurobi")
 
 
-@pytest.mark.gurobi
+@pytest.mark.gurobipy
 @pytest.mark.slow
 @pytest.mark.parametrize("abc_yaml_instance", abc_yaml_filenames)
 def test_output_EJR_PAV(abc_yaml_instance):
@@ -257,7 +257,7 @@ def test_output_EJR_PAV(abc_yaml_instance):
     assert properties.check_EJR(profile, input_committee, algorithm="gurobi")
 
 
-@pytest.mark.gurobi
+@pytest.mark.gurobipy
 @pytest.mark.slow
 @pytest.mark.parametrize("abc_yaml_instance", abc_yaml_filenames)
 def test_output_PJR_seqPhragmen(abc_yaml_instance):

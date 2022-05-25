@@ -55,7 +55,7 @@ jobs:
     - name: Test with pytest
       run: |
         # note that some tests are skipped because Gurobi is not available on Github
-        coverage run --source=. -m pytest -v --tb=long -m "not gurobi and not ortools and not veryslow" -ra tests/
+        coverage run --source=. -m pytest -v --tb=long -m "not mipgurobi and not ortools and not veryslow" -ra tests/
 
     - name: Generate coverage report
       run: coverage xml

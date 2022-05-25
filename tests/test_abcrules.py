@@ -12,17 +12,10 @@ from abcvoting import abcrules, misc, fileio
 from itertools import combinations
 
 MARKS = {
-    "gurobi": [pytest.mark.gurobi],
-    # "cvxpy_scip": [pytest.mark.cvxpy, pytest.mark.scip],
-    # "cvxpy_glpk_mi": [pytest.mark.cvxpy, pytest.mark.glpk_mi],
-    # "cvxpy_cbc": [pytest.mark.cvxpy, pytest.mark.cbc],
-    # "cvxpy_gurobi": [pytest.mark.cvxpy, pytest.mark.gurobi],
+    "gurobi": [pytest.mark.gurobipy],
     "ortools-cp": [pytest.mark.ortools],
-    # "ortools-cbc": [pytest.mark.ortools, pytest.mark.cbc],
-    # "ortools-gurobi": [pytest.mark.ortools, pytest.mark.gurobi],
-    # "ortools-scip": [pytest.mark.ortools, pytest.mark.scip],
-    "mip-cbc": [pytest.mark.mip],  # does not require cbc because cbc is included in mip
-    "mip-gurobi": [pytest.mark.mip, pytest.mark.gurobi],
+    "mip-cbc": [pytest.mark.mip, pytest.mark.mipcbc],
+    "mip-gurobi": [pytest.mark.mip, pytest.mark.mipgurobi],
     "brute-force": [],
     "branch-and-bound": [],
     "standard": [],

@@ -152,7 +152,7 @@ def test_abcbook_propositionA3_py(check_output):
     from examples.abcbook import propositionA3  # noqa: F401
 
 
-@pytest.mark.gurobi
+@pytest.mark.gurobipy
 def test_abcbook_propositionA4_py(check_output):
     from examples.abcbook import propositionA4  # noqa: F401
 
@@ -162,7 +162,7 @@ def test_simple_py(check_output):
     from examples import simple  # noqa: F401
 
 
-@pytest.mark.gurobi
+@pytest.mark.gurobipy
 def test_allrules_py(check_output):
     from examples import allrules  # noqa: F401
 

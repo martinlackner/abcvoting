@@ -95,6 +95,7 @@ setuptools.setup(
         "mip>=1.13.0",
         "ruamel.yaml>=0.16.13",
         "numpy>=1.20",
+        "gurobipy>=9.5.0",
     ],
     extras_require={
         "dev": [
