@@ -52,10 +52,9 @@ jobs:
     - name: Check for correct black formatting
       run: black --check .
 
-    - name: Test with pytest
+    - name: Test with pytest including slow
       run: |
-        # note that some tests are skipped because Gurobi is not available on Github
-        coverage run --source=. -m pytest -v --tb=long -m "not mipgurobi and not ortools and not veryslow" -ra tests/
+        coverage run --source=. -m pytest -v --tb=long -m "(not mipgurobi or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
 
     - name: Generate coverage report
       run: coverage xml
