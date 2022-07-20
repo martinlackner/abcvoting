@@ -43,7 +43,7 @@ The main ABC rules implemented in `abcvoting` are the following:
     greedy-monroe       Greedy Monroe
     minimaxav           Minimax Approval Voting (MAV)
     lexminimaxav        Lexicographic Minimax Approval Voting (lex-MAV)
-    rule-x              Rule X (aka Method of Equal Shares)
+    equal-shares        Method of Equal Shares (aka Rule X)
     phragmen-enestroem  Method of Phragmén-Eneström
     consensus-rule      Consensus Rule
     trivial             Trivial Rule

@@ -102,7 +102,7 @@ monotonicity_instances = [
         committees_after=[{1, 2, 3}],
     ),
     MonotonicityInstance(
-        rule_id="rule-x",
+        rule_id="equal-shares",
         committeesize=3,
         approval_sets=[
             {1, 3},
@@ -121,7 +121,7 @@ monotonicity_instances = [
         committees_after=[{1, 2, 4}],
     ),
     MonotonicityInstance(
-        rule_id="rule-x-without-phragmen-phase",
+        rule_id="equal-shares-without-phragmen-phase",
         committeesize=4,
         approval_sets=[
             {0, 1, 2},
@@ -285,7 +285,7 @@ monotonicity_instances = [
         committees_after=[{0, 1, 2}],
     ),
     MonotonicityInstance(
-        rule_id="rule-x",
+        rule_id="equal-shares",
         committeesize=3,
         approval_sets=[{1}, {0, 1, 4}, {1, 4}, {2}, {1, 4}, {0, 2}, {0}],
         with_additional_voter=False,

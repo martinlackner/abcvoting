@@ -234,7 +234,7 @@ class _CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
-            "rule-x": [
+            "equal-shares": [
                 {0, 1, 4, 5},
                 {0, 2, 4, 5},
                 {0, 3, 4, 5},
@@ -242,7 +242,7 @@ class _CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
-            "rule-x-without-phragmen-phase": [{4, 5}],
+            "equal-shares-without-phragmen-phase": [{4, 5}],
             "phragmen-enestroem": [
                 {0, 1, 4, 5},
                 {0, 2, 4, 5},
@@ -329,8 +329,8 @@ class _CollectInstances:
             "greedy-monroe": [{0, 1, 3}],
             "seqslav": [{0, 1, 3}],
             "slav": [{0, 1, 3}],
-            "rule-x": [{0, 1, 3}],
-            "rule-x-without-phragmen-phase": [{0, 1, 3}],
+            "equal-shares": [{0, 1, 3}],
+            "equal-shares-without-phragmen-phase": [{0, 1, 3}],
             "phragmen-enestroem": [{0, 1, 3}],
             "consensus-rule": [{0, 1, 3}],
             "trivial": [
@@ -433,8 +433,8 @@ class _CollectInstances:
             "greedy-monroe": [{0, 1, 2, 4}],
             "seqslav": [{0, 1, 2, 4}],
             "slav": [{0, 1, 2, 4}],
-            "rule-x": [{0, 1, 2, 4}],
-            "rule-x-without-phragmen-phase": [{0, 2}],
+            "equal-shares": [{0, 1, 2, 4}],
+            "equal-shares-without-phragmen-phase": [{0, 2}],
             "phragmen-enestroem": [{0, 1, 2, 4}],
             "consensus-rule": [{0, 1, 2, 4}],
             "trivial": [
@@ -471,8 +471,8 @@ class _CollectInstances:
             "greedy-monroe": [{0, 3}],
             "seqslav": [{0, 3}],
             "slav": [{0, 3}],
-            "rule-x": [{0, 3}],
-            "rule-x-without-phragmen-phase": [{0}],
+            "equal-shares": [{0, 3}],
+            "equal-shares-without-phragmen-phase": [{0}],
             "phragmen-enestroem": [{0, 3}],
             "consensus-rule": [{0, 3}],
             "trivial": [
@@ -512,8 +512,8 @@ class _CollectInstances:
             "greedy-monroe": one_each,
             "seqslav": one_each,
             "slav": one_each,
-            "rule-x": one_each,
-            "rule-x-without-phragmen-phase": one_each,
+            "equal-shares": one_each,
+            "equal-shares-without-phragmen-phase": one_each,
             "phragmen-enestroem": one_each,
             "consensus-rule": one_each,
             "trivial": [
@@ -753,7 +753,7 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute):
 
     if rule_id in [
         "lexminimaxav",
-        "rule-x",
+        "equal-shares",
         "phragmen-enestroem",
         "rsd",
         "monroe",

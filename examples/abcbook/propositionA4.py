@@ -123,7 +123,7 @@ manipulations = [
         committees_after=[{a, b, c}],
     ),
     ManipulationInstance(
-        rule_id="rule-x",
+        rule_id="equal-shares",
         committeesize=3,
         approval_sets=[{1, 2, 3}, {0, 1}, {1, 3}, {2, 3}, {3, 4}, {3, 4}],
         manipulated_vote={2},

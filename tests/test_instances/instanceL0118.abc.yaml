@@ -121,11 +121,11 @@ compute:
 - rule_id: lexminimaxav
   result: [[1, 2, 5], [1, 2, 6], [1, 4, 5], [1, 4, 6], [2, 5, 7], [2, 6, 7], [4, 5, 7], [4, 6, 7]]
   resolute: true
-- rule_id: rule-x
+- rule_id: equal-shares
   result: [[1, 2, 4], [1, 2, 5], [1, 2, 6], [1, 4, 5], [1, 4, 6], [2, 4, 5], [2, 4, 6], [2, 4, 7], [2, 5, 7], [2, 6, 7], [
       4, 5, 7], [4, 6, 7]]
   resolute: true
-- rule_id: rule-x
+- rule_id: equal-shares
   result: [[1, 2, 4], [1, 2, 5], [1, 2, 6], [1, 4, 5], [1, 4, 6], [2, 4, 5], [2, 4, 6], [2, 4, 7], [2, 5, 7], [2, 6, 7], [
       4, 5, 7], [4, 6, 7]]
   resolute: false

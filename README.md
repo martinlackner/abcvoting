@@ -51,7 +51,7 @@ The following ABC rules are implemented:
 
 * Greedy Monroe
 
-* Rule X (Method of Equal Shares)
+* Method of Equal Shares (Rule X)
 
 * Phragmén's First Method (Enestr&ouml;m's Method)
 

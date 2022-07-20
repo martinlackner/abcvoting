@@ -116,7 +116,7 @@ winning committees after the modification:
 Greedy Monroe fails candidate monotonicity with additional voters
 
 -----------------------------------
-Rule X (aka Method of Equal Shares)
+Method of Equal Shares (aka Rule X)
 -----------------------------------
 
 profile with 9 voters and 8 candidates:
@@ -137,11 +137,11 @@ additional voter: {a}
 winning committees after the modification:
  {b, c, e}
 
-Rule X fails candidate monotonicity with additional voters
+Equal Shares fails candidate monotonicity with additional voters
 
-------------------------------------------------
-Rule X without the Phragmén phase (second phase)
-------------------------------------------------
+-----------------------------------------------------------------------------
+Method of Equal Shares (aka Rule X) without the Phragmén phase (second phase)
+-----------------------------------------------------------------------------
 
 profile with 12 voters and 8 candidates:
  2 x {a, b, c},
@@ -164,7 +164,7 @@ additional voter: {e}
 winning committees after the modification:
  {a, d, h}
 
-Rule X without Phragmén phase fails candidate monotonicity with additional voters
+Equal Shares without Phragmén phase fails candidate monotonicity with additional voters
 
 -------------------------------
 Monroe's Approval Rule (Monroe)
@@ -417,7 +417,7 @@ winning committees after the modification:
 seq-CC fails support monotonicity without additional voters
 
 -----------------------------------
-Rule X (aka Method of Equal Shares)
+Method of Equal Shares (aka Rule X)
 -----------------------------------
 
 profile with 7 voters and 8 candidates:
@@ -436,7 +436,7 @@ change of voter 0: {b} --> {a, b, e}
 winning committees after the modification:
  {a, b, c}
 
-Rule X fails support monotonicity without additional voters
+Equal Shares fails support monotonicity without additional voters
 
 -------------
 Greedy Monroe

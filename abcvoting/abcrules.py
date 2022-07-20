@@ -36,7 +36,7 @@ MAIN_RULE_IDS = [
     "greedy-monroe",
     "minimaxav",
     "lexminimaxav",
-    "rule-x",
+    "equal-shares",
     "phragmen-enestroem",
     "consensus-rule",
     "trivial",
@@ -227,16 +227,18 @@ class Rule:
             self.compute_fct = compute_lexminimaxav
             self.algorithms = ("gurobi", "brute-force")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
-        elif rule_id == "rule-x":
-            self.shortname = "Rule X"
-            self.longname = "Rule X (aka Method of Equal Shares)"
-            self.compute_fct = compute_rule_x
+        elif rule_id in ["rule-x", "equal-shares"]:
+            self.shortname = "Equal Shares"
+            self.longname = "Method of Equal Shares (aka Rule X)"
+            self.compute_fct = compute_equal_shares
             self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
-        elif rule_id == "rule-x-without-phragmen-phase":
-            self.shortname = "Rule X without Phragmén phase"
-            self.longname = "Rule X without the Phragmén phase (second phase)"
-            self.compute_fct = functools.partial(compute_rule_x, skip_phragmen_phase=True)
+        elif rule_id in ["rule-x-without-phragmen-phase", "equal-shares-without-phragmen-phase"]:
+            self.shortname = "Equal Shares without Phragmén phase"
+            self.longname = (
+                "Method of Equal Shares (aka Rule X) without the Phragmén phase (second phase)"
+            )
+            self.compute_fct = functools.partial(compute_equal_shares, skip_phragmen_phase=True)
             self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
         elif rule_id == "phragmen-enestroem":
@@ -2939,7 +2941,33 @@ def compute_rule_x(
     skip_phragmen_phase=False,
 ):
     """
-    Compute winning committees with Rule X (aka Method of Equal Shares).
+    Compute winning committees with the Method of Equal Shares (aka Rule X).
+
+    .. deprecated:: 2.4.0
+        Use :func:`compute_equal_shares` instead. (Rule X has been renamed by the authors
+        to Method of Equal Shares and this appears to be the new standard name used in the
+        literature by now.)
+    """
+    return compute_equal_shares(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+        skip_phragmen_phase=skip_phragmen_phase,
+    )
+
+
+def compute_equal_shares(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    skip_phragmen_phase=False,
+):
+    """
+    Compute winning committees with the Method of Equal Shares (aka Rule X).
 
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
@@ -2958,11 +2986,11 @@ def compute_rule_x(
         algorithm : str, optional
             The algorithm to be used.
 
-            The following algorithms are available for Rule X (aka Method of Equal Shares):
+            The following algorithms are available for the Method of Equal Shares:
 
             .. doctest::
 
-                >>> Rule("rule-x").algorithms
+                >>> Rule("equal-shares").algorithms
                 ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
 
         resolute : bool, optional
@@ -2989,9 +3017,9 @@ def compute_rule_x(
             A list of winning committees.
     """
     if skip_phragmen_phase:
-        rule_id = "rule-x-without-phragmen-phase"
+        rule_id = "equal-shares-without-phragmen-phase"
     else:
-        rule_id = "rule-x"
+        rule_id = "equal-shares"
     rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
@@ -3006,7 +3034,7 @@ def compute_rule_x(
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
-    committees, detailed_info = _rule_x_algorithm(
+    committees, detailed_info = _equal_shares_algorithm(
         profile=profile,
         committeesize=committeesize,
         algorithm=algorithm,
@@ -3108,12 +3136,12 @@ def compute_rule_x(
     return sorted_committees(committees)
 
 
-def _rule_x_algorithm(
+def _equal_shares_algorithm(
     profile, committeesize, algorithm, resolute, max_num_of_committees, skip_phragmen_phase=False
 ):
-    """Algorithm for Rule X."""
+    """Algorithm for the Method of Equal Shares."""
 
-    def _rule_x_get_min_q(profile, budget, cand, division):
+    def _equal_shares_get_min_q(profile, budget, cand, division):
         rich = {v for v, voter in enumerate(profile) if cand in voter.approved}
         poor = set()
         while len(rich) > 0:
@@ -3179,7 +3207,7 @@ def _rule_x_algorithm(
             )
         division = mpq  # using gmpy2 fractions
     else:
-        raise UnknownAlgorithm("rule-x", algorithm)
+        raise UnknownAlgorithm("equal-shares", algorithm)
 
     if resolute:
         max_num_of_committees = 1  # same algorithm for resolute==True and resolute==False
@@ -3202,7 +3230,7 @@ def _rule_x_algorithm(
         available_candidates = [cand for cand in profile.candidates if cand not in committee]
         min_q = {}
         for cand in available_candidates:
-            q = _rule_x_get_min_q(profile, budget, cand, division)
+            q = _equal_shares_get_min_q(profile, budget, cand, division)
             if q is not None:
                 min_q[cand] = q
 

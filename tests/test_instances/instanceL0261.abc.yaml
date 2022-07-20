@@ -131,10 +131,10 @@ compute:
 - rule_id: lexminimaxav
   result: [[2, 4, 7]]
   resolute: true
-- rule_id: rule-x
+- rule_id: equal-shares
   result: [[2, 4, 7]]
   resolute: true
-- rule_id: rule-x
+- rule_id: equal-shares
   result: [[2, 4, 7]]
   resolute: false
 - rule_id: phragmen-enestroem

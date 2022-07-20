@@ -1,5 +1,5 @@
 """
-Example 2.12 (Rule X, seq-Phragmen).
+Example 2.12 (Method of Equal Shares, seq-Phragmen).
 
 From "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
@@ -28,7 +28,7 @@ profile.add_voters(approval_sets)
 print(misc.header("Input:"))
 print(profile.str_compact())
 
-committees_rule_x = abcrules.compute_rule_x(
+committees_equal_shares = abcrules.compute_equal_shares(
     profile, 3, resolute=True, algorithm="standard-fractions"
 )
 
@@ -37,5 +37,5 @@ committees_seqphragmen = abcrules.compute_seqphragmen(
 )
 
 # verify correctness
-assert committees_rule_x == [{a, c, d}]
+assert committees_equal_shares == [{a, c, d}]
 assert committees_seqphragmen == [{b, c, d}]

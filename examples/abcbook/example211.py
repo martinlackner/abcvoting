@@ -1,5 +1,5 @@
 """
-Example 2.11 (Rule X).
+Example 2.11 (Method of Equal Shares).
 
 From "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
@@ -40,7 +40,7 @@ print(misc.header("Example 11", "*"))
 print(misc.header("Input (election instance from Example 1):"))
 print(profile.str_compact())
 
-committees = abcrules.compute_rule_x(profile, 4, algorithm="standard-fractions")
+committees = abcrules.compute_equal_shares(profile, 4, algorithm="standard-fractions")
 
 # verify correctness
 a, b, c, d, e, f, g = range(7)  # a = 0, b = 1, c = 2, ...
