@@ -32,4 +32,4 @@ jobs:
       run: |
         rm -r abcvoting
         ls
-        coverage run --source=. -m pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
+        coverage run --source=. -m pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow) and (not mipcbc or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
