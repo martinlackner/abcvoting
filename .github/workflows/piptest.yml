@@ -2,7 +2,7 @@ name: Unittests using abcvoting installed from pip, run daily
 
 on:
   schedule:
-    - cron: '* 5 * * *'
+    - cron: '* 5 * * *'  # every day at 5:00
 
 jobs:
   unittests:
@@ -27,9 +27,10 @@ jobs:
         pip install gmpy2
         pip install ortools
         pip install gurobipy
+        pip install pytest
 
     - name: Test with pytest
       run: |
         rm -r abcvoting
         ls
-        coverage run --source=. -m pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow) and (not mipcbc or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
+        pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow) and (not mipcbc or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
