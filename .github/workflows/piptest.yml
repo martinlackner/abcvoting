@@ -13,24 +13,34 @@ jobs:
         python-version: [3.7, 3.8, 3.9, "3.10"]
 
     steps:
-    - uses: actions/checkout@v3
+      - name: get latest release with tag
+        id: latestrelease
+        run: |
+          echo "::set-output name=releasetag::$(curl -s https://api.github.com/repos/weide-zhou/ticket13/releases/latest | jq '.tag_name' | sed 's/\"//g')"
+      - name: confirm release tag
+        run: |
+          echo ${{ steps.latestrelease.outputs.releasetag }}
+      - name: tagcheckout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.latestrelease.outputs.releasetag }}
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install abcvoting
-        pip install gmpy2
-        pip install ortools
-        pip install gurobipy
-        pip install pytest
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install abcvoting
+          pip install gmpy2
+          pip install ortools
+          pip install gurobipy
+          pip install pytest
 
-    - name: Test with pytest
-      run: |
-        rm -r abcvoting
-        ls
-        pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow) and (not mipcbc or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
+      - name: Test with pytest
+        run: |
+          rm -r abcvoting
+          ls
+          pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow) and (not mipcbc or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
