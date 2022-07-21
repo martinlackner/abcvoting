@@ -18,7 +18,7 @@ Requirements:
 
 - Python 3.7+
 
-- The following pip packages are required and installed automatically: mip, networkx, ortools, and ruamel.yaml.
+- The following pip packages are required and installed automatically: `gurobipy`, `mip`, `networkx`, `numpy`, `ortools`, and `ruamel.yaml`.
 
 Optional requirements:
 
@@ -29,6 +29,8 @@ Optional requirements:
 
 - `Gurobi (gurobipy) <https://www.gurobi.com/>`_: Most computationally hard rules are also implemented via the ILP
   solver Gurobi. The corresponding functions require
-  `gurobipy <https://www.gurobi.com/documentation/8.1/quickstart_mac/the_gurobi_python_interfac.html>`_.
+  `gurobipy <https://www.gurobi.com/documentation/quickstart.html>`_.
+  While `gurobipy` is installed by default (together with abcvoting), it requires a license to solve larger instances
+  (`academic licenses <https://www.gurobi.com/academia/academic-program-and-licenses/>`_ are available).
   If Gurobi is not available, the open-source solver `CBC <https://github.com/coin-or/Cbc>`_ is a slower alternative
   (that is installed automatically as part of `mip`).
