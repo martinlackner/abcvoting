@@ -43,4 +43,7 @@ jobs:
         run: |
           rm -r abcvoting
           ls
+          echo $PYTHONPATH
+          export PYTHONPATH=$PYTHONPATH:$PWD
+          echo $PYTHONPATH
           pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow) and (not mipcbc or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
