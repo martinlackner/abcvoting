@@ -68,7 +68,7 @@ def generate_abc_yaml_testinstances(
 
             if rule_id == "rsd":
                 committees = None  # result is random, not sensible for unit tests
-            elif rule_id == "leximaxphragmen" and (num_cand > 7 or num_voters > 8):
+            elif rule_id == "leximaxphragmen" and (num_cand > 9 or num_voters > 9):
                 committees = None  # too slow
             else:
                 committees = abcrules.compute(rule_id, profile, committeesize, resolute=resolute)

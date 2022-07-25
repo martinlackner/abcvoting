@@ -95,10 +95,10 @@ compute:
       4, 5, 7], [4, 6, 7]]
   resolute: true
 - rule_id: leximaxphragmen
-  result:
+  result: [[1, 2, 5], [1, 2, 6], [1, 4, 5], [1, 4, 6], [2, 5, 7], [2, 6, 7], [4, 5, 7], [4, 6, 7]]
   resolute: false
 - rule_id: leximaxphragmen
-  result:
+  result: [[1, 2, 5], [1, 2, 6], [1, 4, 5], [1, 4, 6], [2, 5, 7], [2, 6, 7], [4, 5, 7], [4, 6, 7]]
   resolute: true
 - rule_id: monroe
   result: [[1, 2, 5], [1, 2, 6], [1, 4, 5], [1, 4, 6], [2, 5, 7], [2, 6, 7], [4, 5, 7], [4, 6, 7]]

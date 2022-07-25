@@ -87,10 +87,10 @@ compute:
   result: [[0, 3, 6], [0, 5, 6]]
   resolute: true
 - rule_id: leximaxphragmen
-  result:
+  result: [[0, 3, 6], [0, 5, 6]]
   resolute: false
 - rule_id: leximaxphragmen
-  result:
+  result: [[0, 3, 6], [0, 5, 6]]
   resolute: true
 - rule_id: monroe
   result: [[0, 1, 5], [0, 1, 6], [0, 3, 6], [0, 5, 6], [0, 6, 7], [1, 5, 6], [3, 5, 6], [3, 6, 7]]

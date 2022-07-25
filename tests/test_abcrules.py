@@ -1242,9 +1242,7 @@ def test_selection_of_abc_yaml_instances(filename, rule_id, algorithm, load_abc_
         if compute_instance["rule_id"] != rule_id:
             continue
         if compute_instance["result"] is None:
-            if rule_id == "rsd":
-                return  # random, not applicable
-            pytest.skip(f"test for {rule_id} ({algorithm}), instance {filename}.")
+            return  # no result known, cannot test
         abcrules.compute(**compute_instance, algorithm=algorithm)
 
 

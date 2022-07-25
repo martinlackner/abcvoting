@@ -109,10 +109,10 @@ compute:
   result: [[0, 2, 4, 7]]
   resolute: true
 - rule_id: leximaxphragmen
-  result:
+  result: [[0, 2, 4, 7]]
   resolute: false
 - rule_id: leximaxphragmen
-  result:
+  result: [[0, 2, 4, 7]]
   resolute: true
 - rule_id: monroe
   result: [[0, 2, 4, 7]]
