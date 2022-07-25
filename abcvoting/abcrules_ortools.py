@@ -67,7 +67,7 @@ def _optimize_rule_ortools(
 
         if status not in [cp_model.OPTIMAL, cp_model.INFEASIBLE]:
             raise RuntimeError(
-                f"OR-Tools returned an unexpected status code: {status}"
+                f"OR-Tools returned an unexpected status code: {status}\n"
                 f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
 

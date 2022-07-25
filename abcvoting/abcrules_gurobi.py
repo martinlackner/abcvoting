@@ -90,7 +90,7 @@ def _optimize_rule_gurobi(
             # model.Status in [3, 4] implies infeasible --> no more solutions
             # otherwise ...
             raise RuntimeError(
-                f"Gurobi returned an unexpected status code: {model.Status}"
+                f"Gurobi returned an unexpected status code: {model.Status}\n"
                 f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
         if model.Status != 2:

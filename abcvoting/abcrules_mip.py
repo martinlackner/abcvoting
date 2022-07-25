@@ -104,7 +104,7 @@ def _optimize_rule_mip(
 
         if status not in [mip.OptimizationStatus.OPTIMAL, mip.OptimizationStatus.INFEASIBLE]:
             raise RuntimeError(
-                f"Python MIP returned an unexpected status code: {status}"
+                f"Python MIP returned an unexpected status code: {status}\n"
                 f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
 
