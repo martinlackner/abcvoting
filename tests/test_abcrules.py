@@ -561,15 +561,15 @@ def _list_abc_yaml_compute_instances():
         for rule_id in abcrules.MAIN_RULE_IDS:
             rule = abcrules.Rule(rule_id)
             for algorithm in rule.algorithms:
-                if "instanceS" in filename:
+                if rule_id == "leximaxphragmen":
+                    marks = [pytest.mark.slow, pytest.mark.veryslow]
+                elif "instanceS" in filename:
                     marks = []  # small instances, rather fast
                     if algorithm in ["mip-cbc"]:
                         marks = [pytest.mark.slow]
                 elif "instanceVL" in filename:
                     marks = [pytest.mark.slow, pytest.mark.veryslow]  # very large instances
                 elif rule_id == "monroe" and algorithm in ["mip-cbc"]:
-                    marks = [pytest.mark.slow, pytest.mark.veryslow]
-                elif rule_id == "leximaxphragmen":
                     marks = [pytest.mark.slow, pytest.mark.veryslow]
                 else:
                     marks = [pytest.mark.slow]
@@ -581,10 +581,10 @@ def _list_abc_yaml_compute_instances():
                         marks=marks + MARKS[algorithm],
                     )
                 )
-    return _abc_yaml_instances
+    return _abc_yaml_instances, filenames
 
 
-abc_yaml_instances = _list_abc_yaml_compute_instances()
+abc_yaml_instances, abc_yaml_filenames = _list_abc_yaml_compute_instances()
 
 
 @pytest.fixture(scope="module")
@@ -1410,3 +1410,28 @@ def test_natural_tiebreaking_order_max_num_of_committees(rule_id, algorithm, app
         max_num_of_committees=6,
     )
     assert committees == [{0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {1, 2}]
+
+
+# test that lexicographic rules are refinements of their non-lexicographic counterparts
+@pytest.mark.slow
+@pytest.mark.parametrize("filename", abc_yaml_filenames)
+def test_lex_rules_with_abc_yaml_instances(filename, load_abc_yaml_file):
+    profile, committeesize, compute_instances = load_abc_yaml_file[filename]
+    relevant_ruleids = [
+        "cc",
+        "lexcc",
+        "minimaxphragmen",
+        "leximaxphragmen",
+        "minimaxav",
+        "lexminimaxav",
+    ]
+    results = {}
+    for compute_instance in compute_instances:
+        if compute_instance["rule_id"] in relevant_ruleids:
+            results[compute_instance["rule_id"]] = compute_instance["result"]
+    if results["lexcc"]:
+        assert all(comm in results["cc"] for comm in results["lexcc"])
+    if results["leximaxphragmen"]:
+        assert all(comm in results["minimaxphragmen"] for comm in results["leximaxphragmen"])
+    if results["lexminimaxav"]:
+        assert all(comm in results["minimaxav"] for comm in results["lexminimaxav"])
