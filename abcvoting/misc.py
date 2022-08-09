@@ -4,6 +4,7 @@ Miscellaneous functions for committees (i.e., subsets of candidates).
 
 import math
 import numpy as np
+from time import perf_counter
 
 
 FLOAT_ISCLOSE_REL_TOL = 1e-12
@@ -411,3 +412,12 @@ def isclose(x, y):
         bool
     """
     return math.isclose(x, y, rel_tol=FLOAT_ISCLOSE_REL_TOL, abs_tol=FLOAT_ISCLOSE_ABS_TOL)
+
+
+def time_it(func):
+    def wrapper_function(*args, **kwargs):
+        start = perf_counter()
+        result = func(*args,  **kwargs)
+        print(f"{func.__name__}({kwargs}) needed {perf_counter()-start} seconds")
+        return result
+    return wrapper_function
