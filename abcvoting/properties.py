@@ -6,8 +6,8 @@ import itertools
 import math
 from more_itertools import set_partitions, powerset
 from abcvoting.output import output, WARNING
-from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate, time_it
-from abcvoting.preferences import Profile, Voter
+from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate
+from abcvoting.preferences import Profile
 
 try:
     import gurobipy as gb
@@ -33,7 +33,8 @@ def full_analysis(profile, committee):
     """
     Test all implemented properties for the given committee.
 
-    Returns a dictionary with the following keys: "pareto", "jr", "pjr", and "ejr".
+    Returns a dictionary with the following keys: "pareto", "jr", "pjr", "ejr", "priceability",
+    "stable_priceability" and "core".
     The values are `True` or `False`, depending on whether this property is satisfied.
 
     Parameters
@@ -57,12 +58,18 @@ def full_analysis(profile, committee):
     results["jr"] = check_JR(profile, committee)
     results["pjr"] = check_PJR(profile, committee)
     results["ejr"] = check_EJR(profile, committee)
+    results["priceability"] = check_priceability(profile, committee)
+    results["stable_priceability"] = check_stable_priceability(profile, committee)
+    results["core"] = check_core(profile, committee)
 
     description = {
         "pareto": "Pareto optimality",
         "jr": "Justified representation (JR)",
         "pjr": "Proportional justified representation (PJR)",
         "ejr": "Extended justified representation (EJR)",
+        "priceability": "Priceability",
+        "stable_priceability": "Stable Priceability",
+        "core": "The core",
     }
 
     # restore output verbosity
@@ -922,7 +929,6 @@ def _check_JR(profile, committee):
     return True, detailed_information
 
 
-@time_it
 def check_priceability(profile, committee, algorithm="fastest", stable=False):
     """Test whether a committee satisfies Priceability.
 
@@ -957,20 +963,21 @@ def check_priceability(profile, committee, algorithm="fastest", stable=False):
     if algorithm == "gurobi":
         result = _check_priceability_gurobi(profile, committee, stable)
     else:
-        raise NotImplementedError(
-            f"Algorithm {algorithm} not specified for check_priceability"
-        )
+        raise NotImplementedError(f"Algorithm {algorithm} not specified for check_priceability")
 
     stable_str = "stable "
     if result:
-        output.info(f"Committee {str_set_of_candidates(committee)} is {stable_str*stable}priceable.")
+        output.info(
+            f"Committee {str_set_of_candidates(committee)} is {stable_str*stable}priceable."
+        )
     else:
-        output.info(f"Committee {str_set_of_candidates(committee)} is not {stable_str*stable}priceable.")
+        output.info(
+            f"Committee {str_set_of_candidates(committee)} is not {stable_str*stable}priceable."
+        )
 
     return result
 
 
-@time_it
 def check_stable_priceability(profile, committee, algorithm="fastest"):
     """Test whether a committee satisfies stable Priceability.
 
@@ -1025,7 +1032,6 @@ def _check_priceability_gurobi(profile, committee, stable=False):
     if not gb:
         raise ImportError("Gurobi (gurobipy) not available.")
 
-
     model = gb.Model()
 
     budget = model.addVar(vtype=gb.GRB.CONTINUOUS)
@@ -1035,25 +1041,27 @@ def _check_priceability_gurobi(profile, committee, stable=False):
         for candidate in profile.candidates:
             payment[voter][candidate] = model.addVar(vtype=gb.GRB.CONTINUOUS)
 
-    #condition 1 [from "Multi-Winner Voting with Approval Preferences", Definition 4.8]
+    # condition 1 [from "Multi-Winner Voting with Approval Preferences", Definition 4.8]
     for voter in profile:
-        model.addConstr(gb.quicksum(payment[voter][candidate] for candidate in profile.candidates) <= budget)
+        model.addConstr(
+            gb.quicksum(payment[voter][candidate] for candidate in profile.candidates) <= budget
+        )
 
-    #condition 2 [from "Multi-Winner Voting with Approval Preferences", Definition 4.8]
+    # condition 2 [from "Multi-Winner Voting with Approval Preferences", Definition 4.8]
     for voter in profile:
         for candidate in profile.candidates:
             if candidate not in voter.approved:
                 model.addConstr(payment[voter][candidate] == 0)
 
-    #condition 3 [from "Multi-Winner Voting with Approval Preferences", Definition 4.8]
+    # condition 3 [from "Multi-Winner Voting with Approval Preferences", Definition 4.8]
     for candidate in profile.candidates:
         if candidate in committee:
             model.addConstr(gb.quicksum(payment[voter][candidate] for voter in profile) == 1)
         else:
             model.addConstr(gb.quicksum(payment[voter][candidate] for voter in profile) == 0)
-    
+
     if stable:
-        #condition 4* [from "Market-Based Explanations of Collective Decisions", Section 3.1, Formular (3)]
+        # condition 4* [from "Market-Based Explanations of Collective Decisions", Section 3.1, Formular (3)]
         for candidate in profile.candidates:
             if candidate not in committee:
                 extrema = []
@@ -1063,21 +1071,34 @@ def _check_priceability_gurobi(profile, committee, stable=False):
                         extrema.append(extremum)
                         r = model.addVar(vtype=gb.GRB.CONTINUOUS)
                         max_Payment = model.addVar(vtype=gb.GRB.CONTINUOUS)
-                        model.addConstr(r == budget - gb.quicksum(payment[voter][committee_member] for committee_member in committee))
-                        model.addGenConstrMax(max_Payment, [payment[voter][committee_member] for committee_member in committee])
+                        model.addConstr(
+                            r
+                            == budget
+                            - gb.quicksum(
+                                payment[voter][committee_member] for committee_member in committee
+                            )
+                        )
+                        model.addGenConstrMax(
+                            max_Payment,
+                            [payment[voter][committee_member] for committee_member in committee],
+                        )
                         model.addGenConstrMax(extremum, [max_Payment, r])
-                model.addConstr(
-                    gb.quicksum(extrema) <= 1
-                )
+                model.addConstr(gb.quicksum(extrema) <= 1)
     else:
-        #condition 4 [from "Multi-Winner Voting with Approval Preferences", Definition 4.8]
+        # condition 4 [from "Multi-Winner Voting with Approval Preferences", Definition 4.8]
         for candidate in profile.candidates:
             if candidate not in committee:
                 model.addConstr(
                     gb.quicksum(
-                        budget - gb.quicksum(payment[voter][committee_member] for committee_member in committee)
-                        for voter in profile if candidate in voter.approved
-                    ) <= 1)
+                        budget
+                        - gb.quicksum(
+                            payment[voter][committee_member] for committee_member in committee
+                        )
+                        for voter in profile
+                        if candidate in voter.approved
+                    )
+                    <= 1
+                )
 
     model.setObjective(budget)
     _set_gurobi_model_parameters(model)
@@ -1086,11 +1107,28 @@ def _check_priceability_gurobi(profile, committee, stable=False):
     if model.Status == gb.GRB.OPTIMAL:
         output.details(f"Budget: {budget.X}")
 
-        column_widths = {candidate: max(len(str(payment[voter][candidate].X)) for voter in payment) for candidate in profile.candidates}
+        column_widths = {
+            candidate: max(len(str(payment[voter][candidate].X)) for voter in payment)
+            for candidate in profile.candidates
+        }
         column_widths["voter"] = len(str(len(profile)))
-        output.details(" "*column_widths["voter"] + " | " + " | ".join(str(i).rjust(column_widths[candidate]) for i, candidate in enumerate(profile.candidates)))
+        output.details(
+            " " * column_widths["voter"]
+            + " | "
+            + " | ".join(
+                str(i).rjust(column_widths[candidate])
+                for i, candidate in enumerate(profile.candidates)
+            )
+        )
         for i, voter in enumerate(profile):
-            output.details(str(i).rjust(column_widths["voter"]) + " | " + " | ".join(str(pay.X).rjust(column_widths[candidate]) for candidate, pay in payment[voter].items()))
+            output.details(
+                str(i).rjust(column_widths["voter"])
+                + " | "
+                + " | ".join(
+                    str(pay.X).rjust(column_widths[candidate])
+                    for candidate, pay in payment[voter].items()
+                )
+            )
 
         return True
     elif model.Status == gb.GRB.INFEASIBLE:
@@ -1100,7 +1138,6 @@ def _check_priceability_gurobi(profile, committee, stable=False):
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
-@time_it
 def check_core(profile, committee, algorithm="fastest", committeesize=None):
     """Test whether a committee is in the core.
 
@@ -1130,13 +1167,9 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
     if committeesize is None:
         committeesize = len(committee)
     elif committeesize < len(committee):
-        raise ValueError(
-            "committeesize is smaller than size of given committee"
-        )
+        raise ValueError("committeesize is smaller than size of given committee")
     elif committeesize > profile.num_cand:
-        raise ValueError(
-            "committeesize is greater than number of candidates"
-        )
+        raise ValueError("committeesize is greater than number of candidates")
 
     if algorithm == "fastest":
         if gb:
@@ -1149,9 +1182,7 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
     elif algorithm == "gurobi":
         result = _check_core_gurobi(profile, committee, committeesize)
     else:
-        raise NotImplementedError(
-            f"Algorithm {algorithm} not specified for check_core"
-        )
+        raise NotImplementedError(f"Algorithm {algorithm} not specified for check_core")
 
     if result:
         output.info(f"Committee {str_set_of_candidates(committee)} is in the core.")
@@ -1186,8 +1217,14 @@ def _check_core_brute_force(profile, committee, committeesize):
 
     for set_of_voter in powerset(profile):
         for set_of_candidates in powerset(profile.approved_candidates()):
-            if len(set_of_candidates)*len(profile) <= len(set_of_voter)*committeesize and set_of_voter:
-                if not any(len(voter.approved & set(set_of_candidates)) <= len(voter.approved & committee) for voter in set_of_voter):
+            if (
+                len(set_of_candidates) * len(profile) <= len(set_of_voter) * committeesize
+                and set_of_voter
+            ):
+                if not any(
+                    len(voter.approved & set(set_of_candidates)) <= len(voter.approved & committee)
+                    for voter in set_of_voter
+                ):
                     return False
     return True
 
@@ -1218,21 +1255,24 @@ def _check_core_gurobi(profile, committee, committeesize):
     if not gb:
         raise ImportError("Gurobi (gurobipy) not available.")
 
-
     model = gb.Model()
 
     set_of_voter = model.addVars(range(len(profile)), vtype=gb.GRB.BINARY)
     set_of_candidates = model.addVars(range(profile.num_cand), vtype=gb.GRB.BINARY)
 
-    model.addConstr(gb.quicksum(set_of_candidates)*len(profile) <= gb.quicksum(set_of_voter)*committeesize)
+    model.addConstr(
+        gb.quicksum(set_of_candidates) * len(profile) <= gb.quicksum(set_of_voter) * committeesize
+    )
     model.addConstr(gb.quicksum(set_of_voter) >= 1)
     for i, voter in enumerate(profile):
-        approved = [(c in voter.approved) * set_of_candidates[i] for i,c in enumerate(profile.candidates)]
+        approved = [
+            (c in voter.approved) * set_of_candidates[i] for i, c in enumerate(profile.candidates)
+        ]
         model.addConstr(
-            (set_of_voter[i]==1) >>
-                (gb.quicksum(approved) >= len(voter.approved & committee) + 1)
+            (set_of_voter[i] == 1)
+            >> (gb.quicksum(approved) >= len(voter.approved & committee) + 1)
         )
-    
+
     _set_gurobi_model_parameters(model)
     model.optimize()
 
