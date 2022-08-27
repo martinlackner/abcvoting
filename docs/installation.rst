@@ -12,7 +12,7 @@ Latest development version from source:
 ::
 
     git clone https://github.com/martinlackner/abcvoting/
-    python setup.py install
+    pip install .
 
 Requirements:
 

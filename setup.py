@@ -32,10 +32,7 @@ def read_version():
     if git_describe.returncode == 0:
         git_version = git_describe.stdout.strip().decode("utf-8")
     else:
-        # per default no old commit are fetched in Github actions, that means, that git describe
-        # fails if the latest commit is not a tag, because old tags can't be found.
-        # to fetch tags in Github actions use "fetch-depth: 0"
-        raise RuntimeError("Git describe failed: did you fetch at least one tag?")
+        return None  # code probably comes from a repo without tags
 
     # git_version contains the latest tag, if it is not identical with HEAD need to postifx
     head_is_tag = (
@@ -86,9 +83,7 @@ setuptools.setup(
     ],
     packages=["abcvoting", "abcvoting.bipartite_matching"],
     python_requires=">=3.7",
-    setup_requires=[
-        "wheel",
-    ],
+    setup_requires=["wheel"],
     install_requires=[
         "networkx>=2.2",
         "ortools>=8.1.8487",
