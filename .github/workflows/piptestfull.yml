@@ -2,7 +2,7 @@ name: Unittests using abcvoting installed from pip, run daily
 
 on:
   schedule:
-    - cron: '0 5 * * *'  # every day at 5:00
+    - cron: '0 20 * * Tue'  # every Sunday
 
 jobs:
   unittests:
@@ -39,11 +39,11 @@ jobs:
           pip install gurobipy
           pip install pytest
 
-      - name: Test with pytest
+      - name: Test with pytest (full tests except Gurobi on large instances)
         run: |
           rm -r abcvoting
           ls
           echo $PYTHONPATH
           export PYTHONPATH=$PYTHONPATH:$PWD
           echo $PYTHONPATH
-          pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow) and (not mipcbc or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
+          pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow)" -ra tests/
