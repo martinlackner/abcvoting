@@ -88,7 +88,7 @@ setuptools.setup(
         "networkx[default]>=2.8",
         "mip>=1.14.0",
         "ruamel.yaml>=0.17",
-        "numpy>=1.23",
+        "numpy>=1.21",
         "gurobipy>=9.5.0",
     ],
     extras_require={
