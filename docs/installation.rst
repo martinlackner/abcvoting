@@ -18,7 +18,7 @@ Requirements:
 
 - Python 3.7+
 
-- The following pip packages are required and installed automatically: `gurobipy`, `mip`, `networkx`, `numpy`, `ortools`, and `ruamel.yaml`.
+- The following pip packages are required and installed automatically: `gurobipy`, `mip`, `networkx`, `numpy`, and `ruamel.yaml`.
 
 Optional requirements:
 
@@ -26,6 +26,10 @@ Optional requirements:
   These compute significantly faster if the module gmpy2 is available.
   If gmpy2 is not available, the much slower Python module
   `fractions <https://docs.python.org/2/library/fractions.html>`_ is used.
+
+- `ortools <https://developers.google.com/optimization/install/python>`_:
+  Ortools can be used as an alternative solver for some ABC voting rules (Monroe, CC, Minimax AV).
+  Advantage: open source, faster than CBC. Disadvantage: not as reliable as Gurobi (proprietary).
 
 - `Gurobi (gurobipy) <https://www.gurobi.com/>`_: Most computationally hard rules are also implemented via the ILP
   solver Gurobi. The corresponding functions require
