@@ -150,7 +150,7 @@ class Rule:
             self.longname = "Lexicographic Chamberlin-Courant (lex-CC)"
             self.compute_fct = compute_lexcc
             # algorithms sorted by speed
-            self.algorithms = ("gurobi", "mip-gurobi", "brute-force", "mip-cbc")
+            self.algorithms = ("gurobi", "brute-force")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "seqpav":
             self.shortname = "seq-PAV"
