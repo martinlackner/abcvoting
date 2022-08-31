@@ -499,6 +499,8 @@ def _available_algorithms():
             continue
         if algorithm == "gmpy2-fractions" and not mpq:
             continue
+        if algorithm == "ortools-cp" and not abcrules_ortools.cp_model:
+            continue
         available.append(algorithm)
 
     return available

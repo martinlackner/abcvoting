@@ -86,7 +86,6 @@ setuptools.setup(
     setup_requires=["wheel"],
     install_requires=[
         "networkx>=2.2",
-        "ortools>=8.1.8487",
         "mip>=1.13.0",
         "ruamel.yaml>=0.16.13",
         "numpy>=1.20",

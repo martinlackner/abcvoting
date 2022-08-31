@@ -3,7 +3,12 @@ ABC rules implemented as constraint satisfaction programs with OR-Tools.
 """
 
 import functools
-from ortools.sat.python import cp_model
+
+try:
+    from ortools.sat.python import cp_model
+except ImportError:
+    cp_model = None
+
 from abcvoting.misc import sorted_committees
 from abcvoting import scores
 

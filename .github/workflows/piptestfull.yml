@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11.0-rc.1"]
+        python-version: [3.7, 3.8, 3.9, "3.10"]
 
     steps:
       - uses: actions/checkout@v2
@@ -28,6 +28,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[dev]
           pip install gmpy2
+          pip install ortools
 
       - name: Test with pytest (full tests except Gurobi on large instances)
         run: |
