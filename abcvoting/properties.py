@@ -4,7 +4,7 @@ Properties of committees.
 
 import itertools
 import math
-from more_itertools import set_partitions, powerset
+from more_itertools import powerset
 from abcvoting.output import output, WARNING
 from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate
 from abcvoting.preferences import Profile
