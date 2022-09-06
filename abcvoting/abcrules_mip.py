@@ -104,7 +104,7 @@ def _optimize_rule_mip(
 
         if status not in [mip.OptimizationStatus.OPTIMAL, mip.OptimizationStatus.INFEASIBLE]:
             raise RuntimeError(
-                f"Python MIP returned an unexpected status code: {status}"
+                f"Python MIP returned an unexpected status code: {status}\n"
                 f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
 
@@ -236,98 +236,6 @@ def _mip_thiele_methods(
         committeescorefct=functools.partial(scores.thiele_score, scorefct_id),
     )
     return sorted_committees(committees)
-
-
-def _mip_lexcc(profile, committeesize, resolute, max_num_of_committees, solver_id):
-    def set_opt_model_func(model, profile, in_committee, committeesize):
-        # utility[(voter, x)] contains (intended binary) variables counting the number of approved
-        # candidates in the selected committee by `voter`. This utility[(voter, x)] is true for
-        # exactly the number of candidates in the committee approved by `voter` for all
-        # x = 1...committeesize.
-
-        utility = {}
-        iteration = len(satisfaction_constraints)
-        marginal_scorefcts = [
-            scores.get_marginal_scorefct(f"atleast{i + 1}") for i in range(iteration + 1)
-        ]
-
-        max_in_committee = {}
-        for i, voter in enumerate(profile):
-            # maximum number of approved candidates that this voter can have in a committee
-            max_in_committee[voter] = min(len(voter.approved), committeesize)
-            for x in range(1, max_in_committee[voter] + 1):
-                utility[(voter, x)] = model.add_var(var_type=mip.BINARY, name=f"utility({i},{x})")
-
-        # constraint: the committee has the required size
-        model += mip.xsum(in_committee) == committeesize
-
-        # constraint: utilities are consistent with actual committee
-        for voter in profile:
-            model += mip.xsum(
-                utility[voter, x] for x in range(1, max_in_committee[voter] + 1)
-            ) == mip.xsum(in_committee[cand] for cand in voter.approved)
-
-        # additional constraints from previous iterations
-        for prev_iteration in range(iteration):
-            model += (
-                mip.xsum(
-                    float(marginal_scorefcts[prev_iteration](x))
-                    * voter.weight
-                    * utility[(voter, x)]
-                    for voter in profile
-                    for x in range(1, max_in_committee[voter] + 1)
-                )
-                >= satisfaction_constraints[prev_iteration] - ACCURACY
-            )
-
-        # objective: the at-least-y score of the committee in iteration y
-        model.objective = mip.maximize(
-            mip.xsum(
-                float(marginal_scorefcts[iteration](x)) * voter.weight * utility[(voter, x)]
-                for voter in profile
-                for x in range(1, max_in_committee[voter] + 1)
-            )
-        )
-
-    # proceed in `committeesize` many iterations to achieve lexicographic tie-breaking
-    satisfaction_constraints = []
-    for iteration in range(1, committeesize):
-        # in iteration x maximize the number of voters that have at least x approved candidates
-        # in the committee
-        committees = _optimize_rule_mip(
-            set_opt_model_func=set_opt_model_func,
-            profile=profile,
-            committeesize=committeesize,
-            resolute=resolute,
-            max_num_of_committees=max_num_of_committees,
-            solver_id=solver_id,
-            name=f"lexcc-atleast{iteration}",
-            committeescorefct=functools.partial(scores.thiele_score, f"atleast{iteration}"),
-            reuse_model=False,  # slower, but apparently necessary
-        )
-        new_score = scores.thiele_score(f"atleast{iteration}", profile, committees[0])
-        if new_score == 0:
-            satisfaction_constraints += [0] * (committeesize - 1 - len(satisfaction_constraints))
-            break
-        satisfaction_constraints.append(new_score)
-
-    iteration = committeesize
-    committees = _optimize_rule_mip(
-        set_opt_model_func=set_opt_model_func,
-        profile=profile,
-        committeesize=committeesize,
-        resolute=resolute,
-        max_num_of_committees=max_num_of_committees,
-        solver_id=solver_id,
-        name="lexcc-final",
-        committeescorefct=functools.partial(scores.thiele_score, f"atleast{committeesize}"),
-        reuse_model=False,  # slower, but apparently necessary
-    )
-    satisfaction_constraints.append(
-        scores.thiele_score(f"atleast{iteration}", profile, committees[0])
-    )
-    detailed_info = {"opt_score_vector": satisfaction_constraints}
-    return sorted_committees(committees), detailed_info
 
 
 def _mip_monroe(profile, committeesize, resolute, max_num_of_committees, solver_id):

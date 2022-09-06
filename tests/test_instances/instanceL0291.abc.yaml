@@ -125,10 +125,10 @@ compute:
   result: [[8, 1, 2, 5]]
   resolute: true
 - rule_id: leximaxphragmen
-  result:
+  result: [[8, 1, 2, 5]]
   resolute: false
 - rule_id: leximaxphragmen
-  result:
+  result: [[8, 1, 2, 5]]
   resolute: true
 - rule_id: monroe
   result: [[8, 1, 2, 5]]

@@ -111,10 +111,10 @@ compute:
   result: [[0, 8, 3, 4]]
   resolute: true
 - rule_id: leximaxphragmen
-  result:
+  result: [[0, 8, 3, 4]]
   resolute: false
 - rule_id: leximaxphragmen
-  result:
+  result: [[0, 8, 3, 4]]
   resolute: true
 - rule_id: monroe
   result: [[0, 8, 3, 4]]

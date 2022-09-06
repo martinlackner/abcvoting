@@ -3,7 +3,12 @@ ABC rules implemented as constraint satisfaction programs with OR-Tools.
 """
 
 import functools
-from ortools.sat.python import cp_model
+
+try:
+    from ortools.sat.python import cp_model
+except ImportError:
+    cp_model = None
+
 from abcvoting.misc import sorted_committees
 from abcvoting import scores
 
@@ -67,7 +72,7 @@ def _optimize_rule_ortools(
 
         if status not in [cp_model.OPTIMAL, cp_model.INFEASIBLE]:
             raise RuntimeError(
-                f"OR-Tools returned an unexpected status code: {status}"
+                f"OR-Tools returned an unexpected status code: {status}\n"
                 f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
 

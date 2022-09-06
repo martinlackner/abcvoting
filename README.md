@@ -97,9 +97,8 @@ python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-u
 
 Code needs to be formatted using the [black formatter](https://black.readthedocs.io/en/stable/). This is
 checked by Github actions.
-[Configure your editor](https://black.readthedocs.io/en/stable/integrations/editors.html), to run the
+[Configure your editor](https://black.readthedocs.io/en/stable/integrations/editors.html) to run the
 black formatter.
-
 
 ### Pre-commit hooks
 

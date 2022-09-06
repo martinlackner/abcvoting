@@ -99,10 +99,10 @@ compute:
   result: [[2, 4, 6], [2, 4, 7], [2, 6, 7], [4, 6, 7]]
   resolute: true
 - rule_id: leximaxphragmen
-  result:
+  result: [[2, 4, 6], [2, 4, 7], [2, 6, 7], [4, 6, 7]]
   resolute: false
 - rule_id: leximaxphragmen
-  result:
+  result: [[2, 4, 6], [2, 4, 7], [2, 6, 7], [4, 6, 7]]
   resolute: true
 - rule_id: monroe
   result: [[2, 4, 6], [2, 4, 7], [2, 6, 7], [4, 6, 7]]

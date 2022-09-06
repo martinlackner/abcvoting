@@ -1,0 +1,38 @@
+name: Almost full unittests, run weekly
+
+on:
+  schedule:
+    - cron: '0 20 * * Tue'  # every Tuesday
+
+jobs:
+  unittests:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, "3.10"]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # fetch all tags to be able to generate a version number for test packages
+          fetch-depth: 0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+          pip install gmpy2
+          pip install ortools
+
+      - name: Test with pytest (full tests except Gurobi on large instances)
+        run: |
+          echo $PYTHONPATH
+          export PYTHONPATH=$PYTHONPATH:$PWD
+          echo $PYTHONPATH
+          pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow)" -ra tests/

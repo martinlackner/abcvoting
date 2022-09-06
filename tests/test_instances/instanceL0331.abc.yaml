@@ -147,10 +147,10 @@ compute:
   result: [[0, 1, 2, 6, 7], [0, 1, 2, 7, 8]]
   resolute: true
 - rule_id: leximaxphragmen
-  result:
+  result: [[0, 1, 2, 6, 7], [0, 1, 2, 7, 8]]
   resolute: false
 - rule_id: leximaxphragmen
-  result:
+  result: [[0, 1, 2, 6, 7], [0, 1, 2, 7, 8]]
   resolute: true
 - rule_id: monroe
   result: [[0, 1, 2, 3, 4], [0, 1, 2, 3, 6], [0, 1, 2, 3, 7], [0, 1, 2, 3, 8], [0, 1, 2, 4, 6], [0, 1, 2, 4, 7], [0, 1, 2,

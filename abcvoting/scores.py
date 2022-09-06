@@ -6,7 +6,6 @@ except ImportError:
     from fractions import Fraction
 import functools
 import networkx as nx
-from abcvoting.bipartite_matching import matching
 from abcvoting.misc import hamming
 
 
@@ -410,17 +409,23 @@ def monroescore_matching(profile, committee):
             "monroescore_matching() works only if "
             + "the committee size divides the number of voters "
         )
-    graph = {}
+    graph = nx.Graph()
     sizeofdistricts = len(profile) // len(committee)
+    voter_nodes = range(len(profile))
+    graph.add_nodes_from(voter_nodes, bipartite=0)
+    graph.add_nodes_from(
+        [f"{cand}/{j}" for cand in committee for j in range(sizeofdistricts)], bipartite=1
+    )  # candidates with multiplicities
+
     for cand in committee:
-        interestedvoters = []
-        for i, voter in enumerate(profile):
-            if cand in voter.approved:
-                interestedvoters.append(i)
-        for j in range(sizeofdistricts):
-            graph[str(cand) + "/" + str(j)] = interestedvoters
-    m, _, _ = matching.bipartiteMatch(graph)
-    return len(m)
+        interestedvoters = [
+            i for i in voter_nodes if cand in profile[i].approved
+        ]  # voters that approve `cand`
+        graph.add_edges_from(
+            [(i, f"{cand}/{j}") for j in range(sizeofdistricts) for i in interestedvoters]
+        )  # edge from all interested voters to all nodes corresponding to `cand`
+    matching = nx.bipartite.maximum_matching(graph, top_nodes=voter_nodes)
+    return len(matching) // 2  # `matching` is a dictionary representing *directed* edges
 
 
 def monroescore_flowbased(profile, committee):

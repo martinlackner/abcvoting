@@ -2,7 +2,7 @@ name: Unittests using abcvoting installed from pip, run daily
 
 on:
   schedule:
-    - cron: '* 5 * * *'  # every day at 5:00
+    - cron: '0 5 * * *'  # every day at 5:00
 
 jobs:
   unittests:
@@ -38,6 +38,7 @@ jobs:
           pip install ortools
           pip install gurobipy
           pip install pytest
+          pip install ortools
 
       - name: Test with pytest
         run: |

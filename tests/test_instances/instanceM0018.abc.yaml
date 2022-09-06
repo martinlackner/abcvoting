@@ -82,10 +82,10 @@ compute:
   result: [[1, 2, 4]]
   resolute: true
 - rule_id: leximaxphragmen
-  result:
+  result: [[1, 2, 4]]
   resolute: false
 - rule_id: leximaxphragmen
-  result:
+  result: [[1, 2, 4]]
   resolute: true
 - rule_id: monroe
   result: [[1, 4, 5], [1, 4, 6], [2, 4, 5], [2, 4, 6]]

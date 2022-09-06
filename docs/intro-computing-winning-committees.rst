@@ -143,4 +143,4 @@ In addition to the dependencies of abcvoting [#]_, some algorithms have addition
 
 .. [#] If `abcvoting` is installed via
     ``pip install abcvoting``, then all dependencies are installed automatically. If `abcvoting` is installed
-    from source, run ``python setup.py install``.
+    from source, run ``pip install .``.

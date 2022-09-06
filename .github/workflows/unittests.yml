@@ -30,6 +30,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e .[dev]
         pip install gmpy2
+        pip install ortools
 
         # these are optional requirements, but we want GLPK_MI to be installed to run more unitests
         # TODO: cvxpy pip install is not working currently
