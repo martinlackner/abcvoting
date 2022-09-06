@@ -101,6 +101,7 @@ setuptools.setup(
             "numpydoc>=1.2",
             "sphinx-codeautolink>=0.10",
             "matplotlib>=3.4.3",
+            "more_itertools>=8.13.0",
         ]
     },
 )

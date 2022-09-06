@@ -288,3 +288,113 @@ def test_output_JR_with_rules(abc_yaml_instance):
                 break
         # winning committee should satisfy JR
         assert properties.check_JR(profile, input_committee)
+
+
+# instances to check output of priceable methods
+priceability_instances = []
+
+# add an instance from
+# Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 23
+profile = Profile(15)
+profile.add_voters(
+    [[0, 1, 2, 3]] + [[0, 1, 2, 4]] + [[0, 1, 2, 5]] + [[6, 7, 8]] + [[9, 10, 11]] + [[12, 13, 14]]
+)
+committee = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 13}
+expected_result = True
+priceability_instances.append((profile, committee, expected_result))
+committee = {0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14}
+expected_result = False
+priceability_instances.append((profile, committee, expected_result))
+
+profile = Profile(3)
+profile.add_voters([[0, 1]] + [[0, 1, 2]] + [[2]])
+committee = {0, 1}
+expected_result = True
+priceability_instances.append((profile, committee, expected_result))
+
+
+@pytest.mark.parametrize(
+    "algorithm", ["fastest", pytest.param("gurobi", marks=pytest.mark.gurobipy)]
+)
+@pytest.mark.parametrize("profile, committee, expected_result", priceability_instances)
+def test_priceability_methods(algorithm, profile, committee, expected_result):
+    # check whether the committee satisfies priceability
+    satisfies_priceability = properties.check_priceability(profile, committee, algorithm=algorithm)
+
+    assert satisfies_priceability == expected_result
+
+
+# instances to check output of stable priceable methods
+stable_priceability_instances = []
+
+# add an instance from
+# Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 23
+profile = Profile(15)
+profile.add_voters(
+    [[0, 1, 2, 3]] + [[0, 1, 2, 4]] + [[0, 1, 2, 5]] + [[6, 7, 8]] + [[9, 10, 11]] + [[12, 13, 14]]
+)
+committee = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 13}
+expected_result = True
+stable_priceability_instances.append((profile, committee, expected_result))
+committee = {0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14}
+expected_result = False
+stable_priceability_instances.append((profile, committee, expected_result))
+
+profile = Profile(3)
+profile.add_voters([[0, 1]] + [[0, 1, 2]] + [[2]])
+committee = {0, 1, 2}
+expected_result = True
+stable_priceability_instances.append((profile, committee, expected_result))
+committee = {0, 1}
+expected_result = False
+stable_priceability_instances.append((profile, committee, expected_result))
+
+
+@pytest.mark.parametrize(
+    "algorithm", ["fastest", pytest.param("gurobi", marks=pytest.mark.gurobipy)]
+)
+@pytest.mark.parametrize("profile, committee, expected_result", stable_priceability_instances)
+def test_stable_priceability_methods(algorithm, profile, committee, expected_result):
+    # check whether the committee satisfies stable priceability
+    satisfies_stable_priceability = properties.check_stable_priceability(
+        profile, committee, algorithm=algorithm
+    )
+
+    assert satisfies_stable_priceability == expected_result
+
+
+# instances to check output of the core methods
+core_instances = []
+
+# add an instance from
+# Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 23
+profile = Profile(15)
+profile.add_voters(
+    [[0, 1, 2, 3]] + [[0, 1, 2, 4]] + [[0, 1, 2, 5]] + [[6, 7, 8]] + [[9, 10, 11]] + [[12, 13, 14]]
+)
+committee = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 13}
+expected_result = True
+core_instances.append((profile, committee, expected_result))
+committee = {0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14}
+expected_result = False
+core_instances.append((profile, committee, expected_result))
+
+profile = Profile(20)
+profile.add_voters([[i, i + 10] for i in range(10)])
+committee = set(range(20))
+expected_result = True
+core_instances.append((profile, committee, expected_result))
+committee = set(range(9)).union({10})
+expected_result = False
+core_instances.append((profile, committee, expected_result))
+
+
+@pytest.mark.parametrize(
+    "algorithm", ["fastest", pytest.param("gurobi", marks=pytest.mark.gurobipy)]
+)
+@pytest.mark.parametrize("profile, committee, expected_result", core_instances)
+def test_core_methods(algorithm, profile, committee, expected_result):
+    # check whether the committee satisfies core
+    satisfies_core = properties.check_core(profile, committee, algorithm=algorithm)
+
+    assert satisfies_core == expected_result
