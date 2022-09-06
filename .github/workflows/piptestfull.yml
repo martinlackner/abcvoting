@@ -1,8 +1,8 @@
-name: (Almost) full unittests, run weekly
+name: Almost full unittests, run weekly
 
 on:
   schedule:
-    - cron: '0 20 * * Tue'  # every Sunday
+    - cron: '0 20 * * Tue'  # every Tuesday
 
 jobs:
   unittests:
@@ -32,8 +32,6 @@ jobs:
 
       - name: Test with pytest (full tests except Gurobi on large instances)
         run: |
-          rm -r abcvoting
-          ls
           echo $PYTHONPATH
           export PYTHONPATH=$PYTHONPATH:$PWD
           echo $PYTHONPATH
