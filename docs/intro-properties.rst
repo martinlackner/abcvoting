@@ -41,6 +41,9 @@ is printed.
     Justified representation (JR)                      : True
     Proportional justified representation (PJR)        : True
     Extended justified representation (EJR)            : False
+    Priceability                                       : True
+    Stable Priceability                                : False
+    The core                                           : False
 
 In contrast, committees returned by seq-Phragmén always satisfy JR and PJR [2]_.
 Pareto optimality is not necessarily satisfied by seq-Phragmén, but it is satisfied in this instance.
