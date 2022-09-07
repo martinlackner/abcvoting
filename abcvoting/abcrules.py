@@ -1022,7 +1022,7 @@ def compute_lexcc(
             .. doctest::
 
                 >>> Rule("lexcc").algorithms
-                ('gurobi', 'mip-gurobi', 'brute-force', 'mip-cbc')
+                ('gurobi', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -2949,6 +2949,47 @@ def compute_rule_x(
         Use :func:`compute_equal_shares` instead. (Rule X has been renamed by the authors
         to Method of Equal Shares and this appears to be the new standard name used in the
         literature by now.)
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for the Method of Equal Shares:
+
+            .. doctest::
+
+                >>> Rule("equal-shares").algorithms
+                ('float-fractions', 'gmpy2-fractions', 'standard-fractions')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+        skip_phragmen_phase : bool, default=False
+             Omit the second phase (that uses seq-Phragmen).
+
+             May result in a committee that is too small (length smaller than `committeesize`).
+
+    Returns
+    -------
+        list of CandidateSet
+            A list of winning committees.
     """
     return compute_equal_shares(
         profile=profile,

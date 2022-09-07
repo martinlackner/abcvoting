@@ -7,7 +7,6 @@ import math
 from more_itertools import powerset
 from abcvoting.output import output, WARNING
 from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate
-from abcvoting.preferences import Profile
 
 try:
     import gurobipy as gb
@@ -930,25 +929,26 @@ def _check_JR(profile, committee):
 
 
 def check_priceability(profile, committee, algorithm="fastest", stable=False):
-    """Test whether a committee satisfies Priceability.
+    """
+    Test whether a committee satisfies Priceability.
 
     Parameters
     ----------
     profile : abcvoting.preferences.Profile
-        approval sets of voters
-    committee : set / list / tuple
-        set of candidates
-    algorithm : string
-        describe which algorithm to use
-    stable : bool
-        if True check for stable priceability
+        A profile.
+    committee : iterable of int
+        A committee.
+    algorithm : str, optional
+        The algorithm to be used.
+    stable : bool, default=False
+        Whether to check for stable priceability.
 
     Returns
     -------
     bool
 
-    Reference
-    ---------
+    References
+    ----------
     Multi-Winner Voting with Approval Preferences.
     Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
@@ -957,8 +957,7 @@ def check_priceability(profile, committee, algorithm="fastest", stable=False):
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
     if algorithm == "fastest":
-        if gb:
-            algorithm = "gurobi"
+        algorithm = "gurobi"
 
     if algorithm == "gurobi":
         result = _check_priceability_gurobi(profile, committee, stable)
@@ -979,23 +978,24 @@ def check_priceability(profile, committee, algorithm="fastest", stable=False):
 
 
 def check_stable_priceability(profile, committee, algorithm="fastest"):
-    """Test whether a committee satisfies stable Priceability.
+    """
+    Test whether a committee satisfies stable Priceability.
 
     Parameters
     ----------
     profile : abcvoting.preferences.Profile
-        approval sets of voters
-    committee : set / list / tuple
-        set of candidates
-    algorithm : string
-        describe which algorithm to use
+        A profile.
+    committee : iterable of int
+        A committee.
+    algorithm : str, optional
+        The algorithm to be used.
 
     Returns
     -------
     bool
 
-    Reference
-    ---------
+    References
+    ----------
     Multi-Winner Voting with Approval Preferences.
     Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
@@ -1005,7 +1005,8 @@ def check_stable_priceability(profile, committee, algorithm="fastest"):
 
 
 def _check_priceability_gurobi(profile, committee, stable=False):
-    """Test, by an ILP and the Gurobi solver, whether a committee is priceable.
+    """
+    Test, by an ILP and the Gurobi solver, whether a committee is priceable.
 
     Parameters
     ----------
@@ -1061,7 +1062,8 @@ def _check_priceability_gurobi(profile, committee, stable=False):
             model.addConstr(gb.quicksum(payment[voter][candidate] for voter in profile) == 0)
 
     if stable:
-        # condition 4* [from "Market-Based Explanations of Collective Decisions", Section 3.1, Formular (3)]
+        # condition 4*
+        # [from "Market-Based Explanations of Collective Decisions", Section 3.1, Equation (3)]
         for candidate in profile.candidates:
             if candidate not in committee:
                 extrema = []
@@ -1132,25 +1134,29 @@ def _check_priceability_gurobi(profile, committee, stable=False):
 
         return True
     elif model.Status == gb.GRB.INFEASIBLE:
-        output.details(f"No feasible budget and payment function")
+        output.details("No feasible budget and payment function")
         return False
     else:
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
 def check_core(profile, committee, algorithm="fastest", committeesize=None):
-    """Test whether a committee is in the core.
+    """
+    Test whether a committee is in the core.
 
     Parameters
     ----------
     profile : abcvoting.preferences.Profile
-        approval sets of voters
-    committee : set / list / tuple
-        set of candidates
-    algorithm : string
-        describe which algorithm to use
-    committeesize : int
-        size of committee
+        A profile.
+    committee : iterable of int
+        A committee.
+    algorithm : str, optional
+        The algorithm to be used.
+    committeesize : int, optional
+        Desired committee size.
+
+        This parameter is used when determining whether already a committee smaller than
+        `committeesize` satisfies the core property.
 
     Returns
     -------
