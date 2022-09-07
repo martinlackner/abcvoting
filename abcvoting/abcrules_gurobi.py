@@ -1,17 +1,13 @@
 """ABC rules implemented as integer linear programs (ILPs) with Gurobi."""
 
 import functools
+import gurobipy as gb
 import itertools
 import math
 from abcvoting.misc import sorted_committees
 from abcvoting import scores
 from abcvoting import misc
 from abcvoting.output import output
-
-try:
-    import gurobipy as gb
-except ImportError:
-    gb = None
 
 
 ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)

@@ -2,16 +2,12 @@
 Properties of committees.
 """
 
+import gurobipy as gb
 import itertools
 import math
 from more_itertools import powerset
 from abcvoting.output import output, WARNING
 from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate
-
-try:
-    import gurobipy as gb
-except ImportError:
-    gb = None
 
 
 ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
@@ -135,10 +131,7 @@ def check_pareto_optimality(profile, committee, algorithm="fastest"):
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
     if algorithm == "fastest":
-        if gb:
-            algorithm = "gurobi"
-        else:
-            algorithm = "brute-force"
+        algorithm = "gurobi"
 
     if algorithm == "brute-force":
         result, detailed_information = _check_pareto_optimality_brute_force(profile, committee)
@@ -222,10 +215,7 @@ def check_EJR(profile, committee, algorithm="fastest"):
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
     if algorithm == "fastest":
-        if gb:
-            algorithm = "gurobi"
-        else:
-            algorithm = "brute-force"
+        algorithm = "gurobi"
 
     if algorithm == "brute-force":
         result, detailed_information = _check_EJR_brute_force(profile, committee)
@@ -314,10 +304,7 @@ def check_PJR(profile, committee, algorithm="fastest"):
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
     if algorithm == "fastest":
-        if gb:
-            algorithm = "gurobi"
-        else:
-            algorithm = "brute-force"
+        algorithm = "gurobi"
 
     if algorithm == "brute-force":
         result, detailed_information = _check_PJR_brute_force(profile, committee)
@@ -1178,10 +1165,7 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
         raise ValueError("committeesize is greater than number of candidates")
 
     if algorithm == "fastest":
-        if gb:
-            algorithm = "gurobi"
-        else:
-            algorithm = "brute-force"
+        algorithm = "gurobi"
 
     if algorithm == "brute-force":
         result = _check_core_brute_force(profile, committee, committeesize)
