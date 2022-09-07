@@ -90,6 +90,7 @@ setuptools.setup(
         "ruamel.yaml>=0.17",
         "numpy>=1.21",
         "gurobipy>=9.5.0",
+        "more_itertools>=8.13.0",
     ],
     extras_require={
         "dev": [
@@ -101,7 +102,6 @@ setuptools.setup(
             "numpydoc>=1.2",
             "sphinx-codeautolink>=0.10",
             "matplotlib>=3.4.3",
-            "more_itertools>=8.13.0",
         ]
     },
 )
