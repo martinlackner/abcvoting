@@ -64,9 +64,6 @@ def _optimize_rule_gurobi(
 
     """
 
-    if not gb:
-        raise ImportError("Gurobi (gurobipy) not available.")
-
     maxscore = None
     committees = []
 
