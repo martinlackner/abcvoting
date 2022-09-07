@@ -1,5 +1,5 @@
 """
-Properties of committees.
+Axiomatic properties of committees.
 """
 
 import gurobipy as gb
@@ -11,6 +11,7 @@ from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate
 
 
 ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
+PROPERTY_NAMES = ["pareto", "jr", "pjr", "ejr", "priceability", "stable_priceability", "core"]
 
 
 def _set_gurobi_model_parameters(model):
@@ -49,13 +50,8 @@ def full_analysis(profile, committee):
     current_verbosity = output.verbosity
     output.set_verbosity(WARNING)
 
-    results["pareto"] = check_pareto_optimality(profile, committee)
-    results["jr"] = check_JR(profile, committee)
-    results["pjr"] = check_PJR(profile, committee)
-    results["ejr"] = check_EJR(profile, committee)
-    results["priceability"] = check_priceability(profile, committee)
-    results["stable_priceability"] = check_stable_priceability(profile, committee)
-    results["core"] = check_core(profile, committee)
+    for property_name in PROPERTY_NAMES:
+        results[property_name] = check(property_name, profile, committee)
 
     description = {
         "pareto": "Pareto optimality",
@@ -72,6 +68,47 @@ def full_analysis(profile, committee):
 
     for prop, value in results.items():
         output.info(f"{description[prop]:50s} : {value}")
+
+
+def check(property_name, profile, committee, algorithm="fastest"):
+    """
+    Test whether a committee satisfies a given property.
+
+    Parameters
+    ----------
+    property_name : str
+        Name of a property.
+    profile : abcvoting.preferences.Profile
+        A profile.
+    committee : iterable of int
+        A committee.
+    algorithm : str, optional
+        The algorithm to be used.
+
+    Returns
+    -------
+    bool
+    """
+
+    if property_name not in PROPERTY_NAMES:
+        raise ValueError(f"Property {property_name} not known.")
+
+    if property_name == "pareto":
+        return check_pareto_optimality(profile, committee)
+    elif property_name == "jr":
+        return check_JR(profile, committee)
+    elif property_name == "pjr":
+        return check_PJR(profile, committee)
+    elif property_name == "ejr":
+        return check_EJR(profile, committee)
+    elif property_name == "priceability":
+        return check_priceability(profile, committee)
+    elif property_name == "stable_priceability":
+        return check_stable_priceability(profile, committee)
+    elif property_name == "core":
+        return check_core(profile, committee)
+    else:
+        raise NotImplementedError(f"Property {property_name} not implemented.")
 
 
 def check_pareto_optimality(profile, committee, algorithm="fastest"):
@@ -451,8 +488,6 @@ def _check_pareto_optimality_gurobi(profile, committee):
     -------
     bool
     """
-    if not gb:
-        raise ImportError("Gurobi (gurobipy) not available.")
 
     # array to store number of approved candidates per voter in the query committee
     num_apprvd_cands_query = [len(voter.approved & committee) for voter in profile]
@@ -622,9 +657,6 @@ def _check_EJR_gurobi(profile, committee):
     bool
     """
 
-    if not gb:
-        raise ImportError("Gurobi (gurobipy) not available.")
-
     # compute matrix-dictionary for voters approval
     # approval_matrix[(voter, cand)] = 1 if cand is in voter's approval set
     # approval_matrix[(voter, cand)] = 0 otherwise
@@ -751,7 +783,7 @@ def _check_PJR_brute_force(profile, committee):
                 for j in group:
                     approved_cands_union = approved_cands_union.union(profile[j].approved)
 
-                # if intersection of approved_cands_union with committee yields a set of size
+                # if intersection of `approved_cands_union` with committee yields a set of size
                 # strictly less than ell, then this ell-cohesive group violates PJR
                 if len(approved_cands_union & committee) < ell:
                     detailed_information = {
@@ -783,8 +815,6 @@ def _check_PJR_gurobi(profile, committee):
     -------
     bool
     """
-    if not gb:
-        raise ImportError("Gurobi (gurobipy) not available.")
 
     # compute matrix-dictionary for voters approval
     # approval_matrix[(voter, cand)] = 1 if cand is in voter's approval set
@@ -1017,10 +1047,17 @@ def _check_priceability_gurobi(profile, committee, stable=False):
     <https://www.cs.toronto.edu/~nisarg/papers/priceability.pdf>
     """
 
-    if not gb:
-        raise ImportError("Gurobi (gurobipy) not available.")
-
     model = gb.Model()
+
+    approved_candidates = [
+        cand for cand in profile.candidates if any(cand in voter.approved for voter in profile)
+    ]
+    if len(approved_candidates) < len(committee):
+        # there are fewer candidates that are approved by at least one voter than candidates
+        # in the committee.
+        # in this case, return True iff all approved candidates appear in the committee
+        # note: the original definition of priceability does not work in this case.
+        return all(cand in committee for cand in approved_candidates)
 
     budget = model.addVar(vtype=gb.GRB.CONTINUOUS)
     payment = {}
@@ -1241,9 +1278,6 @@ def _check_core_gurobi(profile, committee, committeesize):
     Martin Lackner and Piotr Skowron.
     <https://arxiv.org/abs/2007.01795>
     """
-
-    if not gb:
-        raise ImportError("Gurobi (gurobipy) not available.")
 
     model = gb.Model()
 
