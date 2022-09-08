@@ -36,7 +36,7 @@ is printed.
 .. doctest::
 
     >>> output.set_verbosity(INFO)
-    >>> properties.full_analysis(profile, committees[0])
+    >>> results = properties.full_analysis(profile, committees[0])
     Pareto optimality                                  : True
     Justified representation (JR)                      : True
     Proportional justified representation (PJR)        : True
@@ -47,6 +47,12 @@ is printed.
 
 In contrast, committees returned by seq-Phragmén always satisfy JR and PJR [2]_.
 Pareto optimality is not necessarily satisfied by seq-Phragmén, but it is satisfied in this instance.
+(The variable `results` is a dictionary containing the respective truth values.)
+
+.. doctest::
+
+    >>> print(results)
+    {'pareto': True, 'jr': True, 'pjr': True, 'ejr': False, 'priceability': True, 'stable-priceability': False, 'core': False}
 
 .. testcleanup::
 
