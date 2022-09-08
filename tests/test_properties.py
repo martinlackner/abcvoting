@@ -14,36 +14,6 @@ from abcvoting import abcrules, properties, fileio
 output.set_verbosity(verbosity=DETAILS)
 
 
-# Test from literature: Lackner and Skowron 2020
-# With given input profile, committee returned by Monroe Rule
-# is not Pareto optimal
-@pytest.mark.parametrize(
-    "algorithm", ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobipy)]
-)
-def test_pareto_optimality_methods(algorithm):
-    # profile with 4 candidates: a, b, c, d
-    profile = Profile(4)
-
-    # add voters in the profile
-    profile.add_voters([[0]] * 2 + [[0, 2]] + [[0, 3]] + [[1, 2]] * 10 + [[1, 3]] * 10)
-
-    # compute output committee from Monroe's Rule
-    monroe_output = abcrules.compute_monroe(profile, 2)
-
-    # Monroe's Rule should output winning committee {2, 3} for this input
-    # It is not Pareto optimal because it is dominated by committee {0, 1}
-    # Check using the methods
-    is_pareto_optimal = properties.check_pareto_optimality(
-        profile, monroe_output[0], algorithm=algorithm
-    )
-
-    assert monroe_output == [{2, 3}]
-    assert abcvoting.misc.dominate(profile, {0, 1}, {2, 3})
-    assert not is_pareto_optimal
-
-    assert properties.check_pareto_optimality(profile, {0, 1}, algorithm=algorithm)
-
-
 # instances to check output of check_* property functions
 def _create_handcrafted_instances():
     handcrafted_instances = []
@@ -235,22 +205,6 @@ def _create_handcrafted_instances():
     return handcrafted_instances
 
 
-check_property_instances = _create_handcrafted_instances()
-
-
-@pytest.mark.parametrize(
-    "algorithm", ["brute-force", "fastest", pytest.param("gurobi", marks=pytest.mark.gurobipy)]
-)
-@pytest.mark.parametrize(
-    "property_name, profile, committee, expected_result", check_property_instances
-)
-def test_property_functions(property_name, algorithm, profile, committee, expected_result):
-    # check whether the committee satisfies EJR
-    assert (
-        properties.check(property_name, profile, committee, algorithm=algorithm) == expected_result
-    )
-
-
 def _list_abc_yaml_instances():
     currdir = os.path.dirname(os.path.abspath(__file__))
     return [
@@ -260,7 +214,35 @@ def _list_abc_yaml_instances():
     ]
 
 
+check_property_instances = _create_handcrafted_instances()
 abc_yaml_filenames = _list_abc_yaml_instances()
+
+
+@pytest.mark.parametrize(
+    "algorithm",
+    ["brute-force", "fastest", pytest.param("gurobi", marks=pytest.mark.gurobipy), "nonsense"],
+)
+@pytest.mark.parametrize(
+    "property_name, profile, committee, expected_result", check_property_instances
+)
+def test_property_functions_with_handcrafted_instances(
+    property_name, algorithm, profile, committee, expected_result
+):
+    if algorithm == "nonsense":
+        if property_name == "jr":
+            return  # no `algorithm` parameter
+        with pytest.raises(NotImplementedError):
+            properties.check(
+                property_name, profile, committee, algorithm=algorithm
+            ) == expected_result
+    elif algorithm == "brute-force":
+        if property_name in ["priceability", "stable-priceability"]:
+            return  # not supported
+    else:
+        assert (
+            properties.check(property_name, profile, committee, algorithm=algorithm)
+            == expected_result
+        )
 
 
 # to test the output of the brute-force vs gurobi counterparts
@@ -297,6 +279,7 @@ def test_matching_output_different_approaches(abc_yaml_instance):
     ) == properties.check_core(profile, input_committee, algorithm="gurobi")
 
 
+@pytest.mark.gurobipy
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "rule_id, property_name",
@@ -344,3 +327,33 @@ def test_properties_with_rules(rule_id, property_name, abc_yaml_instance):
     # winning committees should satisfy `property_name`
     for committee in committees:
         assert properties.check(property_name, profile, committee)
+
+
+# Test from literature: Lackner and Skowron 2020
+# With given input profile, committee returned by Monroe Rule
+# is not Pareto optimal
+@pytest.mark.parametrize(
+    "algorithm", ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobipy)]
+)
+def test_pareto_optimality_methods(algorithm):
+    # profile with 4 candidates: a, b, c, d
+    profile = Profile(4)
+
+    # add voters in the profile
+    profile.add_voters([[0]] * 2 + [[0, 2]] + [[0, 3]] + [[1, 2]] * 10 + [[1, 3]] * 10)
+
+    # compute output committee from Monroe's Rule
+    monroe_output = abcrules.compute_monroe(profile, 2)
+
+    # Monroe's Rule should output winning committee {2, 3} for this input
+    # It is not Pareto optimal because it is dominated by committee {0, 1}
+    # Check using the methods
+    is_pareto_optimal = properties.check_pareto_optimality(
+        profile, monroe_output[0], algorithm=algorithm
+    )
+
+    assert monroe_output == [{2, 3}]
+    assert abcvoting.misc.dominate(profile, {0, 1}, {2, 3})
+    assert not is_pareto_optimal
+
+    assert properties.check_pareto_optimality(profile, {0, 1}, algorithm=algorithm)
