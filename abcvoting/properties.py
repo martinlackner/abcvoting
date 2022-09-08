@@ -69,6 +69,8 @@ def full_analysis(profile, committee):
     for prop, value in results.items():
         output.info(f"{description[prop]:50s} : {value}")
 
+    return results
+
 
 def check(property_name, profile, committee, algorithm="fastest"):
     """
@@ -94,19 +96,19 @@ def check(property_name, profile, committee, algorithm="fastest"):
         raise ValueError(f"Property {property_name} not known.")
 
     if property_name == "pareto":
-        return check_pareto_optimality(profile, committee)
+        return check_pareto_optimality(profile, committee, algorithm=algorithm)
     elif property_name == "jr":
         return check_JR(profile, committee)
     elif property_name == "pjr":
-        return check_PJR(profile, committee)
+        return check_PJR(profile, committee, algorithm=algorithm)
     elif property_name == "ejr":
-        return check_EJR(profile, committee)
+        return check_EJR(profile, committee, algorithm=algorithm)
     elif property_name == "priceability":
-        return check_priceability(profile, committee)
+        return check_priceability(profile, committee, algorithm=algorithm)
     elif property_name == "stable_priceability":
-        return check_stable_priceability(profile, committee)
+        return check_stable_priceability(profile, committee, algorithm=algorithm)
     elif property_name == "core":
-        return check_core(profile, committee)
+        return check_core(profile, committee, algorithm=algorithm)
     else:
         raise NotImplementedError(f"Property {property_name} not implemented.")
 

@@ -176,3 +176,8 @@ def test_handling_preflib_files_py(check_output):
 @pytest.mark.slow
 def test_generating_random_profiles_py(check_output):
     from examples import generating_random_profiles  # noqa: F401
+
+
+# noinspection PyUnresolvedReferences
+def test_axiomatic_properties(check_output):
+    from examples import axiomatic_properties  # noqa: F401

@@ -1,0 +1,44 @@
+Input: profile with 6 voters and 16 candidates:
+ voter 0:   {1, 2, 3, 4},
+ voter 1:   {1, 2, 3, 5},
+ voter 2:   {1, 2, 3, 6},
+ voter 3:   {7, 8, 9},
+ voter 4:   {10, 11, 12},
+ voter 5:   {13, 14, 15}
+
+----------------------------------
+Proportional Approval Voting (PAV)
+----------------------------------
+
+Computing only one winning committee (resolute=True)
+
+1 winning committee:
+ {1, 10, 11, 12, 13, 14, 15, 2, 3, 7, 8, 9}
+
+-----------------------------------------
+Phragmén's Sequential Rule (seq-Phragmén)
+-----------------------------------------
+
+1 winning committee:
+ {1, 10, 11, 13, 14, 2, 3, 4, 5, 6, 7, 8}
+
+Results for PAV:
+Pareto optimality                                  : True
+Justified representation (JR)                      : True
+Proportional justified representation (PJR)        : True
+Extended justified representation (EJR)            : True
+Priceability                                       : False
+Stable Priceability                                : False
+The core                                           : False
+
+Results for Sequential Phragmén:
+Pareto optimality                                  : True
+Justified representation (JR)                      : True
+Proportional justified representation (PJR)        : True
+Extended justified representation (EJR)            : True
+Priceability                                       : True
+Stable Priceability                                : True
+The core                                           : True
+
+Sequential Phragmén satisfies priceability, PAV does not.
+Sequential Phragmén satisfies the core property, PAV does not.
