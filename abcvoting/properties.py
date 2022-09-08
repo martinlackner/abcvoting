@@ -11,7 +11,7 @@ from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate
 
 
 ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
-PROPERTY_NAMES = ["pareto", "jr", "pjr", "ejr", "priceability", "stable_priceability", "core"]
+PROPERTY_NAMES = ["pareto", "jr", "pjr", "ejr", "priceability", "stable-priceability", "core"]
 
 
 def _set_gurobi_model_parameters(model):
@@ -30,7 +30,7 @@ def full_analysis(profile, committee):
     Test all implemented properties for the given committee.
 
     Returns a dictionary with the following keys: "pareto", "jr", "pjr", "ejr", "priceability",
-    "stable_priceability" and "core".
+    "stable-priceability" and "core".
     The values are `True` or `False`, depending on whether this property is satisfied.
 
     Parameters
@@ -59,7 +59,7 @@ def full_analysis(profile, committee):
         "pjr": "Proportional justified representation (PJR)",
         "ejr": "Extended justified representation (EJR)",
         "priceability": "Priceability",
-        "stable_priceability": "Stable Priceability",
+        "stable-priceability": "Stable Priceability",
         "core": "The core",
     }
 
@@ -105,7 +105,7 @@ def check(property_name, profile, committee, algorithm="fastest"):
         return check_EJR(profile, committee, algorithm=algorithm)
     elif property_name == "priceability":
         return check_priceability(profile, committee, algorithm=algorithm)
-    elif property_name == "stable_priceability":
+    elif property_name == "stable-priceability":
         return check_stable_priceability(profile, committee, algorithm=algorithm)
     elif property_name == "core":
         return check_core(profile, committee, algorithm=algorithm)

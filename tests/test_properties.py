@@ -144,19 +144,19 @@ def _create_handcrafted_instances():
     )
     committee = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 13}
     expected_result = True
-    handcrafted_instances.append(("stable_priceability", profile, committee, expected_result))
+    handcrafted_instances.append(("stable-priceability", profile, committee, expected_result))
     committee = {0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14}
     expected_result = False
-    handcrafted_instances.append(("stable_priceability", profile, committee, expected_result))
+    handcrafted_instances.append(("stable-priceability", profile, committee, expected_result))
 
     profile = Profile(3)
     profile.add_voters([[0, 1]] + [[0, 1, 2]] + [[2]])
     committee = {0, 1, 2}
     expected_result = True
-    handcrafted_instances.append(("stable_priceability", profile, committee, expected_result))
+    handcrafted_instances.append(("stable-priceability", profile, committee, expected_result))
     committee = {0, 1}
     expected_result = False
-    handcrafted_instances.append(("stable_priceability", profile, committee, expected_result))
+    handcrafted_instances.append(("stable-priceability", profile, committee, expected_result))
 
     # add an instance from
     # Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 23
@@ -235,14 +235,14 @@ def test_property_functions_with_handcrafted_instances(
             properties.check(
                 property_name, profile, committee, algorithm=algorithm
             ) == expected_result
-    elif algorithm == "brute-force":
-        if property_name in ["priceability", "stable-priceability"]:
-            return  # not supported
     else:
-        assert (
-            properties.check(property_name, profile, committee, algorithm=algorithm)
-            == expected_result
-        )
+        if algorithm == "brute-force" and property_name in ["priceability", "stable-priceability"]:
+            return  # not supported
+        else:
+            assert (
+                properties.check(property_name, profile, committee, algorithm=algorithm)
+                == expected_result
+            )
 
 
 # to test the output of the brute-force vs gurobi counterparts
