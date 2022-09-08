@@ -77,7 +77,7 @@ jobs:
       env:
         TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
       if: (env.TEST_PYPI_API_TOKEN != null) && (matrix.python-version == '3.8') && (github.ref == 'refs/heads/master')
-      uses: pypa/gh-action-pypi-publish@master
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository_url: https://test.pypi.org/legacy/
