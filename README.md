@@ -57,6 +57,19 @@ The following ABC rules are implemented:
 
 * and many more ...
 
+In addition, one can verify axiomatic properties such as
+
+* Justified Representation (JR)
+
+* Propotional Justified Representation (PJR)
+
+* Extended Justified Representation (EJR)
+
+* Priceability
+
+* The core property
+
+
 ## Installation
 
 As simple as:
