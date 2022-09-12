@@ -232,9 +232,7 @@ def test_property_functions_with_handcrafted_instances(
         if property_name == "jr":
             return  # no `algorithm` parameter
         with pytest.raises(NotImplementedError):
-            properties.check(
-                property_name, profile, committee, algorithm=algorithm
-            ) == expected_result
+            properties.check(property_name, profile, committee, algorithm=algorithm)
     else:
         if algorithm == "brute-force" and property_name in ["priceability", "stable-priceability"]:
             return  # not supported
