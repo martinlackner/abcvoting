@@ -43,14 +43,15 @@ Such properties are fundamentally important to the analysis and discussion
 of voting rules.
 
 In a bit more detail, `abcvoting` has the following functionality:
+
 - Algorithms for **computing winning committees** of many ABC voting rules,
-  including Proportional Approval Voting (PAV), 
-  Sequential PAV,
-  Chamberlin-Courant (CC),
-  Phragmén's sequential rule,
-  Monroe's rule,
-  Method of Equal Shares,
-  and many more.
+  including 
+  - Proportional Approval Voting (PAV), Chamberlin-Courant (CC), and arbitrary Thiele methods, 
+  - Sequential and Reverse-Sequential Thiele methods
+  - Phragmén's sequential rule and other rules by Phragmén,
+  - Monroe's rule and its approximation Greedy Monroe,
+  - the Method of Equal Shares.
+  - and many more.
 - Functions for **reading and writing election (preference) data**. 
   In particular, it supports the established Preflib format [@MatteiW13].
 - Functions for **generating ABC elections from probabilistic distributions**, 
