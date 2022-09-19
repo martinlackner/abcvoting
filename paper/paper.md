@@ -39,7 +39,7 @@ winning committees for all implemented voting rules.
 In addition to computing winning committees, `abcvoting` can be used to
 verify axiomatic properties of committees. Axiomatic properties are 
 mathematical formalizations of desirable features, e.g, fairness guarantees.
-Such properties are fundamentally important to the analysis and discussion
+Such properties are fundamental to the analysis and discussion
 of voting rules.
 
 In a bit more detail, `abcvoting` has the following functionality:
@@ -47,11 +47,13 @@ In a bit more detail, `abcvoting` has the following functionality:
 - Algorithms for **computing winning committees** of many ABC voting rules,
   including 
   - Proportional Approval Voting (PAV), Chamberlin-Courant (CC), and arbitrary Thiele methods, 
-  - Sequential and Reverse-Sequential Thiele methods
+  - Sequential and Reverse-Sequential Thiele methods,
   - Phragmén's sequential rule and other rules by Phragmén,
   - Monroe's rule and its approximation Greedy Monroe,
   - the Method of Equal Shares.
   - and many more.
+    
+  We refer to the book by [@abcbook] for an overview and explanations of these and other ABC voting rules.
 - Functions for **reading and writing election (preference) data**. 
   In particular, it supports the established Preflib format [@MatteiW13].
 - Functions for **generating ABC elections from probabilistic distributions**, 
@@ -59,7 +61,7 @@ In a bit more detail, `abcvoting` has the following functionality:
   Resampling, and the Truncated Polya Urn model (see the work of
   @howtosample for details).
 - Algorithms for analyzing the **axiomatic properties** of a given committee. 
-  To name a few important axiomatic properties, `abcvoting`
+  To name a few important properties, `abcvoting`
 supports Proportional Justified Representation [@pjr17],
 Extended Justified Representation [@justifiedRepresentation], 
 Priceability [@pet-sko:laminar], 
@@ -68,8 +70,8 @@ and the Core property [@justifiedRepresentation].
 # Statement of need
 
 In the last years, approval-based committee voting has become an increasingly active
-topic of research, in particular within the artificial intelligence community
-(and in particular its subfield *computational social choice*).
+topic of research within the artificial intelligence community
+(in particular its subfield *computational social choice*).
 While originally most of the research on this topic has been of theoretical nature,
 more and more recent publications complement theoretical work with practical,
 computional evaluations. Thus, there is a growing need for
@@ -77,7 +79,7 @@ well-tested implementations of common ABC voting rules that can serve as
 a basis for experimental evaluations of new concepts.
 
 Moreover, many computational problems related to ABC elections are computationally
-hard (NP-hard or harder). For example, many ABC voting rules are formulated
+difficult (NP-hard or harder). For example, many ABC voting rules are formulated
 as optimization problems, where the goal is find a committee
 maximizing a certain score. As there are exponentially many possible committees,
 it requires effort to find 
@@ -90,7 +92,7 @@ and others. Many voting rules are implemented via more than one algorithm.
 This is useful for correctness tests and algorithmic comparisons. 
 
 The `abcvoting` package has been used in a number of publications
- [@godziszewski2021analysis; @howtosample; @FairsteinVMG22; @brill2022individual; @aij/guarantees].
+ [@aij/guarantees; @godziszewski2021analysis; @howtosample; @FairsteinVMG22; @brill2022individual].
 In addition, it contains Python code for many of the examples appearing in 
 the book *Multi-winner voting with approval preferences* [@abcbook].
 
