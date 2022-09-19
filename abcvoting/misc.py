@@ -5,7 +5,7 @@ Miscellaneous functions for committees (i.e., subsets of candidates).
 import math
 import numpy as np
 from time import perf_counter
-
+import itertools
 
 FLOAT_ISCLOSE_REL_TOL = 1e-12
 """
@@ -253,6 +253,26 @@ def header(text, symbol="-"):
     """
     border = symbol[0] * len(text) + "\n"
     return border + text + "\n" + border
+
+
+def powerset(iterable):
+    """
+    Yield all possible subsets of the iterable.
+
+    From: https://docs.python.org/3/library/itertools.html#itertools-recipes
+
+    Parameters
+    ----------
+        iterable : iterable
+            An iterable.
+
+    Returns
+    -------
+        iterable
+    """
+
+    s = list(iterable)
+    return itertools.chain.from_iterable(itertools.combinations(s, r) for r in range(len(s) + 1))
 
 
 def compare_list_of_committees(committees1, committees2):

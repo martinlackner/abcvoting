@@ -18,6 +18,16 @@ output.set_verbosity(verbosity=DETAILS)
 def _create_handcrafted_instances():
     handcrafted_instances = []
 
+    # very simple instance with committeesize 1
+    profile = Profile(5)
+    profile.add_voters([{1, 2, 3}, {0, 1}, {0, 1, 2}, {1, 2}])
+    # cand 1 is approved by everyone
+    for property_name in properties.PROPERTY_NAMES:
+        handcrafted_instances.append((property_name, profile, {1}, True))
+    # cand 4 is approved by no one
+    for property_name in properties.PROPERTY_NAMES:
+        handcrafted_instances.append((property_name, profile, {4}, False))
+
     # add an instance from
     # Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 20
     profile = Profile(4)

@@ -5,9 +5,8 @@ Axiomatic properties of committees.
 import gurobipy as gb
 import itertools
 import math
-from more_itertools import powerset
 from abcvoting.output import output, WARNING
-from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate
+from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate, powerset
 
 
 ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
@@ -1244,17 +1243,17 @@ def _check_core_brute_force(profile, committee, committeesize):
     <https://arxiv.org/abs/2007.01795>
     """
 
-    for set_of_voter in powerset(profile):
-        for set_of_candidates in powerset(profile.approved_candidates()):
-            if (
-                len(set_of_candidates) * len(profile) <= len(set_of_voter) * committeesize
-                and set_of_voter
-            ):
-                if not any(
-                    len(voter.approved & set(set_of_candidates)) <= len(voter.approved & committee)
-                    for voter in set_of_voter
-                ):
-                    return False
+    for cands in powerset(profile.approved_candidates()):
+        cands = set(cands)
+        set_of_voters = [
+            voter
+            for voter in profile
+            if len(voter.approved & cands) > len(voter.approved & committee)
+        ]  # set of voters that would profit from `cands`
+        if not set_of_voters:
+            continue
+        if len(cands) * len(profile) <= len(set_of_voters) * committeesize:
+            return False  # a sufficient number of voters would profit from deviating to `cands`
     return True
 
 
