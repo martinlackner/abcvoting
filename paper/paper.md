@@ -20,8 +20,8 @@ bibliography: paper.bib
 # Summary
 
 The Python package `abcvoting` is a research tool to explore and analyse
-*approval-based committee (ABC) elections* [@abcbook]. First and foremost,
-it contains implementations
+*approval-based committee (ABC) elections* [@FSST-trends, @abcbook]. 
+First and foremost, it contains implementations
 of major ABC voting rules. These are voting rules that accept as input
 *approval ballots*, that is, the (binary) preferences of voters expressing 
 which candidates they like or support.
