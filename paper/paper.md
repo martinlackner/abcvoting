@@ -26,8 +26,10 @@ of major ABC voting rules. These are voting rules that accept as input
 *approval ballots*, that is, the (binary) preferences of voters expressing 
 which candidates they like or support.
 The output is a fixed-size subset of candidates, called a *committee*.
-Ideally, a committee is chosen in such a fashion that it reflects the input,
-that is, the voters' opinion as expressed via approval ballots.
+Different ABC voting rules represent different approaches how such a committee
+should be formed.
+For example, there is a trade-off between selecting widely supported candidates
+and selecting candidates that represent as many voters as possible [@aij/guarantees].
 Much of the recent research has focussed on developing ABC voting rules
 that reflect the preferences of voters in a *proportional* fashion.
 
@@ -50,7 +52,7 @@ In a bit more detail, `abcvoting` has the following functionality:
   - Sequential and Reverse-Sequential Thiele methods,
   - Phragmén's sequential rule and other rules by Phragmén,
   - Monroe's rule and its approximation Greedy Monroe,
-  - the Method of Equal Shares.
+  - the Method of Equal Shares,
   - and many more.
     
   We refer to the book by [@abcbook] for an overview and explanations of these and other ABC voting rules.
@@ -58,7 +60,7 @@ In a bit more detail, `abcvoting` has the following functionality:
   In particular, it supports the established Preflib format [@MatteiW13].
 - Functions for **generating ABC elections from probabilistic distributions**, 
   such as the Truncated Mallows distribution, Independent Culture,
-  Resampling, and the Truncated Polya Urn model (see the work of
+  Resampling, and the Truncated Pólya Urn model (see the work of
   @howtosample for details).
 - Algorithms for analyzing the **axiomatic properties** of a given committee. 
   To name a few important properties, `abcvoting`
@@ -80,11 +82,10 @@ a basis for experimental evaluations of new concepts.
 
 Moreover, many computational problems related to ABC elections are computationally
 difficult (NP-hard or harder). For example, many ABC voting rules are formulated
-as optimization problems, where the goal is find a committee
+as optimization problems, where the goal is to find a committee
 maximizing a certain score. As there are exponentially many possible committees,
-it requires effort to find 
-suitable solution techniques for computing winning committees.
-The same holds for axiomatic properties: many of those are also computationally
+it requires non-trivial algorithmic techniques to compute winning committees in reasonable time.
+The same holds for axiomatic properties: many of these are also computationally
 hard to verify.
 `abcvoting` uses a number of techniques to deal with this computational complexity:
 integer linear programs, branch-and-bound algorithms, constraint programming,
@@ -98,11 +99,13 @@ the book *Multi-winner voting with approval preferences* [@abcbook].
 
 # Acknowledgements
 
-The following people have contributed code to this package or provided help with technical and scientific questions (in alphabetic order):
-Pawel Batko, Elvi Cela, Piotr Faliszewski, Stefan Schlomo Forster, Andrzej Kaczmarczyk, Jonas Kompauer, Benjamin Krenn, Florian Lackner,
+The following people have contributed code to this package or provided help with technical 
+and scientific questions (in alphabetical order):
+Pawel Batko, Elvi Cela, Piotr Faliszewski, Stefan Schlomo Forster, Andrzej Kaczmarczyk, 
+Jonas Kompauer, Benjamin Krenn, Florian Lackner,
 Dominik Peters, Peter Regner, Piotr Skowron, Stanisław Szufa.
 
-The development of this package has been supported by the Austrian Science Fund FWF, grant P31890.
+The development of this package was supported by the Austrian Science Fund FWF, grant P31890.
 
 # References
 
