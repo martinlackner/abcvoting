@@ -28,8 +28,8 @@ which candidates they like or support.
 The output is a fixed-size subset of candidates, called a *committee*.
 Different ABC voting rules represent different approaches how such a committee
 should be formed.
-For example, there is a trade-off between selecting widely supported candidates
-and selecting candidates that represent as many voters as possible [@aij/guarantees].
+For example, there is a trade-off between selecting only widely supported candidates
+and choosing a committee that represent as many voters as possible [@aij/guarantees].
 Much of the recent research has focussed on developing ABC voting rules
 that reflect the preferences of voters in a *proportional* fashion.
 
@@ -71,7 +71,8 @@ and the Core property [@justifiedRepresentation].
 
 # Statement of need
 
-In the last years, approval-based committee voting has become an increasingly active
+In the last years, committee voting (also known as multi-winner voting) 
+has become an increasingly active
 topic of research within the artificial intelligence community
 (in particular its subfield *computational social choice*).
 While originally most of the research on this topic has been of theoretical nature,
