@@ -16,7 +16,7 @@ jobs:
       - name: get latest release with tag
         id: latestrelease
         run: |
-          echo "::set-output name=releasetag::$(curl -s https://api.github.com/repos/martinlackner/abcvoting/releases/latest | jq '.tag_name' | sed 's/\"//g')"
+          echo "{releasetag}=$(curl -s https://api.github.com/repos/martinlackner/abcvoting/releases/latest | jq '.tag_name' | sed 's/\"//g')" >> $GITHUB_OUTPUT
       - name: confirm release tag
         run: |
           echo ${{ steps.latestrelease.outputs.releasetag }}
@@ -26,7 +26,7 @@ jobs:
           ref: ${{ steps.latestrelease.outputs.releasetag }}
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
