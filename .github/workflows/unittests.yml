@@ -61,7 +61,7 @@ jobs:
       run: coverage xml
 
     - name: Upload coverage metrics to codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
 
     # tests the package, the release is done in build.yml
     - name: Build a binary wheel and a source tarball
