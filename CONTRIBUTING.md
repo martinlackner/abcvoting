@@ -7,6 +7,7 @@ the best way to contribute is to simply get in contact with me (Martin Lackner, 
 post an [issue](https://github.com/martinlackner/abcvoting/issues).
 
 Further comments:
+- Documentation is available at https://abcvoting.readthedocs.io/en/latest/.
 - If you would like to contribute but don't have a concrete idea, take a look the open [issues](https://github.com/martinlackner/abcvoting/issues) or
 contact me directly (Martin Lackner, lackner@dbai.tuwien.ac.at).
 - If you would like to contribute your favourite approval-based committee voting rules or axiom, you are very welcome to do so! 
