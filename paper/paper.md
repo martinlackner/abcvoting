@@ -11,6 +11,7 @@ authors:
     orcid: 0000-0003-2170-0770
     affiliation: 1
   - name: Peter Regner
+    orcid: 0000-0001-8480-4900
     affiliation: 2
   - name: Benjamin Krenn
     affiliation: 1
