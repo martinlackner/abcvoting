@@ -10,10 +10,16 @@ authors:
   - name: Martin Lackner
     orcid: 0000-0003-2170-0770
     affiliation: 1
+  - name: Peter Regner
+    affiliation: 2
+  - name: Benjamin Krenn
+    affiliation: 1
 affiliations:
  - name: TU Wien, Vienna, Austria
    index: 1
-date: 15 September 2022
+ - name: University of Natural Resources and Life Sciences, Vienna, Austria
+   index: 2
+date: 23 November 2022
 bibliography: paper.bib
 ---
 
