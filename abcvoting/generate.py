@@ -5,7 +5,7 @@ This module is based on the paper
     *How to Sample Approval Elections?*
     Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
     Krzysztof Sornat, Nimrod Talmon.
-    TODO: URL
+    https://arxiv.org/abs/2207.01140
 """
 
 import math
@@ -263,7 +263,7 @@ def random_ic_profile(num_voters, num_cand, p=0.5):
     *How to Sample Approval Elections?*
     Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
     Krzysztof Sornat, Nimrod Talmon.
-    TODO: URL
+    https://arxiv.org/abs/2207.01140
     """
     approval_sets = [set() for _ in range(num_voters)]
     for i in range(num_voters):
@@ -368,7 +368,7 @@ def random_truncated_urn_profile(num_voters, num_cand, setsize, replace):
     *How to Sample Approval Elections?*
     Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
     Krzysztof Sornat, Nimrod Talmon.
-    TODO: URL
+    https://arxiv.org/abs/2207.01140
     """
     ordinal_votes = _ordinal_urn_profile(num_voters, num_cand, replace)
     approval_sets = []
@@ -404,7 +404,7 @@ def random_resampling_profile(num_voters, num_cand, p, phi):
     *How to Sample Approval Elections?*
     Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
     Krzysztof Sornat, Nimrod Talmon.
-    TODO: URL
+    https://arxiv.org/abs/2207.01140
     """
     k = int(p * num_cand)
     central_vote = set(range(k))
@@ -452,7 +452,7 @@ def random_disjoint_resampling_profile(num_voters, num_cand, p, phi=None, num_gr
     *How to Sample Approval Elections?*
     Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
     Krzysztof Sornat, Nimrod Talmon.
-    TODO: URL
+    https://arxiv.org/abs/2207.01140
     """
 
     def _uniform_in_simplex(n):
@@ -518,7 +518,7 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
     *How to Sample Approval Elections?*
     Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
     Krzysztof Sornat, Nimrod Talmon.
-    TODO: URL
+    https://arxiv.org/abs/2207.01140
     """
     k = int(p * num_cand)
     set_a = set(range(k))
@@ -798,7 +798,7 @@ def random_euclidean_vcr_profile(
     *How to Sample Approval Elections?*
     Stanisław Szufa, Piotr Faliszewski, Łukasz Janeczko, Martin Lackner, Arkadii Slinko,
     Krzysztof Sornat, Nimrod Talmon.
-    TODO: URL
+    https://arxiv.org/abs/2207.01140
     """
     voter_points, candidate_points = _voter_and_candidate_points(
         num_voters,
