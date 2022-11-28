@@ -107,7 +107,7 @@ def test_read_and_write_abc_yaml_file():
         {
             "rule_id": "equal-shares",
             "algorithm": "standard-fractions",
-            "skip_phragmen_phase": True,
+            "completion": None,
         },
     ]
 

@@ -116,6 +116,15 @@ compute:
 - rule_id: equal-shares
   result: [[8, 4, 5]]
   resolute: false
+- rule_id: equal-shares-with-av-completion
+  result: [[8, 4, 5]]
+  resolute: true
+- rule_id: equal-shares-with-av-completion
+  result: [[8, 4, 5]]
+  resolute: false
+- rule_id: equal-shares-with-increment-completion
+  result: [[8, 4, 5]]
+  resolute: true
 - rule_id: phragmen-enestroem
   result: [[8, 4, 5]]
   resolute: true

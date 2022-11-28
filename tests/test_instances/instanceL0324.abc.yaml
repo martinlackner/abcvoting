@@ -130,6 +130,15 @@ compute:
 - rule_id: equal-shares
   result: [[2, 3, 4, 7, 8]]
   resolute: false
+- rule_id: equal-shares-with-av-completion
+  result: [[2, 3, 4, 7, 8]]
+  resolute: true
+- rule_id: equal-shares-with-av-completion
+  result: [[2, 3, 4, 7, 8]]
+  resolute: false
+- rule_id: equal-shares-with-increment-completion
+  result: [[2, 3, 4, 7, 8]]
+  resolute: true
 - rule_id: phragmen-enestroem
   result: [[2, 3, 4, 7, 8]]
   resolute: true

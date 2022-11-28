@@ -11,5 +11,5 @@ exclude =
     */__init__.py,
     .eggs,
     .github
-max-complexity = 35
+max-complexity = 40
 max-line-length = 99

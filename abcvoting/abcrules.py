@@ -37,6 +37,8 @@ MAIN_RULE_IDS = [
     "minimaxav",
     "lexminimaxav",
     "equal-shares",
+    "equal-shares-with-av-completion",
+    "equal-shares-with-increment-completion",
     "phragmen-enestroem",
     "consensus-rule",
     "trivial",
@@ -227,18 +229,32 @@ class Rule:
             self.compute_fct = compute_lexminimaxav
             self.algorithms = ("gurobi", "brute-force")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
-        elif rule_id in ["rule-x", "equal-shares"]:
+        elif rule_id in ["rule-x", "equal-shares", "equal-shares-with-seqphragmen-completion"]:
             self.shortname = "Equal Shares"
-            self.longname = "Method of Equal Shares (aka Rule X)"
+            self.longname = "Method of Equal Shares (aka Rule X) with Phragmén phase"
             self.compute_fct = compute_equal_shares
             self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
-        elif rule_id in ["rule-x-without-phragmen-phase", "equal-shares-without-phragmen-phase"]:
-            self.shortname = "Equal Shares without Phragmén phase"
-            self.longname = (
-                "Method of Equal Shares (aka Rule X) without the Phragmén phase (second phase)"
-            )
-            self.compute_fct = functools.partial(compute_equal_shares, skip_phragmen_phase=True)
+        elif rule_id in ["equal-shares-with-av-completion"]:
+            self.shortname = "Equal Shares with AV completion"
+            self.longname = "Method of Equal Shares (aka Rule X) with AV completion"
+            self.compute_fct = functools.partial(compute_equal_shares, completion="av")
+            self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
+        elif rule_id in ["equal-shares-with-increment-completion"]:
+            self.shortname = "Equal Shares with increment completion"
+            self.longname = "Method of Equal Shares (aka Rule X) with increment completion"
+            self.compute_fct = functools.partial(compute_equal_shares, completion="increment")
+            self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
+            self.resolute_values = (True,)  # this rule is ill-defined for resolute=False
+        elif rule_id in [
+            "rule-x-without-phragmen-phase",
+            "equal-shares-without-phragmen-phase",
+            "equal-shares-without-completion",
+        ]:
+            self.shortname = "Equal Shares without completion"
+            self.longname = "Method of Equal Shares (aka Rule X) without completion (second phase)"
+            self.compute_fct = functools.partial(compute_equal_shares, completion=None)
             self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
         elif rule_id == "phragmen-enestroem":
@@ -1881,7 +1897,9 @@ def compute_separable_rule(
     return committees
 
 
-def _separable_rule_algorithm(rule_id, profile, committeesize, resolute, max_num_of_committees):
+def _separable_rule_algorithm(
+    rule_id, profile, committeesize, resolute, max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT
+):
     """
     Algorithm for separable rules (such as AV and SAV).
     """
@@ -2991,13 +3009,17 @@ def compute_rule_x(
         list of CandidateSet
             A list of winning committees.
     """
+    if skip_phragmen_phase:
+        completion = None
+    else:
+        completion = "seqphragmen"
     return compute_equal_shares(
         profile=profile,
         committeesize=committeesize,
         algorithm=algorithm,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
-        skip_phragmen_phase=skip_phragmen_phase,
+        completion=completion,
     )
 
 
@@ -3007,7 +3029,7 @@ def compute_equal_shares(
     algorithm="fastest",
     resolute=True,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
-    skip_phragmen_phase=False,
+    completion="seqphragmen",
 ):
     """
     Compute winning committees with the Method of Equal Shares (aka Rule X).
@@ -3049,20 +3071,36 @@ def compute_equal_shares(
              The default value of `max_num_of_committees` can be modified via the constant
              `MAX_NUM_OF_COMMITTEES_DEFAULT`.
 
-        skip_phragmen_phase : bool, default=False
-             Omit the second phase (that uses seq-Phragmen).
+        completion : str, default="seqphragmen"
+             As Equal Shares does not necessarily return the desired number of committee members,
+             it requires an additional method to fill the remaining seats. The default is
+             to use Sequential Phragmén.
 
-             May result in a committee that is too small (length smaller than `committeesize`).
+             The following options are available:
+
+             - `"seqphragmen"`: Use Sequential Phragmén to fill seats.
+             - `"av"`: Use Approval Voting to fill seats (i.e., take those with most approvals).
+             - `"increment"`: Increase the budget of voters by virtually incrementing
+               the committee size. This step is repeated until a committee of size `committeesize`
+               is found.
+             - None: Do not fill the remaining seats. The resulting committees may contain
+               fewer than `committeesize` members.
 
     Returns
     -------
         list of CandidateSet
             A list of winning committees.
     """
-    if skip_phragmen_phase:
-        rule_id = "equal-shares-without-phragmen-phase"
-    else:
+    if not completion:
+        rule_id = "equal-shares-without-completion"
+    elif completion == "seqphragmen":
         rule_id = "equal-shares"
+    elif completion == "av":
+        rule_id = "equal-shares-with-av-completion"
+    elif completion == "increment":
+        rule_id = "equal-shares-with-increment-completion"
+    else:
+        raise ValueError(f"completion argument {completion} unknown.")
     rule = Rule(rule_id)
     if algorithm == "fastest":
         algorithm = rule.fastest_available_algorithm()
@@ -3077,14 +3115,21 @@ def compute_equal_shares(
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
-    committees, detailed_info = _equal_shares_algorithm(
-        profile=profile,
-        committeesize=committeesize,
-        algorithm=algorithm,
-        resolute=resolute,
-        max_num_of_committees=max_num_of_committees,
-        skip_phragmen_phase=skip_phragmen_phase,
-    )
+    if completion == "increment":
+        committees, detailed_info = _equal_shares_algorithm_with_increment_completion(
+            profile=profile,
+            committeesize=committeesize,
+            algorithm=algorithm,
+        )
+    else:
+        committees, detailed_info = _equal_shares_algorithm(
+            profile=profile,
+            committeesize=committeesize,
+            algorithm=algorithm,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            completion=completion,
+        )
 
     # optional output
     output.info(header(rule.longname), wrap=False)
@@ -3093,7 +3138,19 @@ def compute_equal_shares(
         output.info(" (aka parallel universes tiebreaking) (resolute=False)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
 
-    if resolute:
+    if "too_few_approved_candidates" in detailed_info.keys():
+        output.details(
+            "There are fewer candidates approved by at least one voter than"
+            " the desired committee size. Thus Equal Shares returns all approved candidates"
+            " and fills the committee with non-approved candidates."
+        )
+    elif completion == "increment":
+        output.details("Incrementing starting budget of voters to fill the committee.")
+        output.details(
+            "Successful for a (virtual) committee size of "
+            f"{detailed_info['increment_committeesize']}."
+        )
+    elif resolute:
         start_budget = detailed_info["start_budget"]
         output.details("Phase 1:\n")
         output.details("starting budget:")
@@ -3180,7 +3237,13 @@ def compute_equal_shares(
 
 
 def _equal_shares_algorithm(
-    profile, committeesize, algorithm, resolute, max_num_of_committees, skip_phragmen_phase=False
+    profile,
+    committeesize,
+    algorithm,
+    resolute,
+    max_num_of_committees=None,
+    completion="seqphragmen",
+    per_voter_budget=None,
 ):
     """Algorithm for the Method of Equal Shares."""
 
@@ -3239,6 +3302,35 @@ def _equal_shares_algorithm(
         detailed_info["phragmen_phase"] = detailed_info_phragmen
         # after filling the remaining spots these committees have size `committeesize`
 
+    def av_phase(_committee):
+        num_missing = committeesize - len(_committee)
+        for _ in range(committeesize):
+            new_winning_committees = []
+            av_committees, detailed_info_av = _separable_rule_algorithm(
+                rule_id="av",
+                profile=profile,
+                committeesize=num_missing,
+                resolute=False,
+                max_num_of_committees=None,
+            )
+            for comm in av_committees:
+                new_comm = set(_committee).union(comm)
+                if len(new_comm) == committeesize:
+                    new_winning_committees.append(new_comm)
+                if len(new_comm) > committeesize:
+                    raise RuntimeError("Critical bug. This condition should not be satisfiable.")
+
+            if new_winning_committees:
+                winning_committees.update(
+                    [tuple(sorted(committee)) for committee in new_winning_committees]
+                )
+                detailed_info["av_phase"] = detailed_info_av
+                break
+            else:
+                num_missing += 1
+        else:
+            raise RuntimeError("Critical bug. This for-loop should terminate earlier.")
+
     if algorithm == "float-fractions":
         division = lambda x, y: x / y  # standard float division
     elif algorithm == "standard-fractions":
@@ -3255,7 +3347,10 @@ def _equal_shares_algorithm(
     if resolute:
         max_num_of_committees = 1  # same algorithm for resolute==True and resolute==False
 
-    start_budget = {v: division(committeesize, len(profile)) for v, _ in enumerate(profile)}
+    if per_voter_budget:
+        start_budget = {v: per_voter_budget for v, _ in enumerate(profile)}
+    else:
+        start_budget = {v: division(committeesize, len(profile)) for v, _ in enumerate(profile)}
     committee_bugdet_pairs = [(tuple(), start_budget)]
     winning_committees = set()
     detailed_info = {
@@ -3316,17 +3411,60 @@ def _equal_shares_algorithm(
             committee_bugdet_pairs += reversed(new_committee_budget_pairs)
 
         else:  # no affordable candidates remain
-            if skip_phragmen_phase:
+            if not completion or completion.lower == "none":
                 winning_committees.add(tuple(sorted(committee)))
-            else:
+            elif completion == "seqphragmen":
                 # fill committee via seq-Phragmen
                 phragmen_phase(committee, budget)
+            elif completion == "av":
+                av_phase(committee)
+            else:
+                raise ValueError(f"completion argument {completion} unknown.")
 
         if max_num_of_committees is not None and len(winning_committees) >= max_num_of_committees:
             winning_committees = sorted_committees(winning_committees)[:max_num_of_committees]
             break
 
     return sorted_committees(winning_committees), detailed_info
+
+
+def _equal_shares_algorithm_with_increment_completion(
+    profile,
+    committeesize,
+    algorithm,
+):
+    if len(profile.approved_candidates()) < committeesize:
+        # There are fewer candidates approved by at least one voter than `committeesize`.
+        # Should return the approved candidates and fill the committee with non-approved
+        # candidates. This is done, e.g., by AV.
+        committees, _ = _separable_rule_algorithm(
+            rule_id="av",
+            profile=profile,
+            committeesize=committeesize,
+            resolute=True,  # increment completion is ill-defined for resolute=False
+        )
+        detailed_info = {"too_few_approved_candidates": True}
+        return committees, detailed_info
+
+    for increment_committeesize in range(committeesize, committeesize * len(profile) + 1):
+        committees, detailed_info = _equal_shares_algorithm(
+            profile,
+            committeesize,
+            algorithm,
+            resolute=True,
+            completion=None,
+            per_voter_budget=Fraction(increment_committeesize, len(profile)),
+        )
+        detailed_info["increment_committeesize"] = increment_committeesize
+        committees = [comm for comm in committees if len(comm) == committeesize]
+        if any(len(comm) > committeesize for comm in committees):
+            raise RuntimeError("Critical bug. This condition should not be satisfiable.")
+        if committees:
+            return committees, detailed_info
+    else:
+        raise RuntimeError(
+            "Critical bug. This LOC should not be reachable; for-loop should terminate earlier."
+        )
 
 
 def compute_minimaxphragmen(
@@ -3691,7 +3829,8 @@ def _phragmen_enestroem_algorithm(
             ]
         else:
             tied_cands = sorted(cand for cand, supp in support.items() if supp == max_support)
-        assert tied_cands, "_phragmen_enestroem_algorithm: no candidate with max support (??)"
+        if not tied_cands:
+            raise RuntimeError("_phragmen_enestroem_algorithm: no candidate with max support (??)")
 
         new_committee_budget_pairs = []
         for cand in tied_cands:
@@ -3852,7 +3991,8 @@ def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_n
             ]
         else:
             tied_cands = sorted(cand for cand, supp in support.items() if supp == max_support)
-        assert tied_cands, "_consensus_rule_algorithm: no candidate with max support (??)"
+        if not tied_cands:
+            raise RuntimeError("_consensus_rule_algorithm: no candidate with max support (??)")
 
         new_committee_budget_pairs = []
         for cand in tied_cands:
@@ -4024,7 +4164,6 @@ def compute_rsd(
 
     if not profile.has_unit_weights():
         raise ValueError(f"{rule.shortname} is only implemented for unit weights (weight=1).")
-        # Todo: fix
 
     if algorithm == "standard":
         approval_sets = [sorted(voter.approved) for voter in profile]
@@ -4062,7 +4201,11 @@ def compute_rsd(
 
 
 def compute_eph(
-    profile, committeesize, algorithm="float-fractions", resolute=False, max_num_of_committees=None
+    profile,
+    committeesize,
+    algorithm="float-fractions",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
 ):
     """
     Compute winning committees with the "E Pluribus Hugo" (EPH) voting rule.

@@ -195,9 +195,9 @@ profile with 4 voters and 6 candidates:
  1 x {c, d, f}
 
 winning committees for k=3 and k=4:
------------------------------------
-Method of Equal Shares (aka Rule X)
------------------------------------
+-------------------------------------------------------
+Method of Equal Shares (aka Rule X) with Phragmén phase
+-------------------------------------------------------
 
 
 Phase 1:
@@ -229,9 +229,9 @@ adding candidate number 3: e
 1 winning committee:
  {a, c, e}
 
------------------------------------
-Method of Equal Shares (aka Rule X)
------------------------------------
+-------------------------------------------------------
+Method of Equal Shares (aka Rule X) with Phragmén phase
+-------------------------------------------------------
 
 
 Phase 1:

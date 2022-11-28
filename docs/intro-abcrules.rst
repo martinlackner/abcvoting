@@ -24,31 +24,34 @@ The main ABC rules implemented in `abcvoting` are the following:
 .. doctest::
 
     >>> for rule_id in abcrules.MAIN_RULE_IDS:
-    ...     print(f"{rule_id:20s}{abcrules.get_rule(rule_id).longname}")
-    av                  Approval Voting (AV)
-    sav                 Satisfaction Approval Voting (SAV)
-    pav                 Proportional Approval Voting (PAV)
-    slav                Sainte-Laguë Approval Voting (SLAV)
-    cc                  Approval Chamberlin-Courant (CC)
-    lexcc               Lexicographic Chamberlin-Courant (lex-CC)
-    geom2               2-Geometric Rule
-    seqpav              Sequential Proportional Approval Voting (seq-PAV)
-    revseqpav           Reverse Sequential Proportional Approval Voting (revseq-PAV)
-    seqslav             Sequential Sainte-Laguë Approval Voting (seq-SLAV)
-    seqcc               Sequential Approval Chamberlin-Courant (seq-CC)
-    seqphragmen         Phragmén's Sequential Rule (seq-Phragmén)
-    minimaxphragmen     Phragmén's Minimax Rule (minimax-Phragmén)
-    leximaxphragmen     Phragmén's Leximax Rule (leximax-Phragmén)
-    monroe              Monroe's Approval Rule (Monroe)
-    greedy-monroe       Greedy Monroe
-    minimaxav           Minimax Approval Voting (MAV)
-    lexminimaxav        Lexicographic Minimax Approval Voting (lex-MAV)
-    equal-shares        Method of Equal Shares (aka Rule X)
-    phragmen-enestroem  Method of Phragmén-Eneström
-    consensus-rule      Consensus Rule
-    trivial             Trivial Rule
-    rsd                 Random Serial Dictator
-    eph                 E Pluribus Hugo (EPH)
+    ...     print(f"{rule_id:40s}{abcrules.get_rule(rule_id).longname}")
+    av                                      Approval Voting (AV)
+    sav                                     Satisfaction Approval Voting (SAV)
+    pav                                     Proportional Approval Voting (PAV)
+    slav                                    Sainte-Laguë Approval Voting (SLAV)
+    cc                                      Approval Chamberlin-Courant (CC)
+    lexcc                                   Lexicographic Chamberlin-Courant (lex-CC)
+    geom2                                   2-Geometric Rule
+    seqpav                                  Sequential Proportional Approval Voting (seq-PAV)
+    revseqpav                               Reverse Sequential Proportional Approval Voting (revseq-PAV)
+    seqslav                                 Sequential Sainte-Laguë Approval Voting (seq-SLAV)
+    seqcc                                   Sequential Approval Chamberlin-Courant (seq-CC)
+    seqphragmen                             Phragmén's Sequential Rule (seq-Phragmén)
+    minimaxphragmen                         Phragmén's Minimax Rule (minimax-Phragmén)
+    leximaxphragmen                         Phragmén's Leximax Rule (leximax-Phragmén)
+    monroe                                  Monroe's Approval Rule (Monroe)
+    greedy-monroe                           Greedy Monroe
+    minimaxav                               Minimax Approval Voting (MAV)
+    lexminimaxav                            Lexicographic Minimax Approval Voting (lex-MAV)
+    equal-shares                            Method of Equal Shares (aka Rule X) with Phragmén phase
+    equal-shares-with-av-completion         Method of Equal Shares (aka Rule X) with AV completion
+    equal-shares-with-increment-completion  Method of Equal Shares (aka Rule X) with increment completion
+    phragmen-enestroem                      Method of Phragmén-Eneström
+    consensus-rule                          Consensus Rule
+    trivial                                 Trivial Rule
+    rsd                                     Random Serial Dictator
+    eph                                     E Pluribus Hugo (EPH)
+
 
 The short identifiers on the left side are the respective `rule_id`'s.
 

@@ -198,9 +198,23 @@ Lexicographic Minimax Approval Voting (lex-MAV)
  {1, 3, 4, 5}
  {2, 3, 4, 5}
 
------------------------------------
-Method of Equal Shares (aka Rule X)
------------------------------------
+-------------------------------------------------------
+Method of Equal Shares (aka Rule X) with Phragmén phase
+-------------------------------------------------------
+
+1 winning committee:
+ {0, 1, 4, 5}
+
+------------------------------------------------------
+Method of Equal Shares (aka Rule X) with AV completion
+------------------------------------------------------
+
+1 winning committee:
+ {0, 1, 4, 5}
+
+-------------------------------------------------------------
+Method of Equal Shares (aka Rule X) with increment completion
+-------------------------------------------------------------
 
 1 winning committee:
  {0, 1, 4, 5}

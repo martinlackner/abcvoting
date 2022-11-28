@@ -184,9 +184,9 @@ Manipulation by voter 0: {a, b} --> {a}
 winning committee after manipulation:
  {a, b, c}
 
------------------------------------
-Method of Equal Shares (aka Rule X)
------------------------------------
+-------------------------------------------------------
+Method of Equal Shares (aka Rule X) with Phragmén phase
+-------------------------------------------------------
 
 profile with 6 voters and 6 candidates:
  1 x {b, c, d},

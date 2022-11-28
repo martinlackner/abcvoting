@@ -242,6 +242,22 @@ class _CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
+            "equal-shares-with-av-completion": [
+                {0, 1, 4, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
+            ],
+            "equal-shares-with-increment-completion": [
+                {0, 1, 4, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
+            ],
             "equal-shares-without-phragmen-phase": [{4, 5}],
             "phragmen-enestroem": [
                 {0, 1, 4, 5},
@@ -330,6 +346,8 @@ class _CollectInstances:
             "seqslav": [{0, 1, 3}],
             "slav": [{0, 1, 3}],
             "equal-shares": [{0, 1, 3}],
+            "equal-shares-with-av-completion": [{0, 1, 3}],
+            "equal-shares-with-increment-completion": [{0, 1, 3}],
             "equal-shares-without-phragmen-phase": [{0, 1, 3}],
             "phragmen-enestroem": [{0, 1, 3}],
             "consensus-rule": [{0, 1, 3}],
@@ -434,7 +452,10 @@ class _CollectInstances:
             "seqslav": [{0, 1, 2, 4}],
             "slav": [{0, 1, 2, 4}],
             "equal-shares": [{0, 1, 2, 4}],
+            "equal-shares-with-av-completion": [{0, 1, 2, 4}, {0, 2, 3, 4}],
+            "equal-shares-with-increment-completion": [{0, 1, 2, 4}],
             "equal-shares-without-phragmen-phase": [{0, 2}],
+            "equal-shares-without-completion": [{0, 2}],
             "phragmen-enestroem": [{0, 1, 2, 4}],
             "consensus-rule": [{0, 1, 2, 4}],
             "trivial": [
@@ -472,6 +493,8 @@ class _CollectInstances:
             "seqslav": [{0, 3}],
             "slav": [{0, 3}],
             "equal-shares": [{0, 3}],
+            "equal-shares-with-av-completion": [{0, 1}, {0, 3}],
+            "equal-shares-with-increment-completion": [{0, 1}, {0, 3}],
             "equal-shares-without-phragmen-phase": [{0}],
             "phragmen-enestroem": [{0, 3}],
             "consensus-rule": [{0, 3}],
@@ -513,6 +536,8 @@ class _CollectInstances:
             "seqslav": one_each,
             "slav": one_each,
             "equal-shares": one_each,
+            "equal-shares-with-av-completion": one_each,
+            "equal-shares-with-increment-completion": one_each,
             "equal-shares-without-phragmen-phase": one_each,
             "phragmen-enestroem": one_each,
             "consensus-rule": one_each,
@@ -753,12 +778,11 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute):
 
     if rule_id in [
         "lexminimaxav",
-        "equal-shares",
         "phragmen-enestroem",
         "rsd",
         "monroe",
         "greedy-monroe",
-    ]:
+    ] or rule_id.startswith("equal-shares"):
         with pytest.raises(ValueError):
             abcrules.compute(rule_id, profile, committeesize, algorithm=algorithm)
         return
@@ -868,7 +892,9 @@ def test_abcrules_handling_empty_ballots(rule_id, algorithm, resolute):
     else:
         assert committees == [{0, 1, 2}]
 
+    assert len(profile) == 3
     profile.add_voters([[]])
+    assert len(profile) == 4
 
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm, resolute=resolute
