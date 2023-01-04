@@ -36,4 +36,4 @@ jobs:
           echo $PYTHONPATH
           export PYTHONPATH=$PYTHONPATH:$PWD
           echo $PYTHONPATH
-          pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow)" -ra tests/
+          pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow) and (not mipcbc or not veryslow)" -ra tests/
