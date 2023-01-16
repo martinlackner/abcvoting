@@ -133,7 +133,7 @@ def check_pareto_optimality(profile, committee, algorithm="fastest"):
     ----------
     Multi-Winner Voting with Approval Preferences.
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Examples
     --------
@@ -969,7 +969,7 @@ def check_priceability(profile, committee, algorithm="fastest", stable=False):
     ----------
     Multi-Winner Voting with Approval Preferences.
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
     committee = CandidateSet(committee, num_cand=profile.num_cand)
@@ -1016,7 +1016,7 @@ def check_stable_priceability(profile, committee, algorithm="fastest"):
     ----------
     Multi-Winner Voting with Approval Preferences.
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
     return check_priceability(profile, committee, algorithm, stable=True)
@@ -1041,7 +1041,7 @@ def _check_priceability_gurobi(profile, committee, stable=False):
     ----------
     Multi-Winner Voting with Approval Preferences.
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Market-Based Explanations of Collective Decisions.
     Dominik Peters, Grzegorz Pierczyski, Nisarg Shah, Piotr Skowron.
@@ -1191,7 +1191,7 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
     ----------
     Multi-Winner Voting with Approval Preferences.
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
     committee = CandidateSet(committee, num_cand=profile.num_cand)
@@ -1240,7 +1240,7 @@ def _check_core_brute_force(profile, committee, committeesize):
     ----------
     Multi-Winner Voting with Approval Preferences.
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
     for cands in powerset(profile.approved_candidates()):
@@ -1277,7 +1277,7 @@ def _check_core_gurobi(profile, committee, committeesize):
     ----------
     Multi-Winner Voting with Approval Preferences.
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
     model = gb.Model()

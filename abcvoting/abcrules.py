@@ -614,7 +614,7 @@ def compute_thiele_method(
     For a mathematical description of Thiele methods, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -823,7 +823,7 @@ def compute_pav(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -950,7 +950,7 @@ def compute_cc(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -1152,7 +1152,7 @@ def compute_seq_thiele_method(
     For a mathematical description of these rules, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -1348,7 +1348,7 @@ def compute_seqpav(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -1471,7 +1471,7 @@ def compute_seqcc(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -1533,7 +1533,7 @@ def compute_revseq_thiele_method(
     For a mathematical description of these rules, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -1730,7 +1730,7 @@ def compute_revseqpav(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -1969,7 +1969,7 @@ def compute_sav(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -2034,7 +2034,7 @@ def compute_av(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -2095,7 +2095,7 @@ def compute_minimaxav(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -2232,7 +2232,7 @@ def compute_lexminimaxav(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
     (Remark 2)
 
     If `lexicographic_tiebreaking` is True, compute all winning committees and choose the
@@ -2369,7 +2369,7 @@ def compute_monroe(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -2503,7 +2503,7 @@ def compute_greedy_monroe(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -2664,7 +2664,7 @@ def compute_seqphragmen(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Parameters
     ----------
@@ -3037,7 +3037,7 @@ def compute_equal_shares(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
     See also <https://arxiv.org/pdf/1911.11747.pdf>, page 7
 
     Parameters
@@ -3482,7 +3482,7 @@ def compute_minimaxphragmen(
     For a mathematical description of this rule, see e.g.
     "Multi-Winner Voting with Approval Preferences".
     Martin Lackner and Piotr Skowron.
-    <https://arxiv.org/abs/2007.01795>
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
 
     Does not include the lexicographic optimization as specified
     in Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner.

@@ -23,7 +23,7 @@ ABC rules are also known as approval-based multi-winner rules.
 The input of such rules are
 [approval ballots](https://en.wikipedia.org/wiki/Approval_voting#/media/File:Approval_ballot.svg).
 We recommend the book
-([Multi-Winner Voting with Approval Preferences](https://arxiv.org/abs/2007.01795))
+([Multi-Winner Voting with Approval Preferences](https://link.springer.com/book/10.1007/978-3-031-09016-5))
 by Lackner and Skowron [2] as a detailed introduction to ABC rules and related research directions.
 In addition, the
 [survey by Faliszewski et al.](http://research.illc.uva.nl/COST-IC1205/BookDocs/Chapters/TrendsCOMSOC-02.pdf) [1]
@@ -126,8 +126,9 @@ pre-commit (e.g. via apt, conda or pip) and then run `$ pre-commit install` to i
 new challenge for social choice theory. In Ulle Endriss, editor, Trends in Computational Social
 Choice, chapter 2, pages 27–47. AI Access, 2017. http://research.illc.uva.nl/COST-IC1205/BookDocs/Chapters/TrendsCOMSOC-02.pdf
 
-[2] Lackner, Martin, and Piotr Skowron. "Multi-Winner Voting with Approval Preferences". arXiv preprint arXiv:2007.01795. 2020. https://arxiv.org/abs/2007.01795
-
+[2] Lackner, Martin, and Piotr Skowron. "Multi-Winner Voting with Approval Preferences". 
+Springer International Publishing, SpringerBriefs in Intelligent Systems , 2023.
+https://link.springer.com/book/10.1007/978-3-031-09016-5
 
 <!--
 [2] Markus Brill, Rupert Freeman, Svante Janson and Martin Lackner. Phragmén's Voting Methods and Justified Representation. In Proceedings of the 31st AAAI Conference on Artificial Intelligence (AAAI 2017), pages 406-413, AAAI Press, 2017. https://arxiv.org/abs/2102.12305

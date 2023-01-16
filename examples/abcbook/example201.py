@@ -3,7 +3,7 @@ Example 2.1 (approval profile for running example).
 
 From "Multi-Winner Voting with Approval Preferences"
 by Martin Lackner and Piotr Skowron
-https://arxiv.org/abs/2007.01795
+http://dx.doi.org/10.1007/978-3-031-09016-5
 """
 
 from abcvoting.preferences import Profile
