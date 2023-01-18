@@ -27,9 +27,17 @@ Optional requirements:
   If gmpy2 is not available, the much slower Python module
   `fractions <https://docs.python.org/2/library/fractions.html>`_ is used.
 
+::
+
+    pip install gmpy2
+
 - `ortools <https://developers.google.com/optimization/install/python>`_:
   Ortools can be used as an alternative solver for some ABC voting rules (Monroe, CC, Minimax AV).
   Advantage: open source, faster than CBC. Disadvantage: not as reliable as Gurobi (proprietary).
+
+::
+
+    pip install ortools
 
 - `Gurobi (gurobipy) <https://www.gurobi.com/>`_: Most computationally hard rules are also implemented via the ILP
   solver Gurobi. The corresponding functions require
@@ -38,3 +46,9 @@ Optional requirements:
   (`academic licenses <https://www.gurobi.com/academia/academic-program-and-licenses/>`_ are available).
   If Gurobi is not available, the open-source solver `CBC <https://github.com/coin-or/Cbc>`_ is a slower alternative
   (that is installed automatically as part of `mip`).
+
+Developer tools (unit testing, etc):
+
+::
+
+    pip install .[dev]
