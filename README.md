@@ -1,4 +1,5 @@
 [![DOI](https://zenodo.org/badge/192713860.svg)](https://zenodo.org/badge/latestdoi/192713860)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.04880/status.svg)](https://doi.org/10.21105/joss.04880)
 [![MIT License](https://badgen.net/github/license/martinlackner/abcvoting)](https://choosealicense.com/licenses/mit/)
 [![PyPi](https://badgen.net/pypi/v/abcvoting)](https://pypi.org/project/abcvoting/)
 ![Python versions](https://badgen.net/pypi/python/abcvoting)
