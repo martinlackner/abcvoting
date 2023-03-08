@@ -1,11 +1,8 @@
 cff-version: 1.2.0
-title: >-
-  abcvoting: A Python library of approval-based
-  committee voting rules
+title: "abcvoting"
 message: >-
   If you would like to acknowledge our work in a
-  scientific paper, please use the following (or a
-  similar) citation:
+  scientific paper, please use the following citation:
 type: software
 authors:
   - given-names: Martin
@@ -31,21 +28,21 @@ url: 'https://github.com/martinlackner/abcvoting'
 license: MIT
 version: 2.6.0
 date-released: 2022-11-30
-references:
-  - type: article
-    journal: "Journal of Open Source Software"
-    title: "abcvoting: A Python package for approval-based multi-winner voting rules"
-    volume: 8
-    number: 81
-    pages: 4880
-    doi: 10.21105/joss.04880
-    url: https://doi.org/10.21105/joss.04880
-    authors:
-      - given-names: Martin
-        family-names: Lackner
-        orcid: 'https://orcid.org/0000-0003-2170-0770'
-      - given-names: Peter
-        family-names: Regner
-        orcid: 'https://orcid.org/0000-0001-8480-4900'
-      - given-names: Benjamin
-        family-names: Krenn
+preferred-citation:
+  type: article
+  journal: "Journal of Open Source Software"
+  title: "abcvoting: A Python package for approval-based multi-winner voting rules"
+  volume: 8
+  number: 81
+  pages: 4880
+  doi: 10.21105/joss.04880
+  url: https://doi.org/10.21105/joss.04880
+  authors:
+    - given-names: Martin
+      family-names: Lackner
+      orcid: 'https://orcid.org/0000-0003-2170-0770'
+    - given-names: Peter
+      family-names: Regner
+      orcid: 'https://orcid.org/0000-0001-8480-4900'
+    - given-names: Benjamin
+      family-names: Krenn
