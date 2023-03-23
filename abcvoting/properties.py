@@ -529,8 +529,8 @@ def _check_pareto_optimality_gurobi(profile, committee):
     # at least one more preferred candidate in the dominating committee.
     for i, voter in enumerate(profile):
         model.addConstr(
-                gb.quicksum(utility[(voter, x)] for x in range(1, len(committee) + 1))
-                >= num_apprvd_cands_query[i] + condition_strictly_more[i]
+            gb.quicksum(utility[(voter, x)] for x in range(1, len(committee) + 1))
+            >= num_apprvd_cands_query[i] + condition_strictly_more[i]
         )
 
     # constraint: committee has the right size
@@ -1251,8 +1251,9 @@ def _check_core_brute_force(profile, committee, committeesize):
         if not set_of_voters:
             continue
         if len(cands) * len(profile) <= len(set_of_voters) * committeesize:
+            # a sufficient number of voters would profit from deviating to `cands`
             detailed_information = {"coalition": set_of_voters, "objection": cands}
-            return False, detailed_information  # a sufficient number of voters would profit from deviating to `cands`
+            return False, detailed_information
     detailed_information = {}
     return True, detailed_information
 
