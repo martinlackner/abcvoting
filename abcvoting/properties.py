@@ -862,10 +862,10 @@ def _check_PJR_gurobi(profile, committee):
     # of approved candidates, taken over voters that are in the ell-cohesive group
     in_union = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_union")
 
-    # compute the in_union variables, depending on the values of in_cut
+    # compute the in_union variables, depending on the values of in_group
     for vi, voter in enumerate(profile):
         for cand in voter.approved:
-            model.addConstr((in_group[vi] == 1) >> (in_union[cand] == 1))
+            model.addConstr(in_union[cand] >= in_group[vi])
 
     # constraint to ensure that the intersection between candidates that are in union
     # intersected with the input committee, has size strictly less than ell
