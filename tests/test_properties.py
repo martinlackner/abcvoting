@@ -280,7 +280,7 @@ def test_property_functions_with_handcrafted_instances(
     property_name, algorithm, profile, committee, expected_result
 ):
     if algorithm == "nonsense":
-        if property_name == "jr":
+        if property_name in ["jr", "ejr+"]:
             return  # no `algorithm` parameter
         with pytest.raises(NotImplementedError):
             properties.check(property_name, profile, committee, algorithm=algorithm)
