@@ -583,18 +583,18 @@ def _check_EJR_brute_force(profile, committee):
 
     # loop through all possible ell
     for ell in range(1, ell_upper_bound):
-        # list of candidates with less than ell approved candidates in committee
+        # list of voters with less than ell approved candidates in committee
         voters_less_than_ell_approved_candidates = []
 
         # compute minimum group size for this ell
         group_size = math.ceil(ell * (len(profile) / len(committee)))
 
-        # compute list of candidates to consider
+        # compute list of voters to consider
         for i, voter in enumerate(profile):
             if len(voter.approved & committee) < ell:
                 voters_less_than_ell_approved_candidates.append(i)
 
-        # check if an ell-cohesive group can be formed with considered candidates
+        # check if an ell-cohesive group can be formed with considered voters
         if len(voters_less_than_ell_approved_candidates) < group_size:
             # if not possible then simply continue with next ell
             continue
@@ -626,7 +626,7 @@ def _check_EJR_brute_force(profile, committee):
                 return False, detailed_information
 
     # if function has not returned by now, then it means that for all ell,
-    # no ell-cohesive group was found among candidates with less than ell
+    # no ell-cohesive group was found among voters with less than ell
     # approved candidates in committee. Thus committee satisfies EJR
     detailed_information = {}
     return True, detailed_information
@@ -738,7 +738,7 @@ def _check_PJR_brute_force(profile, committee):
 
     # considering ell-cohesive groups
     for ell in range(1, len(committee) + 1):
-        # list of candidates with less than ell approved candidates in committee
+        # list of voters with less than ell approved candidates in committee
         # will not consider voters with >= ell approved candidates in committee,
         # because this voter will immediately satisfy the condition of PJR
         voters_less_than_ell_approved_candidates = []
@@ -746,12 +746,12 @@ def _check_PJR_brute_force(profile, committee):
         # compute minimum group size for this ell
         group_size = math.ceil(ell * (len(profile) / len(committee)))
 
-        # compute list of candidates to consider
+        # compute list of voters to consider
         for vi, voter in enumerate(profile):
             if len(voter.approved & committee) < ell:
                 voters_less_than_ell_approved_candidates.append(vi)
 
-        # check if an ell-cohesive group can be formed with considered candidates
+        # check if an ell-cohesive group can be formed with considered voters
         if len(voters_less_than_ell_approved_candidates) < group_size:
             # if not possible then simply continue with next ell
             continue
@@ -785,7 +785,7 @@ def _check_PJR_brute_force(profile, committee):
                     return False, detailed_information
 
     # if function has not returned by now, then it means that for all ell,
-    # no ell-cohesive group was found among candidates with less than ell
+    # no ell-cohesive group was found among voters with less than ell
     # approved candidates in committee. Thus committee satisfies PJR
     detailed_information = {}
     return True, detailed_information
