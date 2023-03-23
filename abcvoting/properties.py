@@ -519,28 +519,18 @@ def _check_pareto_optimality_gurobi(profile, committee):
             == gb.quicksum(in_committee[cand] for cand in voter.approved)
         )
 
-    # constraint: all voters should have at least as many preferred candidates
-    # in the dominating committee as in the query committee
-    for i, voter in enumerate(profile):
-        model.addConstr(
-            gb.quicksum(utility[(voter, x)] for x in range(1, len(committee) + 1))
-            >= num_apprvd_cands_query[i]
-        )
-
     # constraint: the condition of having strictly more approved candidates in
     # dominating committee will be satisfied for at least one voter
     model.addConstr(gb.quicksum(condition_strictly_more) >= 1)
 
-    # loop through all variables in the condition_strictly_more array (there is one for each voter)
-    # if it has value 1, then the condition of having strictly more preferred candidates on the
-    # dominating committee has to be satisfied for this voter
+    # constraint: all voters should have at least as many preferred candidates
+    # in the dominating committee as in the query committee.
+    # for the voter with the condition_strictly_more variable set to 1, it should have
+    # at least one more preferred candidate in the dominating committee.
     for i, voter in enumerate(profile):
         model.addConstr(
-            (condition_strictly_more[i] == 1)
-            >> (
                 gb.quicksum(utility[(voter, x)] for x in range(1, len(committee) + 1))
-                >= num_apprvd_cands_query[i] + 1
-            )
+                >= num_apprvd_cands_query[i] + condition_strictly_more[i]
         )
 
     # constraint: committee has the right size
