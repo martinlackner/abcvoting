@@ -10,7 +10,16 @@ from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate, powers
 
 
 ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
-PROPERTY_NAMES = ["pareto", "jr", "pjr", "ejr", "priceability", "stable-priceability", "core"]
+PROPERTY_NAMES = [
+    "pareto",
+    "jr",
+    "pjr",
+    "ejr",
+    "ejr+",
+    "priceability",
+    "stable-priceability",
+    "core",
+]
 
 
 def _set_gurobi_model_parameters(model):
@@ -57,6 +66,7 @@ def full_analysis(profile, committee):
         "jr": "Justified representation (JR)",
         "pjr": "Proportional justified representation (PJR)",
         "ejr": "Extended justified representation (EJR)",
+        "ejr+": "EJR+",
         "priceability": "Priceability",
         "stable-priceability": "Stable Priceability",
         "core": "The core",
@@ -102,6 +112,8 @@ def check(property_name, profile, committee, algorithm="fastest"):
         return check_PJR(profile, committee, algorithm=algorithm)
     elif property_name == "ejr":
         return check_EJR(profile, committee, algorithm=algorithm)
+    elif property_name == "ejr+":
+        return check_EJR_plus(profile, committee)
     elif property_name == "priceability":
         return check_priceability(profile, committee, algorithm=algorithm)
     elif property_name == "stable-priceability":
@@ -442,6 +454,42 @@ def check_JR(profile, committee):
         )
 
     return result
+
+
+def _check_JR(profile, committee):
+    """
+    Test whether a committee satisfies JR.
+
+    Uses the polynomial-time algorithm proposed by Aziz et.al (2017).
+
+    Parameters
+    ----------
+    profile : abcvoting.preferences.Profile
+        A profile.
+    committee : iterable of int
+        A committee.
+
+    Returns
+    -------
+    bool
+    """
+
+    for cand in profile.candidates:
+        group = set()
+        for vi, voter in enumerate(profile):
+            # if current candidate appears in this voter's ballot AND
+            # this voter's approval ballot does NOT intersect with input committee
+            if (cand in voter.approved) and (len(voter.approved & committee) == 0):
+                group.add(vi)
+
+        if len(group) * len(committee) >= len(profile):  # |group| >= num_voters / |committee|
+            detailed_information = {"cohesive_group": group, "joint_candidate": cand}
+            return False, detailed_information
+
+    # if function has not yet returned by now, then this means no such candidate
+    # exists. Then input committee must satisfy JR wrt the input profile
+    detailed_information = {}
+    return True, detailed_information
 
 
 def _check_pareto_optimality_brute_force(profile, committee):
@@ -910,11 +958,55 @@ def _check_PJR_gurobi(profile, committee):
     raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
-def _check_JR(profile, committee):
+def check_EJR_plus(profile, committee):
     """
-    Test whether a committee satisfies JR.
+    Test whether a committee satisfies EJR+.
 
-    Uses the polynomial-time algorithm proposed by Aziz et.al (2017).
+    Parameters
+    ----------
+    profile : abcvoting.preferences.Profile
+        A profile.
+    committee : iterable of int
+        A committee.
+
+    Returns
+    -------
+    bool
+
+    References
+    ----------
+    Brill, M., & Peters, J. (2023).
+    Robust and Verifiable Proportionality Axioms for Multiwinner Voting.
+    https://arxiv.org/abs/2302.01989
+    """
+
+    # check that `committee` is a valid input
+    committee = CandidateSet(committee, num_cand=profile.num_cand)
+
+    result, detailed_information = _check_EJR_plus(profile, committee)
+
+    if result:
+        output.info(f"Committee {str_set_of_candidates(committee)} satisfies EJR+.")
+    else:
+        output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy EJR+.")
+        cand = detailed_information["joint_candidate"]
+        cohesive_group = detailed_information["cohesive_group"]
+        ell = detailed_information["ell"]
+        output.details(
+            f"(The group of voters {str_set_of_candidates(cohesive_group)}"
+            f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters) deserves {ell} candidates,"
+            f" and jointly approve candidate {profile.cand_names[cand]} which is not part of the committee,"
+            "but no member approves at least {ell} members of the committee.)"
+        )
+
+    return result
+
+
+def _check_EJR_plus(profile, committee):
+    """
+    Test whether a committee satisfies EJR+.
+
+    Uses the polynomial-time algorithm proposed by Brill and Peters (2023).
 
     Parameters
     ----------
@@ -929,19 +1021,32 @@ def _check_JR(profile, committee):
     """
 
     for cand in profile.candidates:
-        group = set()
+        if cand in committee:
+            continue
+        supporters_by_utility = {ell: set() for ell in range(len(committee) + 1)}
         for vi, voter in enumerate(profile):
-            # if current candidate appears in this voter's ballot AND
-            # this voter's approval ballot does NOT intersect with input committee
-            if (cand in voter.approved) and (len(voter.approved & committee) == 0):
-                group.add(vi)
+            if cand in voter.approved:
+                utility = len(voter.approved & committee)
+                supporters_by_utility[utility].add(vi)
 
-        if len(group) * len(committee) >= len(profile):  # |group| >= num_voters / |committee|
-            detailed_information = {"cohesive_group": group, "joint_candidate": cand}
-            return False, detailed_information
+        group = set()
+        for ell in range(len(committee)):
+            # group of supporters of cand with utility <= ell
+            group |= supporters_by_utility[ell]
+            if len(group) * len(committee) >= (ell + 1) * len(
+                profile
+            ):  # |group| >= (ell + 1) * num_voters / |committee|
+                # EJR+ requires someone to get utility at least ell + 1, but no one does
+                detailed_information = {
+                    "cohesive_group": group,
+                    "joint_candidate": cand,
+                    "ell": ell + 1,
+                }
+                return False, detailed_information
 
     # if function has not yet returned by now, then this means no such candidate
-    # exists. Then input committee must satisfy JR wrt the input profile
+    # has sufficiently many sufficiently unsatisfied supporters.
+    # Then input committee must satisfy EJR+
     detailed_information = {}
     return True, detailed_information
 
