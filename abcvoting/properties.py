@@ -1196,9 +1196,9 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
         algorithm = "gurobi"
 
     if algorithm == "brute-force":
-        result = _check_core_brute_force(profile, committee, committeesize)
+        result, detailed_information = _check_core_brute_force(profile, committee, committeesize)
     elif algorithm == "gurobi":
-        result = _check_core_gurobi(profile, committee, committeesize)
+        result, detailed_information = _check_core_gurobi(profile, committee, committeesize)
     else:
         raise NotImplementedError(f"Algorithm {algorithm} not specified for check_core")
 
@@ -1206,6 +1206,14 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
         output.info(f"Committee {str_set_of_candidates(committee)} is in the core.")
     else:
         output.info(f"Committee {str_set_of_candidates(committee)} is not in the core.")
+        objection = detailed_information["objection"]
+        coalition = detailed_information["coalition"]
+        output.details(
+            f"(The group of voters {str_set_of_candidates(coalition)}"
+            f" ({len(coalition)/len(profile)*100:.1f}% of all voters)"
+            f"can block the outcome by proposing {str_set_of_candidates(objection)},"
+            f"in which each group member approves strictly more candidates.)"
+        )
 
     return result
 
@@ -1243,8 +1251,10 @@ def _check_core_brute_force(profile, committee, committeesize):
         if not set_of_voters:
             continue
         if len(cands) * len(profile) <= len(set_of_voters) * committeesize:
-            return False  # a sufficient number of voters would profit from deviating to `cands`
-    return True
+            detailed_information = {"coalition": set_of_voters, "objection": cands}
+            return False, detailed_information  # a sufficient number of voters would profit from deviating to `cands`
+    detailed_information = {}
+    return True, detailed_information
 
 
 def _check_core_gurobi(profile, committee, committeesize):
@@ -1272,19 +1282,19 @@ def _check_core_gurobi(profile, committee, committeesize):
 
     model = gb.Model()
 
-    set_of_voter = model.addVars(range(len(profile)), vtype=gb.GRB.BINARY)
+    set_of_voters = model.addVars(range(len(profile)), vtype=gb.GRB.BINARY)
     set_of_candidates = model.addVars(range(profile.num_cand), vtype=gb.GRB.BINARY)
 
     model.addConstr(
-        gb.quicksum(set_of_candidates) * len(profile) <= gb.quicksum(set_of_voter) * committeesize
+        gb.quicksum(set_of_candidates) * len(profile) <= gb.quicksum(set_of_voters) * committeesize
     )
-    model.addConstr(gb.quicksum(set_of_voter) >= 1)
+    model.addConstr(gb.quicksum(set_of_voters) >= 1)
     for i, voter in enumerate(profile):
         approved = [
             (c in voter.approved) * set_of_candidates[i] for i, c in enumerate(profile.candidates)
         ]
         model.addConstr(
-            (set_of_voter[i] == 1)
+            (set_of_voters[i] == 1)
             >> (gb.quicksum(approved) >= len(voter.approved & committee) + 1)
         )
 
@@ -1292,8 +1302,15 @@ def _check_core_gurobi(profile, committee, committeesize):
     model.optimize()
 
     if model.Status == gb.GRB.OPTIMAL:
-        return False
+        coalition = {vi for vi, _ in enumerate(profile) if set_of_voters[vi].Xn >= 0.9}
+        objection = {cand for cand in profile.candidates if set_of_candidates[cand].Xn >= 0.9}
+        detailed_information = {
+            "coalition": coalition,
+            "objection": objection,
+        }
+        return False, detailed_information
     elif model.Status == gb.GRB.INFEASIBLE:
-        return True
+        detailed_information = {}
+        return True, detailed_information
     else:
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
