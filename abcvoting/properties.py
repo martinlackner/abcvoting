@@ -996,7 +996,7 @@ def check_EJR_plus(profile, committee):
             f"(The group of voters {str_set_of_candidates(cohesive_group)}"
             f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters) deserves {ell} candidates,"
             f" and jointly approve candidate {profile.cand_names[cand]} which is not part of the committee,"
-            "but no member approves at least {ell} members of the committee.)"
+            f" but no member approves at least {ell} members of the committee.)"
         )
 
     return result
