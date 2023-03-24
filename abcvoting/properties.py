@@ -1211,8 +1211,8 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
         output.details(
             f"(The group of voters {str_set_of_candidates(coalition)}"
             f" ({len(coalition)/len(profile)*100:.1f}% of all voters)"
-            f"can block the outcome by proposing {str_set_of_candidates(objection)},"
-            f"in which each group member approves strictly more candidates.)"
+            f" can block the outcome by proposing {str_set_of_candidates(objection)},"
+            f" in which each group member approves strictly more candidates.)"
         )
 
     return result
