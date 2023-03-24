@@ -39,6 +39,7 @@ The main ABC rules implemented in `abcvoting` are the following:
     seqphragmen                             Phragmén's Sequential Rule (seq-Phragmén)
     minimaxphragmen                         Phragmén's Minimax Rule (minimax-Phragmén)
     leximaxphragmen                         Phragmén's Leximax Rule (leximax-Phragmén)
+    maximin-support                         Maximin Support Method (MMS)
     monroe                                  Monroe's Approval Rule (Monroe)
     greedy-monroe                           Greedy Monroe
     minimaxav                               Minimax Approval Voting (MAV)
