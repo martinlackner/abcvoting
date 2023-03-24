@@ -395,7 +395,8 @@ def random_resampling_profile(num_voters, num_cand, p, phi):
         p : float in [0, 1]
             Fraction of candidates that will be approved by the central ballot.
 
-            Precisely, the central ballot will approve the first floor(`p` * `num_cand`) candidates.
+            Precisely, the central ballot will approve the first floor(`p` * `num_cand`)
+            candidates.
 
         phi : float in [0, 1]
             Probability to resample an approval.
@@ -454,7 +455,7 @@ def random_disjoint_resampling_profile(num_voters, num_cand, p, phi=None, num_gr
             Probability to resample an approval.
 
             For each generated vote, we go through all candidates. For each candidate, we
-            use copy the approval of the central ballot with probability 1 - `phi`. Otherwise,
+            copy the approval of the central ballot with probability 1 - `phi`. Otherwise,
             with probability `phi`, we resample the approval of the candidate (so that the
             generated vote approves that candidate with probability `p`).
 
@@ -526,7 +527,8 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
         p : float in [0, 1]
             Fraction of candidates that will be approved by the central ballot.
 
-            Precisely, the central ballot will approve the first floor(`p` * `num_cand`) candidates.
+            Precisely, the central ballot will approve the first floor(`p` * `num_cand`)
+            candidates.
 
         phi : float in [0, 1]
             Probability to resample an approval.
