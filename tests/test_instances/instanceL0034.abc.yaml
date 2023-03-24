@@ -89,6 +89,12 @@ compute:
 - rule_id: leximaxphragmen
   result:
   resolute: true
+- rule_id: maximin-support
+  result: [[1, 4, 5]]
+  resolute: true
+- rule_id: maximin-support
+  result: [[1, 4, 5]]
+  resolute: false
 - rule_id: monroe
   result: [[1, 4, 5]]
   resolute: false
