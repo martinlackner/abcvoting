@@ -192,6 +192,22 @@ class _CollectInstances:
             ],
             "minimaxphragmen": [{0, 1, 2, 3}],
             "leximaxphragmen": [{0, 1, 2, 3}],
+            "maximin-support": [
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 1, 3, 4},
+                {0, 1, 3, 5},
+                {0, 1, 4, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
+                {0, 3, 4, 5},
+                {1, 2, 3, 4},
+                {1, 2, 3, 5},
+                {1, 2, 4, 5},
+                {1, 3, 4, 5},
+                {2, 3, 4, 5},
+            ],
             "cc": [{0, 1, 2, 3}],
             "lexcc": [{0, 1, 2, 3}],
             "seqcc": [
@@ -337,6 +353,7 @@ class _CollectInstances:
             "seqphragmen": [{0, 1, 3}],
             "minimaxphragmen": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
             "leximaxphragmen": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
+            "maximin-support": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
             "cc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
             "lexcc": [{0, 1, 3}],
             "seqcc": [{0, 1, 3}, {0, 2, 3}, {0, 3, 4}, {1, 2, 3}, {1, 3, 4}],
@@ -405,6 +422,14 @@ class _CollectInstances:
                 {1, 2, 3, 4},
                 {1, 2, 3, 5},
                 {1, 2, 4, 5},
+            ],
+            "maximin-support": [
+                {0, 1, 2, 3},
+                {0, 1, 2, 4},
+                {0, 1, 2, 5},
+                {0, 2, 3, 4},
+                {0, 2, 3, 5},
+                {0, 2, 4, 5},
             ],
             "cc": [
                 {0, 1, 2, 3},
@@ -484,6 +509,7 @@ class _CollectInstances:
             "seqphragmen": [{0, 3}],
             "minimaxphragmen": [{0, 3}, {1, 3}],
             "leximaxphragmen": [{0, 3}, {1, 3}],
+            "maximin-support": [{0, 3}],
             "cc": [{0, 2}, {0, 3}, {1, 3}],
             "lexcc": [{0, 3}],
             "seqcc": [{0, 2}, {0, 3}],
@@ -527,6 +553,7 @@ class _CollectInstances:
             "seqphragmen": one_each,
             "minimaxphragmen": one_each,
             "leximaxphragmen": one_each,
+            "maximin-support": one_each,
             "cc": one_each,
             "lexcc": one_each,
             "seqcc": one_each,
@@ -1254,6 +1281,75 @@ def test_seqphragmen_fails_ejr():
     assert abcrules.compute_seqphragmen(profile, 12) == [
         {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12}
     ]
+
+
+def test_maximin_support():
+    # Examples from the paper
+    # Luis Sánchez-Fernández, Norberto Fernández, Jesús A. Fisteus, Markus Brill
+    # The maximin support method: an extension of the D'Hondt method
+    # to approval-based multiwinner elections
+    # Mathematical Programming, 2022
+
+    # from paper, Example 3.1/4.1
+    profile = Profile(7)
+    committeesize = 3
+    approval_sets = (
+        [{0, 1}] * 100
+        + [{0, 2}] * 60
+        + [{1}] * 40
+        + [{2}] * 55
+        + [{3}] * 95
+        + [{4}] * 30
+        + [{4, 5, 6}] * 50
+    )
+    profile.add_voters(approval_sets)
+    assert abcrules.compute("maximin-support", profile, committeesize, resolute=False) == [
+        {0, 2, 3}
+    ]
+
+    # MMS fails EJR, Example 5.1
+    profile = Profile(7)
+    committeesize = 4
+    approval_sets = (
+        [{0, 1, 2, 3, 4}] * 5
+        + [{5, 1, 2, 3, 4}] * 4
+        + [{6, 1, 2, 3, 4}] * 3
+        + [{0}] * 2
+        + [{5}]
+        + [{6}]
+    )
+    profile.add_voters(approval_sets)
+    assert abcrules.compute("maximin-support", profile, committeesize, resolute=False) == [
+        {0, 1, 5, 6},
+        {0, 2, 5, 6},
+        {0, 3, 5, 6},
+        {0, 4, 5, 6},
+    ]
+    # on this example, seq-Phragmen differs from MMS
+    assert abcrules.compute("seqphragmen", profile, committeesize, resolute=False) == [
+        {0, 1, 2, 3},
+        {0, 1, 2, 4},
+        {0, 1, 3, 4},
+        {0, 2, 3, 4},
+    ]
+
+    # MMS fails strong support monotonicity, Example 5.3
+    profile = Profile(7)
+    committeesize = 6
+    approval_sets = [{1, 2, 3, 4, 5}] * 13 + [{0, 6}] * 2 + [{0}] * 2 + [{6}]
+    profile.add_voters(approval_sets)
+    assert abcrules.compute("maximin-support", profile, committeesize, resolute=False) == [
+        {0, 1, 2, 3, 4, 5}
+    ]
+    profile = Profile(7)
+    committeesize = 6
+    approval_sets = (
+        [{1, 2, 3, 4, 5}] * 13 + [{0, 6}] * 2 + [{0}] * 2 + [{6}] + [{0, 1, 2, 3, 4, 5}]
+    )
+    profile.add_voters(approval_sets)
+    assert {0, 1, 2, 3, 4, 6} in abcrules.compute(
+        "maximin-support", profile, committeesize, resolute=False
+    )
 
 
 @pytest.mark.slow
