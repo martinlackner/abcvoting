@@ -151,6 +151,13 @@ Phragmén's Leximax Rule (leximax-Phragmén)
 1 winning committee:
  {0, 1, 2, 3}
 
+----------------------------
+Maximin Support Method (MMS)
+----------------------------
+
+1 winning committee:
+ {0, 1, 2, 4}
+
 -------------------------------
 Monroe's Approval Rule (Monroe)
 -------------------------------
