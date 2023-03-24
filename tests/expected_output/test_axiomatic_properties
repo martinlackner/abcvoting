@@ -27,6 +27,7 @@ Pareto optimality                                  : True
 Justified representation (JR)                      : True
 Proportional justified representation (PJR)        : True
 Extended justified representation (EJR)            : True
+EJR+                                               : True
 Priceability                                       : False
 Stable Priceability                                : False
 The core                                           : False
@@ -36,6 +37,7 @@ Pareto optimality                                  : True
 Justified representation (JR)                      : True
 Proportional justified representation (PJR)        : True
 Extended justified representation (EJR)            : True
+EJR+                                               : True
 Priceability                                       : True
 Stable Priceability                                : True
 The core                                           : True
