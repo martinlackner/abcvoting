@@ -1291,18 +1291,17 @@ def test_maximin_support():
     # Mathematical Programming, 2022
 
     # from paper, Example 3.1/4.1
+    # written in weighted form to make a smaller ILP
+    # because Github Actions has a size limit for gurobi
     profile = Profile(7)
     committeesize = 3
-    approval_sets = (
-        [{0, 1}] * 100
-        + [{0, 2}] * 60
-        + [{1}] * 40
-        + [{2}] * 55
-        + [{3}] * 95
-        + [{4}] * 30
-        + [{4, 5, 6}] * 50
-    )
-    profile.add_voters(approval_sets)
+    profile.add_voter(Voter([0, 1], 100))
+    profile.add_voter(Voter([0, 2], 60))
+    profile.add_voter(Voter([1], 40))
+    profile.add_voter(Voter([2], 55))
+    profile.add_voter(Voter([3], 95))
+    profile.add_voter(Voter([4], 30))
+    profile.add_voter(Voter([4, 5, 6], 50))
     assert abcrules.compute("maximin-support", profile, committeesize, resolute=False) == [
         {0, 2, 3}
     ]
