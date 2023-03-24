@@ -32,6 +32,7 @@ MAIN_RULE_IDS = [
     "seqphragmen",
     "minimaxphragmen",
     "leximaxphragmen",
+    "maximin-support",
     "monroe",
     "greedy-monroe",
     "minimaxav",
@@ -196,6 +197,12 @@ class Rule:
             self.compute_fct = compute_leximaxphragmen
             self.algorithms = ("gurobi",)  # TODO: "mip-gurobi", "mip-cbc"),
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "maximin-support":
+            self.shortname = "Maximin-Support"
+            self.longname = "Maximin Support Method (MMS)"
+            self.compute_fct = compute_maximin_support
+            self.algorithms = ("gurobi",)
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
         elif rule_id == "monroe":
             self.shortname = "Monroe"
             self.longname = "Monroe's Approval Rule (Monroe)"
@@ -3689,6 +3696,191 @@ def compute_leximaxphragmen(
     # end of optional output
 
     return committees
+
+
+def compute_maximin_support(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=True,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
+    """
+    Compute winning committees with the maximin support method (MMS).
+
+    Details in
+    Luis Sánchez-Fernández, Norberto Fernández, Jesús A. Fisteus, Markus Brill
+    The maximin support method: an extension of the D'Hondt method
+    to approval-based multiwinner elections
+    <https://arxiv.org/abs/1609.05370>
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available for the maximin support method (MMS):
+
+            .. doctest::
+
+                >>> Rule("maximin-support").algorithms
+                ('gurobi',)
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+             The default value of `max_num_of_committees` can be modified via the constant
+             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
+
+    Returns
+    -------
+        list of CandidateSet
+            A list of winning committees.
+    """
+    rule_id = "maximin-support"
+    rule = Rule(rule_id)
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm()
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
+
+    if algorithm == "gurobi":
+        scorefct = abcrules_gurobi._gurobi_maximin_support_scorefct
+    else:
+        raise UnknownAlgorithm(rule_id, algorithm)
+
+    if resolute:
+        committees, detailed_info = _maximin_support_resolute(scorefct, profile, committeesize)
+    else:
+        committees, detailed_info = _maximin_support_irresolute(
+            scorefct, profile, committeesize, max_num_of_committees
+        )
+
+    # optional output
+    output.info(header(rule.longname), wrap=False)
+    if not resolute:
+        output.info("Computing all possible winning committees for any tiebreaking order")
+        output.info(" (aka parallel universes tiebreaking) (resolute=False)\n")
+    if output.verbosity <= DETAILS:  # skip thiele_score() calculations if not necessary
+        output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
+        if resolute:
+            output.details(f"starting with the empty committee\n")
+            committee = []
+            for i, next_cand in enumerate(detailed_info["next_cand"]):
+                tied_cands = detailed_info["tied_cands"][i]
+                support_value = detailed_info["support_value"][i]
+                committee.append(next_cand)
+                output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
+                output.details(
+                    f"giving a committee with maximin support value {support_value}",
+                    indent=" ",
+                )
+                if len(tied_cands) > 1:
+                    output.details(f"tie broken in favor of {next_cand},", indent=" ")
+                    output.details(
+                        f"candidates "
+                        f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)} "
+                        "are tied",
+                        indent=" ",
+                    )
+                    output.details(
+                        f"(all would give the same maximin support value {support_value})",
+                        indent=" ",
+                    )
+                output.details("")
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
+    # end of optional output
+
+    return sorted_committees(committees)
+
+
+def _maximin_support_resolute(scorefct, profile, committeesize):
+    """Compute one winning committee (=resolute) for the maximin support method (MMS).
+
+    Tiebreaking between candidates in favor of candidate with smaller
+    number/index (candidates with larger numbers get deleted first).
+    """
+    committee = []
+    remaining_cands = set(profile.candidates)
+    detailed_info = {"next_cand": [], "tied_cands": [], "support_value": []}
+
+    # build a committee starting with the empty set
+    for _ in range(committeesize):
+        additional_score_cand = scorefct(profile, committee)
+        highest_score = max(additional_score_cand[cand] for cand in remaining_cands)
+        tied_cands = [
+            cand
+            for cand in remaining_cands
+            if additional_score_cand[cand] >= highest_score - 1e-7  # ILP float accuracy
+        ]
+        next_cand = tied_cands[0]  # tiebreaking in favor of candidate with smallest index
+        committee.append(next_cand)
+        remaining_cands.remove(next_cand)
+        detailed_info["next_cand"].append(next_cand)
+        detailed_info["tied_cands"].append(tied_cands)
+        detailed_info["support_value"].append(max(additional_score_cand))
+
+    return sorted_committees([committee]), detailed_info
+
+
+def _maximin_support_irresolute(scorefct, profile, committeesize, max_num_of_committees):
+    """Compute all winning committee (=irresolute) for the maximin support method (MMS).
+
+    Consider all possible ways to break ties between candidates
+    (aka parallel universe tiebreaking)
+    """
+    # build committees starting with the empty set
+    partial_committees = [()]
+    winning_committees = set()
+
+    while partial_committees:
+        new_partial_committees = []
+        committee = partial_committees.pop()
+        additional_score_cand = scorefct(profile, committee)
+        remaining_cands = set(profile.candidates) - set(committee)
+        highest_score = max(additional_score_cand[cand] for cand in remaining_cands)
+        for cand in remaining_cands:
+            if additional_score_cand[cand] >= highest_score - 1e-7:  # ILP float accuracy
+                new_committee = committee + (cand,)
+
+                if len(new_committee) == committeesize:
+                    new_committee = tuple(sorted(new_committee))
+                    winning_committees.add(new_committee)  # remove duplicate committees
+                    if (
+                        max_num_of_committees is not None
+                        and len(winning_committees) == max_num_of_committees
+                    ):
+                        # sufficiently many winning committees found
+                        detailed_info = {}
+                        return sorted_committees(winning_committees), detailed_info
+                else:
+                    # partial committee
+                    new_partial_committees.append(new_committee)
+        # add new partial committees in reversed order, so that tiebreaking is correct
+        partial_committees += reversed(new_partial_committees)
+
+    detailed_info = {}
+    return sorted_committees(winning_committees), detailed_info
 
 
 def compute_phragmen_enestroem(
