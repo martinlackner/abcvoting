@@ -401,7 +401,7 @@ def random_resampling_profile(num_voters, num_cand, p, phi):
             Probability to resample an approval.
 
             For each generated vote, we go through all candidates. For each candidate, we
-            use copy the approval of the central ballot with probability 1 - `phi`. Otherwise,
+            copy the approval of the central ballot with probability 1 - `phi`. Otherwise,
             with probability `phi`, we resample the approval of the candidate (so that the
             generated vote approves that candidate with probability `p`).
 
@@ -532,7 +532,7 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
             Probability to resample an approval.
 
             For each generated vote, we go through all candidates. For each candidate, we
-            use copy the approval of the central ballot with probability 1 - `phi`. Otherwise,
+            copy the approval of the central ballot with probability 1 - `phi`. Otherwise,
             with probability `phi`, we resample the approval of the candidate (so that the
             generated vote approves that candidate with probability `p`).
 
