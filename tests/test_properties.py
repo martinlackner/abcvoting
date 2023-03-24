@@ -86,6 +86,42 @@ def _create_handcrafted_instances():
     expected_result = False
     handcrafted_instances.append(("ejr", profile, committee, expected_result))
 
+    # EJR+
+    # Brill and Peters, 2023, "Robust and Verifiable Proportionality Axioms for Multiwinner Voting", Example 3 left
+    profile = Profile(7)
+    profile.add_voters(
+        [[0, 1, 2]]
+        + [[0, 1, 2, 3]] * 2
+        + [[0, 1, 2, 3, 4]]
+        + [[2, 3, 4]]
+        + [[2, 3, 4, 5]]
+        + [[2, 3, 4, 5]]
+        + [[3, 4, 5, 6]]
+    )
+    committee = {0, 2, 4, 6}
+    expected_result = True
+    handcrafted_instances.append(("ejr", profile, committee, expected_result))
+    expected_result = False
+    handcrafted_instances.append(("ejr+", profile, committee, expected_result))
+
+    # Brill and Peters, 2023, "Robust and Verifiable Proportionality Axioms for Multiwinner Voting", Example 3 right
+    profile = Profile(7)
+    profile.add_voters([[0]] + [[0, 1]] + [[0, 1, 2, 3]] + [[2, 3, 4]] * 3 + [[4, 5]] + [[5, 6]])
+    committee = {0, 1, 2, 6}
+    expected_result = True
+    handcrafted_instances.append(("ejr", profile, committee, expected_result))
+    expected_result = False
+    handcrafted_instances.append(("ejr+", profile, committee, expected_result))
+
+    # Brill and Peters, 2023, "Robust and Verifiable Proportionality Axioms for Multiwinner Voting", Remark 2 (core does not imply EJR+)
+    profile = Profile(3)
+    profile.add_voters([[0, 1]] + [[0, 2]])
+    committee = {1, 2}
+    expected_result = True
+    handcrafted_instances.append(("core", profile, committee, expected_result))
+    expected_result = False
+    handcrafted_instances.append(("ejr+", profile, committee, expected_result))
+
     # add an instance from
     # Sanchez-Fernandez et al, 2017, "Proportional Justified Representation", Example 1
     profile = Profile(8)
@@ -202,6 +238,11 @@ def _create_handcrafted_instances():
     expected_result = False
     handcrafted_instances.append(("jr", profile, committee, expected_result))
 
+    # EJR+ implies EJR
+    for property_name, profile, committee, expected_result in handcrafted_instances:
+        if property_name == "ejr+" and expected_result:
+            handcrafted_instances.append(("ejr", profile, committee, expected_result))
+
     # EJR implies PJR
     for property_name, profile, committee, expected_result in handcrafted_instances:
         if property_name == "ejr" and expected_result:
@@ -239,7 +280,7 @@ def test_property_functions_with_handcrafted_instances(
     property_name, algorithm, profile, committee, expected_result
 ):
     if algorithm == "nonsense":
-        if property_name == "jr":
+        if property_name in ["jr", "ejr+"]:
             return  # no `algorithm` parameter
         with pytest.raises(NotImplementedError):
             properties.check(property_name, profile, committee, algorithm=algorithm)
@@ -298,6 +339,7 @@ def test_matching_output_different_approaches(abc_yaml_instance):
         ("pav", "jr"),
         ("pav", "pjr"),
         ("pav", "ejr"),
+        ("pav", "ejr+"),
         ("slav", "pareto"),
         ("cc", "jr"),
         ("geom2", "pareto"),
@@ -311,6 +353,7 @@ def test_matching_output_different_approaches(abc_yaml_instance):
         ("equal-shares", "jr"),
         ("equal-shares", "pjr"),
         ("equal-shares", "ejr"),
+        ("equal-shares", "ejr+"),
         ("equal-shares", "priceability"),
         ("phragmen-enestroem", "jr"),
         ("phragmen-enestroem", "pjr"),
