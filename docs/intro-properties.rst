@@ -42,6 +42,7 @@ is printed.
     Proportional justified representation (PJR)        : True
     Extended justified representation (EJR)            : False
     EJR+                                               : False
+    Full justified representation (FJR)                : False
     Priceability                                       : True
     Stable Priceability                                : False
     The core                                           : False
@@ -53,7 +54,7 @@ Pareto optimality is not necessarily satisfied by seq-Phragmén, but it is satis
 .. doctest::
 
     >>> print(results)
-    {'pareto': True, 'jr': True, 'pjr': True, 'ejr': False, 'ejr+': False, 'priceability': True, 'stable-priceability': False, 'core': False}
+    {'pareto': True, 'jr': True, 'pjr': True, 'ejr': False, 'ejr+': False, 'fjr': False, 'priceability': True, 'stable-priceability': False, 'core': False}
 
 
 .. testcleanup::
