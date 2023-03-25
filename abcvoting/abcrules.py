@@ -3784,33 +3784,32 @@ def compute_maximin_support(
     if not resolute:
         output.info("Computing all possible winning committees for any tiebreaking order")
         output.info(" (aka parallel universes tiebreaking) (resolute=False)\n")
-    if output.verbosity <= DETAILS:  # skip thiele_score() calculations if not necessary
-        output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
-        if resolute:
-            output.details(f"starting with the empty committee\n")
-            committee = []
-            for i, next_cand in enumerate(detailed_info["next_cand"]):
-                tied_cands = detailed_info["tied_cands"][i]
-                support_value = detailed_info["support_value"][i]
-                committee.append(next_cand)
-                output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
+    if resolute:
+        output.details(f"starting with the empty committee\n")
+        committee = []
+        for i, next_cand in enumerate(detailed_info["next_cand"]):
+            tied_cands = detailed_info["tied_cands"][i]
+            support_value = detailed_info["support_value"][i]
+            committee.append(next_cand)
+            output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
+            output.details(
+                f"giving a committee with maximin support value {support_value}",
+                indent=" ",
+            )
+            if len(tied_cands) > 1:
+                output.details(f"tie broken in favor of {next_cand},", indent=" ")
                 output.details(
-                    f"giving a committee with maximin support value {support_value}",
+                    f"candidates "
+                    f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)} "
+                    "are tied",
                     indent=" ",
                 )
-                if len(tied_cands) > 1:
-                    output.details(f"tie broken in favor of {next_cand},", indent=" ")
-                    output.details(
-                        f"candidates "
-                        f"{str_set_of_candidates(tied_cands, cand_names=profile.cand_names)} "
-                        "are tied",
-                        indent=" ",
-                    )
-                    output.details(
-                        f"(all would give the same maximin support value {support_value})",
-                        indent=" ",
-                    )
-                output.details("")
+                output.details(
+                    f"(all would give the same maximin support value {support_value})",
+                    indent=" ",
+                )
+            output.details("")
     output.info(
         str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
     )
