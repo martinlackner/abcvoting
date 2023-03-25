@@ -1416,7 +1416,10 @@ def _check_FJR_gurobi(profile, committee):
         approved_in_set_of_candidates = [
             (c in voter.approved) * set_of_candidates[i] for i, c in enumerate(profile.candidates)
         ]
-        model.addConstr(gb.quicksum(approved_in_set_of_candidates) >= beta - committeesize * (1 - set_of_voters[i]))
+        model.addConstr(
+            gb.quicksum(approved_in_set_of_candidates)
+            >= beta - committeesize * (1 - set_of_voters[i])
+        )
 
     _set_gurobi_model_parameters(model)
     model.optimize()
