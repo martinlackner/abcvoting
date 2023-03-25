@@ -38,8 +38,8 @@ def full_analysis(profile, committee):
     """
     Test all implemented properties for the given committee.
 
-    Returns a dictionary with the following keys: "pareto", "jr", "pjr", "ejr", "priceability",
-    "stable-priceability" and "core".
+    Returns a dictionary with the following keys: "pareto", "jr", "pjr", "ejr", "ejr+",
+    "fjr", "priceability", "stable-priceability" and "core".
     The values are `True` or `False`, depending on whether this property is satisfied.
 
     Parameters
