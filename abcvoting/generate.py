@@ -392,8 +392,19 @@ def random_resampling_profile(num_voters, num_cand, p, phi):
         num_cand : int
             The desired number of candidates in the profile.
 
-        p, phi : float in [0, 1]
-            Parameters of (p,phi)-Resampling.
+        p : float in [0, 1]
+            Fraction of candidates that will be approved by the central ballot.
+
+            Precisely, the central ballot will approve the first floor(`p` * `num_cand`)
+            candidates.
+
+        phi : float in [0, 1]
+            Probability to resample an approval.
+
+            For each generated vote, we go through all candidates. For each candidate, we
+            copy the approval of the central ballot with probability 1 - `phi`. Otherwise,
+            with probability `phi`, we resample the approval of the candidate (so that the
+            generated vote approves that candidate with probability `p`).
 
     Returns
     -------
@@ -437,11 +448,25 @@ def random_disjoint_resampling_profile(num_voters, num_cand, p, phi=None, num_gr
         num_cand : int
             The desired number of candidates in the profile.
 
-        p, phi : float in [0, 1]
-            Parameters of (p,phi,g)-Disjoint Resampling.
+        p : float in [0, 1]
+            Probability of approving a candidate in case that the model resamples.
+
+        phi : float in [0, 1]
+            Probability to resample an approval.
+
+            For each generated vote, we go through all candidates. For each candidate, we
+            copy the approval of the central ballot with probability 1 - `phi`. Otherwise,
+            with probability `phi`, we resample the approval of the candidate (so that the
+            generated vote approves that candidate with probability `p`).
 
         num_groups : int, optional
             Corresponds to the parameter g in (p,phi,g)-Disjoint Resampling.
+
+            The model randomly partitions the candidates into `num_groups` groups. To generate
+            a vote, the model first randomly selects a group. Then, it samples a vote from a
+            (p,phi)-resampling model, where the central ballot approves exactly all candidates
+            in the selected group. (Thus, the parameter `p` is not used to obtain the central
+            ballot, but is used in case of resampling.)
 
     Returns
     -------
@@ -470,7 +495,6 @@ def random_disjoint_resampling_profile(num_voters, num_cand, p, phi=None, num_gr
     approval_sets = [set() for _ in range(num_voters)]
 
     for g in range(num_groups):
-
         central_vote = {g * k + i for i in range(k)}
 
         for v in range(int(sizes[g] * num_voters), int(sizes[g + 1] * num_voters)):
@@ -500,8 +524,19 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
         num_cand : int
             The desired number of candidates in the profile.
 
-        p, phi : float in [0, 1]
-            Parameters.
+        p : float in [0, 1]
+            Fraction of candidates that will be approved by the central ballot.
+
+            Precisely, the central ballot will approve the first floor(`p` * `num_cand`)
+            candidates.
+
+        phi : float in [0, 1]
+            Probability to resample an approval.
+
+            For each generated vote, we go through all candidates. For each candidate, we
+            copy the approval of the central ballot with probability 1 - `phi`. Otherwise,
+            with probability `phi`, we resample the approval of the candidate (so that the
+            generated vote approves that candidate with probability `p`).
 
         distance : str, optional
             The used distance measure.
@@ -576,7 +611,7 @@ def random_euclidean_fixed_size_profile(
     return_points=False,
 ):
     """
-    Generate a random profile using the *Euclidean VCR (Voter Candidate Range)* distribution.
+    Generate a random profile using the *Euclidean with fixed-size approval sets* distribution.
 
     Parameters
     ----------

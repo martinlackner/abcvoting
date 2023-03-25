@@ -15,7 +15,7 @@
 > - [**Installation**](https://abcvoting.readthedocs.io/en/latest/installation.html)  
 > - [**How to cite the abcvoting library**](https://abcvoting.readthedocs.io/en/latest/howtocite.html)
 > - [**Acknowledgements and contributors**](https://abcvoting.readthedocs.io/en/latest/acks.html)
-
+> - [**► abcvoting web app**](https://pref.tools/abcvoting/)
 
 ## A Python library of approval-based committee (ABC) rules
 
@@ -70,6 +70,8 @@ In addition, one can verify axiomatic properties such as
 
 * The core property
 
+Instead of using the abcvoting Python library, you can also use the 
+[**abcvoting web application**](https://pref.tools/abcvoting/) by Dominik Peters.
 
 ## Installation
 
