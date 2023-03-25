@@ -201,7 +201,7 @@ class Rule:
             self.shortname = "Maximin-Support"
             self.longname = "Maximin Support Method (MMS)"
             self.compute_fct = compute_maximin_support
-            self.algorithms = ("gurobi",)
+            self.algorithms = ("gurobi", "mip-gurobi", "mip-cbc")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
         elif rule_id == "monroe":
             self.shortname = "Monroe"
@@ -3764,6 +3764,11 @@ def compute_maximin_support(
 
     if algorithm == "gurobi":
         scorefct = abcrules_gurobi._gurobi_maximin_support_scorefct
+    elif algorithm.startswith("mip-"):
+        solver_id = algorithm[4:]
+        scorefct = functools.partial(
+            abcrules_mip._mip_maximin_support_scorefct, solver_id=solver_id
+        )
     else:
         raise UnknownAlgorithm(rule_id, algorithm)
 
