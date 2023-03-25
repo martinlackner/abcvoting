@@ -1320,16 +1320,16 @@ def check_FJR(profile, committee, algorithm="fastest", committeesize=None):
         cands = detailed_information["joint_candidates"]
         cohesive_group = detailed_information["cohesive_group"]
         output.details(
-            f"(The weakly ({beta}, {ell})-cohesive group of voters {str_set_of_candidates(cohesive_group)}"
-            f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
-            f" each approve at least {beta} of the {ell} candidates {str_set_of_candidates(cands)},"
-            f"but none of them approves {beta} candidates in the committee.)",
+            f"(The weakly cohesive group of voters {str_set_of_candidates(cohesive_group)}"
+            f"({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
+            f"each approve at least {beta} of the {ell} candidates {str_set_of_candidates(cands)},"
+            f"but all approve at most {beta - 1} candidates in the committee.)",
             indent=" ",
         )
     return result
 
 
-def _check_FJR_brute_force(profile, committee, committeesize):
+def _check_FJR_brute_force(profile, committee):
     """Test using brute-force whether a committee satisfies FJR.
 
     Parameters
@@ -1350,22 +1350,40 @@ def _check_FJR_brute_force(profile, committee, committeesize):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
-    for cands in powerset(profile.approved_candidates()):
-        cands = set(cands)
-        set_of_voters = [
-            voter
-            for voter in profile
-            if len(voter.approved & cands) > len(voter.approved & committee)
-        ]  # set of voters that would profit from `cands`
-        if not set_of_voters:
-            continue
-        if len(cands) * len(profile) <= len(set_of_voters) * committeesize:
-            return False  # a sufficient number of voters would profit from deviating to `cands`
-    return True
+    committeesize = len(committee)
+
+    committee_utility_at_most = {
+        utility: set(voter for voter in profile if len(voter.approved & committee) <= utility)
+        for utility in range(len(committee) + 1)
+    }
+
+    for T in powerset(profile.approved_candidates(), max_size=committeesize):
+        T = set(T)
+        T_utility_at_least = {
+            utility: set(voter for voter in profile if len(voter.approved & T) >= utility)
+            for utility in range(len(T) + 1)
+        }
+        for beta in range(1, len(T) + 1):
+            # find set of voters who have utility at least beta in T
+            # and utility at most beta-1 in committee
+            cohesive_group = T_utility_at_least[beta] & committee_utility_at_most[beta - 1]
+
+            # is coalition large enough to deserve |T| seats?
+            if len(cohesive_group) * committeesize >= len(T) * len(profile):
+                detailed_information = {
+                    "ell": len(T),
+                    "beta": beta,
+                    "joint_candidates": T,
+                    "cohesive_group": cohesive_group,
+                }
+                return False, detailed_information
+
+    detailed_information = {}
+    return True, detailed_information
 
 
-def _check_FJR_gurobi(profile, committee, committeesize):
-    """Test, by an ILP and the Gurobi solver, whether a committee is in the core.
+def _check_FJR_gurobi(profile, committee):
+    """Test, by an ILP and the Gurobi solver, whether a committee satisfies FJR.
 
     Parameters
     ----------
@@ -1373,8 +1391,6 @@ def _check_FJR_gurobi(profile, committee, committeesize):
         approval sets of voters
     committee : set
         set of candidates
-    committeesize : int
-        size of committee
 
     Returns
     -------
@@ -1387,31 +1403,46 @@ def _check_FJR_gurobi(profile, committee, committeesize):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
+    committeesize = len(committee)
+
     model = gb.Model()
 
-    set_of_voter = model.addVars(range(len(profile)), vtype=gb.GRB.BINARY)
+    set_of_voters = model.addVars(range(len(profile)), vtype=gb.GRB.BINARY)
     set_of_candidates = model.addVars(range(profile.num_cand), vtype=gb.GRB.BINARY)
+    beta = model.addVar(lb=1, ub=committeesize, vtype=gb.GRB.INTEGER)
+    model.addConstr(beta <= set_of_candidates.sum())
 
+    # coalition large enough to deserve |set_of_candidates| seats
     model.addConstr(
-        gb.quicksum(set_of_candidates) * len(profile) <= gb.quicksum(set_of_voter) * committeesize
+        gb.quicksum(set_of_candidates) * len(profile) <= gb.quicksum(set_of_voters) * committeesize
     )
-    model.addConstr(gb.quicksum(set_of_voter) >= 1)
+    model.addConstr(gb.quicksum(set_of_voters) >= 1)
     for i, voter in enumerate(profile):
-        approved = [
+        # if i is in set_of_voters, then:
+        # (a) i has utility at most beta-1 in committee
+        utility_in_committee = len(committee & voter.approved)
+        model.addConstr(utility_in_committee * set_of_voters[i] <= beta - 1)
+        # (b) i has utility at least beta in set_of_candidates
+        approved_in_set_of_candidates = [
             (c in voter.approved) * set_of_candidates[i] for i, c in enumerate(profile.candidates)
         ]
-        model.addConstr(
-            (set_of_voter[i] == 1)
-            >> (gb.quicksum(approved) >= len(voter.approved & committee) + 1)
-        )
+        model.addConstr(gb.quicksum(approved_in_set_of_candidates) >= beta * set_of_voters[i])
 
     _set_gurobi_model_parameters(model)
     model.optimize()
 
     if model.Status == gb.GRB.OPTIMAL:
-        return False
+        T = [c for c in profile.candidates if set_of_candidates[c].Xn > 0.9]
+        detailed_information = {
+            "ell": len(T),
+            "beta": beta.Xn,
+            "joint_candidates": T,
+            "cohesive_group": [i for i in range(len(profile)) if set_of_voters[i].Xn > 0.9],
+        }
+        return False, detailed_information
     elif model.Status == gb.GRB.INFEASIBLE:
-        return True
+        detailed_information = {}
+        return True, detailed_information
     else:
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
@@ -1494,7 +1525,7 @@ def _check_core_brute_force(profile, committee, committeesize):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
-    for cands in powerset(profile.approved_candidates()):
+    for cands in powerset(profile.approved_candidates(), max_size=committeesize):
         cands = set(cands)
         set_of_voters = [
             voter

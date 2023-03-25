@@ -255,9 +255,10 @@ def header(text, symbol="-"):
     return border + text + "\n" + border
 
 
-def powerset(iterable):
+def powerset(iterable, max_size=None):
     """
-    Yield all possible subsets of the iterable.
+    Yield all possible subsets of the iterable
+    (or all subsets with at most `max-size` elements).
 
     From: https://docs.python.org/3/library/itertools.html#itertools-recipes
 
@@ -266,13 +267,18 @@ def powerset(iterable):
         iterable : iterable
             An iterable.
 
+        max_size : int, optional
+            Maximum size of the subsets.
+
     Returns
     -------
         iterable
     """
 
     s = list(iterable)
-    return itertools.chain.from_iterable(itertools.combinations(s, r) for r in range(len(s) + 1))
+    if max_size is None:
+        max_size = len(s)
+    return itertools.chain.from_iterable(itertools.combinations(s, r) for r in range(max_size + 1))
 
 
 def compare_list_of_committees(committees1, committees2):
