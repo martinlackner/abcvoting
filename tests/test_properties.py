@@ -306,29 +306,43 @@ def test_property_functions_with_handcrafted_instances(
         or abc_yaml_filename.__contains__("instanceM")
     ],
 )
-def test_matching_output_different_approaches(abc_yaml_instance):
+def test_matching_output_different_approaches_and_implications(abc_yaml_instance):
     # read the instance from the file
     profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
 
     # get one sample committee as input for the functions
     input_committee = compute_instances[0]["result"][0]
 
-    assert properties.check_pareto_optimality(
+    brute_force_pareto_optimality = properties.check_pareto_optimality(
         profile, input_committee, algorithm="brute-force"
-    ) == properties.check_pareto_optimality(profile, input_committee, algorithm="gurobi")
-    assert properties.check_core(
-        profile, input_committee, algorithm="brute-force"
-    ) == properties.check_core(profile, input_committee, algorithm="gurobi")
-    assert properties.check_FJR(
-        profile, input_committee, algorithm="brute-force"
-    ) == properties.check_FJR(profile, input_committee, algorithm="gurobi")
-    assert properties.check_EJR(
-        profile, input_committee, algorithm="brute-force"
-    ) == properties.check_EJR(profile, input_committee, algorithm="gurobi")
-    assert properties.check_PJR(
-        profile, input_committee, algorithm="brute-force"
-    ) == properties.check_PJR(profile, input_committee, algorithm="gurobi")
+    )
+    brute_force_core = properties.check_core(profile, input_committee, algorithm="brute-force")
+    brute_force_FJR = properties.check_FJR(profile, input_committee, algorithm="brute-force")
+    brute_force_EJR = properties.check_EJR(profile, input_committee, algorithm="brute-force")
+    brute_force_PJR = properties.check_PJR(profile, input_committee, algorithm="brute-force")
 
+    # check that gurobi and brute-force give the same result
+    assert brute_force_pareto_optimality == properties.check_pareto_optimality(profile, input_committee, algorithm="gurobi")
+    assert brute_force_core == properties.check_core(profile, input_committee, algorithm="gurobi")
+    assert brute_force_FJR == properties.check_FJR(profile, input_committee, algorithm="gurobi")
+    assert brute_force_EJR == properties.check_EJR(profile, input_committee, algorithm="gurobi")
+    assert brute_force_PJR == properties.check_PJR(profile, input_committee, algorithm="gurobi")
+
+    # check logical implications
+    is_EJR_plus = properties.check_EJR_plus(profile, input_committee)
+    is_JR = properties.check_JR(profile, input_committee)
+    logical_implications = [
+        (brute_force_core, brute_force_FJR),
+        (brute_force_FJR, brute_force_EJR),
+        (brute_force_EJR, brute_force_PJR),
+        (brute_force_PJR, is_JR),
+        (is_EJR_plus, brute_force_EJR)
+    ]
+    for premise, conclusion in logical_implications:
+        if premise:
+            assert conclusion
+        if not conclusion:
+            assert not premise
 
 @pytest.mark.gurobipy
 @pytest.mark.slow
