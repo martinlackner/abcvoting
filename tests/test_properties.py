@@ -135,8 +135,8 @@ def _create_handcrafted_instances():
         + [[4, 5, 6]] * 3
         + [[12, 13, 14, 15, 16]]
     )
-    committee = {0, 1, 2, 3, 4, 5, 6} # selected by equal shares without completion
-    committee |= {12, 13, 14, 15} # completion
+    committee = {0, 1, 2, 3, 4, 5, 6}  # selected by equal shares without completion
+    committee |= {12, 13, 14, 15}  # completion
     assert len(committee) == 11
     expected_result = False
     handcrafted_instances.append(("fjr", profile, committee, expected_result))
@@ -322,7 +322,9 @@ def test_matching_output_different_approaches_and_implications(abc_yaml_instance
     brute_force_PJR = properties.check_PJR(profile, input_committee, algorithm="brute-force")
 
     # check that gurobi and brute-force give the same result
-    assert brute_force_pareto_optimality == properties.check_pareto_optimality(profile, input_committee, algorithm="gurobi")
+    assert brute_force_pareto_optimality == properties.check_pareto_optimality(
+        profile, input_committee, algorithm="gurobi"
+    )
     assert brute_force_core == properties.check_core(profile, input_committee, algorithm="gurobi")
     assert brute_force_FJR == properties.check_FJR(profile, input_committee, algorithm="gurobi")
     assert brute_force_EJR == properties.check_EJR(profile, input_committee, algorithm="gurobi")
@@ -336,13 +338,14 @@ def test_matching_output_different_approaches_and_implications(abc_yaml_instance
         (brute_force_FJR, brute_force_EJR),
         (brute_force_EJR, brute_force_PJR),
         (brute_force_PJR, is_JR),
-        (is_EJR_plus, brute_force_EJR)
+        (is_EJR_plus, brute_force_EJR),
     ]
     for premise, conclusion in logical_implications:
         if premise:
             assert conclusion
         if not conclusion:
             assert not premise
+
 
 @pytest.mark.gurobipy
 @pytest.mark.slow
