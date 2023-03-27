@@ -10,9 +10,6 @@ from abcvoting.output import DETAILS, output
 from abcvoting.preferences import Profile
 from abcvoting import abcrules, properties, fileio
 
-# set verbosity to DETAILS to increase unittest coverage
-output.set_verbosity(verbosity=DETAILS)
-
 
 # instances to check output of check_* property functions
 def _create_handcrafted_instances():
@@ -87,7 +84,8 @@ def _create_handcrafted_instances():
     handcrafted_instances.append(("ejr", profile, committee, expected_result))
 
     # EJR+
-    # Brill and Peters, 2023, "Robust and Verifiable Proportionality Axioms for Multiwinner Voting", Example 3 left
+    # Brill and Peters, 2023,
+    # "Robust and Verifiable Proportionality Axioms for Multiwinner Voting", Example 3 left
     profile = Profile(7)
     profile.add_voters(
         [[0, 1, 2]]
@@ -104,7 +102,8 @@ def _create_handcrafted_instances():
     expected_result = False
     handcrafted_instances.append(("ejr+", profile, committee, expected_result))
 
-    # Brill and Peters, 2023, "Robust and Verifiable Proportionality Axioms for Multiwinner Voting", Example 3 right
+    # Brill and Peters, 2023,
+    # "Robust and Verifiable Proportionality Axioms for Multiwinner Voting", Example 3 right
     profile = Profile(7)
     profile.add_voters([[0]] + [[0, 1]] + [[0, 1, 2, 3]] + [[2, 3, 4]] * 3 + [[4, 5]] + [[5, 6]])
     committee = {0, 1, 2, 6}
@@ -113,7 +112,9 @@ def _create_handcrafted_instances():
     expected_result = False
     handcrafted_instances.append(("ejr+", profile, committee, expected_result))
 
-    # Brill and Peters, 2023, "Robust and Verifiable Proportionality Axioms for Multiwinner Voting", Remark 2 (core does not imply EJR+)
+    # Brill and Peters, 2023,
+    # "Robust and Verifiable Proportionality Axioms for Multiwinner Voting",
+    # Remark 2 (core does not imply EJR+)
     profile = Profile(3)
     profile.add_voters([[0, 1]] + [[0, 2]])
     committee = {1, 2}
@@ -122,7 +123,9 @@ def _create_handcrafted_instances():
     expected_result = False
     handcrafted_instances.append(("ejr+", profile, committee, expected_result))
 
-    # Peters, Pierczynski, Skowron, 2021, "Proportional Participatory Budgeting with Additive Utilities", Example 4 (equal shares fails fjr)
+    # Peters, Pierczynski, Skowron, 2021,
+    # "Proportional Participatory Budgeting with Additive Utilities",
+    # Example 4 (Equal Shares fails FJR)
     # padded with dummy candidates to make committee exhaustive
     profile = Profile(17)
     profile.add_voters(
@@ -211,12 +214,12 @@ def _create_handcrafted_instances():
     expected_result = False
     handcrafted_instances.append(("stable-priceability", profile, committee, expected_result))
 
-    profile = Profile(20)
-    profile.add_voters([[i, i + 10] for i in range(10)])
-    committee = set(range(20))
+    profile = Profile(10)
+    profile.add_voters([[i, i + 5] for i in range(5)])
+    committee = set(range(5))
     expected_result = True
     handcrafted_instances.append(("core", profile, committee, expected_result))
-    committee = set(range(9)).union({10})
+    committee = {0, 1, 2, 3, 5}
     expected_result = False
     handcrafted_instances.append(("core", profile, committee, expected_result))
 
@@ -278,6 +281,8 @@ abc_yaml_filenames = _list_abc_yaml_instances()
 def test_property_functions_with_handcrafted_instances(
     property_name, algorithm, profile, committee, expected_result
 ):
+    output.set_verbosity(verbosity=DETAILS)
+
     if algorithm == "nonsense":
         if property_name in ["jr", "ejr+"]:
             return  # no `algorithm` parameter
@@ -287,6 +292,8 @@ def test_property_functions_with_handcrafted_instances(
         if algorithm == "brute-force" and property_name in ["priceability", "stable-priceability"]:
             return  # not supported
         else:
+            print(profile)
+            print(committee)
             assert (
                 properties.check(property_name, profile, committee, algorithm=algorithm)
                 == expected_result
@@ -307,6 +314,8 @@ def test_property_functions_with_handcrafted_instances(
     ],
 )
 def test_matching_output_different_approaches_and_implications(abc_yaml_instance):
+    output.set_verbosity(verbosity=DETAILS)
+
     # read the instance from the file
     profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
 
@@ -383,6 +392,8 @@ def test_matching_output_different_approaches_and_implications(abc_yaml_instance
 )
 @pytest.mark.parametrize("abc_yaml_instance", abc_yaml_filenames)
 def test_properties_with_rules(rule_id, property_name, abc_yaml_instance):
+    output.set_verbosity(verbosity=DETAILS)
+
     # read the instance from the file
     profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
     print(profile)
@@ -409,6 +420,8 @@ def test_properties_with_rules(rule_id, property_name, abc_yaml_instance):
     "algorithm", ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobipy)]
 )
 def test_pareto_optimality_methods(algorithm):
+    output.set_verbosity(verbosity=DETAILS)
+
     # profile with 4 candidates: a, b, c, d
     profile = Profile(4)
 
@@ -430,3 +443,49 @@ def test_pareto_optimality_methods(algorithm):
     assert not is_pareto_optimal
 
     assert properties.check_pareto_optimality(profile, {0, 1}, algorithm=algorithm)
+
+
+@pytest.mark.parametrize(
+    "algorithm",
+    ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobipy)],
+)
+@pytest.mark.parametrize("property_name", ["jr", "pjr", "ejr", "ejr+", "fjr", "core"])
+def test_quota_properties(property_name, algorithm):
+    output.set_verbosity(verbosity=DETAILS)
+
+    profile = Profile(num_cand=5)
+    profile.add_voters([[0], [1], [2], [3], [4]])
+    committee = [0, 1, 2, 3]
+    # quota=1 is chosen too small
+    assert not properties.check(property_name, profile, committee, quota=1, algorithm=algorithm)
+    assert properties.check(property_name, profile, committee, quota=None, algorithm=algorithm)
+
+    profile = Profile(num_cand=2)
+    profile.add_voters([[0], [0], [1]])
+    committee = [0]
+    assert properties.check(property_name, profile, committee, quota=2, algorithm=algorithm)
+
+    profile = Profile(num_cand=10)
+    profile.add_voters([[0, 1, 2]] * 5 + [[5], [6], [7], [8], [9]])
+
+    assert properties.check(
+        property_name, profile, committee=[0, 1], quota=10 / 4, algorithm=algorithm
+    )
+    if property_name == "jr":
+        assert properties.check(
+            property_name, profile, committee=[0], quota=10 / 6, algorithm=algorithm
+        )
+        assert properties.check(
+            property_name, profile, committee=[0, 5], quota=10 / 6, algorithm=algorithm
+        )
+    else:
+        print(profile)
+        assert not properties.check(
+            property_name, profile, committee=[0, 1], quota=10 / 6, algorithm=algorithm
+        )
+        assert not properties.check(
+            property_name, profile, committee=[0, 1, 5], quota=10 / 6, algorithm=algorithm
+        )
+    assert properties.check(
+        property_name, profile, committee=[0, 1, 2], quota=10 / 6, algorithm=algorithm
+    )

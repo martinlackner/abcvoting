@@ -5,6 +5,7 @@ Axiomatic properties of committees.
 import gurobipy as gb
 import itertools
 import math
+from fractions import Fraction
 from abcvoting.output import output, WARNING
 from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate, powerset
 
@@ -83,7 +84,7 @@ def full_analysis(profile, committee):
     return results
 
 
-def check(property_name, profile, committee, algorithm="fastest"):
+def check(property_name, profile, committee, quota=None, algorithm="fastest"):
     """
     Test whether a committee satisfies a given property.
 
@@ -95,6 +96,11 @@ def check(property_name, profile, committee, algorithm="fastest"):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
+
+        Does apply only to some axiomatic properties. If the chosen property does not use a
+        quota and `quota` is set to a value, `check()` raises a ValueError.
     algorithm : str, optional
         The algorithm to be used.
 
@@ -107,23 +113,29 @@ def check(property_name, profile, committee, algorithm="fastest"):
         raise ValueError(f"Property {property_name} not known.")
 
     if property_name == "pareto":
+        if quota is not None:
+            raise ValueError("check_pareto_optimality() does not use the parameter `quota`.")
         return check_pareto_optimality(profile, committee, algorithm=algorithm)
     elif property_name == "jr":
-        return check_JR(profile, committee)
+        return check_JR(profile, committee, quota=quota)
     elif property_name == "pjr":
-        return check_PJR(profile, committee, algorithm=algorithm)
+        return check_PJR(profile, committee, quota=quota, algorithm=algorithm)
     elif property_name == "ejr":
-        return check_EJR(profile, committee, algorithm=algorithm)
+        return check_EJR(profile, committee, quota=quota, algorithm=algorithm)
     elif property_name == "ejr+":
-        return check_EJR_plus(profile, committee)
+        return check_EJR_plus(profile, committee, quota=quota)
     elif property_name == "fjr":
-        return check_FJR(profile, committee, algorithm=algorithm)
+        return check_FJR(profile, committee, quota=quota, algorithm=algorithm)
     elif property_name == "priceability":
+        if quota is not None:
+            raise ValueError("check_priceability() does not use the parameter `quota`.")
         return check_priceability(profile, committee, algorithm=algorithm)
     elif property_name == "stable-priceability":
+        if quota is not None:
+            raise ValueError("check_stable_priceability() does not use the parameter `quota`.")
         return check_stable_priceability(profile, committee, algorithm=algorithm)
     elif property_name == "core":
-        return check_core(profile, committee, algorithm=algorithm)
+        return check_core(profile, committee, quota=quota, algorithm=algorithm)
     else:
         raise NotImplementedError(f"Property {property_name} not implemented.")
 
@@ -208,7 +220,7 @@ def check_pareto_optimality(profile, committee, algorithm="fastest"):
     return result
 
 
-def check_EJR(profile, committee, algorithm="fastest"):
+def check_EJR(profile, committee, quota=None, algorithm="fastest"):
     """
     Test whether a committee satisfies Extended Justified Representation (EJR).
 
@@ -218,6 +230,10 @@ def check_EJR(profile, committee, algorithm="fastest"):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
+
+        Defaults to n/k, i.e., the number of voters divided by the committee size.
     algorithm : str, optional
         The algorithm to be used.
 
@@ -265,6 +281,12 @@ def check_EJR(profile, committee, algorithm="fastest"):
         output.set_verbosity()
     """
 
+    if quota is None:
+        standard_quota = True
+        quota = Fraction(len(profile), len(committee))
+    else:
+        standard_quota = False
+
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
@@ -278,16 +300,24 @@ def check_EJR(profile, committee, algorithm="fastest"):
         algorithm = "gurobi"
 
     if algorithm == "brute-force":
-        result, detailed_information = _check_EJR_brute_force(profile, committee)
+        result, detailed_information = _check_EJR_brute_force(profile, committee, quota)
     elif algorithm == "gurobi":
-        result, detailed_information = _check_EJR_gurobi(profile, committee)
+        result, detailed_information = _check_EJR_gurobi(profile, committee, quota)
     else:
         raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for check_EJR")
 
+    message = f"Committee {str_set_of_candidates(committee)} "
     if result:
-        output.info(f"Committee {str_set_of_candidates(committee)} satisfies EJR.")
+        message += "satisfies EJR"
     else:
-        output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy EJR.")
+        message += "does not satisfy EJR"
+    if standard_quota:
+        message += "."
+    else:
+        message += f" (for quota = {quota})."
+    output.info(message)
+
+    if not result:
         ell = detailed_information["ell"]
         cands = detailed_information["joint_candidates"]
         cohesive_group = detailed_information["cohesive_group"]
@@ -302,7 +332,7 @@ def check_EJR(profile, committee, algorithm="fastest"):
     return result
 
 
-def check_PJR(profile, committee, algorithm="fastest"):
+def check_PJR(profile, committee, quota=None, algorithm="fastest"):
     """
     Test whether a committee satisfies Proportional Justified Representation (PJR).
 
@@ -312,6 +342,10 @@ def check_PJR(profile, committee, algorithm="fastest"):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
+
+        Defaults to n/k, i.e., the number of voters divided by the committee size.
     algorithm : str, optional
         The algorithm to be used.
 
@@ -360,6 +394,12 @@ def check_PJR(profile, committee, algorithm="fastest"):
         output.set_verbosity()
     """
 
+    if quota is None:
+        standard_quota = True
+        quota = Fraction(len(profile), len(committee))
+    else:
+        standard_quota = False
+
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
@@ -373,16 +413,24 @@ def check_PJR(profile, committee, algorithm="fastest"):
         algorithm = "gurobi"
 
     if algorithm == "brute-force":
-        result, detailed_information = _check_PJR_brute_force(profile, committee)
+        result, detailed_information = _check_PJR_brute_force(profile, committee, quota)
     elif algorithm == "gurobi":
-        result, detailed_information = _check_PJR_gurobi(profile, committee)
+        result, detailed_information = _check_PJR_gurobi(profile, committee, quota)
     else:
         raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for check_PJR")
 
+    message = f"Committee {str_set_of_candidates(committee)} "
     if result:
-        output.info(f"Committee {str_set_of_candidates(committee)} satisfies PJR.")
+        message += "satisfies PJR"
     else:
-        output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy PJR.")
+        message += "does not satisfy PJR"
+    if standard_quota:
+        message += "."
+    else:
+        message += f" (for quota = {quota})."
+    output.info(message)
+
+    if not result:
         ell = detailed_information["ell"]
         cands = detailed_information["joint_candidates"]
         cohesive_group = detailed_information["cohesive_group"]
@@ -396,7 +444,7 @@ def check_PJR(profile, committee, algorithm="fastest"):
     return result
 
 
-def check_JR(profile, committee):
+def check_JR(profile, committee, quota=None):
     """
     Test whether a committee satisfies Justified Representation (JR).
 
@@ -406,6 +454,10 @@ def check_JR(profile, committee):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
+
+        Defaults to n/k, i.e., the number of voters divided by the committee size.
 
     Returns
     -------
@@ -451,6 +503,12 @@ def check_JR(profile, committee):
         output.set_verbosity()
     """
 
+    if quota is None:
+        standard_quota = True
+        quota = Fraction(len(profile), len(committee))
+    else:
+        standard_quota = False
+
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
@@ -460,12 +518,20 @@ def check_JR(profile, committee):
             "check_JR is currently only implemented for unit weights (weight=1)"
         )
 
-    result, detailed_information = _check_JR(profile, committee)
+    result, detailed_information = _check_JR(profile, committee, quota=quota)
 
+    message = f"Committee {str_set_of_candidates(committee)} "
     if result:
-        output.info(f"Committee {str_set_of_candidates(committee)} satisfies JR.")
+        message += "satisfies JR"
     else:
-        output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy JR.")
+        message += "does not satisfy JR"
+    if standard_quota:
+        message += "."
+    else:
+        message += f" (for quota = {quota})."
+    output.info(message)
+
+    if not result:
         cand = detailed_information["joint_candidate"]
         cohesive_group = detailed_information["cohesive_group"]
         output.details(
@@ -478,7 +544,7 @@ def check_JR(profile, committee):
     return result
 
 
-def _check_JR(profile, committee):
+def _check_JR(profile, committee, quota):
     """
     Test whether a committee satisfies JR.
 
@@ -490,6 +556,8 @@ def _check_JR(profile, committee):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
 
     Returns
     -------
@@ -504,7 +572,7 @@ def _check_JR(profile, committee):
             if (cand in voter.approved) and (len(voter.approved & committee) == 0):
                 group.add(vi)
 
-        if len(group) * len(committee) >= len(profile):  # |group| >= num_voters / |committee|
+        if len(group) >= quota:
             detailed_information = {"cohesive_group": group, "joint_candidate": cand}
             return False, detailed_information
 
@@ -632,7 +700,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
     raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
-def _check_EJR_brute_force(profile, committee):
+def _check_EJR_brute_force(profile, committee, quota):
     """
     Test using brute-force whether a committee satisfies EJR.
 
@@ -642,22 +710,24 @@ def _check_EJR_brute_force(profile, committee):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
 
     Returns
     -------
     bool
     """
 
-    # should check for ell from 1 until committee size
-    ell_upper_bound = len(committee) + 1
+    # largest possible ell such that ell-cohesive groups can exist
+    ell_upper_bound = int(len(profile) / quota)
 
     # loop through all possible ell
-    for ell in range(1, ell_upper_bound):
+    for ell in range(1, ell_upper_bound + 1):
         # list of voters with less than ell approved candidates in committee
         voters_less_than_ell_approved_candidates = []
 
         # compute minimum group size for this ell
-        group_size = math.ceil(ell * (len(profile) / len(committee)))
+        group_size = math.ceil(ell * quota)
 
         # compute list of voters to consider
         for i, voter in enumerate(profile):
@@ -702,7 +772,7 @@ def _check_EJR_brute_force(profile, committee):
     return True, detailed_information
 
 
-def _check_EJR_gurobi(profile, committee):
+def _check_EJR_gurobi(profile, committee, quota):
     """
     Test, by an ILP and the Gurobi solver, whether a committee satisfies EJR.
 
@@ -712,6 +782,8 @@ def _check_EJR_gurobi(profile, committee):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
 
     Returns
     -------
@@ -738,12 +810,12 @@ def _check_EJR_gurobi(profile, committee):
     # binary variables: indicate whether a voter is inside the ell-cohesive group
     in_group = model.addVars(len(profile), vtype=gb.GRB.BINARY, name="in_group")
 
-    # constraints: ell has to be between 1 and committeesize inclusive
     model.addConstr(ell >= 1)
-    model.addConstr(ell <= len(committee))
+    # largest possible ell such that ell-cohesive groups can exist
+    model.addConstr(ell <= int(len(profile) / quota))
 
     # constraint: size of ell-cohesive group should be appropriate wrt. ell
-    model.addConstr(gb.quicksum(in_group) >= ell * len(profile) / len(committee))
+    model.addConstr(gb.quicksum(in_group) >= ell * quota)
 
     # constraints based on binary indicator variables:
     # if voter is in ell-cohesive group, then the voter should have
@@ -790,7 +862,7 @@ def _check_EJR_gurobi(profile, committee):
     raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
-def _check_PJR_brute_force(profile, committee):
+def _check_PJR_brute_force(profile, committee, quota):
     """
     Test using brute-force whether a committee satisfies PJR.
 
@@ -800,21 +872,26 @@ def _check_PJR_brute_force(profile, committee):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
 
     Returns
     -------
     bool
     """
 
+    # largest possible ell such that ell-cohesive groups can exist
+    ell_upper_bound = int(len(profile) / quota)
+
     # considering ell-cohesive groups
-    for ell in range(1, len(committee) + 1):
+    for ell in range(1, ell_upper_bound + 1):
         # list of voters with less than ell approved candidates in committee
         # will not consider voters with >= ell approved candidates in committee,
         # because this voter will immediately satisfy the condition of PJR
         voters_less_than_ell_approved_candidates = []
 
         # compute minimum group size for this ell
-        group_size = math.ceil(ell * (len(profile) / len(committee)))
+        group_size = math.ceil(ell * quota)
 
         # compute list of voters to consider
         for vi, voter in enumerate(profile):
@@ -861,7 +938,7 @@ def _check_PJR_brute_force(profile, committee):
     return True, detailed_information
 
 
-def _check_PJR_gurobi(profile, committee):
+def _check_PJR_gurobi(profile, committee, quota):
     """
     Test with a Gurobi ILP whether a committee satisfies PJR.
 
@@ -871,6 +948,8 @@ def _check_PJR_gurobi(profile, committee):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
 
     Returns
     -------
@@ -907,12 +986,12 @@ def _check_PJR_gurobi(profile, committee):
     # binary variables: indicate whether a voter is inside the ell-cohesive group
     in_group = model.addVars(len(profile), vtype=gb.GRB.BINARY, name="in_group")
 
-    # constraints: ell has to be between 1 and committeesize inclusive
     model.addConstr(ell >= 1)
-    model.addConstr(ell <= len(committee))
+    # largest possible ell such that ell-cohesive groups can exist
+    model.addConstr(ell <= int(len(profile) / quota))
 
     # constraint: size of ell-cohesive group should be appropriate wrt ell
-    model.addConstr(gb.quicksum(in_group) >= ell * len(profile) / len(committee))
+    model.addConstr(gb.quicksum(in_group) >= ell * quota)
 
     # binary variables: indicate whether a candidate is in the intersection
     # of approved candidates over voters inside the group
@@ -970,7 +1049,7 @@ def _check_PJR_gurobi(profile, committee):
     raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
-def check_EJR_plus(profile, committee):
+def check_EJR_plus(profile, committee, quota=None):
     """
     Test whether a committee satisfies EJR+.
 
@@ -980,6 +1059,10 @@ def check_EJR_plus(profile, committee):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
+
+        Defaults to n/k, i.e., the number of voters divided by the committee size.
 
     Returns
     -------
@@ -992,6 +1075,12 @@ def check_EJR_plus(profile, committee):
     https://arxiv.org/abs/2302.01989
     """
 
+    if quota is None:
+        standard_quota = True
+        quota = Fraction(len(profile), len(committee))
+    else:
+        standard_quota = False
+
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
@@ -1001,12 +1090,20 @@ def check_EJR_plus(profile, committee):
             "check_EJR_plus is currently only implemented for unit weights (weight=1)"
         )
 
-    result, detailed_information = _check_EJR_plus(profile, committee)
+    result, detailed_information = _check_EJR_plus(profile, committee, quota)
 
+    message = f"Committee {str_set_of_candidates(committee)} "
     if result:
-        output.info(f"Committee {str_set_of_candidates(committee)} satisfies EJR+.")
+        message += "satisfies EJR+"
     else:
-        output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy EJR+.")
+        message += "does not satisfy EJR+"
+    if standard_quota:
+        message += "."
+    else:
+        message += f" (for quota = {quota})."
+    output.info(message)
+
+    if not result:
         cand = detailed_information["joint_candidate"]
         cohesive_group = detailed_information["cohesive_group"]
         ell = detailed_information["ell"]
@@ -1021,7 +1118,7 @@ def check_EJR_plus(profile, committee):
     return result
 
 
-def _check_EJR_plus(profile, committee):
+def _check_EJR_plus(profile, committee, quota):
     """
     Test whether a committee satisfies EJR+.
 
@@ -1033,28 +1130,31 @@ def _check_EJR_plus(profile, committee):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
 
     Returns
     -------
     bool
     """
 
+    # largest possible ell such that ell-cohesive groups can exist
+    ell_upper_bound = int(len(profile) / quota)
+
     for cand in profile.candidates:
         if cand in committee:
             continue
-        supporters_by_utility = {ell: set() for ell in range(len(committee) + 1)}
+        supporters_by_utility = {ell: set() for ell in range(ell_upper_bound + 1)}
         for vi, voter in enumerate(profile):
             if cand in voter.approved:
                 utility = len(voter.approved & committee)
                 supporters_by_utility[utility].add(vi)
 
         group = set()
-        for ell in range(len(committee)):
+        for ell in range(ell_upper_bound):
             # group of supporters of cand with utility <= ell
             group |= supporters_by_utility[ell]
-            if len(group) * len(committee) >= (ell + 1) * len(
-                profile
-            ):  # |group| >= (ell + 1) * num_voters / |committee|
+            if len(group) >= (ell + 1) * quota:
                 # EJR+ requires someone to get utility at least ell + 1, but no one does
                 detailed_information = {
                     "cohesive_group": group,
@@ -1296,7 +1396,7 @@ def _check_priceability_gurobi(profile, committee, stable=False):
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
-def check_FJR(profile, committee, algorithm="fastest"):
+def check_FJR(profile, committee, quota=None, algorithm="fastest"):
     """
     Test whether a committee satisfies Full Justified Representation (FJR).
 
@@ -1306,6 +1406,10 @@ def check_FJR(profile, committee, algorithm="fastest"):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
+
+        Defaults to n/k, i.e., the number of voters divided by the committee size.
     algorithm : str, optional
         The algorithm to be used.
 
@@ -1320,6 +1424,12 @@ def check_FJR(profile, committee, algorithm="fastest"):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
+    if quota is None:
+        standard_quota = True
+        quota = Fraction(len(profile), len(committee))
+    else:
+        standard_quota = False
+
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
@@ -1327,16 +1437,24 @@ def check_FJR(profile, committee, algorithm="fastest"):
         algorithm = "gurobi"
 
     if algorithm == "brute-force":
-        result, detailed_information = _check_FJR_brute_force(profile, committee)
+        result, detailed_information = _check_FJR_brute_force(profile, committee, quota)
     elif algorithm == "gurobi":
-        result, detailed_information = _check_FJR_gurobi(profile, committee)
+        result, detailed_information = _check_FJR_gurobi(profile, committee, quota)
     else:
         raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for check_FJR")
 
+    message = f"Committee {str_set_of_candidates(committee)} "
     if result:
-        output.info(f"Committee {str_set_of_candidates(committee)} satisfies FJR.")
+        message += "satisfies FJR"
     else:
-        output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy FJR.")
+        message += "does not satisfy FJR"
+    if standard_quota:
+        message += "."
+    else:
+        message += f" (for quota = {quota})."
+    output.info(message)
+
+    if not result:
         ell = detailed_information["ell"]
         beta = detailed_information["beta"]
         cands = detailed_information["joint_candidates"]
@@ -1351,7 +1469,7 @@ def check_FJR(profile, committee, algorithm="fastest"):
     return result
 
 
-def _check_FJR_brute_force(profile, committee):
+def _check_FJR_brute_force(profile, committee, quota):
     """Test using brute-force whether a committee satisfies FJR.
 
     Parameters
@@ -1360,6 +1478,8 @@ def _check_FJR_brute_force(profile, committee):
         approval sets of voters
     committee : set
         set of candidates
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
 
     Returns
     -------
@@ -1372,14 +1492,15 @@ def _check_FJR_brute_force(profile, committee):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
-    committeesize = len(committee)
+    # largest possible size of set T (and beta)
+    set_upper_bound = int(len(profile) / quota)
 
     committee_utility_at_most = {
         utility: set(voter for voter in profile if len(voter.approved & committee) <= utility)
-        for utility in range(len(committee) + 1)
+        for utility in range(set_upper_bound + 1)
     }
 
-    for T in powerset(profile.approved_candidates(), max_size=committeesize):
+    for T in powerset(profile.approved_candidates(), max_size=set_upper_bound):
         T = set(T)
         T_utility_at_least = {
             utility: set(voter for voter in profile if len(voter.approved & T) >= utility)
@@ -1391,7 +1512,7 @@ def _check_FJR_brute_force(profile, committee):
             cohesive_group = T_utility_at_least[beta] & committee_utility_at_most[beta - 1]
 
             # is coalition large enough to deserve |T| seats?
-            if len(cohesive_group) * committeesize >= len(T) * len(profile):
+            if len(cohesive_group) >= len(T) * quota:
                 detailed_information = {
                     "ell": len(T),
                     "beta": beta,
@@ -1404,7 +1525,7 @@ def _check_FJR_brute_force(profile, committee):
     return True, detailed_information
 
 
-def _check_FJR_gurobi(profile, committee):
+def _check_FJR_gurobi(profile, committee, quota):
     """Test, by an ILP and the Gurobi solver, whether a committee satisfies FJR.
 
     Parameters
@@ -1413,6 +1534,8 @@ def _check_FJR_gurobi(profile, committee):
         approval sets of voters
     committee : set
         set of candidates
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
 
     Returns
     -------
@@ -1425,19 +1548,18 @@ def _check_FJR_gurobi(profile, committee):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
-    committeesize = len(committee)
+    # largest possible size of set T (and beta)
+    set_upper_bound = int(len(profile) / quota)
 
     model = gb.Model()
 
     set_of_voters = model.addVars(range(len(profile)), vtype=gb.GRB.BINARY)
     set_of_candidates = model.addVars(range(profile.num_cand), vtype=gb.GRB.BINARY)
-    beta = model.addVar(lb=1, ub=committeesize, vtype=gb.GRB.INTEGER)
+    beta = model.addVar(lb=1, ub=set_upper_bound, vtype=gb.GRB.INTEGER)
     model.addConstr(beta <= set_of_candidates.sum())
 
     # coalition large enough to deserve |set_of_candidates| seats
-    model.addConstr(
-        gb.quicksum(set_of_candidates) * len(profile) <= gb.quicksum(set_of_voters) * committeesize
-    )
+    model.addConstr(gb.quicksum(set_of_candidates) * quota <= gb.quicksum(set_of_voters))
     model.addConstr(gb.quicksum(set_of_voters) >= 1)
     for i, voter in enumerate(profile):
         # if i is in set_of_voters, then:
@@ -1450,7 +1572,7 @@ def _check_FJR_gurobi(profile, committee):
         ]
         model.addConstr(
             gb.quicksum(approved_in_set_of_candidates)
-            >= beta - committeesize * (1 - set_of_voters[i])
+            >= beta - set_upper_bound * (1 - set_of_voters[i])
         )
 
     _set_gurobi_model_parameters(model)
@@ -1472,7 +1594,7 @@ def _check_FJR_gurobi(profile, committee):
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
-def check_core(profile, committee, algorithm="fastest", committeesize=None):
+def check_core(profile, committee, quota=None, algorithm="fastest"):
     """
     Test whether a committee is in the core.
 
@@ -1482,13 +1604,12 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
         A profile.
     committee : iterable of int
         A committee.
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
+
+        Defaults to n/k, i.e., the number of voters divided by the committee size.
     algorithm : str, optional
         The algorithm to be used.
-    committeesize : int, optional
-        Desired committee size.
-
-        This parameter is used when determining whether already a committee smaller than
-        `committeesize` satisfies the core property.
 
     Returns
     -------
@@ -1501,6 +1622,12 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
+    if quota is None:
+        standard_quota = True
+        quota = Fraction(len(profile), len(committee))
+    else:
+        standard_quota = False
+
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
@@ -1510,27 +1637,28 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
             "check_core is currently only implemented for unit weights (weight=1)"
         )
 
-    if committeesize is None:
-        committeesize = len(committee)
-    elif committeesize < len(committee):
-        raise ValueError("committeesize is smaller than size of given committee")
-    elif committeesize > profile.num_cand:
-        raise ValueError("committeesize is greater than number of candidates")
-
     if algorithm == "fastest":
         algorithm = "gurobi"
 
     if algorithm == "brute-force":
-        result, detailed_information = _check_core_brute_force(profile, committee, committeesize)
+        result, detailed_information = _check_core_brute_force(profile, committee, quota)
     elif algorithm == "gurobi":
-        result, detailed_information = _check_core_gurobi(profile, committee, committeesize)
+        result, detailed_information = _check_core_gurobi(profile, committee, quota)
     else:
         raise NotImplementedError(f"Algorithm {algorithm} not specified for check_core")
 
+    message = f"Committee {str_set_of_candidates(committee)} "
     if result:
-        output.info(f"Committee {str_set_of_candidates(committee)} is in the core.")
+        message += "is in the core"
     else:
-        output.info(f"Committee {str_set_of_candidates(committee)} is not in the core.")
+        message += "is not in the core"
+    if standard_quota:
+        message += "."
+    else:
+        message += f" (for quota = {quota})."
+    output.info(message)
+
+    if not result:
         objection = detailed_information["objection"]
         coalition = detailed_information["coalition"]
         output.details(
@@ -1543,7 +1671,7 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
     return result
 
 
-def _check_core_brute_force(profile, committee, committeesize):
+def _check_core_brute_force(profile, committee, quota):
     """Test using brute-force whether a committee is in the core.
 
     Parameters
@@ -1552,8 +1680,8 @@ def _check_core_brute_force(profile, committee, committeesize):
         approval sets of voters
     committee : set
         set of candidates
-    committeesize : int
-        size of committee
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
 
     Returns
     -------
@@ -1566,7 +1694,9 @@ def _check_core_brute_force(profile, committee, committeesize):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
-    for cands in powerset(profile.approved_candidates(), max_size=committeesize):
+    max_num_of_candidates = int(len(profile) / quota)
+
+    for cands in powerset(profile.approved_candidates(), max_size=max_num_of_candidates):
         cands = set(cands)
         set_of_voters = [
             voter
@@ -1575,7 +1705,7 @@ def _check_core_brute_force(profile, committee, committeesize):
         ]  # set of voters that would profit from `cands`
         if not set_of_voters:
             continue
-        if len(cands) * len(profile) <= len(set_of_voters) * committeesize:
+        if len(cands) * quota <= len(set_of_voters):
             # a sufficient number of voters would profit from deviating to `cands`
             detailed_information = {"coalition": set_of_voters, "objection": cands}
             return False, detailed_information
@@ -1583,7 +1713,7 @@ def _check_core_brute_force(profile, committee, committeesize):
     return True, detailed_information
 
 
-def _check_core_gurobi(profile, committee, committeesize):
+def _check_core_gurobi(profile, committee, quota):
     """Test, by an ILP and the Gurobi solver, whether a committee is in the core.
 
     Parameters
@@ -1592,8 +1722,8 @@ def _check_core_gurobi(profile, committee, committeesize):
         approval sets of voters
     committee : set
         set of candidates
-    committeesize : int
-        size of committee
+    quota : Fraction or float, optional
+        The quota, i.e., size of a group, to deserve one committee member.
 
     Returns
     -------
@@ -1611,9 +1741,7 @@ def _check_core_gurobi(profile, committee, committeesize):
     set_of_voters = model.addVars(range(len(profile)), vtype=gb.GRB.BINARY)
     set_of_candidates = model.addVars(range(profile.num_cand), vtype=gb.GRB.BINARY)
 
-    model.addConstr(
-        gb.quicksum(set_of_candidates) * len(profile) <= gb.quicksum(set_of_voters) * committeesize
-    )
+    model.addConstr(gb.quicksum(set_of_candidates) * quota <= gb.quicksum(set_of_voters))
     model.addConstr(gb.quicksum(set_of_voters) >= 1)
     for i, voter in enumerate(profile):
         approved = [
