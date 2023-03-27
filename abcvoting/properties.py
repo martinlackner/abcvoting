@@ -268,6 +268,12 @@ def check_EJR(profile, committee, algorithm="fastest"):
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
+    # TODO: currently only works for unit weights
+    if not profile.has_unit_weights():
+        raise NotImplementedError(
+            "check_EJR is currently only implemented for unit weights (weight=1)"
+        )
+
     if algorithm == "fastest":
         algorithm = "gurobi"
 
@@ -357,6 +363,12 @@ def check_PJR(profile, committee, algorithm="fastest"):
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
+    # TODO: currently only works for unit weights
+    if not profile.has_unit_weights():
+        raise NotImplementedError(
+            "check_PJR is currently only implemented for unit weights (weight=1)"
+        )
+
     if algorithm == "fastest":
         algorithm = "gurobi"
 
@@ -441,6 +453,12 @@ def check_JR(profile, committee):
 
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
+
+    # TODO: currently only works for unit weights
+    if not profile.has_unit_weights():
+        raise NotImplementedError(
+            "check_JR is currently only implemented for unit weights (weight=1)"
+        )
 
     result, detailed_information = _check_JR(profile, committee)
 
@@ -977,6 +995,12 @@ def check_EJR_plus(profile, committee):
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
+    # TODO: currently only works for unit weights
+    if not profile.has_unit_weights():
+        raise NotImplementedError(
+            "check_EJR_plus is currently only implemented for unit weights (weight=1)"
+        )
+
     result, detailed_information = _check_EJR_plus(profile, committee)
 
     if result:
@@ -988,9 +1012,10 @@ def check_EJR_plus(profile, committee):
         ell = detailed_information["ell"]
         output.details(
             f"(The group of voters {str_set_of_candidates(cohesive_group)}"
-            f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters) deserves {ell} candidates,"
-            f" and jointly approve candidate {profile.cand_names[cand]} which is not part of the committee,"
-            f" but no member approves at least {ell} members of the committee.)"
+            f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
+            f" deserves {ell} candidates,"
+            f" and jointly approve candidate {profile.cand_names[cand]} which is not part of the"
+            f" committee, but no member approves at least {ell} members of the committee.)"
         )
 
     return result
@@ -1071,7 +1096,14 @@ def check_priceability(profile, committee, algorithm="fastest", stable=False):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
+    # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
+
+    # TODO: currently only works for unit weights
+    if not profile.has_unit_weights():
+        raise NotImplementedError(
+            "check_priceability is currently only implemented for unit weights (weight=1)"
+        )
 
     if algorithm == "fastest":
         algorithm = "gurobi"
@@ -1469,7 +1501,15 @@ def check_core(profile, committee, algorithm="fastest", committeesize=None):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
+    # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
+
+    # TODO: currently only works for unit weights
+    if not profile.has_unit_weights():
+        raise NotImplementedError(
+            "check_core is currently only implemented for unit weights (weight=1)"
+        )
+
     if committeesize is None:
         committeesize = len(committee)
     elif committeesize < len(committee):
