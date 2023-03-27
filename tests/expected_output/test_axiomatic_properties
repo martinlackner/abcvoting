@@ -28,6 +28,7 @@ Justified representation (JR)                      : True
 Proportional justified representation (PJR)        : True
 Extended justified representation (EJR)            : True
 EJR+                                               : True
+Full justified representation (FJR)                : False
 Priceability                                       : False
 Stable Priceability                                : False
 The core                                           : False
@@ -38,6 +39,7 @@ Justified representation (JR)                      : True
 Proportional justified representation (PJR)        : True
 Extended justified representation (EJR)            : True
 EJR+                                               : True
+Full justified representation (FJR)                : True
 Priceability                                       : True
 Stable Priceability                                : True
 The core                                           : True

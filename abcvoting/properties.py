@@ -16,6 +16,7 @@ PROPERTY_NAMES = [
     "pjr",
     "ejr",
     "ejr+",
+    "fjr",
     "priceability",
     "stable-priceability",
     "core",
@@ -37,8 +38,8 @@ def full_analysis(profile, committee):
     """
     Test all implemented properties for the given committee.
 
-    Returns a dictionary with the following keys: "pareto", "jr", "pjr", "ejr", "priceability",
-    "stable-priceability" and "core".
+    Returns a dictionary with the following keys: "pareto", "jr", "pjr", "ejr", "ejr+",
+    "fjr", "priceability", "stable-priceability" and "core".
     The values are `True` or `False`, depending on whether this property is satisfied.
 
     Parameters
@@ -67,6 +68,7 @@ def full_analysis(profile, committee):
         "pjr": "Proportional justified representation (PJR)",
         "ejr": "Extended justified representation (EJR)",
         "ejr+": "EJR+",
+        "fjr": "Full justified representation (FJR)",
         "priceability": "Priceability",
         "stable-priceability": "Stable Priceability",
         "core": "The core",
@@ -114,6 +116,8 @@ def check(property_name, profile, committee, algorithm="fastest"):
         return check_EJR(profile, committee, algorithm=algorithm)
     elif property_name == "ejr+":
         return check_EJR_plus(profile, committee)
+    elif property_name == "fjr":
+        return check_FJR(profile, committee, algorithm=algorithm)
     elif property_name == "priceability":
         return check_priceability(profile, committee, algorithm=algorithm)
     elif property_name == "stable-priceability":
@@ -1260,6 +1264,182 @@ def _check_priceability_gurobi(profile, committee, stable=False):
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
+def check_FJR(profile, committee, algorithm="fastest", committeesize=None):
+    """
+    Test whether a committee satisfies Full Justified Representation (FJR).
+
+    Parameters
+    ----------
+    profile : abcvoting.preferences.Profile
+        A profile.
+    committee : iterable of int
+        A committee.
+    algorithm : str, optional
+        The algorithm to be used.
+
+    Returns
+    -------
+    bool
+
+    References
+    ----------
+    Multi-Winner Voting with Approval Preferences.
+    Martin Lackner and Piotr Skowron.
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
+    """
+
+    # check that `committee` is a valid input
+    committee = CandidateSet(committee, num_cand=profile.num_cand)
+
+    if algorithm == "fastest":
+        algorithm = "gurobi"
+
+    if algorithm == "brute-force":
+        result, detailed_information = _check_FJR_brute_force(profile, committee)
+    elif algorithm == "gurobi":
+        result, detailed_information = _check_FJR_gurobi(profile, committee)
+    else:
+        raise NotImplementedError("Algorithm " + str(algorithm) + " not specified for check_FJR")
+
+    if result:
+        output.info(f"Committee {str_set_of_candidates(committee)} satisfies FJR.")
+    else:
+        output.info(f"Committee {str_set_of_candidates(committee)} does not satisfy FJR.")
+        ell = detailed_information["ell"]
+        beta = detailed_information["beta"]
+        cands = detailed_information["joint_candidates"]
+        cohesive_group = detailed_information["cohesive_group"]
+        output.details(
+            f"(The weakly cohesive group of voters {str_set_of_candidates(cohesive_group)}"
+            f"({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
+            f"each approve at least {beta} of the {ell} candidates {str_set_of_candidates(cands)},"
+            f"but all approve at most {beta - 1} candidates in the committee.)",
+            indent=" ",
+        )
+    return result
+
+
+def _check_FJR_brute_force(profile, committee):
+    """Test using brute-force whether a committee satisfies FJR.
+
+    Parameters
+    ----------
+    profile : abcvoting.preferences.Profile
+        approval sets of voters
+    committee : set
+        set of candidates
+
+    Returns
+    -------
+    bool
+
+    References
+    ----------
+    Multi-Winner Voting with Approval Preferences.
+    Martin Lackner and Piotr Skowron.
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
+    """
+
+    committeesize = len(committee)
+
+    committee_utility_at_most = {
+        utility: set(voter for voter in profile if len(voter.approved & committee) <= utility)
+        for utility in range(len(committee) + 1)
+    }
+
+    for T in powerset(profile.approved_candidates(), max_size=committeesize):
+        T = set(T)
+        T_utility_at_least = {
+            utility: set(voter for voter in profile if len(voter.approved & T) >= utility)
+            for utility in range(len(T) + 1)
+        }
+        for beta in range(1, len(T) + 1):
+            # find set of voters who have utility at least beta in T
+            # and utility at most beta-1 in committee
+            cohesive_group = T_utility_at_least[beta] & committee_utility_at_most[beta - 1]
+
+            # is coalition large enough to deserve |T| seats?
+            if len(cohesive_group) * committeesize >= len(T) * len(profile):
+                detailed_information = {
+                    "ell": len(T),
+                    "beta": beta,
+                    "joint_candidates": T,
+                    "cohesive_group": cohesive_group,
+                }
+                return False, detailed_information
+
+    detailed_information = {}
+    return True, detailed_information
+
+
+def _check_FJR_gurobi(profile, committee):
+    """Test, by an ILP and the Gurobi solver, whether a committee satisfies FJR.
+
+    Parameters
+    ----------
+    profile : abcvoting.preferences.Profile
+        approval sets of voters
+    committee : set
+        set of candidates
+
+    Returns
+    -------
+    bool
+
+    References
+    ----------
+    Multi-Winner Voting with Approval Preferences.
+    Martin Lackner and Piotr Skowron.
+    <http://dx.doi.org/10.1007/978-3-031-09016-5>
+    """
+
+    committeesize = len(committee)
+
+    model = gb.Model()
+
+    set_of_voters = model.addVars(range(len(profile)), vtype=gb.GRB.BINARY)
+    set_of_candidates = model.addVars(range(profile.num_cand), vtype=gb.GRB.BINARY)
+    beta = model.addVar(lb=1, ub=committeesize, vtype=gb.GRB.INTEGER)
+    model.addConstr(beta <= set_of_candidates.sum())
+
+    # coalition large enough to deserve |set_of_candidates| seats
+    model.addConstr(
+        gb.quicksum(set_of_candidates) * len(profile) <= gb.quicksum(set_of_voters) * committeesize
+    )
+    model.addConstr(gb.quicksum(set_of_voters) >= 1)
+    for i, voter in enumerate(profile):
+        # if i is in set_of_voters, then:
+        # (a) i has utility at most beta-1 in committee
+        utility_in_committee = len(committee & voter.approved)
+        model.addConstr(utility_in_committee * set_of_voters[i] <= beta - 1)
+        # (b) i has utility at least beta in set_of_candidates
+        approved_in_set_of_candidates = [
+            (c in voter.approved) * set_of_candidates[i] for i, c in enumerate(profile.candidates)
+        ]
+        model.addConstr(
+            gb.quicksum(approved_in_set_of_candidates)
+            >= beta - committeesize * (1 - set_of_voters[i])
+        )
+
+    _set_gurobi_model_parameters(model)
+    model.optimize()
+
+    if model.Status == gb.GRB.OPTIMAL:
+        T = [c for c in profile.candidates if set_of_candidates[c].Xn > 0.9]
+        detailed_information = {
+            "ell": len(T),
+            "beta": beta.Xn,
+            "joint_candidates": T,
+            "cohesive_group": [i for i in range(len(profile)) if set_of_voters[i].Xn > 0.9],
+        }
+        return False, detailed_information
+    elif model.Status == gb.GRB.INFEASIBLE:
+        detailed_information = {}
+        return True, detailed_information
+    else:
+        raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
+
+
 def check_core(profile, committee, algorithm="fastest", committeesize=None):
     """
     Test whether a committee is in the core.
@@ -1346,7 +1526,7 @@ def _check_core_brute_force(profile, committee, committeesize):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
-    for cands in powerset(profile.approved_candidates()):
+    for cands in powerset(profile.approved_candidates(), max_size=committeesize):
         cands = set(cands)
         set_of_voters = [
             voter

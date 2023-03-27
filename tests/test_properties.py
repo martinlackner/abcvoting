@@ -122,6 +122,25 @@ def _create_handcrafted_instances():
     expected_result = False
     handcrafted_instances.append(("ejr+", profile, committee, expected_result))
 
+    # Peters, Pierczynski, Skowron, 2021, "Proportional Participatory Budgeting with Additive Utilities", Example 4 (equal shares fails fjr)
+    # padded with dummy candidates to make committee exhaustive
+    profile = Profile(17)
+    profile.add_voters(
+        [[0, 1, 2, 3, 7]] * 3
+        + [[0, 1, 2, 3, 8]] * 3
+        + [[0, 1, 2, 3, 9]] * 3
+        + [[0, 1, 2, 3, 10]] * 3
+        + [[0, 1, 2, 3, 11]] * 3
+        + [[4, 5, 6, 7, 8, 9, 10, 11]] * 3
+        + [[4, 5, 6]] * 3
+        + [[12, 13, 14, 15, 16]]
+    )
+    committee = {0, 1, 2, 3, 4, 5, 6}  # selected by equal shares without completion
+    committee |= {12, 13, 14, 15}  # completion
+    assert len(committee) == 11
+    expected_result = False
+    handcrafted_instances.append(("fjr", profile, committee, expected_result))
+
     # add an instance from
     # Sanchez-Fernandez et al, 2017, "Proportional Justified Representation", Example 1
     profile = Profile(8)
@@ -167,33 +186,21 @@ def _create_handcrafted_instances():
     committee = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 13}
     expected_result = True
     handcrafted_instances.append(("priceability", profile, committee, expected_result))
+    handcrafted_instances.append(("stable-priceability", profile, committee, expected_result))
+    handcrafted_instances.append(("fjr", profile, committee, expected_result))
+    handcrafted_instances.append(("core", profile, committee, expected_result))
     committee = {0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14}
     expected_result = False
     handcrafted_instances.append(("priceability", profile, committee, expected_result))
+    handcrafted_instances.append(("stable-priceability", profile, committee, expected_result))
+    handcrafted_instances.append(("fjr", profile, committee, expected_result))
+    handcrafted_instances.append(("core", profile, committee, expected_result))
 
     profile = Profile(3)
     profile.add_voters([[0, 1]] + [[0, 1, 2]] + [[2]])
     committee = {0, 1}
     expected_result = True
     handcrafted_instances.append(("priceability", profile, committee, expected_result))
-
-    # add an instance from
-    # Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 23
-    profile = Profile(15)
-    profile.add_voters(
-        [[0, 1, 2, 3]]
-        + [[0, 1, 2, 4]]
-        + [[0, 1, 2, 5]]
-        + [[6, 7, 8]]
-        + [[9, 10, 11]]
-        + [[12, 13, 14]]
-    )
-    committee = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 13}
-    expected_result = True
-    handcrafted_instances.append(("stable-priceability", profile, committee, expected_result))
-    committee = {0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14}
-    expected_result = False
-    handcrafted_instances.append(("stable-priceability", profile, committee, expected_result))
 
     profile = Profile(3)
     profile.add_voters([[0, 1]] + [[0, 1, 2]] + [[2]])
@@ -203,24 +210,6 @@ def _create_handcrafted_instances():
     committee = {0, 1}
     expected_result = False
     handcrafted_instances.append(("stable-priceability", profile, committee, expected_result))
-
-    # add an instance from
-    # Lackner and Skowron, 2021, "Approval-Based Committee Voting", Example 23
-    profile = Profile(15)
-    profile.add_voters(
-        [[0, 1, 2, 3]]
-        + [[0, 1, 2, 4]]
-        + [[0, 1, 2, 5]]
-        + [[6, 7, 8]]
-        + [[9, 10, 11]]
-        + [[12, 13, 14]]
-    )
-    committee = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 13}
-    expected_result = True
-    handcrafted_instances.append(("core", profile, committee, expected_result))
-    committee = {0, 1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14}
-    expected_result = False
-    handcrafted_instances.append(("core", profile, committee, expected_result))
 
     profile = Profile(20)
     profile.add_voters([[i, i + 10] for i in range(10)])
@@ -237,6 +226,16 @@ def _create_handcrafted_instances():
     committee = {0, 1, 2}
     expected_result = False
     handcrafted_instances.append(("jr", profile, committee, expected_result))
+
+    # core implies FJR
+    for property_name, profile, committee, expected_result in handcrafted_instances:
+        if property_name == "core" and expected_result:
+            handcrafted_instances.append(("fjr", profile, committee, expected_result))
+
+    # FJR implies EJR
+    for property_name, profile, committee, expected_result in handcrafted_instances:
+        if property_name == "fjr" and expected_result:
+            handcrafted_instances.append(("ejr", profile, committee, expected_result))
 
     # EJR+ implies EJR
     for property_name, profile, committee, expected_result in handcrafted_instances:
@@ -307,25 +306,45 @@ def test_property_functions_with_handcrafted_instances(
         or abc_yaml_filename.__contains__("instanceM")
     ],
 )
-def test_matching_output_different_approaches(abc_yaml_instance):
+def test_matching_output_different_approaches_and_implications(abc_yaml_instance):
     # read the instance from the file
     profile, _, compute_instances, _ = fileio.read_abcvoting_yaml_file(abc_yaml_instance)
 
     # get one sample committee as input for the functions
     input_committee = compute_instances[0]["result"][0]
 
-    assert properties.check_pareto_optimality(
+    brute_force_pareto_optimality = properties.check_pareto_optimality(
         profile, input_committee, algorithm="brute-force"
-    ) == properties.check_pareto_optimality(profile, input_committee, algorithm="gurobi")
-    assert properties.check_EJR(
-        profile, input_committee, algorithm="brute-force"
-    ) == properties.check_EJR(profile, input_committee, algorithm="gurobi")
-    assert properties.check_PJR(
-        profile, input_committee, algorithm="brute-force"
-    ) == properties.check_PJR(profile, input_committee, algorithm="gurobi")
-    assert properties.check_core(
-        profile, input_committee, algorithm="brute-force"
-    ) == properties.check_core(profile, input_committee, algorithm="gurobi")
+    )
+    brute_force_core = properties.check_core(profile, input_committee, algorithm="brute-force")
+    brute_force_FJR = properties.check_FJR(profile, input_committee, algorithm="brute-force")
+    brute_force_EJR = properties.check_EJR(profile, input_committee, algorithm="brute-force")
+    brute_force_PJR = properties.check_PJR(profile, input_committee, algorithm="brute-force")
+
+    # check that gurobi and brute-force give the same result
+    assert brute_force_pareto_optimality == properties.check_pareto_optimality(
+        profile, input_committee, algorithm="gurobi"
+    )
+    assert brute_force_core == properties.check_core(profile, input_committee, algorithm="gurobi")
+    assert brute_force_FJR == properties.check_FJR(profile, input_committee, algorithm="gurobi")
+    assert brute_force_EJR == properties.check_EJR(profile, input_committee, algorithm="gurobi")
+    assert brute_force_PJR == properties.check_PJR(profile, input_committee, algorithm="gurobi")
+
+    # check logical implications
+    is_EJR_plus = properties.check_EJR_plus(profile, input_committee)
+    is_JR = properties.check_JR(profile, input_committee)
+    logical_implications = [
+        (brute_force_core, brute_force_FJR),
+        (brute_force_FJR, brute_force_EJR),
+        (brute_force_EJR, brute_force_PJR),
+        (brute_force_PJR, is_JR),
+        (is_EJR_plus, brute_force_EJR),
+    ]
+    for premise, conclusion in logical_implications:
+        if premise:
+            assert conclusion
+        if not conclusion:
+            assert not premise
 
 
 @pytest.mark.gurobipy
