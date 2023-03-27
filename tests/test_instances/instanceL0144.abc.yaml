@@ -91,6 +91,12 @@ compute:
 - rule_id: leximaxphragmen
   result: [[1, 2, 3, 5]]
   resolute: true
+- rule_id: maximin-support
+  result: [[0, 1, 2, 3], [1, 2, 3, 5]]
+  resolute: true
+- rule_id: maximin-support
+  result: [[0, 1, 2, 3], [1, 2, 3, 5]]
+  resolute: false
 - rule_id: monroe
   result: [[1, 2, 3, 5]]
   resolute: false

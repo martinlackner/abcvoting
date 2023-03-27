@@ -380,6 +380,61 @@ def _mip_minimaxphragmen(profile, committeesize, resolute, max_num_of_committees
     return sorted_committees(committees)
 
 
+def _mip_maximin_support_scorefct(profile, base_committee, solver_id):
+    """Uses an LP to compute the maximin support values obtained when adding any
+    candidate to the committee.
+
+    Based on the LP described in the proof of Theorem 4.2 of
+    L. Sánchez-Fernández et al.
+    The maximin support method: an extension of the D'Hondt method to approval-based multiwinner elections
+    Mathematical Programming (2022)
+    """
+
+    scores = [0] * profile.num_cand
+    remaining_candidates = [cand for cand in profile.candidates if cand not in base_committee]
+
+    for added_cand in remaining_candidates:
+        committee = set(base_committee) | {added_cand}
+
+        model = mip.Model(solver_name=solver_id, sense=mip.MAXIMIZE)
+
+        minimum = model.add_var(lb=0, name="minimum")  # named "s" in the paper
+
+        f = {
+            (vi, cand): model.add_var(lb=0, name=f"fractional_assignment_{vi}_{cand}")
+            for vi in range(len(profile))
+            for cand in range(profile.num_cand)
+        }
+
+        for vi, voter in enumerate(profile):
+            if voter.approved & committee:
+                model += (
+                    mip.xsum(f[vi, cand] for cand in voter.approved & committee) == voter.weight
+                )
+
+        for cand in committee:
+            model += (
+                mip.xsum(f[vi, cand] for vi, voter in enumerate(profile) if cand in voter.approved)
+                >= minimum
+            )
+
+        model.verbose = 0
+        model.emphasis = 2
+        model.opt_tol = ACCURACY
+
+        model.objective = minimum
+        status = model.optimize()
+
+        if status != mip.OptimizationStatus.OPTIMAL:
+            raise RuntimeError(
+                f"Python MIP returned an unexpected status code: {status} while computing the maximin support score."
+            )
+
+        scores[added_cand] = minimum.x
+
+    return scores
+
+
 def _mip_minimaxav(profile, committeesize, resolute, max_num_of_committees, solver_id):
     def set_opt_model_func(model, profile, in_committee, committeesize):
         max_hamming_distance = model.add_var(

@@ -560,6 +560,54 @@ def _gurobi_leximaxphragmen(profile, committeesize, resolute, max_num_of_committ
     return sorted_committees(committees)
 
 
+def _gurobi_maximin_support_scorefct(profile, base_committee):
+    """Uses an LP to compute the maximin support values obtained when adding any
+    candidate to the committee.
+
+    Based on the LP described in the proof of Theorem 4.2 of
+    L. Sánchez-Fernández et al.
+    The maximin support method: an extension of the D'Hondt method to approval-based multiwinner elections
+    Mathematical Programming (2022)
+    """
+
+    scores = [0] * profile.num_cand
+    remaining_candidates = [cand for cand in profile.candidates if cand not in base_committee]
+
+    for added_cand in remaining_candidates:
+        committee = set(base_committee) | {added_cand}
+
+        model = gb.Model()
+        _set_gurobi_model_parameters(model)
+
+        minimum = model.addVar(lb=0, name="minimum")  # named "s" in the paper
+
+        f = model.addVars(len(profile), profile.num_cand, lb=0, name="fractional_assignment")
+        for vi, voter in enumerate(profile):
+            if voter.approved & committee:
+                model.addConstr(
+                    gb.quicksum(f[vi, cand] for cand in voter.approved & committee) == voter.weight
+                )
+
+        for cand in committee:
+            model.addConstr(
+                gb.quicksum(
+                    f[vi, cand] for vi, voter in enumerate(profile) if cand in voter.approved
+                )
+                >= minimum
+            )
+
+        model.setObjective(minimum, gb.GRB.MAXIMIZE)
+        model.optimize()
+        if model.status != gb.GRB.OPTIMAL:
+            raise RuntimeError(
+                f"Gurobi returned an unexpected status code: {model.Status} while computing the maximin support score."
+            )
+
+        scores[added_cand] = minimum.x
+
+    return scores
+
+
 def _gurobi_minimaxav(profile, committeesize, resolute, max_num_of_committees):
     def set_opt_model_func(model, in_committee):
         max_hamming_distance = model.addVar(
