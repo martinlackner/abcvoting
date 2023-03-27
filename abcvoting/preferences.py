@@ -155,6 +155,76 @@ class Profile:
         """
         return all(voter.weight == 1 for voter in self._voters)
 
+    def convert_to_unit_weights(self):
+        """
+        Convert all voters with weights into the appropropriate number of unit-weight copies.
+
+        Only works if weights are integers.
+
+        Returns
+        -------
+            None
+
+        Examples
+        --------
+        .. doctest::
+
+            >>> profile = Profile(num_cand=3)
+            >>> profile.add_voter(Voter([0, 1], weight=2))
+            >>> profile.add_voter(Voter([2], weight=1))
+            >>> print(profile)
+            weighted profile with 2 voters and 3 candidates:
+             voter 0:   2 * {0, 1},
+             voter 1:   1 * {2}
+            >>> profile.convert_to_unit_weights()
+            >>> print(profile)
+            profile with 3 voters and 3 candidates:
+             voter 0:   {0, 1},
+             voter 1:   {0, 1},
+             voter 2:   {2}
+        """
+        new_voters = []
+        for voter in self._voters:
+            try:
+                for _ in range(voter.weight):
+                    new_voters.append(Voter(voter.approved))
+            except TypeError:
+                raise TypeError(
+                    "Converting a profile to unit weights is only possible with integer weights."
+                )
+        self._voters = new_voters
+
+    def convert_to_weighted(self):
+        """
+        Merge all voters with the same approval set into a single voter with appropropriate weight.
+
+        Returns
+        -------
+            None
+
+        Examples
+        --------
+        .. doctest::
+
+            >>> profile = Profile(num_cand=3)
+            >>> profile.add_voters([[0, 1], [0, 1], [2]])
+            >>> print(profile)
+            profile with 3 voters and 3 candidates:
+             voter 0:   {0, 1},
+             voter 1:   {0, 1},
+             voter 2:   {2}
+            >>> profile.convert_to_weighted()
+            >>> print(profile)
+            weighted profile with 2 voters and 3 candidates:
+             voter 0:   2 * {0, 1},
+             voter 1:   1 * {2}
+        """
+        approval_sets = {tuple(sorted(voter.approved)) for voter in self._voters}
+        weights = {appr: 0 for appr in approval_sets}
+        for voter in self._voters:
+            weights[tuple(sorted(voter.approved))] += voter.weight
+        self._voters = [Voter(appr, weight=weight) for appr, weight in weights.items()]
+
     def __iter__(self):
         return iter(self._voters)
 
