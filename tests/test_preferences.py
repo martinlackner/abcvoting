@@ -80,22 +80,22 @@ def test_unitweights(num_cand):
     assert profile.has_unit_weights()
 
     assert len(profile) == 4
-    assert profile.totalweight() == 4
+    assert profile.total_weight() == 4
 
     profile.convert_to_weighted()
     assert len(profile) == 2
-    assert profile.totalweight() == 4
+    assert profile.total_weight() == 4
     assert not profile.has_unit_weights()
 
     profile.convert_to_unit_weights()
     assert len(profile) == 4
-    assert profile.totalweight() == 4
+    assert profile.total_weight() == 4
     assert profile.has_unit_weights()
 
     profile.add_voter(Voter([0, 4, 5], 2.4))
     assert not profile.has_unit_weights()
 
-    assert profile.totalweight() == 6.4
+    assert profile.total_weight() == 6.4
 
 
 @pytest.mark.parametrize("num_cand", [6, 7])

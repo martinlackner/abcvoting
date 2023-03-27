@@ -134,7 +134,7 @@ class Profile:
         for voter in voters:
             self.add_voter(voter)
 
-    def totalweight(self):
+    def total_weight(self):
         """
         Return the totol weight of all voters, i.e., the sum of weights.
 
@@ -300,7 +300,7 @@ class Profile:
             )
         output = output[:-2]
         if not self.has_unit_weights():
-            output += "\ntotal weight: " + str(self.totalweight())
+            output += "\ntotal weight: " + str(self.total_weight())
         output += "\n"
 
         return output
