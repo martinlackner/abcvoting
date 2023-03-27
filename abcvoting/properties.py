@@ -239,26 +239,26 @@ def check_EJR(profile, committee, algorithm="fastest"):
         >>> from abcvoting.preferences import Profile
         >>> from abcvoting.output import output, DETAILS
 
-        >>> profile = Profile(5)
-        >>> profile.add_voters([[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2], [3, 4], [3, 4]])
+        >>> profile = Profile(4)
+        >>> profile.add_voters([[0, 1], [0, 1], [0, 1], [0, 1], [2, 3], [2, 3]])
         >>> print(profile)
-        profile with 6 voters and 5 candidates:
-         voter 0:   {0, 1, 2},
-         voter 1:   {0, 1, 2},
-         voter 2:   {0, 1, 2},
-         voter 3:   {0, 1, 2},
-         voter 4:   {3, 4},
-         voter 5:   {3, 4}
+        profile with 6 voters and 4 candidates:
+         voter 0:   {0, 1},
+         voter 1:   {0, 1},
+         voter 2:   {0, 1},
+         voter 3:   {0, 1},
+         voter 4:   {2, 3},
+         voter 5:   {2, 3}
 
         >>> output.set_verbosity(DETAILS)  # enable output for check_EJR
-        >>> result = check_EJR(profile, committee={0, 3, 4})
-        Committee {0, 3, 4} does not satisfy EJR.
+        >>> result = check_EJR(profile, committee={0, 2, 3})
+        Committee {0, 2, 3} does not satisfy EJR.
          (The 2-cohesive group of voters {0, 1, 2, 3} (66.7% of all voters)
-         jointly approve the candidates {0, 1, 2}, but none of them approves 2
+         jointly approve the candidates {0, 1}, but none of them approves 2
          candidates in the committee.)
 
-        >>> result = check_EJR(profile, committee={1, 2, 3})
-        Committee {1, 2, 3} satisfies EJR.
+        >>> result = check_EJR(profile, committee={0, 1, 2})
+        Committee {0, 1, 2} satisfies EJR.
 
     .. testcleanup::
 
@@ -334,26 +334,26 @@ def check_PJR(profile, committee, algorithm="fastest"):
         >>> from abcvoting.preferences import Profile
         >>> from abcvoting.output import output, DETAILS
 
-        >>> profile = Profile(5)
-        >>> profile.add_voters([[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2], [3, 4], [3, 4]])
+        >>> profile = Profile(4)
+        >>> profile.add_voters([[0, 1], [0, 1], [0, 1], [0, 1], [2, 3], [2, 3]])
         >>> print(profile)
-        profile with 6 voters and 5 candidates:
-         voter 0:   {0, 1, 2},
-         voter 1:   {0, 1, 2},
-         voter 2:   {0, 1, 2},
-         voter 3:   {0, 1, 2},
-         voter 4:   {3, 4},
-         voter 5:   {3, 4}
+        profile with 6 voters and 4 candidates:
+         voter 0:   {0, 1},
+         voter 1:   {0, 1},
+         voter 2:   {0, 1},
+         voter 3:   {0, 1},
+         voter 4:   {2, 3},
+         voter 5:   {2, 3}
 
         >>> output.set_verbosity(DETAILS)  # enable output for check_PJR
-        >>> result = check_PJR(profile, committee={0, 3, 4})
-        Committee {0, 3, 4} does not satisfy PJR.
+        >>> result = check_PJR(profile, committee={0, 2, 3})
+        Committee {0, 2, 3} does not satisfy PJR.
         (The 2-cohesive group of voters {0, 1, 2, 3} (66.7% of all voters)
-        jointly approve the candidates {0, 1, 2}, but they approve fewer than
-        2 candidates in the committee.)
+        jointly approve the candidates {0, 1}, but they approve fewer than 2
+        candidates in the committee.)
 
-        >>> result = check_PJR(profile, committee={1, 2, 3})
-        Committee {1, 2, 3} satisfies PJR.
+        >>> result = check_PJR(profile, committee={0, 1, 2})
+        Committee {0, 1, 2} satisfies PJR.
 
     .. testcleanup::
 
@@ -1296,7 +1296,7 @@ def _check_priceability_gurobi(profile, committee, stable=False):
         raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
 
 
-def check_FJR(profile, committee, algorithm="fastest", committeesize=None):
+def check_FJR(profile, committee, algorithm="fastest"):
     """
     Test whether a committee satisfies Full Justified Representation (FJR).
 

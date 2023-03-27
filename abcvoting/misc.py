@@ -257,8 +257,7 @@ def header(text, symbol="-"):
 
 def powerset(iterable, max_size=None):
     """
-    Yield all possible subsets of the iterable
-    (or all subsets with at most `max-size` elements).
+    Yield all possible subsets of the iterable (or all subsets with at most `max-size` elements).
 
     From: https://docs.python.org/3/library/itertools.html#itertools-recipes
 

@@ -465,8 +465,8 @@ def random_disjoint_resampling_profile(num_voters, num_cand, p, phi=None, num_gr
             The model randomly partitions the candidates into `num_groups` groups. To generate
             a vote, the model first randomly selects a group. Then, it samples a vote from a
             (p,phi)-resampling model, where the central ballot approves exactly all candidates
-            in the selected group. (Thus, the parameter `p` is not used to obtain the central
-            ballot, but is used in case of resampling.)
+            in the selected group. Thus, the parameter `p` is not used to obtain the central
+            ballot, but is used in case of resampling.
 
     Returns
     -------
