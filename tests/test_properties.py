@@ -298,7 +298,7 @@ def test_property_functions_with_handcrafted_instances(
             return  # not supported
         else:
             if convert_to_weighted:
-                if len(profile) == profile.total_weight:
+                if len(profile) == profile.total_weight():
                     return  # no need to test this instance
                 weighted_profile = profile.copy()
                 weighted_profile.convert_to_weighted()

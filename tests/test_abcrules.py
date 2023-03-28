@@ -1402,7 +1402,7 @@ def converted_to_weighted_abc_yaml_instances(filename, rule_id, algorithm, load_
     profile, committeesize, compute_instances = load_abc_yaml_file[filename]
     if rule_id in only_defined_for_unit_weights:
         return
-    if len(profile) == profile.total_weight:
+    if len(profile) == profile.total_weight():
         return  # no need to test this instance
     weighted_profile = profile.copy()
     weighted_profile.convert_to_weighted()
