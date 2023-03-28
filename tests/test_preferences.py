@@ -101,8 +101,12 @@ def test_unitweights(num_cand):
 
     profile.add_voter(Voter([0, 4, 5], 2.4))
     assert not profile.has_unit_weights()
-
     assert profile.total_weight() == 6.4
+
+    with pytest.raises(TypeError):
+        # requires integer weights
+        profile.convert_to_unit_weights()
+
 
 
 @pytest.mark.parametrize("num_cand", [6, 7])
@@ -142,3 +146,22 @@ def test_approved_candidates():
     assert profile.approved_candidates() == {0, 1, 3, 4, 5, 7, 8}
     profile[0].approved = [1, 5]
     assert profile.approved_candidates() == {0, 1, 4, 5, 7, 8}
+
+def test_copy_profile():
+    profile = Profile(10)
+    profile.add_voter(Voter([1, 3, 5], 3))
+    profile.add_voter(Voter([2]))
+    copy = profile.copy()
+    assert profile.num_cand == copy.num_cand
+    for voter, voter_copy in zip(profile, copy):
+        assert voter.approved == voter_copy.approved
+        assert voter.weight == voter_copy.weight
+        assert voter is not voter_copy
+    copy.add_voter(Voter([4], 2))
+    assert len(profile) != len(copy)
+
+def test_voter_str():
+    v = Voter({0,1})
+    assert str(v) == '{0, 1}'
+    assert v.str_with_names() == '{0, 1}'
+    assert v.str_with_names({0: 'hello', 1: 'world'}) == '{hello, world}'
