@@ -258,6 +258,23 @@ class Profile:
             output += f"{misc.str_set_of_candidates(voter.approved, self.cand_names)},\n"
         return output[:-2]
 
+    def copy(self):
+        """
+        Return a copy of the profile.
+
+        This is a deep copy, i.e., all Voter objects are copied too.
+
+        Returns
+        -------
+            Profile
+        """
+        copy_profile = Profile(num_cand=self.num_cand)
+        copy_profile.add_voters(self._voters)
+        return copy_profile
+
+    __copy__ = copy
+    __deepcopy__ = copy
+
     def is_party_list(self):
         """
         Check whether this profile is a party-list profile.
