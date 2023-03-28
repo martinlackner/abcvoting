@@ -805,11 +805,10 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute):
 
     if rule_id in [
         "lexminimaxav",
-        "phragmen-enestroem",
         "rsd",
         "monroe",
         "greedy-monroe",
-    ] or rule_id.startswith("equal-shares"):
+    ]:
         with pytest.raises(ValueError):
             abcrules.compute(rule_id, profile, committeesize, algorithm=algorithm)
         return
