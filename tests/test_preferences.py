@@ -108,7 +108,6 @@ def test_unitweights(num_cand):
         profile.convert_to_unit_weights()
 
 
-
 @pytest.mark.parametrize("num_cand", [6, 7])
 def test_iterate(num_cand):
     profile = Profile(num_cand)
@@ -147,6 +146,7 @@ def test_approved_candidates():
     profile[0].approved = [1, 5]
     assert profile.approved_candidates() == {0, 1, 4, 5, 7, 8}
 
+
 def test_copy_profile():
     profile = Profile(10)
     profile.add_voter(Voter([1, 3, 5], 3))
@@ -160,8 +160,9 @@ def test_copy_profile():
     copy.add_voter(Voter([4], 2))
     assert len(profile) != len(copy)
 
+
 def test_voter_str():
-    v = Voter({0,1})
-    assert str(v) == '{0, 1}'
-    assert v.str_with_names() == '{0, 1}'
-    assert v.str_with_names({0: 'hello', 1: 'world'}) == '{hello, world}'
+    v = Voter({0, 1})
+    assert str(v) == "{0, 1}"
+    assert v.str_with_names() == "{0, 1}"
+    assert v.str_with_names({0: "hello", 1: "world"}) == "{hello, world}"

@@ -539,10 +539,10 @@ def test_non_existent_property():
     with pytest.raises(ValueError):
         properties.check("a_property_that_does_not_exist", profile, {0})
 
+
 def test_props_that_do_not_need_quota():
     profile = Profile(3)
     props = ["pareto", "priceability", "stable-priceability"]
     for prop in props:
         with pytest.raises(ValueError):
             properties.check(prop, profile, {0}, quota=1)
-

@@ -1393,7 +1393,9 @@ only_defined_for_unit_weights = [
     abc_yaml_instances,
     ids=id_function,
 )
-def test_converted_to_weighted_abc_yaml_instances(filename, rule_id, algorithm, load_abc_yaml_file):
+def test_converted_to_weighted_abc_yaml_instances(
+    filename, rule_id, algorithm, load_abc_yaml_file
+):
     # skip tests involving CBC and minimaxphragmen that are known to fail
     if rule_id == "minimaxphragmen" and algorithm == "mip-cbc":
         if "instanceL0145.abc.yaml" in filename or "instanceL0153.abc.yaml" in filename:
