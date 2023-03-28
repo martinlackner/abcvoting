@@ -1404,12 +1404,9 @@ def converted_to_weighted_abc_yaml_instances(filename, rule_id, algorithm, load_
         return
     if len(profile) == profile.total_weight:
         return  # no need to test this instance
-    profile_copy = Profile(profile.num_cand)
-    for voter in profile:
-        profile_copy.add_voter(voter)
-    profile = profile_copy
-    profile.convert_to_weighted()
-    assert not profile.has_unit_weights()
+    weighted_profile = profile.copy()
+    weighted_profile.convert_to_weighted()
+    assert not weighted_profile.has_unit_weights()
 
     for compute_instance in compute_instances:
         if compute_instance["rule_id"] != rule_id:
@@ -1419,7 +1416,7 @@ def converted_to_weighted_abc_yaml_instances(filename, rule_id, algorithm, load_
 
         abcrules.compute(
             rule_id=compute_instance["rule_id"],
-            profile=profile,
+            profile=weighted_profile,
             committeesize=committeesize,
             result=compute_instance["result"],
             algorithm=algorithm,

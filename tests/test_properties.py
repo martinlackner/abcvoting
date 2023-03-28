@@ -298,19 +298,18 @@ def test_property_functions_with_handcrafted_instances(
             return  # not supported
         else:
             if convert_to_weighted:
-                original_length = len(profile)
-                profile_copy = Profile(profile.num_cand)
-                for voter in profile:
-                    profile_copy.add_voter(voter)
-                profile = profile_copy
-                profile.convert_to_weighted()
-                if len(profile) == original_length:
+                if len(profile) == profile.total_weight:
                     return  # no need to test this instance
-                assert not profile.has_unit_weights()
-            print(profile)
+                weighted_profile = profile.copy()
+                weighted_profile.convert_to_weighted()
+                assert not weighted_profile.has_unit_weights()
+                profile_to_use = weighted_profile
+            else:
+                profile_to_use = profile
+            print(profile_to_use)
             print(committee)
             assert (
-                properties.check(property_name, profile, committee, algorithm=algorithm)
+                properties.check(property_name, profile_to_use, committee, algorithm=algorithm)
                 == expected_result
             )
 
