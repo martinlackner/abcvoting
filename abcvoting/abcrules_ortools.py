@@ -66,7 +66,6 @@ def _optimize_rule_ortools(
     )
 
     while True:
-
         solver = cp_model.CpSolver()
         status = solver.Solve(model)
 

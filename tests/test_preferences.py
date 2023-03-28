@@ -57,6 +57,13 @@ def test_invalidprofiles(num_cand):
         profile.add_voter([[0, 4, 5]])
 
 
+def test_invalidweights():
+    with pytest.raises(ValueError):
+        Voter([0, 4, 5], weight=-1)
+    with pytest.raises(ValueError):
+        Voter([0, 4, 5], weight=0)
+
+
 @pytest.mark.parametrize("num_cand", [6, 7])
 def test_empty_approval(num_cand):
     profile = Profile(num_cand)
