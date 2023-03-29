@@ -1,4 +1,4 @@
-name: Almost full unittests, run weekly
+name: Almost full unittests, weekly
 
 on:
   schedule:
