@@ -78,15 +78,12 @@ def _optimize_rule_gurobi(
     while True:
         model.optimize()
 
-        if model.Status not in [2, 3, 4]:
-            # model.Status == 2 implies solution found
-            # model.Status in [3, 4] implies infeasible --> no more solutions
-            # otherwise ...
+        if model.Status not in [gb.GRB.OPTIMAL, gb.GRB.INFEASIBLE]:
             raise RuntimeError(
                 f"Gurobi returned an unexpected status code: {model.Status}\n"
                 f"Warning: solutions may be incomplete or not optimal (model {name})."
             )
-        if model.Status != 2:
+        if model.Status != gb.GRB.OPTIMAL:
             if len(committees) == 0:
                 # we are in the first round of searching for committees
                 # and Gurobi didn't find any
@@ -566,7 +563,8 @@ def _gurobi_maximin_support_scorefct(profile, base_committee):
 
     Based on the LP described in the proof of Theorem 4.2 of
     L. Sánchez-Fernández et al.
-    The maximin support method: an extension of the D'Hondt method to approval-based multiwinner elections
+    "The maximin support method: an extension of the D'Hondt method to
+    approval-based multiwinner elections"
     Mathematical Programming (2022)
     """
 
@@ -600,7 +598,8 @@ def _gurobi_maximin_support_scorefct(profile, base_committee):
         model.optimize()
         if model.status != gb.GRB.OPTIMAL:
             raise RuntimeError(
-                f"Gurobi returned an unexpected status code: {model.Status} while computing the maximin support score."
+                f"Gurobi returned an unexpected status code: {model.Status}"
+                " while computing the maximin support score."
             )
 
         scores[added_cand] = minimum.x
