@@ -1208,9 +1208,6 @@ def test_jansonexamples(rule_id, algorithm):
     )
     assert committees == [{a, b, q}]
 
-    if rule_id == "phragmen-enestroem":
-        # only supports unit weights
-        return
     profile.convert_to_weighted()
     committees = abcrules.compute(
         rule_id, profile, committeesize, algorithm=algorithm, resolute=False
