@@ -3,6 +3,7 @@
 import functools
 import itertools
 import random
+import math
 from fractions import Fraction
 from abcvoting.output import output, DETAILS
 from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, misc, scores
@@ -3119,9 +3120,6 @@ def compute_equal_shares(
         max_num_of_committees=max_num_of_committees,
     )
 
-    if not profile.has_unit_weights():
-        raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
-
     if completion == "increment":
         committees, detailed_info = _equal_shares_algorithm_with_increment_completion(
             profile=profile,
@@ -3259,12 +3257,17 @@ def _equal_shares_algorithm(
         poor = set()
         while len(rich) > 0:
             poor_budget = sum(budget[v] for v in poor)
-            _q = division(1 - poor_budget, len(rich))
+            _q = division(1 - poor_budget, sum(profile[v].weight for v in rich))
             if algorithm == "float-fractions":
                 # due to float imprecision, values very close to `q` count as `q`
-                new_poor = {v for v in rich if budget[v] < _q and not misc.isclose(budget[v], _q)}
+                new_poor = {
+                    v
+                    for v in rich
+                    if budget[v] < _q * profile[v].weight
+                    and not misc.isclose(budget[v], _q * profile[v].weight)
+                }
             else:
-                new_poor = {v for v in rich if budget[v] < _q}
+                new_poor = {v for v in rich if budget[v] < _q * profile[v].weight}
             if len(new_poor) == 0:
                 return _q
             rich -= new_poor
@@ -3282,7 +3285,7 @@ def _equal_shares_algorithm(
 
     def phragmen_phase(_committee, _budget):
         # translate budget to loads
-        start_load = [-_budget[v] for v in range(len(profile))]
+        start_load = [-_budget[v] / profile[v].weight for v in range(len(profile))]
         detailed_info["phragmen_start_load"] = list(start_load)  # make a copy
 
         if resolute:
@@ -3355,10 +3358,13 @@ def _equal_shares_algorithm(
         max_num_of_committees = 1  # same algorithm for resolute==True and resolute==False
 
     if per_voter_budget:
-        start_budget = {v: per_voter_budget for v, _ in enumerate(profile)}
+        start_budget = {vi: voter.weight * per_voter_budget for vi, voter in enumerate(profile)}
     else:
-        start_budget = {v: division(committeesize, len(profile)) for v, _ in enumerate(profile)}
-    committee_bugdet_pairs = [(tuple(), start_budget)]
+        start_budget = {
+            vi: division(voter.weight * committeesize, profile.total_weight())
+            for vi, voter in enumerate(profile)
+        }
+    committee_budget_pairs = [(tuple(), start_budget)]
     winning_committees = set()
     detailed_info = {
         "next_cand": [],
@@ -3369,8 +3375,8 @@ def _equal_shares_algorithm(
         "phragmen_start_load": None,
     }
 
-    while committee_bugdet_pairs:
-        committee, budget = committee_bugdet_pairs.pop()
+    while committee_budget_pairs:
+        committee, budget = committee_budget_pairs.pop()
 
         available_candidates = [cand for cand in profile.candidates if cand not in committee]
         min_q = {}
@@ -3388,7 +3394,7 @@ def _equal_shares_algorithm(
                 new_budget = dict(budget)
                 for v, voter in enumerate(profile):
                     if next_cand in voter.approved:
-                        new_budget[v] -= min(budget[v], min_q[next_cand])
+                        new_budget[v] -= min(budget[v], min_q[next_cand] * voter.weight)
 
                 new_committee = committee + (next_cand,)
 
@@ -3415,7 +3421,7 @@ def _equal_shares_algorithm(
                     break
 
             # add new committee/budget pairs in reversed order, so that tiebreaking is correct
-            committee_bugdet_pairs += reversed(new_committee_budget_pairs)
+            committee_budget_pairs += reversed(new_committee_budget_pairs)
 
         else:  # no affordable candidates remain
             if not completion or completion.lower == "none":
@@ -3453,14 +3459,16 @@ def _equal_shares_algorithm_with_increment_completion(
         detailed_info = {"too_few_approved_candidates": True}
         return committees, detailed_info
 
-    for increment_committeesize in range(committeesize, committeesize * len(profile) + 1):
+    for increment_committeesize in range(
+        committeesize, math.ceil(committeesize * profile.total_weight() + 1)
+    ):
         committees, detailed_info = _equal_shares_algorithm(
             profile,
             committeesize,
             algorithm,
             resolute=True,
             completion=None,
-            per_voter_budget=Fraction(increment_committeesize, len(profile)),
+            per_voter_budget=Fraction(increment_committeesize, profile.total_weight()),
         )
         detailed_info["increment_committeesize"] = increment_committeesize
         committees = [comm for comm in committees if len(comm) == committeesize]
@@ -3954,9 +3962,6 @@ def compute_phragmen_enestroem(
         max_num_of_committees=max_num_of_committees,
     )
 
-    if not profile.has_unit_weights():
-        raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
-
     committees, detailed_info = _phragmen_enestroem_algorithm(
         profile=profile,
         committeesize=committeesize,
@@ -4194,7 +4199,9 @@ def _consensus_rule_algorithm(profile, committeesize, algorithm, resolute, max_n
         for cand in tied_cands:
             new_budget = list(budget)  # copy of budget
             for i in supporters[cand]:
-                new_budget[i] -= division(len(profile), len(supporters[cand]))
+                new_budget[i] -= profile[i].weight * division(
+                    profile.total_weight(), sum(profile[vi].weight for vi in supporters[cand])
+                )
             new_committee = committee + (cand,)
 
             if len(new_committee) == committeesize:

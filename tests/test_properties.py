@@ -275,11 +275,12 @@ abc_yaml_filenames = _list_abc_yaml_instances()
     "algorithm",
     ["brute-force", "fastest", pytest.param("gurobi", marks=pytest.mark.gurobipy), "nonsense"],
 )
+@pytest.mark.parametrize("convert_to_weighted", [True, False], ids=["weighted", "unweighted"])
 @pytest.mark.parametrize(
     "property_name, profile, committee, expected_result", check_property_instances
 )
 def test_property_functions_with_handcrafted_instances(
-    property_name, algorithm, profile, committee, expected_result
+    property_name, algorithm, convert_to_weighted, profile, committee, expected_result
 ):
     output.set_verbosity(verbosity=DETAILS)
 
@@ -291,11 +292,24 @@ def test_property_functions_with_handcrafted_instances(
     else:
         if algorithm == "brute-force" and property_name in ["priceability", "stable-priceability"]:
             return  # not supported
+        elif (
+            convert_to_weighted and algorithm == "brute-force" and property_name in ["ejr", "pjr"]
+        ):
+            return  # not supported
         else:
-            print(profile)
+            if convert_to_weighted:
+                if len(profile) == profile.total_weight():
+                    return  # no need to test this instance
+                weighted_profile = profile.copy()
+                weighted_profile.convert_to_weighted()
+                assert not weighted_profile.has_unit_weights()
+                profile_to_use = weighted_profile
+            else:
+                profile_to_use = profile
+            print(profile_to_use)
             print(committee)
             assert (
-                properties.check(property_name, profile, committee, algorithm=algorithm)
+                properties.check(property_name, profile_to_use, committee, algorithm=algorithm)
                 == expected_result
             )
 
@@ -340,11 +354,18 @@ def test_matching_output_different_approaches_and_implications(abc_yaml_instance
     assert brute_force_PJR == properties.check_PJR(profile, input_committee, algorithm="gurobi")
 
     # check logical implications
+    is_priceable = properties.check_priceability(profile, input_committee)
+    is_stable_priceable = properties.check_stable_priceability(profile, input_committee)
     is_EJR_plus = properties.check_EJR_plus(profile, input_committee)
     is_JR = properties.check_JR(profile, input_committee)
+    # see Hasse diagram in Fig. 4.1 of
+    # "Multi-Winner Voting with Approval Preferences", Lackner and Skowron, 2023
     logical_implications = [
+        (is_stable_priceable, is_priceable),
+        (is_stable_priceable, brute_force_core),
         (brute_force_core, brute_force_FJR),
         (brute_force_FJR, brute_force_EJR),
+        (is_priceable, brute_force_PJR),
         (brute_force_EJR, brute_force_PJR),
         (brute_force_PJR, is_JR),
         (is_EJR_plus, brute_force_EJR),
@@ -354,6 +375,20 @@ def test_matching_output_different_approaches_and_implications(abc_yaml_instance
             assert conclusion
         if not conclusion:
             assert not premise
+
+    # check that output remain the same if weighted
+    original_length = len(profile)
+    profile.convert_to_weighted()
+    if len(profile) == original_length:
+        return  # no need to test this instance
+    assert is_priceable == properties.check_priceability(profile, input_committee)
+    assert is_stable_priceable == properties.check_stable_priceability(profile, input_committee)
+    assert brute_force_core == properties.check_core(profile, input_committee)
+    assert brute_force_FJR == properties.check_FJR(profile, input_committee)
+    assert brute_force_EJR == properties.check_EJR(profile, input_committee)
+    assert brute_force_PJR == properties.check_PJR(profile, input_committee)
+    assert is_EJR_plus == properties.check_EJR_plus(profile, input_committee)
+    assert is_JR == properties.check_JR(profile, input_committee)
 
 
 @pytest.mark.gurobipy
@@ -413,14 +448,14 @@ def test_properties_with_rules(rule_id, property_name, abc_yaml_instance):
         assert properties.check(property_name, profile, committee)
 
 
-# Test from literature: Lackner and Skowron 2020
-# With given input profile, committee returned by Monroe Rule
-# is not Pareto optimal
 @pytest.mark.parametrize(
     "algorithm", ["brute-force", pytest.param("gurobi", marks=pytest.mark.gurobipy)]
 )
 def test_pareto_optimality_methods(algorithm):
     output.set_verbosity(verbosity=DETAILS)
+
+    # Test from literature: Lackner and Skowron 2020
+    # Example where Monroe's Rule is not Pareto optimal
 
     # profile with 4 candidates: a, b, c, d
     profile = Profile(4)
@@ -443,6 +478,14 @@ def test_pareto_optimality_methods(algorithm):
     assert not is_pareto_optimal
 
     assert properties.check_pareto_optimality(profile, {0, 1}, algorithm=algorithm)
+
+    # Lackner and Skowron 2020
+    # Example where Phragmén's Rule is not Pareto optimal
+    profile = Profile(5)
+    profile.add_voters([{0, 2, 4}] * 10 + [{0, 1, 4}] * 9 + [{0, 1}] + [{1, 3}] * 8 + [{2, 3}] * 8)
+    phragmen_output = abcrules.compute_seqphragmen(profile, 3)
+    assert phragmen_output == [{0, 3, 4}]
+    assert not properties.check_pareto_optimality(profile, {0, 3, 4}, algorithm=algorithm)
 
 
 @pytest.mark.parametrize(
@@ -489,3 +532,17 @@ def test_quota_properties(property_name, algorithm):
     assert properties.check(
         property_name, profile, committee=[0, 1, 2], quota=10 / 6, algorithm=algorithm
     )
+
+
+def test_non_existent_property():
+    profile = Profile(3)
+    with pytest.raises(ValueError):
+        properties.check("a_property_that_does_not_exist", profile, {0})
+
+
+def test_props_that_do_not_need_quota():
+    profile = Profile(3)
+    props = ["pareto", "priceability", "stable-priceability"]
+    for prop in props:
+        with pytest.raises(ValueError):
+            properties.check(prop, profile, {0}, quota=1)

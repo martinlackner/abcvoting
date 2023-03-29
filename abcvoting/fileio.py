@@ -50,7 +50,7 @@ def get_file_names(dir_name, filename_extensions=None):
             List of file names contained in the directory.
     """
     files = []
-    for (_, _, filenames) in os.walk(dir_name):
+    for _, _, filenames in os.walk(dir_name):
         files = filenames
         break  # do not consider sub-directories
     if len(files) == 0:

@@ -283,21 +283,20 @@ def check_EJR(profile, committee, quota=None, algorithm="fastest"):
 
     if quota is None:
         standard_quota = True
-        quota = Fraction(len(profile), len(committee))
+        quota = Fraction(profile.total_weight(), len(committee))
     else:
         standard_quota = False
 
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
-    # TODO: currently only works for unit weights
-    if not profile.has_unit_weights():
-        raise NotImplementedError(
-            "check_EJR is currently only implemented for unit weights (weight=1)"
-        )
-
     if algorithm == "fastest":
         algorithm = "gurobi"
+
+    if not profile.has_unit_weights() and algorithm == "brute-force":
+        raise NotImplementedError(
+            "For profiles with non-unit weights, check_EJR currently only supports the algorithm 'gurobi'."
+        )
 
     if algorithm == "brute-force":
         result, detailed_information = _check_EJR_brute_force(profile, committee, quota)
@@ -321,9 +320,11 @@ def check_EJR(profile, committee, quota=None, algorithm="fastest"):
         ell = detailed_information["ell"]
         cands = detailed_information["joint_candidates"]
         cohesive_group = detailed_information["cohesive_group"]
+        fractional_size = sum(profile[vi].weight for vi in cohesive_group) / profile.total_weight()
+        fractional_size = sum(profile[vi].weight for vi in cohesive_group) / profile.total_weight()
         output.details(
             f"(The {ell}-cohesive group of voters {str_set_of_candidates(cohesive_group)}"
-            f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
+            f" ({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
             f" jointly approve the candidates {str_set_of_candidates(cands)}, but none of them "
             f"approves {ell} candidates in the committee.)",
             indent=" ",
@@ -396,21 +397,20 @@ def check_PJR(profile, committee, quota=None, algorithm="fastest"):
 
     if quota is None:
         standard_quota = True
-        quota = Fraction(len(profile), len(committee))
+        quota = Fraction(profile.total_weight(), len(committee))
     else:
         standard_quota = False
 
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
 
-    # TODO: currently only works for unit weights
-    if not profile.has_unit_weights():
-        raise NotImplementedError(
-            "check_PJR is currently only implemented for unit weights (weight=1)"
-        )
-
     if algorithm == "fastest":
         algorithm = "gurobi"
+
+    if not profile.has_unit_weights() and algorithm == "brute-force":
+        raise NotImplementedError(
+            "For profiles with non-unit weights, check_PJR currently only supports the algorithm 'gurobi'."
+        )
 
     if algorithm == "brute-force":
         result, detailed_information = _check_PJR_brute_force(profile, committee, quota)
@@ -434,9 +434,10 @@ def check_PJR(profile, committee, quota=None, algorithm="fastest"):
         ell = detailed_information["ell"]
         cands = detailed_information["joint_candidates"]
         cohesive_group = detailed_information["cohesive_group"]
+        fractional_size = sum(profile[vi].weight for vi in cohesive_group) / profile.total_weight()
         output.details(
             f"(The {ell}-cohesive group of voters {str_set_of_candidates(cohesive_group)}"
-            f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
+            f" ({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
             f" jointly approve the candidates {str_set_of_candidates(cands)}, but they "
             f"approve fewer than {ell} candidates in the committee.)"
         )
@@ -505,18 +506,12 @@ def check_JR(profile, committee, quota=None):
 
     if quota is None:
         standard_quota = True
-        quota = Fraction(len(profile), len(committee))
+        quota = Fraction(profile.total_weight(), len(committee))
     else:
         standard_quota = False
 
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
-
-    # TODO: currently only works for unit weights
-    if not profile.has_unit_weights():
-        raise NotImplementedError(
-            "check_JR is currently only implemented for unit weights (weight=1)"
-        )
 
     result, detailed_information = _check_JR(profile, committee, quota=quota)
 
@@ -534,11 +529,12 @@ def check_JR(profile, committee, quota=None):
     if not result:
         cand = detailed_information["joint_candidate"]
         cohesive_group = detailed_information["cohesive_group"]
+        fractional_size = sum(profile[vi].weight for vi in cohesive_group) / profile.total_weight()
         output.details(
             f"(The 1-cohesive group of voters {str_set_of_candidates(cohesive_group)}"
-            f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
-            f" jointly approve candidate {profile.cand_names[cand]}, but none of them "
-            "approve a candidate in the committee.)"
+            f" ({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
+            f" jointly approve candidate {profile.cand_names[cand]}, but none of them"
+            " approve a candidate in the committee.)"
         )
 
     return result
@@ -566,13 +562,15 @@ def _check_JR(profile, committee, quota):
 
     for cand in profile.candidates:
         group = set()
+        group_weight = 0
         for vi, voter in enumerate(profile):
             # if current candidate appears in this voter's ballot AND
             # this voter's approval ballot does NOT intersect with input committee
             if (cand in voter.approved) and (len(voter.approved & committee) == 0):
                 group.add(vi)
+                group_weight += voter.weight
 
-        if len(group) >= quota:
+        if group_weight >= quota:
             detailed_information = {"cohesive_group": group, "joint_candidate": cand}
             return False, detailed_information
 
@@ -719,40 +717,36 @@ def _check_EJR_brute_force(profile, committee, quota):
     """
 
     # largest possible ell such that ell-cohesive groups can exist
-    ell_upper_bound = int(len(profile) / quota)
+    ell_upper_bound = int(profile.total_weight() / quota)
 
     # loop through all possible ell
     for ell in range(1, ell_upper_bound + 1):
         # list of voters with less than ell approved candidates in committee
         voters_less_than_ell_approved_candidates = []
+        voters_less_than_ell_approved_candidates_weight = 0
 
         # compute minimum group size for this ell
-        group_size = math.ceil(ell * quota)
+        min_group_size = math.ceil(ell * quota)
 
         # compute list of voters to consider
         for i, voter in enumerate(profile):
             if len(voter.approved & committee) < ell:
                 voters_less_than_ell_approved_candidates.append(i)
+                voters_less_than_ell_approved_candidates_weight += voter.weight
 
         # check if an ell-cohesive group can be formed with considered voters
-        if len(voters_less_than_ell_approved_candidates) < group_size:
+        if voters_less_than_ell_approved_candidates_weight < min_group_size:
             # if not possible then simply continue with next ell
             continue
 
         # check all possible combinations of considered voters,
         # taken (possible group size) at a time
+        # todo: to support weighted profile, this iterator would need to be adjusted
         for combination in itertools.combinations(
-            voters_less_than_ell_approved_candidates, group_size
+            voters_less_than_ell_approved_candidates, min_group_size
         ):
-            # to calculate the cut of approved candidates for the considered voters
-            # initialize the cut to be the approval set of the first candidate in current
-            # combination
-            cut = set(profile[combination[0]].approved)
-
-            # calculate the cut over all voters for current combination
-            # (also can skip first voter in combination, but inexpensive enough...)
-            for j in combination:
-                cut = cut & profile[j].approved
+            # compute set of candidates approved by all voters in combination
+            cut = set.intersection(*(profile[vi].approved for vi in combination))
 
             # if size of cut is >= ell, then combination is an ell-cohesive group
             if len(cut) >= ell:
@@ -790,17 +784,6 @@ def _check_EJR_gurobi(profile, committee, quota):
     bool
     """
 
-    # compute matrix-dictionary for voters approval
-    # approval_matrix[(voter, cand)] = 1 if cand is in voter's approval set
-    # approval_matrix[(voter, cand)] = 0 otherwise
-    approval_matrix = {}
-    for voter in profile:
-        for cand in profile.candidates:
-            if cand in voter.approved:
-                approval_matrix[(voter, cand)] = 1
-            else:
-                approval_matrix[(voter, cand)] = 0
-
     # create the model to be optimized
     model = gb.Model()
 
@@ -812,10 +795,12 @@ def _check_EJR_gurobi(profile, committee, quota):
 
     model.addConstr(ell >= 1)
     # largest possible ell such that ell-cohesive groups can exist
-    model.addConstr(ell <= int(len(profile) / quota))
+    model.addConstr(ell <= int(profile.total_weight() / quota))
 
     # constraint: size of ell-cohesive group should be appropriate wrt. ell
-    model.addConstr(gb.quicksum(in_group) >= ell * quota)
+    model.addConstr(
+        gb.quicksum(voter.weight * in_group[vi] for vi, voter in enumerate(profile)) >= ell * quota
+    )
 
     # constraints based on binary indicator variables:
     # if voter is in ell-cohesive group, then the voter should have
@@ -828,22 +813,20 @@ def _check_EJR_gurobi(profile, committee, quota):
     # the voters in group should agree on at least ell candidates
     model.addConstr(gb.quicksum(in_cut) >= ell)
 
-    # if a candidate is in the cut, then `approval_matrix[(voter, cand)]` *must be* 1 for all
-    # voters inside the group
-    for voter_index, voter in enumerate(profile):
+    # candidates in cut should be approved by all voters in group
+    for vi, voter in enumerate(profile):
         for cand in profile.candidates:
-            if approval_matrix[(voter, cand)] == 0:
-                model.addConstr(in_cut[cand] + in_group[voter_index] <= 1.5)  # not both true
-
-    # model.setObjective(ell, gb.GRB.MINIMIZE)
+            if cand not in voter.approved:
+                # in_group[vi] implies not in_cut[cand]
+                model.addConstr(in_cut[cand] <= 1 - in_group[vi])
 
     _set_gurobi_model_parameters(model)
     model.optimize()
 
     # return value based on status code
-    # status code 2 means model was solved to optimality, thus an ell-cohesive group
+    # optimality means that an ell-cohesive group
     # that satisfies the condition of EJR was found
-    if model.Status == 2:
+    if model.status == gb.GRB.OPTIMAL:
         cohesive_group = {vi for vi, _ in enumerate(profile) if in_group[vi].Xn >= 0.9}
         joint_candidates = {cand for cand in profile.candidates if in_cut[cand].Xn >= 0.9}
         detailed_information = {
@@ -853,13 +836,13 @@ def _check_EJR_gurobi(profile, committee, quota):
         }
         return False, detailed_information
 
-    # status code 3 means that model is infeasible, thus no ell-cohesive group
+    # infeasible means that no ell-cohesive group
     # that satisfies the condition of EJR was found
-    if model.Status == 3:
+    if model.status == gb.GRB.INFEASIBLE:
         detailed_information = {}
         return True, detailed_information
 
-    raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
+    raise RuntimeError(f"Gurobi returned an unexpected status code: {model.status}")
 
 
 def _check_PJR_brute_force(profile, committee, quota):
@@ -881,7 +864,7 @@ def _check_PJR_brute_force(profile, committee, quota):
     """
 
     # largest possible ell such that ell-cohesive groups can exist
-    ell_upper_bound = int(len(profile) / quota)
+    ell_upper_bound = int(profile.total_weight() / quota)
 
     # considering ell-cohesive groups
     for ell in range(1, ell_upper_bound + 1):
@@ -889,29 +872,30 @@ def _check_PJR_brute_force(profile, committee, quota):
         # will not consider voters with >= ell approved candidates in committee,
         # because this voter will immediately satisfy the condition of PJR
         voters_less_than_ell_approved_candidates = []
+        voters_less_than_ell_approved_candidates_weight = 0
 
         # compute minimum group size for this ell
-        group_size = math.ceil(ell * quota)
+        min_group_size = math.ceil(ell * quota)
 
         # compute list of voters to consider
         for vi, voter in enumerate(profile):
             if len(voter.approved & committee) < ell:
                 voters_less_than_ell_approved_candidates.append(vi)
+                voters_less_than_ell_approved_candidates_weight += voter.weight
 
         # check if an ell-cohesive group can be formed with considered voters
-        if len(voters_less_than_ell_approved_candidates) < group_size:
+        if voters_less_than_ell_approved_candidates_weight < min_group_size:
             # if not possible then simply continue with next ell
             continue
 
         # check all possible combinations of considered voters,
         # taken (possible group size) at a time
-        for group in itertools.combinations(voters_less_than_ell_approved_candidates, group_size):
-            # initialize the cut to be the approval set of the first voter in the group
-            cut = set(profile[group[0]].approved)
-
-            # calculate the cut over all voters for current group
-            for j in group:
-                cut = cut & profile[j].approved
+        # todo: to support weighted profile, this iterator would need to be adjusted
+        for group in itertools.combinations(
+            voters_less_than_ell_approved_candidates, min_group_size
+        ):
+            # find set of candidates that are approved by all voters in group
+            cut = set.intersection(*(profile[j].approved for j in group))
 
             # if size of cut is >= ell, then group is an ell-cohesive group
             if len(cut) >= ell:
@@ -956,27 +940,6 @@ def _check_PJR_gurobi(profile, committee, quota):
     bool
     """
 
-    # compute matrix-dictionary for voters approval
-    # approval_matrix[(voter, cand)] = 1 if cand is in voter's approval set
-    # approval_matrix[(voter, cand)] = 0 otherwise
-    approval_matrix = {}
-
-    for voter in profile:
-        for cand in profile.candidates:
-            if cand in voter.approved:
-                approval_matrix[(voter, cand)] = 1
-            else:
-                approval_matrix[(voter, cand)] = 0
-
-    # compute deterministically array of binary variables that
-    # indicate whether a candidate is inside the input committee
-    in_committee = []
-    for cand in profile.candidates:
-        if cand in committee:
-            in_committee.append(1)
-        else:
-            in_committee.append(0)
-
     # create the model to be optimized
     model = gb.Model()
 
@@ -988,10 +951,12 @@ def _check_PJR_gurobi(profile, committee, quota):
 
     model.addConstr(ell >= 1)
     # largest possible ell such that ell-cohesive groups can exist
-    model.addConstr(ell <= int(len(profile) / quota))
+    model.addConstr(ell <= int(profile.total_weight() / quota))
 
     # constraint: size of ell-cohesive group should be appropriate wrt ell
-    model.addConstr(gb.quicksum(in_group) >= ell * quota)
+    model.addConstr(
+        gb.quicksum(voter.weight * in_group[vi] for vi, voter in enumerate(profile)) >= ell * quota
+    )
 
     # binary variables: indicate whether a candidate is in the intersection
     # of approved candidates over voters inside the group
@@ -1000,12 +965,12 @@ def _check_PJR_gurobi(profile, committee, quota):
     # the voters in group should agree on at least ell candidates
     model.addConstr(gb.quicksum(in_cut) >= ell)
 
-    # if a candidate is in the cut, then `approval_matrix[(voter, cand)]` *must be* 1 for all
-    # voters inside the group
-    for voter_index, voter in enumerate(profile):
+    # candidates in cut should be approved by all voters in group
+    for vi, voter in enumerate(profile):
         for cand in profile.candidates:
-            if approval_matrix[(voter, cand)] == 0:
-                model.addConstr(in_cut[cand] + in_group[voter_index] <= 1.5)  # not both true
+            if cand not in voter.approved:
+                # in_group[vi] implies not in_cut[cand]
+                model.addConstr(in_cut[cand] <= 1 - in_group[vi])
 
     # binary variables: indicate whether a candidate is inside the union
     # of approved candidates, taken over voters that are in the ell-cohesive group
@@ -1018,19 +983,13 @@ def _check_PJR_gurobi(profile, committee, quota):
 
     # constraint to ensure that the intersection between candidates that are in union
     # intersected with the input committee, has size strictly less than ell
-    model.addConstr(
-        gb.quicksum(in_union[cand] * in_committee[cand] for cand in profile.candidates) + 1 <= ell
-    )
-
-    # model.setObjective(ell, gb.GRB.MINIMIZE)
+    model.addConstr(gb.quicksum(in_union[cand] for cand in committee) + 1 <= ell)
 
     _set_gurobi_model_parameters(model)
     model.optimize()
 
     # return value based on status code
-    # status code 2 means model was solved to optimality, thus an ell-cohesive group
-    # that satisfies the condition of PJR was found
-    if model.Status == 2:
+    if model.status == gb.GRB.OPTIMAL:
         cohesive_group = {vi for vi, _ in enumerate(profile) if in_group[vi].Xn >= 0.9}
         joint_candidates = {cand for cand in profile.candidates if in_cut[cand].Xn >= 0.9}
         detailed_information = {
@@ -1040,13 +999,11 @@ def _check_PJR_gurobi(profile, committee, quota):
         }
         return False, detailed_information
 
-    # status code 3 means that model is infeasible, thus no ell-cohesive group
-    # that satisfies the condition of PJR was found
-    if model.Status == 3:
+    if model.status == gb.GRB.INFEASIBLE:
         detailed_information = {}
         return True, detailed_information
 
-    raise RuntimeError(f"Gurobi returned an unexpected status code: {model.Status}")
+    raise RuntimeError(f"Gurobi returned an unexpected status code: {model.status}")
 
 
 def check_EJR_plus(profile, committee, quota=None):
@@ -1077,18 +1034,12 @@ def check_EJR_plus(profile, committee, quota=None):
 
     if quota is None:
         standard_quota = True
-        quota = Fraction(len(profile), len(committee))
+        quota = Fraction(profile.total_weight(), len(committee))
     else:
         standard_quota = False
 
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
-
-    # TODO: currently only works for unit weights
-    if not profile.has_unit_weights():
-        raise NotImplementedError(
-            "check_EJR_plus is currently only implemented for unit weights (weight=1)"
-        )
 
     result, detailed_information = _check_EJR_plus(profile, committee, quota)
 
@@ -1107,9 +1058,10 @@ def check_EJR_plus(profile, committee, quota=None):
         cand = detailed_information["joint_candidate"]
         cohesive_group = detailed_information["cohesive_group"]
         ell = detailed_information["ell"]
+        fractional_size = sum(profile[vi].weight for vi in cohesive_group) / profile.total_weight()
         output.details(
             f"(The group of voters {str_set_of_candidates(cohesive_group)}"
-            f" ({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
+            f" ({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
             f" deserves {ell} candidates,"
             f" and jointly approve candidate {profile.cand_names[cand]} which is not part of the"
             f" committee, but no member approves at least {ell} members of the committee.)"
@@ -1139,7 +1091,7 @@ def _check_EJR_plus(profile, committee, quota):
     """
 
     # largest possible ell such that ell-cohesive groups can exist
-    ell_upper_bound = int(len(profile) / quota)
+    ell_upper_bound = int(profile.total_weight() / quota)
 
     for cand in profile.candidates:
         if cand in committee:
@@ -1154,7 +1106,7 @@ def _check_EJR_plus(profile, committee, quota):
         for ell in range(ell_upper_bound):
             # group of supporters of cand with utility <= ell
             group |= supporters_by_utility[ell]
-            if len(group) >= (ell + 1) * quota:
+            if sum(profile[vi].weight for vi in group) >= (ell + 1) * quota:
                 # EJR+ requires someone to get utility at least ell + 1, but no one does
                 detailed_information = {
                     "cohesive_group": group,
@@ -1198,12 +1150,6 @@ def check_priceability(profile, committee, algorithm="fastest", stable=False):
 
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
-
-    # TODO: currently only works for unit weights
-    if not profile.has_unit_weights():
-        raise NotImplementedError(
-            "check_priceability is currently only implemented for unit weights (weight=1)"
-        )
 
     if algorithm == "fastest":
         algorithm = "gurobi"
@@ -1301,7 +1247,8 @@ def _check_priceability_gurobi(profile, committee, stable=False):
     # condition 1 [from "Multi-Winner Voting with Approval Preferences", Definition 4.8]
     for voter in profile:
         model.addConstr(
-            gb.quicksum(payment[voter][candidate] for candidate in profile.candidates) <= budget
+            gb.quicksum(payment[voter][candidate] for candidate in profile.candidates)
+            <= voter.weight * budget
         )
 
     # condition 2 [from "Multi-Winner Voting with Approval Preferences", Definition 4.8]
@@ -1331,7 +1278,7 @@ def _check_priceability_gurobi(profile, committee, stable=False):
                         max_Payment = model.addVar(vtype=gb.GRB.CONTINUOUS)
                         model.addConstr(
                             r
-                            == budget
+                            == voter.weight * budget
                             - gb.quicksum(
                                 payment[voter][committee_member] for committee_member in committee
                             )
@@ -1348,7 +1295,7 @@ def _check_priceability_gurobi(profile, committee, stable=False):
             if candidate not in committee:
                 model.addConstr(
                     gb.quicksum(
-                        budget
+                        voter.weight * budget
                         - gb.quicksum(
                             payment[voter][committee_member] for committee_member in committee
                         )
@@ -1363,30 +1310,32 @@ def _check_priceability_gurobi(profile, committee, stable=False):
     model.optimize()
 
     if model.Status == gb.GRB.OPTIMAL:
-        output.details(f"Budget: {budget.X}")
+        # todo: adjust output for weighted profiles
+        if profile.has_unit_weights():
+            output.details(f"Budget: {budget.X}")
 
-        column_widths = {
-            candidate: max(len(str(payment[voter][candidate].X)) for voter in payment)
-            for candidate in profile.candidates
-        }
-        column_widths["voter"] = len(str(len(profile)))
-        output.details(
-            " " * column_widths["voter"]
-            + " | "
-            + " | ".join(
-                str(i).rjust(column_widths[candidate])
-                for i, candidate in enumerate(profile.candidates)
-            )
-        )
-        for i, voter in enumerate(profile):
+            column_widths = {
+                candidate: max(len(str(payment[voter][candidate].X)) for voter in payment)
+                for candidate in profile.candidates
+            }
+            column_widths["voter"] = len(str(len(profile)))
             output.details(
-                str(i).rjust(column_widths["voter"])
+                " " * column_widths["voter"]
                 + " | "
                 + " | ".join(
-                    str(pay.X).rjust(column_widths[candidate])
-                    for candidate, pay in payment[voter].items()
+                    str(i).rjust(column_widths[candidate])
+                    for i, candidate in enumerate(profile.candidates)
                 )
             )
+            for i, voter in enumerate(profile):
+                output.details(
+                    str(i).rjust(column_widths["voter"])
+                    + " | "
+                    + " | ".join(
+                        str(pay.X).rjust(column_widths[candidate])
+                        for candidate, pay in payment[voter].items()
+                    )
+                )
 
         return True
     elif model.Status == gb.GRB.INFEASIBLE:
@@ -1426,7 +1375,7 @@ def check_FJR(profile, committee, quota=None, algorithm="fastest"):
 
     if quota is None:
         standard_quota = True
-        quota = Fraction(len(profile), len(committee))
+        quota = Fraction(profile.total_weight(), len(committee))
     else:
         standard_quota = False
 
@@ -1459,9 +1408,10 @@ def check_FJR(profile, committee, quota=None, algorithm="fastest"):
         beta = detailed_information["beta"]
         cands = detailed_information["joint_candidates"]
         cohesive_group = detailed_information["cohesive_group"]
+        fractional_size = sum(profile[vi].weight for vi in cohesive_group) / profile.total_weight()
         output.details(
             f"(The weakly cohesive group of voters {str_set_of_candidates(cohesive_group)}"
-            f"({len(cohesive_group)/len(profile)*100:.1f}% of all voters)"
+            f"({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
             f"each approve at least {beta} of the {ell} candidates {str_set_of_candidates(cands)},"
             f"but all approve at most {beta - 1} candidates in the committee.)",
             indent=" ",
@@ -1493,17 +1443,21 @@ def _check_FJR_brute_force(profile, committee, quota):
     """
 
     # largest possible size of set T (and beta)
-    set_upper_bound = int(len(profile) / quota)
+    set_upper_bound = int(profile.total_weight() / quota)
 
     committee_utility_at_most = {
-        utility: set(voter for voter in profile if len(voter.approved & committee) <= utility)
+        utility: set(
+            vi for vi, voter in enumerate(profile) if len(voter.approved & committee) <= utility
+        )
         for utility in range(set_upper_bound + 1)
     }
 
     for T in powerset(profile.approved_candidates(), max_size=set_upper_bound):
         T = set(T)
         T_utility_at_least = {
-            utility: set(voter for voter in profile if len(voter.approved & T) >= utility)
+            utility: set(
+                vi for vi, voter in enumerate(profile) if len(voter.approved & T) >= utility
+            )
             for utility in range(len(T) + 1)
         }
         for beta in range(1, len(T) + 1):
@@ -1512,7 +1466,7 @@ def _check_FJR_brute_force(profile, committee, quota):
             cohesive_group = T_utility_at_least[beta] & committee_utility_at_most[beta - 1]
 
             # is coalition large enough to deserve |T| seats?
-            if len(cohesive_group) >= len(T) * quota:
+            if sum(profile[vi].weight for vi in cohesive_group) >= len(T) * quota:
                 detailed_information = {
                     "ell": len(T),
                     "beta": beta,
@@ -1549,7 +1503,7 @@ def _check_FJR_gurobi(profile, committee, quota):
     """
 
     # largest possible size of set T (and beta)
-    set_upper_bound = int(len(profile) / quota)
+    set_upper_bound = int(profile.total_weight() / quota)
 
     model = gb.Model()
 
@@ -1559,7 +1513,10 @@ def _check_FJR_gurobi(profile, committee, quota):
     model.addConstr(beta <= set_of_candidates.sum())
 
     # coalition large enough to deserve |set_of_candidates| seats
-    model.addConstr(gb.quicksum(set_of_candidates) * quota <= gb.quicksum(set_of_voters))
+    model.addConstr(
+        gb.quicksum(set_of_candidates) * quota
+        <= gb.quicksum(voter.weight * set_of_voters[vi] for vi, voter in enumerate(profile))
+    )
     model.addConstr(gb.quicksum(set_of_voters) >= 1)
     for i, voter in enumerate(profile):
         # if i is in set_of_voters, then:
@@ -1624,18 +1581,12 @@ def check_core(profile, committee, quota=None, algorithm="fastest"):
 
     if quota is None:
         standard_quota = True
-        quota = Fraction(len(profile), len(committee))
+        quota = Fraction(profile.total_weight(), len(committee))
     else:
         standard_quota = False
 
     # check that `committee` is a valid input
     committee = CandidateSet(committee, num_cand=profile.num_cand)
-
-    # TODO: currently only works for unit weights
-    if not profile.has_unit_weights():
-        raise NotImplementedError(
-            "check_core is currently only implemented for unit weights (weight=1)"
-        )
 
     if algorithm == "fastest":
         algorithm = "gurobi"
@@ -1661,9 +1612,10 @@ def check_core(profile, committee, quota=None, algorithm="fastest"):
     if not result:
         objection = detailed_information["objection"]
         coalition = detailed_information["coalition"]
+        fractional_size = sum(profile[vi].weight for vi in coalition) / profile.total_weight()
         output.details(
             f"(The group of voters {str_set_of_candidates(coalition)}"
-            f" ({len(coalition)/len(profile)*100:.1f}% of all voters)"
+            f" ({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
             f" can block the outcome by proposing {str_set_of_candidates(objection)},"
             f" in which each group member approves strictly more candidates.)"
         )
@@ -1694,18 +1646,18 @@ def _check_core_brute_force(profile, committee, quota):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
-    max_num_of_candidates = int(len(profile) / quota)
+    max_num_of_candidates = int(profile.total_weight() / quota)
 
     for cands in powerset(profile.approved_candidates(), max_size=max_num_of_candidates):
         cands = set(cands)
         set_of_voters = [
-            voter
-            for voter in profile
+            vi
+            for vi, voter in enumerate(profile)
             if len(voter.approved & cands) > len(voter.approved & committee)
         ]  # set of voters that would profit from `cands`
         if not set_of_voters:
             continue
-        if len(cands) * quota <= len(set_of_voters):
+        if len(cands) * quota <= sum(profile[vi].weight for vi in set_of_voters):
             # a sufficient number of voters would profit from deviating to `cands`
             detailed_information = {"coalition": set_of_voters, "objection": cands}
             return False, detailed_information
@@ -1741,8 +1693,14 @@ def _check_core_gurobi(profile, committee, quota):
     set_of_voters = model.addVars(range(len(profile)), vtype=gb.GRB.BINARY)
     set_of_candidates = model.addVars(range(profile.num_cand), vtype=gb.GRB.BINARY)
 
-    model.addConstr(gb.quicksum(set_of_candidates) * quota <= gb.quicksum(set_of_voters))
+    # set_of_voters is large enough to afford set_of_candidates
+    model.addConstr(
+        gb.quicksum(set_of_candidates) * quota
+        <= gb.quicksum(voter.weight * set_of_voters[vi] for vi, voter in enumerate(profile))
+    )
     model.addConstr(gb.quicksum(set_of_voters) >= 1)
+
+    # every voter in set_of_voters prefers set_of_candidates to committee
     for i, voter in enumerate(profile):
         approved = [
             (c in voter.approved) * set_of_candidates[i] for i, c in enumerate(profile.candidates)

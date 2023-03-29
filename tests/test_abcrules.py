@@ -805,11 +805,10 @@ def test_abcrules_weightsconsidered(rule_id, algorithm, resolute):
 
     if rule_id in [
         "lexminimaxav",
-        "phragmen-enestroem",
         "rsd",
         "monroe",
         "greedy-monroe",
-    ] or rule_id.startswith("equal-shares"):
+    ]:
         with pytest.raises(ValueError):
             abcrules.compute(rule_id, profile, committeesize, algorithm=algorithm)
         return
@@ -1209,6 +1208,12 @@ def test_jansonexamples(rule_id, algorithm):
     )
     assert committees == [{a, b, q}]
 
+    profile.convert_to_weighted()
+    committees = abcrules.compute(
+        rule_id, profile, committeesize, algorithm=algorithm, resolute=False
+    )
+    assert committees == [{a, b, q}]
+
 
 @pytest.mark.parametrize("rule_id", abcrules.MAIN_RULE_IDS)
 @pytest.mark.parametrize("resolute", [True, False])
@@ -1370,6 +1375,51 @@ def test_selection_of_abc_yaml_instances(filename, rule_id, algorithm, load_abc_
         if compute_instance["result"] is None:
             return  # no result known, cannot test
         abcrules.compute(**compute_instance, algorithm=algorithm)
+
+
+only_defined_for_unit_weights = [
+    "lexminimaxav",
+    "monroe",
+    "greedy-monroe",
+]
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    "filename, rule_id, algorithm",
+    abc_yaml_instances,
+    ids=id_function,
+)
+def test_converted_to_weighted_abc_yaml_instances(
+    filename, rule_id, algorithm, load_abc_yaml_file
+):
+    # skip tests involving CBC and minimaxphragmen that are known to fail
+    if rule_id == "minimaxphragmen" and algorithm == "mip-cbc":
+        if "instanceL0145.abc.yaml" in filename or "instanceL0153.abc.yaml" in filename:
+            pytest.skip(f"This test is known to fail ({rule_id}, {algorithm}, {filename}).")
+
+    profile, committeesize, compute_instances = load_abc_yaml_file[filename]
+    if rule_id in only_defined_for_unit_weights:
+        return
+    if len(profile) == profile.total_weight():
+        return  # no need to test this instance
+    weighted_profile = profile.copy()
+    weighted_profile.convert_to_weighted()
+    assert not weighted_profile.has_unit_weights()
+
+    for compute_instance in compute_instances:
+        if compute_instance["rule_id"] != rule_id:
+            continue
+        if compute_instance["result"] is None:
+            return  # no result known, cannot test
+
+        abcrules.compute(
+            rule_id=compute_instance["rule_id"],
+            profile=weighted_profile,
+            committeesize=committeesize,
+            result=compute_instance["result"],
+            algorithm=algorithm,
+        )
 
 
 @pytest.mark.parametrize("rule_id, algorithm, resolute", testrules.rule_algorithm_resolute)
