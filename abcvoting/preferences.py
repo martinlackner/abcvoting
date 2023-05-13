@@ -335,7 +335,8 @@ class Voter:
         weight : int or Fraction, default=1
             The weight of the voter.
 
-            This should not be used as the number of voters with these approved candidates.
+            If `weight` is an integer, the voter is interpreted as if there are `weight`
+            many voters with the same approval set.
 
         num_cand : int, optional
             The maximum number of candidates. Used only for checks.
