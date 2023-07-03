@@ -91,6 +91,7 @@ setuptools.setup(
         "ruamel.yaml>=0.17",
         "numpy>=1.21",
         "gurobipy>=9.5.0",
+        "preflibtools>=2.0.10"
     ],
     extras_require={
         "dev": [
