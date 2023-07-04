@@ -145,7 +145,8 @@ def read_preflib_file(filename, num_cats=None, setsize=None, use_weights=False):
                 approval_set = normalize_map.values()
         elif num_cats:
             approval_set = [
-                normalize_map[cand] for category in range(min(len(preferences), num_cats))
+                normalize_map[cand]
+                for category in range(min(len(preferences), num_cats))
                 for cand in preferences[category]
             ]
 
