@@ -15,11 +15,11 @@ currdir = os.path.dirname(os.path.abspath(__file__))
 # Write a profile to toi file
 profile = Profile(5, "ABCDE")
 profile.add_voters([{0, 1}, {1, 3, 4}, {2}, {3}, {3}])
-fileio.write_profile_to_preflib_toi_file(currdir + "/toi-files/new_example.toi", profile)
+fileio.write_profile_to_preflib_cat_file(currdir + "/toi-files/new_example.cat", profile)
 
 
-# Read a directory of Preflib files (using parameter `relative_setsize`)
-profiles = fileio.read_preflib_files_from_dir(currdir + "/toi-files/", relative_setsize=0.7)
+# Read a directory of Preflib files (using parameter `num_cats`)
+profiles = fileio.read_preflib_files_from_dir(currdir + "/toi-files/", num_cats=3)
 # Compute PAV for each profile
 committeesize = 2
 for profile in profiles.values():
