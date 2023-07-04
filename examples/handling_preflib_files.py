@@ -19,7 +19,7 @@ fileio.write_profile_to_preflib_cat_file(currdir + "/toi-files/new_example.cat",
 
 
 # Read a directory of Preflib files (using parameter `relative_setsize`)
-profiles = fileio.read_preflib_files_from_dir(currdir + "/toi-files/", relative_setsize=0.7)
+profiles = fileio.read_preflib_files_from_dir(currdir + "/toi-files/", num_cats=3)
 # Compute PAV for each profile
 committeesize = 2
 for profile in profiles.values():

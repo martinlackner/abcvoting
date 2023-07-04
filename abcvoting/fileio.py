@@ -63,7 +63,7 @@ def get_file_names(dir_name, filename_extensions=None):
     return sorted(files)
 
 
-def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=False):
+def read_preflib_file(filename, num_cats=None, setsize=None, use_weights=False):
     """
     Read a Preflib file (soi, toi, soc or toc).
 
@@ -72,20 +72,18 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
         filename : str
             Name of the Preflib file.
 
+        num_cats : int, default=1
+            The approval set is composed of the union of the first `num_cats` catefories of the instance.
+
+            It cannot be used if parameter `setsize` is used too.
+
         setsize : int
             Minimum number of candidates that voters approve.
 
             These candidates are taken from the top of ranking.
             In case of ties, more than setsize candidates are approved.
 
-            Paramer `setsize` is ignored if `relative_setsize` is used.
-
-        relative_setsize : float
-            Proportion (number between 0 and 1) of candidates that voters approve (rounded up).
-
-            In case of ties, more candidates are approved.
-            E.g., if there are 10 candidates and `relative_setsize=0.75`,
-            then the voter approves the top 8 candidates.
+            It cannot be used if parameter `num_cats` is used too.
 
         use_weights : bool, default=False
             Use weights of voters instead of individual voters.
@@ -99,10 +97,14 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
         abcvoting.preferences.Profile
             Preference profile extracted from Preflib file.
     """
-    if setsize <= 0:
+    if num_cats is None and setsize is None:
+        num_cats = 1
+    if num_cats and setsize:
+        raise ValueError("Parameters num_cats and setsize cannot be used simultaneously.")
+    if num_cats and num_cats <= 0:
+        raise ValueError("Parameter num_cats must be > 0")
+    if setsize and setsize <= 0:
         raise ValueError("Parameter setsize must be > 0")
-    if relative_setsize and (relative_setsize <= 0.0 or relative_setsize > 1.0):
-        raise ValueError("Parameter relative_setsize not in interval (0, 1]")
 
     try:
         preflib_inst = preflib.get_parsed_instance(filename)
@@ -112,22 +114,16 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
         )
 
     if isinstance(preflib_inst, preflib.OrdinalInstance):
-        if relative_setsize:
-            truncators = [relative_setsize, 1 - relative_setsize]
-            preflib_inst = preflib.CategoricalInstance.from_ordinal(
-                preflib_inst, relative_size_truncators=truncators
-            )
-        else:
+        if setsize:
             preflib_inst = preflib.CategoricalInstance.from_ordinal(
                 preflib_inst, size_truncators=[setsize]
             )
+        elif num_cats:
+            preflib_inst = preflib.CategoricalInstance.from_ordinal(
+                preflib_inst, num_indif_classes=[1] * preflib_inst.num_alternatives
+            )
     elif not isinstance(preflib_inst, preflib.CategoricalInstance):
         raise ValueError("Only ordinal and categorical preferences can be converted from PrefLib")
-
-    if preflib_inst.num_categories != 2:
-        raise ValueError(
-            "Only ordinal categorical preferences over 2 categories can be converted from PrefLib"
-        )
 
     # normalize candidates to 0, 1, 2, ...
     cand_names = []
@@ -139,38 +135,29 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
     profile = Profile(preflib_inst.num_alternatives, cand_names=cand_names)
 
     for preferences, count in preflib_inst.multiplicity.items():
-        if len(preferences) > 2:
-            raise ValueError(
-                "There are more than 2 categories in "
-                + str(preferences)
-                + ", this cannot be converted "
-                "into an approval ballot"
-            )
-        if len(preferences) == 1:
-            approval_set = preferences[0]
-        else:
-            approval_set, _ = preferences
-
-        if relative_setsize and 0 < len(approval_set) < int(
-            ceil(sum(len(p) for p in preferences) * relative_setsize)
-        ):
-            normalized_approval_set = normalize_map.values()
-        elif 0 < len(approval_set) < setsize:
-            normalized_approval_set = normalize_map.values()
-        else:
-            normalized_approval_set = []
-            for cand in approval_set:
-                normalized_approval_set.append(normalize_map[cand])
+        approval_set = []
+        if setsize:
+            category = 0
+            while len(approval_set) < setsize and category < len(preferences):
+                approval_set.extend([normalize_map[cand] for cand in preferences[category]])
+                category += 1
+            if 0 < len(approval_set) < setsize:
+                approval_set = normalize_map.values()
+        elif num_cats:
+            approval_set = [
+                normalize_map[cand] for category in range(min(len(preferences), num_cats))
+                for cand in preferences[category]
+            ]
 
         if use_weights:
-            profile.add_voter(Voter(normalized_approval_set, weight=count))
+            profile.add_voter(Voter(approval_set, weight=count))
         else:
-            profile.add_voters([normalized_approval_set] * count)
+            profile.add_voters([approval_set] * count)
 
     return profile
 
 
-def read_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
+def read_preflib_files_from_dir(dir_name, num_cats=None, setsize=None):
     """
     Read all Preflib files (soi, toi, soc or toc) in a given directory.
 
@@ -179,20 +166,18 @@ def read_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
         dir_name : str
             Path of the directory to be searched for Preflib files.
 
+        num_cats : int, default=1
+            The approval set is composed of the union of the first `num_cats` catefories of the instance.
+
+            It cannot be used if parameter `setsize` is used too.
+
         setsize : int
             Minimum number of candidates that voters approve.
 
             These candidates are taken from the top of ranking.
             In case of ties, more than setsize candidates are approved.
 
-            Paramer `setsize` is ignored if `relative_setsize` is used.
-
-        relative_setsize : float
-            Proportion (number between 0 and 1) of candidates that voters approve (rounded up).
-
-            In case of ties, more candidates are approved.
-            E.g., if there are 10 candidates and `relative_setsize=0.75`,
-            then the voter approves the top 8 candidates.
+            It cannot be used if parameter `num_cats` is used too.
 
     Returns
     -------
@@ -204,9 +189,7 @@ def read_preflib_files_from_dir(dir_name, setsize=1, relative_setsize=None):
 
     profiles = {}
     for f in files:
-        profile = read_preflib_file(
-            os.path.join(dir_name, f), setsize=setsize, relative_setsize=relative_setsize
-        )
+        profile = read_preflib_file(os.path.join(dir_name, f), num_cats=num_cats, setsize=setsize)
         profiles[f] = profile
     return profiles
 
