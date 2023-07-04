@@ -15,6 +15,7 @@ scientific questions (in alphabetic order):
 - `Martin Lackner <http://martin.lackner.xyz/>`_,
 - `Dominik Peters <http://dominik-peters.de/>`_,
 - `Peter Regner <https://github.com/lumbric>`_,
+- `Simon Rey <https://simonrey.fr/>`_,
 - `Piotr Skowron <https://www.mimuw.edu.pl/~ps219737/>`_,
 - `Stanisław Szufa <http://ww2.ii.uj.edu.pl/~szufa/>`_.
 
