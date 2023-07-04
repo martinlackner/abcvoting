@@ -18,7 +18,7 @@ profile.add_voters([{0, 1}, {1, 3, 4}, {2}, {3}, {3}])
 fileio.write_profile_to_preflib_cat_file(currdir + "/toi-files/new_example.cat", profile)
 
 
-# Read a directory of Preflib files (using parameter `relative_setsize`)
+# Read a directory of Preflib files (using parameter `num_cats`)
 profiles = fileio.read_preflib_files_from_dir(currdir + "/toi-files/", num_cats=3)
 # Compute PAV for each profile
 committeesize = 2
