@@ -1,5 +1,5 @@
-# FILE NAME: test1.toi
-# TITLE: test1.toi
+# FILE NAME: example.toi
+# TITLE: example.toi
 # DESCRIPTION:
 # DATA TYPE: toi
 # MODIFICATION TYPE: original
@@ -15,7 +15,7 @@
 # ALTERNATIVE NAME 3: c
 # ALTERNATIVE NAME 4: d
 # ALTERNATIVE NAME 5: five
-# ALTERNATIVE NAME 6: f
+# ALTERNATIVE NAME 6: e
 1:1,2,3
 2:2,{1,4}
 1:{1,2},4
