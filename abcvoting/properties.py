@@ -295,7 +295,8 @@ def check_EJR(profile, committee, quota=None, algorithm="fastest"):
 
     if not profile.has_unit_weights() and algorithm == "brute-force":
         raise NotImplementedError(
-            "For profiles with non-unit weights, check_EJR currently only supports the algorithm 'gurobi'."
+            "For profiles with non-unit weights, "
+            "check_EJR currently only supports the algorithm 'gurobi'."
         )
 
     if algorithm == "brute-force":
@@ -324,7 +325,8 @@ def check_EJR(profile, committee, quota=None, algorithm="fastest"):
         fractional_size = sum(profile[vi].weight for vi in cohesive_group) / profile.total_weight()
         output.details(
             f"(The {ell}-cohesive group of voters {str_set_of_candidates(cohesive_group)}"
-            f" ({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
+            f" ({fractional_size*100:.1f}% of all voters"
+            f"{' (by weight)' if not profile.has_unit_weights() else ''})"
             f" jointly approve the candidates {str_set_of_candidates(cands)}, but none of them "
             f"approves {ell} candidates in the committee.)",
             indent=" ",
@@ -409,7 +411,8 @@ def check_PJR(profile, committee, quota=None, algorithm="fastest"):
 
     if not profile.has_unit_weights() and algorithm == "brute-force":
         raise NotImplementedError(
-            "For profiles with non-unit weights, check_PJR currently only supports the algorithm 'gurobi'."
+            "For profiles with non-unit weights, check_PJR "
+            "currently only supports the algorithm 'gurobi'."
         )
 
     if algorithm == "brute-force":
@@ -437,7 +440,8 @@ def check_PJR(profile, committee, quota=None, algorithm="fastest"):
         fractional_size = sum(profile[vi].weight for vi in cohesive_group) / profile.total_weight()
         output.details(
             f"(The {ell}-cohesive group of voters {str_set_of_candidates(cohesive_group)}"
-            f" ({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
+            f" ({fractional_size*100:.1f}% of all voters"
+            f"{' (by weight)' if not profile.has_unit_weights() else ''})"
             f" jointly approve the candidates {str_set_of_candidates(cands)}, but they "
             f"approve fewer than {ell} candidates in the committee.)"
         )
@@ -532,7 +536,8 @@ def check_JR(profile, committee, quota=None):
         fractional_size = sum(profile[vi].weight for vi in cohesive_group) / profile.total_weight()
         output.details(
             f"(The 1-cohesive group of voters {str_set_of_candidates(cohesive_group)}"
-            f" ({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
+            f" ({fractional_size*100:.1f}% of all voters"
+            f"{' (by weight)' if not profile.has_unit_weights() else ''})"
             f" jointly approve candidate {profile.cand_names[cand]}, but none of them"
             " approve a candidate in the committee.)"
         )
@@ -1061,7 +1066,8 @@ def check_EJR_plus(profile, committee, quota=None):
         fractional_size = sum(profile[vi].weight for vi in cohesive_group) / profile.total_weight()
         output.details(
             f"(The group of voters {str_set_of_candidates(cohesive_group)}"
-            f" ({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
+            f" ({fractional_size*100:.1f}% of all voters"
+            f"{' (by weight)' if not profile.has_unit_weights() else ''})"
             f" deserves {ell} candidates,"
             f" and jointly approve candidate {profile.cand_names[cand]} which is not part of the"
             f" committee, but no member approves at least {ell} members of the committee.)"
@@ -1411,7 +1417,8 @@ def check_FJR(profile, committee, quota=None, algorithm="fastest"):
         fractional_size = sum(profile[vi].weight for vi in cohesive_group) / profile.total_weight()
         output.details(
             f"(The weakly cohesive group of voters {str_set_of_candidates(cohesive_group)}"
-            f"({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
+            f"({fractional_size*100:.1f}% of all voters"
+            f"{' (by weight)' if not profile.has_unit_weights() else ''})"
             f"each approve at least {beta} of the {ell} candidates {str_set_of_candidates(cands)},"
             f"but all approve at most {beta - 1} candidates in the committee.)",
             indent=" ",
@@ -1615,7 +1622,8 @@ def check_core(profile, committee, quota=None, algorithm="fastest"):
         fractional_size = sum(profile[vi].weight for vi in coalition) / profile.total_weight()
         output.details(
             f"(The group of voters {str_set_of_candidates(coalition)}"
-            f" ({fractional_size*100:.1f}% of all voters{' (by weight)' if not profile.has_unit_weights() else ''})"
+            f" ({fractional_size*100:.1f}% of all voters"
+            f"{' (by weight)' if not profile.has_unit_weights() else ''})"
             f" can block the outcome by proposing {str_set_of_candidates(objection)},"
             f" in which each group member approves strictly more candidates.)"
         )

@@ -3794,7 +3794,7 @@ def compute_maximin_support(
         output.info(" (aka parallel universes tiebreaking) (resolute=False)\n")
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     if resolute:
-        output.details(f"starting with the empty committee\n")
+        output.details("starting with the empty committee\n")
         committee = []
         for i, next_cand in enumerate(detailed_info["next_cand"]):
             tied_cands = detailed_info["tied_cands"][i]

@@ -386,8 +386,8 @@ def _mip_maximin_support_scorefct(profile, base_committee, solver_id):
 
     Based on the LP described in the proof of Theorem 4.2 of
     L. Sánchez-Fernández et al.
-    The maximin support method: an extension of the D'Hondt method to approval-based multiwinner elections
-    Mathematical Programming (2022)
+    The maximin support method: an extension of the D'Hondt method to approval-based multiwinner
+    elections. Mathematical Programming (2022)
     """
 
     scores = [0] * profile.num_cand
@@ -427,7 +427,8 @@ def _mip_maximin_support_scorefct(profile, base_committee, solver_id):
 
         if status != mip.OptimizationStatus.OPTIMAL:
             raise RuntimeError(
-                f"Python MIP returned an unexpected status code: {status} while computing the maximin support score."
+                f"Python MIP returned an unexpected status code: {status} "
+                "while computing the maximin support score."
             )
 
         scores[added_cand] = minimum.x
