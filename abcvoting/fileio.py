@@ -2,7 +2,7 @@
 Read and write data to files.
 
 Two data formats are supported:
-1. the Preflib format (soi, toi, soc or toc), and
+1. the Preflib format (soi, toi, soc, toc, or cat), and
 2. .abc.yaml files (more expressive than Preflib files).
 """
 
