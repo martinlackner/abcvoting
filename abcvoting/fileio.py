@@ -107,19 +107,27 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
     try:
         preflib_inst = preflib.get_parsed_instance(filename)
     except Exception as e:
-        raise MalformattedFileException("The preflib parser returned the following error: " + str(e))
+        raise MalformattedFileException(
+            "The preflib parser returned the following error: " + str(e)
+        )
 
     if isinstance(preflib_inst, preflib.OrdinalInstance):
         if relative_setsize:
             truncators = [relative_setsize, 1 - relative_setsize]
-            preflib_inst = preflib.CategoricalInstance.from_ordinal(preflib_inst, relative_size_truncators=truncators)
+            preflib_inst = preflib.CategoricalInstance.from_ordinal(
+                preflib_inst, relative_size_truncators=truncators
+            )
         else:
-            preflib_inst = preflib.CategoricalInstance.from_ordinal(preflib_inst, size_truncators=[setsize])
+            preflib_inst = preflib.CategoricalInstance.from_ordinal(
+                preflib_inst, size_truncators=[setsize]
+            )
     elif not isinstance(preflib_inst, preflib.CategoricalInstance):
         raise ValueError("Only ordinal and categorical preferences can be converted from PrefLib")
 
     if preflib_inst.num_categories != 2:
-        raise ValueError("Only ordinal categorical preferences over 2 categories can be converted from PrefLib")
+        raise ValueError(
+            "Only ordinal categorical preferences over 2 categories can be converted from PrefLib"
+        )
 
     # normalize candidates to 0, 1, 2, ...
     cand_names = []
@@ -132,14 +140,20 @@ def read_preflib_file(filename, setsize=1, relative_setsize=None, use_weights=Fa
 
     for preferences, count in preflib_inst.multiplicity.items():
         if len(preferences) > 2:
-            raise ValueError("There are more than 2 categories in " + str(preferences) + ", this cannot be converted "
-                                                                                         "into an approval ballot")
+            raise ValueError(
+                "There are more than 2 categories in "
+                + str(preferences)
+                + ", this cannot be converted "
+                "into an approval ballot"
+            )
         if len(preferences) == 1:
             approval_set = preferences[0]
         else:
             approval_set, _ = preferences
 
-        if relative_setsize and 0 < len(approval_set) < int(ceil(sum(len(p) for p in preferences) * relative_setsize)):
+        if relative_setsize and 0 < len(approval_set) < int(
+            ceil(sum(len(p) for p in preferences) * relative_setsize)
+        ):
             normalized_approval_set = normalize_map.values()
         elif 0 < len(approval_set) < setsize:
             normalized_approval_set = normalize_map.values()
@@ -222,8 +236,10 @@ def write_profile_to_preflib_cat_file(filename, profile):
         preflib_inst.alternatives_name[cand + 1] = profile.cand_names[cand]
 
     for voter in profile:
-        pref = (tuple(cand + 1 for cand in voter.approved),
-                tuple(cand + 1 for cand in profile.candidates if cand not in voter.approved))
+        pref = (
+            tuple(cand + 1 for cand in voter.approved),
+            tuple(cand + 1 for cand in profile.candidates if cand not in voter.approved),
+        )
         if int(voter.weight) == voter.weight:
             multiplicity = voter.weight
         else:
