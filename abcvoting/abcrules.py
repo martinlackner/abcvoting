@@ -3738,7 +3738,7 @@ def compute_maximin_support(
             .. doctest::
 
                 >>> Rule("maximin-support").algorithms
-                ('gurobi',)
+                ('gurobi', 'mip-gurobi', 'mip-cbc')
 
         resolute : bool, optional
             Return only one winning committee.

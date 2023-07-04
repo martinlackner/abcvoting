@@ -74,8 +74,8 @@ def read_preflib_file(filename, top_ranks=None, setsize=None, use_weights=False)
         top_ranks : int, default=1
             The approval set consists of the top entries in each voter's ranking in the Preflib
             instance. The parameter `top_ranks` determines how many ranks are joined to create
-             the approval set. In case of of a Preflib category files, ranks correspond to
-             categories.
+            the approval set. In case of of a Preflib category files, ranks correspond to
+            categories.
 
             It cannot be used if parameter `setsize` is used too.
 
@@ -172,8 +172,8 @@ def read_preflib_files_from_dir(dir_name, top_ranks=None, setsize=None):
         top_ranks : int, default=1
             The approval set consists of the top entries in each voter's ranking in the Preflib
             instance. The parameter `top_ranks` determines how many ranks are joined to create
-             the approval set. In case of of a Preflib category files, ranks correspond to
-             categories.
+            the approval set. In case of of a Preflib category files, ranks correspond to
+            categories.
 
             It cannot be used if parameter `setsize` is used too.
 
