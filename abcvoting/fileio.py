@@ -7,7 +7,6 @@ Two data formats are supported:
 """
 
 import os
-from math import ceil
 import ruamel.yaml
 import preflibtools.instances as preflib
 from abcvoting.preferences import Profile, Voter
@@ -63,7 +62,7 @@ def get_file_names(dir_name, filename_extensions=None):
     return sorted(files)
 
 
-def read_preflib_file(filename, num_cats=None, setsize=None, use_weights=False):
+def read_preflib_file(filename, top_ranks=None, setsize=None, use_weights=False):
     """
     Read a Preflib file (soi, toi, soc or toc).
 
@@ -72,18 +71,21 @@ def read_preflib_file(filename, num_cats=None, setsize=None, use_weights=False):
         filename : str
             Name of the Preflib file.
 
-        num_cats : int, default=1
-            The approval set is composed of the union of the first `num_cats` catefories of the instance.
+        top_ranks : int, default=1
+            The approval set consists of the top entries in each voter's ranking in the Preflib
+            instance. The parameter `top_ranks` determines how many ranks are joined to create
+             the approval set. In case of of a Preflib category files, ranks correspond to
+             categories.
 
             It cannot be used if parameter `setsize` is used too.
 
-        setsize : int
+        setsize : int, optional
             Minimum number of candidates that voters approve.
 
             These candidates are taken from the top of ranking.
             In case of ties, more than setsize candidates are approved.
 
-            It cannot be used if parameter `num_cats` is used too.
+            It cannot be used if parameter `top_ranks` is used too.
 
         use_weights : bool, default=False
             Use weights of voters instead of individual voters.
@@ -97,12 +99,12 @@ def read_preflib_file(filename, num_cats=None, setsize=None, use_weights=False):
         abcvoting.preferences.Profile
             Preference profile extracted from Preflib file.
     """
-    if num_cats is None and setsize is None:
-        num_cats = 1
-    if num_cats and setsize:
-        raise ValueError("Parameters num_cats and setsize cannot be used simultaneously.")
-    if num_cats and num_cats <= 0:
-        raise ValueError("Parameter num_cats must be > 0")
+    if top_ranks is None and setsize is None:
+        top_ranks = 1  # default
+    if top_ranks and setsize:
+        raise ValueError("Parameters top_ranks and setsize cannot be used simultaneously.")
+    if top_ranks and top_ranks <= 0:
+        raise ValueError("Parameter top_ranks must be > 0")
     if setsize and setsize <= 0:
         raise ValueError("Parameter setsize must be > 0")
 
@@ -118,7 +120,7 @@ def read_preflib_file(filename, num_cats=None, setsize=None, use_weights=False):
             preflib_inst = preflib.CategoricalInstance.from_ordinal(
                 preflib_inst, size_truncators=[setsize]
             )
-        elif num_cats:
+        elif top_ranks:
             preflib_inst = preflib.CategoricalInstance.from_ordinal(
                 preflib_inst, num_indif_classes=[1] * preflib_inst.num_alternatives
             )
@@ -143,10 +145,10 @@ def read_preflib_file(filename, num_cats=None, setsize=None, use_weights=False):
                 category += 1
             if 0 < len(approval_set) < setsize:
                 approval_set = normalize_map.values()
-        elif num_cats:
+        elif top_ranks:
             approval_set = [
                 normalize_map[cand]
-                for category in range(min(len(preferences), num_cats))
+                for category in range(min(len(preferences), top_ranks))
                 for cand in preferences[category]
             ]
 
@@ -158,7 +160,7 @@ def read_preflib_file(filename, num_cats=None, setsize=None, use_weights=False):
     return profile
 
 
-def read_preflib_files_from_dir(dir_name, num_cats=None, setsize=None):
+def read_preflib_files_from_dir(dir_name, top_ranks=None, setsize=None):
     """
     Read all Preflib files (soi, toi, soc or toc) in a given directory.
 
@@ -167,8 +169,11 @@ def read_preflib_files_from_dir(dir_name, num_cats=None, setsize=None):
         dir_name : str
             Path of the directory to be searched for Preflib files.
 
-        num_cats : int, default=1
-            The approval set is composed of the union of the first `num_cats` catefories of the instance.
+        top_ranks : int, default=1
+            The approval set consists of the top entries in each voter's ranking in the Preflib
+            instance. The parameter `top_ranks` determines how many ranks are joined to create
+             the approval set. In case of of a Preflib category files, ranks correspond to
+             categories.
 
             It cannot be used if parameter `setsize` is used too.
 
@@ -178,7 +183,7 @@ def read_preflib_files_from_dir(dir_name, num_cats=None, setsize=None):
             These candidates are taken from the top of ranking.
             In case of ties, more than setsize candidates are approved.
 
-            It cannot be used if parameter `num_cats` is used too.
+            It cannot be used if parameter `top_ranks` is used too.
 
     Returns
     -------
@@ -190,14 +195,16 @@ def read_preflib_files_from_dir(dir_name, num_cats=None, setsize=None):
 
     profiles = {}
     for f in files:
-        profile = read_preflib_file(os.path.join(dir_name, f), num_cats=num_cats, setsize=setsize)
+        profile = read_preflib_file(
+            os.path.join(dir_name, f), top_ranks=top_ranks, setsize=setsize
+        )
         profiles[f] = profile
     return profiles
 
 
 def write_profile_to_preflib_cat_file(filename, profile):
     """
-    Write a profile to a Preflib .toi file.
+    Write a profile to a Preflib category file (.cat).
 
     Parameters
     ----------

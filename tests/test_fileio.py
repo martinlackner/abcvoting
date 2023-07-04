@@ -11,7 +11,7 @@ from abcvoting.preferences import Profile, Voter
 @pytest.mark.parametrize("filename", ["test1.toi", "test2.soi", "test3.toc"])
 def test_readfile(filename):
     currdir = os.path.dirname(os.path.abspath(__file__))
-    profile = fileio.read_preflib_file(currdir + "/data/" + filename, num_cats=2)
+    profile = fileio.read_preflib_file(currdir + "/data/" + filename, top_ranks=2)
     assert len(profile) == 5
     assert profile.has_unit_weights()
 
@@ -23,7 +23,7 @@ def test_readfromdir():
     for filename, profile in profiles.items():
         assert isinstance(filename, str)
         for voter in profile:
-            assert len(voter.approved) >= 2 or len(voter.approved) == 0
+            assert len(voter.approved) >= 2
         assert profile.has_unit_weights()
 
 
@@ -38,7 +38,7 @@ def test_readfile_setsize(filename):
 @pytest.mark.parametrize("filename", ["test2.soi", "test3.toc"])
 def test_readfile_numcats(filename):
     currdir = os.path.dirname(os.path.abspath(__file__))
-    profile = fileio.read_preflib_file(currdir + "/data/" + filename, num_cats=2)
+    profile = fileio.read_preflib_file(currdir + "/data/" + filename, top_ranks=2)
     for voter in profile:
         assert len(voter.approved) == 2
 
@@ -66,7 +66,7 @@ def test_readfile_setsize_with_ties(filename, setsize, expected):
 
 
 @pytest.mark.parametrize(
-    "filename,num_cats,expected",
+    "filename,top_ranks,expected",
     [
         ("test1.toi", 1, [1, 1, 1, 2, 1]),
         ("test1.toi", 2, [2, 3, 3, 3, 2]),
@@ -79,9 +79,9 @@ def test_readfile_setsize_with_ties(filename, setsize, expected):
         ("test4.cat", 4, [3, 1, 1, 3, 3]),
     ],
 )
-def test_readfile_num_cats_with_ties(filename, num_cats, expected):
+def test_readfile_top_ranks_with_ties(filename, top_ranks, expected):
     currdir = os.path.dirname(os.path.abspath(__file__))
-    profile = fileio.read_preflib_file(currdir + "/data/" + filename, num_cats=num_cats)
+    profile = fileio.read_preflib_file(currdir + "/data/" + filename, top_ranks=top_ranks)
     assert [len(voter.approved) for voter in profile] == expected
     for voter in profile:
         assert voter.weight == 1
