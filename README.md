@@ -10,6 +10,7 @@
 
 # abcvoting
 
+> [!NOTE]
 > - [**Documentation**](https://abcvoting.readthedocs.io/)
 > - [**Installation**](https://abcvoting.readthedocs.io/en/latest/installation.html)  
 > - [**How to cite the abcvoting library**](https://abcvoting.readthedocs.io/en/latest/howtocite.html)
