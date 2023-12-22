@@ -71,7 +71,8 @@ In addition, one can verify axiomatic properties such as
 * The core property
 
 Instead of using the abcvoting Python library, you can also use the 
-[**abcvoting web application**](https://pref.tools/abcvoting/) by Dominik Peters.
+[**abcvoting web application**](https://pref.tools/abcvoting/) by Dominik Peters
+(which is based on this Python library).
 
 ## Installation
 
