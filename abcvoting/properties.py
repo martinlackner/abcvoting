@@ -662,7 +662,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
 
     # constraint: the condition of having strictly more approved candidates in
     # dominating committee will be satisfied for at least one voter
-    model.addConstr(gb.quicksum(condition_strictly_more) >= 1)
+    model.addConstr(condition_strictly_more.sum() >= 1)
 
     # constraint: all voters should have at least as many preferred candidates
     # in the dominating committee as in the query committee.
@@ -675,7 +675,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
         )
 
     # constraint: committee has the right size
-    model.addConstr(gb.quicksum(in_committee) == len(committee))
+    model.addConstr(in_committee.sum() == len(committee))
 
     # set the objective function
     model.setObjective(
@@ -816,7 +816,7 @@ def _check_EJR_gurobi(profile, committee, quota):
     in_cut = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_cut")
 
     # the voters in group should agree on at least ell candidates
-    model.addConstr(gb.quicksum(in_cut) >= ell)
+    model.addConstr(in_cut.sum() >= ell)
 
     # candidates in cut should be approved by all voters in group
     for vi, voter in enumerate(profile):
@@ -968,7 +968,7 @@ def _check_PJR_gurobi(profile, committee, quota):
     in_cut = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_cut")
 
     # the voters in group should agree on at least ell candidates
-    model.addConstr(gb.quicksum(in_cut) >= ell)
+    model.addConstr(in_cut.sum() >= ell)
 
     # candidates in cut should be approved by all voters in group
     for vi, voter in enumerate(profile):
@@ -1521,10 +1521,10 @@ def _check_FJR_gurobi(profile, committee, quota):
 
     # coalition large enough to deserve |set_of_candidates| seats
     model.addConstr(
-        gb.quicksum(set_of_candidates) * quota
+        set_of_candidates.sum() * quota
         <= gb.quicksum(voter.weight * set_of_voters[vi] for vi, voter in enumerate(profile))
     )
-    model.addConstr(gb.quicksum(set_of_voters) >= 1)
+    model.addConstr(set_of_voters.sum() >= 1)
     for i, voter in enumerate(profile):
         # if i is in set_of_voters, then:
         # (a) i has utility at most beta-1 in committee
@@ -1703,10 +1703,10 @@ def _check_core_gurobi(profile, committee, quota):
 
     # set_of_voters is large enough to afford set_of_candidates
     model.addConstr(
-        gb.quicksum(set_of_candidates) * quota
+        set_of_candidates.sum() * quota
         <= gb.quicksum(voter.weight * set_of_voters[vi] for vi, voter in enumerate(profile))
     )
-    model.addConstr(gb.quicksum(set_of_voters) >= 1)
+    model.addConstr(set_of_voters.sum() >= 1)
 
     # every voter in set_of_voters prefers set_of_candidates to committee
     for i, voter in enumerate(profile):

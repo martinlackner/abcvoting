@@ -169,7 +169,7 @@ def _gurobi_thiele_methods(
                 utility[(voter, x)] = model.addVar(vtype=gb.GRB.BINARY, name=f"utility({i,x})")
 
         # constraint: the committee has the required size
-        model.addConstr(gb.quicksum(in_committee) == committeesize)
+        model.addConstr(in_committee.sum() == committeesize)
 
         # constraint: utilities are consistent with actual committee
         for voter in profile:
@@ -234,7 +234,7 @@ def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
                 utility[(voter, x)] = model.addVar(vtype=gb.GRB.BINARY, name=f"utility({i, x})")
 
         # constraint: the committee has the required size
-        model.addConstr(gb.quicksum(in_committee) == committeesize)
+        model.addConstr(in_committee.sum() == committeesize)
 
         # constraint: utilities are consistent with actual committee
         for voter in profile:
@@ -663,7 +663,7 @@ def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees
                     voteratmostdistances[(i, dist)] = 0
 
         # constraint: the committee has the required size
-        model.addConstr(gb.quicksum(in_committee) == committeesize)
+        model.addConstr(in_committee.sum() == committeesize)
 
         # constraint: distances are consistent with actual committee
         for i, voter in enumerate(profile):
