@@ -90,7 +90,7 @@ Install all dependencies including development requirements and the abcvoting pa
 [development mode](https://setuptools.readthedocs.io/en/latest/userguide/development_mode.html):
 
 ```bash
-pip install -e .[dev]
+pip install -e ".[dev]"
 ```
 
 Basic unit tests can be run by excluding tests which require additional dependencies:
