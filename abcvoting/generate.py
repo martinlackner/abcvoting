@@ -106,35 +106,16 @@ def random_urn_fixed_size_profile(num_voters, num_cand, setsize, replace):
     -------
         abcvoting.preferences.Profile
     """
-    currsize = 1.0
-    approval_sets = []
-    replacedsets = {}
 
-    for _ in range(num_voters):
-        r = rng.random() * currsize
-        if r < 1.0:
-            # base case: sample uniformly at random
-            randset = list(range(num_cand))
-            rng.shuffle(randset)
-            randset = randset[:setsize]
-            approval_sets.append(randset)
-            key = tuple(set(randset))
-            if key in replacedsets:
-                replacedsets[key] += 1
-            else:
-                replacedsets[key] = 1
-            currsize += replace
-        else:
-            # sample from one of the replaced ballots
-            r = rng.integers(0, sum(replacedsets.values()))
-            for approval_set, count in replacedsets.items():
-                if r <= count:
-                    approval_sets.append(list(approval_set))
-                    break
-                r -= count
-    profile = Profile(num_cand)
-    profile.add_voters(approval_sets)
-    return profile
+    return prefsampling_wrapper(
+        app_samplers.urn_constant_size,
+        {
+            "num_voters": num_voters,
+            "num_candidates": num_cand,
+            "rel_num_approvals": setsize / num_cand,
+            "alpha": replace,
+        },
+    )
 
 
 def random_ic_fixed_size_profile(num_voters, num_cand, setsize):
@@ -235,22 +216,6 @@ def random_ic_profile(num_voters, num_cand, p=0.5):
     )
 
 
-def _ordinal_urn_profile(num_voters, num_cand, replace):
-    """
-    Generate rankings according to the Urn probability distribution.
-    """
-    rankings = []
-    urn_size = 1.0
-    for j in range(num_voters):
-        rho = rng.uniform(0, urn_size)
-        if rho <= 1.0:
-            rankings.append(rng.permutation(num_cand))
-        else:
-            rankings.append(rankings[rng.integers(0, j)])
-        urn_size += replace
-    return rankings
-
-
 def random_urn_profile(num_voters, num_cand, p, replace):
     """
     Generate a random profile using the *Polya Urn* probability distribution.
@@ -277,22 +242,11 @@ def random_urn_profile(num_voters, num_cand, p, replace):
     -------
         abcvoting.preferences.Profile
     """
-    approval_sets = []
-    urn_size = 1.0
-    for j in range(num_voters):
-        rho = rng.uniform(0, urn_size)
-        if rho <= 1.0:
-            vote = set()
-            for c in range(num_cand):
-                if rng.random() <= p:
-                    vote.add(c)
-            approval_sets.append(vote)
-        else:
-            approval_sets.append(approval_sets[rng.integers(0, j)])
-        urn_size += replace
-    profile = Profile(num_cand)
-    profile.add_voters(approval_sets)
-    return profile
+
+    return prefsampling_wrapper(
+        app_samplers.urn,
+        {"num_voters": num_voters, "num_candidates": num_cand, "p": p, "alpha": replace},
+    )
 
 
 def random_truncated_urn_profile(num_voters, num_cand, setsize, replace):
