@@ -540,12 +540,18 @@ def prefsampling_euclidean_wrapper(
     -------
         abcvoting.preferences.Profile | tuple[abcvoting.preferences.Profile,np.ndarray,np.ndarray]
     """
+    voter_prob_distribution_func = None
+    if voter_prob_distribution is not None:
+        voter_prob_distribution_func = voter_prob_distribution.prefsampling_function()
+    candidate_prob_distribution_func = None
+    if candidate_prob_distribution is not None:
+        candidate_prob_distribution_func = candidate_prob_distribution.prefsampling_function()
     voters_pos, candidates_pos = prefsampling_sample_election_positions(
         num_voters,
         num_cand,
-        voter_prob_distribution.prefsampling_function(),
+        voter_prob_distribution_func,
         dict(),
-        candidate_prob_distribution.prefsampling_function(),
+        candidate_prob_distribution_func,
         dict(),
         voter_points,
         candidate_points,

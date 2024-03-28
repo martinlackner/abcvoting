@@ -16,9 +16,10 @@ prob_distributions = []
 for num_groups in [2, 3, 4, 5]:
     for phi in np.linspace(0, 1 / num_groups, 5, endpoint=False):
         for p in np.linspace(0.1, 0.9, 9):
-            prob_distributions.append(
-                {"id": "Disjoint Resampling", "num_groups": num_groups, "p": p, "phi": phi}
-            )
+            if p * num_groups <= 1:
+                prob_distributions.append(
+                    {"id": "Disjoint Resampling", "num_groups": num_groups, "p": p, "phi": phi}
+                )
 # Noise
 for phi in np.linspace(0, 1, 10, endpoint=False):
     for p in np.linspace(0.1, 0.9, 9):

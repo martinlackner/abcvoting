@@ -1,8 +1,8 @@
-Generating 560 profiles with 100 voters and 50 candidates.
+Generating 440 profiles with 100 voters and 50 candidates.
 This may take a while...
 
-Done. Generated 560 profiles.
- 180 profiles via Disjoint Resampling
+Done. Generated 440 profiles.
+ 60 profiles via Disjoint Resampling
  200 profiles via Euclidean VCR
  90 profiles via Noise
  90 profiles via Truncated Urn
