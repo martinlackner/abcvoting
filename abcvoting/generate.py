@@ -5,15 +5,32 @@ This module is based on the paper on the package
 `prefsampling <https://github.com/COMSOC-Community/prefsampling>`_.
 """
 
-import math
 import numpy as np
 import prefsampling.approval as app_samplers
 import prefsampling.ordinal as ord_samplers
+import prefsampling.point as point_samplers
+from prefsampling.core.euclidean import (
+    sample_election_positions as prefsampling_sample_election_positions,
+)
 from numpy.random import default_rng
 from abcvoting.preferences import Profile, Voter
 
 
 def prefsampling_wrapper(sampler, sampler_params):
+    """
+    Wrapper for prefsampling functions to map the outcome of the samplers to an abcvoting profile.
+
+    Parameters
+    ----------
+        sampler : Callable
+            The prefsampling function.
+        sampler_params : dict
+            The arguments passed to the sampler, all are passed as kwargs.
+
+    Returns
+    -------
+        abcvoting.preferences.Profile
+    """
     samples = sampler(**sampler_params)
     num_candidates = sampler_params["num_candidates"]
     profile = Profile(num_candidates)
@@ -452,6 +469,8 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
         noise_type = app_samplers.NoiseType.ZELINKA
     elif distance == "bunke-shearer":
         noise_type = app_samplers.NoiseType.BUNKE_SHEARER
+    else:
+        raise ValueError(f"unknown name of distance: {distance}")
     return prefsampling_wrapper(
         app_samplers.noise,
         {
@@ -462,6 +481,83 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
             "noise_type": noise_type,
         },
     )
+
+
+def prefsampling_euclidean_wrapper(
+    num_voters,
+    num_cand,
+    voter_prob_distribution,
+    candidate_prob_distribution,
+    voter_points,
+    candidate_points,
+    return_points,
+    sampler,
+    sampler_params,
+):
+    """
+    Wrapper for prefsampling functions to map the outcome of the samplers to an abcvoting profile.
+    This is specific to the Euclidean samplers.
+
+    Parameters
+    ----------
+        num_voters : int
+            The desired number of voters in the profile.
+
+        num_cand : int
+            The desired number of candidates in the profile.
+
+        voter_prob_distribution : PointProbabilityDistribution or None
+            A probability distribution used to generate voter points.
+
+        candidate_prob_distribution : PointProbabilityDistribution or None
+            A probability distribution used to generate candidate points.
+
+        voter_points : iterable
+            A list of points.
+
+            The length of this list must be `num_voters`. The dimension of the points must be
+            the same as the points in `candiddate_points` or as specified by
+            `candidate_prob_distribution`. This parameter is only used if `voter_prob_distribution`
+            is `None`.
+
+        candidate_points : iterable
+            A list of points.
+
+            The length of this list must be `num_cand`. The dimension of the points must be
+            the same as the points in `voter_points` or as specified by `voter_prob_distribution`.
+            This parameter is only used if `candidate_prob_distribution` is `None`.
+
+        return_points : bool, optional
+            If true, also return the list of voter points and a list of candidate points.
+
+        sampler : Callable
+            The prefsampling function.
+
+        sampler_params : dict
+            The arguments passed to the sampler, all are passed as kwargs.
+
+    Returns
+    -------
+        abcvoting.preferences.Profile | tuple[abcvoting.preferences.Profile,np.ndarray,np.ndarray]
+    """
+    voters_pos, candidates_pos = prefsampling_sample_election_positions(
+        num_voters,
+        num_cand,
+        voter_prob_distribution.prefsampling_function(),
+        dict(),
+        candidate_prob_distribution.prefsampling_function(),
+        dict(),
+        voter_points,
+        candidate_points,
+    )
+    sampler_params["num_voters"] = num_voters
+    sampler_params["num_candidates"] = num_cand
+    sampler_params["voters_positions"] = voters_pos
+    sampler_params["candidates_positions"] = candidates_pos
+    profile = prefsampling_wrapper(sampler, sampler_params)
+    if return_points:
+        return profile, voters_pos, candidates_pos
+    return profile
 
 
 def random_euclidean_fixed_size_profile(
@@ -516,30 +612,17 @@ def random_euclidean_fixed_size_profile(
     -------
         abcvoting.preferences.Profile
     """
-
-    voter_points, candidate_points = _voter_and_candidate_points(
+    return prefsampling_euclidean_wrapper(
         num_voters,
         num_cand,
         voter_prob_distribution,
         candidate_prob_distribution,
         voter_points,
         candidate_points,
+        return_points,
+        app_samplers.euclidean_constant_size,
+        {"rel_num_approvals": setsize / num_cand},
     )
-    profile = Profile(num_cand)
-    approval_sets = []
-    for voterpoint in voter_points:
-        distances = {
-            cand: np.linalg.norm(voterpoint - candidate_points[cand])
-            for cand in profile.candidates
-        }
-        cands_sorted = sorted(distances, key=distances.get)
-        approval_sets.append(cands_sorted[:setsize])
-    profile.add_voters(approval_sets)
-
-    if return_points:
-        return profile, voter_points, candidate_points
-
-    return profile
 
 
 def random_euclidean_threshold_profile(
@@ -599,36 +682,17 @@ def random_euclidean_threshold_profile(
     -------
         abcvoting.preferences.Profile
     """
-
-    if threshold < 1:
-        raise ValueError("threshold must be >= 1.")
-
-    voter_points, candidate_points = _voter_and_candidate_points(
+    return prefsampling_euclidean_wrapper(
         num_voters,
         num_cand,
         voter_prob_distribution,
         candidate_prob_distribution,
         voter_points,
         candidate_points,
+        return_points,
+        app_samplers.euclidean_threshold,
+        {"threshold": threshold},
     )
-
-    profile = Profile(num_cand)
-    approval_sets = []
-    for voterpoint in voter_points:
-        distances = {
-            cand: np.linalg.norm(voterpoint - candidate_points[cand])
-            for cand in profile.candidates
-        }
-        mindist = min(distances.values())
-        approval_sets.append(
-            [cand for cand in profile.candidates if distances[cand] <= mindist * threshold]
-        )
-    profile.add_voters(approval_sets)
-
-    if return_points:
-        return profile, voter_points, candidate_points
-
-    return profile
 
 
 def random_euclidean_vcr_profile(
@@ -699,79 +763,18 @@ def random_euclidean_vcr_profile(
     Krzysztof Sornat, Nimrod Talmon.
     https://arxiv.org/abs/2207.01140
     """
-    voter_points, candidate_points = _voter_and_candidate_points(
+
+    return prefsampling_euclidean_wrapper(
         num_voters,
         num_cand,
         voter_prob_distribution,
         candidate_prob_distribution,
         voter_points,
         candidate_points,
+        return_points,
+        app_samplers.euclidean_vcr,
+        {"voters_radius": voter_radius, "candidates_radius": candidate_radius},
     )
-    try:
-        if len(voter_radius) != num_voters:
-            raise ValueError("Length of `voter_radius` must be equal to `num_voters`.")
-        voter_range = voter_radius
-    except TypeError:
-        voter_range = np.array([voter_radius for _ in range(num_voters)])
-    try:
-        if len(candidate_radius) != num_cand:
-            raise ValueError("Length of `candidate_radius` must be equal to `num_cand`.")
-        cand_range = candidate_radius
-    except TypeError:
-        cand_range = np.array([candidate_radius for _ in range(num_cand)])
-
-    approval_sets = [set() for _ in range(num_voters)]
-    for v in range(num_voters):
-        for c in range(num_cand):
-            if voter_range[v] + cand_range[c] >= np.linalg.norm(
-                voter_points[v] - candidate_points[c]
-            ):
-                approval_sets[v].add(c)
-    profile = Profile(num_cand)
-    profile.add_voters(approval_sets)
-
-    if return_points:
-        return profile, voter_points, candidate_points
-
-    return profile
-
-
-def _voter_and_candidate_points(
-    num_voters,
-    num_cand,
-    voter_prob_distribution,
-    candidate_prob_distribution,
-    voter_points,
-    candidate_points,
-):
-    if voter_prob_distribution is not None:
-        voter_points = np.array([random_point(voter_prob_distribution) for _ in range(num_voters)])
-        voter_dimension = voter_prob_distribution.dimension
-    else:
-        voter_dimension = {len(p) for p in voter_points}
-        if len(voter_dimension) != 1:
-            raise ValueError("Voter points have different dimensions.")
-        voter_points = np.array(voter_points)
-        if len(voter_points) != num_voters:
-            raise ValueError("Length of `voters` is not the same as `num_voters`.")
-        voter_dimension = min(voter_dimension)
-    if candidate_prob_distribution is not None:
-        candidate_points = np.array(
-            [random_point(candidate_prob_distribution) for _ in range(num_cand)]
-        )
-        candidate_dimension = candidate_prob_distribution.dimension
-    else:
-        candidate_dimension = {len(p) for p in candidate_points}
-        if len(candidate_dimension) != 1:
-            raise ValueError("Candidate points have different dimensions.")
-        candidate_points = np.array(candidate_points)
-        if len(candidate_points) != num_cand:
-            raise ValueError("Length of `candidates` is not the same as `num_cand`.")
-        candidate_dimension = min(candidate_dimension)
-    if voter_dimension != candidate_dimension:
-        raise ValueError("Voter points and candidate points have a different dimension.")
-
-    return voter_points, candidate_points
 
 
 class PointProbabilityDistribution:
@@ -847,7 +850,8 @@ class PointProbabilityDistribution:
                 title_coord = [dist.center_point[0], dist.center_point[1] + 0.6]
             else:
                 for _ in range(100):
-                    points.append([generate.random_point(dist), 0])
+                    point = generate.random_point(dist)
+                    points.append(np.array([point[0], 0]))
                 title_coord = [dist.center_point[0], 0.2]
             title = dist.name + "\n"
             if dist.width != 1.0:
@@ -882,6 +886,53 @@ class PointProbabilityDistribution:
         except TypeError:
             self.center_point = np.array([center_point] * self.dimension)
 
+    def prefsampling_function(self):
+        if self.name == "1d_interval":
+            return lambda num_points: point_samplers.cube(
+                num_points, 1, center_point=self.center_point, widths=self.width
+            )
+        elif self.name == "1d_gaussian":
+            return lambda num_points: point_samplers.gaussian(
+                num_points, 1, center_point=self.center_point, sigmas=self.sigma
+            )
+        elif self.name == "1d_gaussian_interval":
+            return lambda num_points: point_samplers.gaussian(
+                num_points,
+                1,
+                center_point=self.center_point,
+                sigmas=self.sigma,
+                widths=[self.width],
+            )
+        elif self.name == "2d_disc":
+            return lambda num_points: point_samplers.ball_uniform(
+                num_points, 2, center_point=self.center_point, widths=self.width
+            )
+        elif self.name == "2d_square":
+            return lambda num_points: point_samplers.cube(
+                num_points, 2, center_point=self.center_point, widths=self.width
+            )
+        elif self.name == "2d_gaussian":
+            return lambda num_points: point_samplers.gaussian(
+                num_points, 2, center_point=self.center_point, sigmas=self.sigma
+            )
+        elif self.name == "2d_gaussian_disc":
+            return lambda num_points: point_samplers.ball_resampling(
+                num_points,
+                2,
+                lambda: point_samplers.gaussian(
+                    1, 2, center_point=self.center_point, sigmas=self.sigma
+                )[0],
+                {},
+                center_point=self.center_point,
+                width=self.width,
+            )
+        elif self.name == "3d_cube":
+            return lambda num_points: point_samplers.cube(
+                num_points, 3, center_point=self.center_point, widths=self.width
+            )
+        else:
+            raise ValueError(f"unknown name of point distribution: {self.name}")
+
 
 def random_point(prob_distribution):
     """
@@ -894,54 +945,9 @@ def random_point(prob_distribution):
 
     Returns
     -------
-        abcvoting.preferences.Profile
+        np.ndarray
     """
-    if prob_distribution.name == "1d_interval":
-        offset = prob_distribution.center_point[0] - prob_distribution.width / 2
-        point = rng.random() * prob_distribution.width + offset
-    elif prob_distribution.name == "1d_gaussian":
-        point = rng.normal(prob_distribution.center_point[0], prob_distribution.sigma)
-    elif prob_distribution.name == "1d_gaussian_interval":
-        while True:
-            point = rng.normal(prob_distribution.center_point[0], prob_distribution.sigma)
-            if (
-                prob_distribution.center_point[0] - prob_distribution.width / 2
-                <= point
-                <= prob_distribution.center_point[0] + prob_distribution.width / 2
-            ):
-                break
-    elif prob_distribution.name == "2d_disc":
-        phi = 2.0 * 180.0 * rng.random()
-        radius = math.sqrt(rng.random()) * prob_distribution.width / 2
-        point = [
-            prob_distribution.center_point[0] + radius * math.cos(phi),
-            prob_distribution.center_point[1] + radius * math.sin(phi),
-        ]
-    elif prob_distribution.name == "2d_square":
-        offset = prob_distribution.center_point - prob_distribution.width / 2
-        point = rng.random(2) * prob_distribution.width + offset
-    elif prob_distribution.name == "2d_gaussian":
-        point = [
-            rng.normal(prob_distribution.center_point[0], prob_distribution.sigma),
-            rng.normal(prob_distribution.center_point[1], prob_distribution.sigma),
-        ]
-    elif prob_distribution.name == "2d_gaussian_disc":
-        while True:
-            point = [
-                rng.normal(prob_distribution.center_point[0], prob_distribution.sigma),
-                rng.normal(prob_distribution.center_point[1], prob_distribution.sigma),
-            ]
-            if (
-                np.linalg.norm(point - prob_distribution.center_point)
-                <= prob_distribution.width / 2
-            ):
-                break
-    elif prob_distribution.name == "3d_cube":
-        point = rng.random(3) * prob_distribution.width + prob_distribution.center_point
-    else:
-        raise ValueError(f"unknown name of point distribution: {prob_distribution.name}")
-
-    return point
+    return prob_distribution.prefsampling_function()(1)[0]
 
 
 PROBABILITY_DISTRIBUTIONS = {
