@@ -886,11 +886,11 @@ class PointProbabilityDistribution:
 
         try:
             len(center_point)
-            self.center_point = np.array(center_point)
+            self.center_point = np.array(center_point, dtype=float)
             if len(self.center_point) != self.dimension:
                 raise ValueError("Center point has a wrong dimension.")
         except TypeError:
-            self.center_point = np.array([center_point] * self.dimension)
+            self.center_point = np.array([center_point] * self.dimension, dtype=float)
 
     def prefsampling_function(self):
         if self.name == "1d_interval":
