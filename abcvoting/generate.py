@@ -534,7 +534,7 @@ def prefsampling_euclidean_wrapper(
             The prefsampling function.
 
         sampler_params : dict
-            The arguments passed to the sampler, all are passed as kwargs.
+            The arguments passed to the sampler, all arguments are passed as kwargs.
 
     Returns
     -------
