@@ -99,10 +99,10 @@ setuptools.setup(
             "pytest>=6",
             "coverage[toml]>=5.3",
             "black==22.3.0",
-            "Sphinx>=4.4.0",
+            "Sphinx>=7.0",
             "sphinx-rtd-theme>=1.0.0",
-            "numpydoc>=1.2",
-            "sphinx-codeautolink>=0.10",
+            "numpydoc>=1.5",
+            "sphinx-codeautolink>=0.15",
             "matplotlib>=3.4.3",
         ]
     },
