@@ -1,7 +1,7 @@
-Sphinx==4.4.0
+Sphinx>=5.0
 sphinx-rtd-theme>=1.0.0
-numpydoc>=1.2
-sphinx-codeautolink>=0.10
+numpydoc>=1.5
+sphinx-codeautolink>=0.15
 matplotlib>=3.4.3
 networkx[default]>=2.6.3
 mip>=1.14.0

@@ -495,7 +495,9 @@ def prefsampling_euclidean_wrapper(
     sampler_params,
 ):
     """
-    Wrapper for prefsampling functions to map the outcome of the samplers to an abcvoting profile.
+    Wrapper for prefsampling functions.
+
+    Maps the outcome of the samplers to an abcvoting profile.
     This is specific to the Euclidean samplers.
 
     Parameters
