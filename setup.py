@@ -90,7 +90,7 @@ setuptools.setup(
         "mip>=1.14.0",
         "ruamel.yaml>=0.17",
         "numpy>=1.21",
-        "gurobipy>=9.5.0",
+        "gurobipy>=11.0",
         "preflibtools>=2.0.12",
         "prefsampling>=0.1.15",
     ],
