@@ -17,6 +17,8 @@
 > - [**Acknowledgements and contributors**](https://abcvoting.readthedocs.io/en/latest/acks.html)
 > - [**► abcvoting web app**](https://pref.tools/abcvoting/)
 
+For an overview of other software tools related to Computational Social Choice, see the [COMSOC community page](https://comsoc-community.org/tools).
+
 ## A Python library of approval-based committee (ABC) rules
 
 **A**pproval-**b**ased **c**ommittee rules (ABC rules) are voting methods for selecting a committee, i.e., a fixed-size subset of candidates.
