@@ -354,7 +354,12 @@ def random_resampling_profile(num_voters, num_cand, p, phi):
     """
     return prefsampling_wrapper(
         app_samplers.resampling,
-        {"num_voters": num_voters, "num_candidates": num_cand, "phi": phi, "rel_size_central_vote": p},
+        {
+            "num_voters": num_voters,
+            "num_candidates": num_cand,
+            "phi": phi,
+            "rel_size_central_vote": p,
+        },
     )
 
 
@@ -558,11 +563,7 @@ def prefsampling_euclidean_wrapper(
     else:
         candidates_positions = candidate_points
     voters_pos, candidates_pos = prefsampling_sample_election_positions(
-        num_voters,
-        num_cand,
-        num_dimensions,
-        voters_positions,
-        candidates_positions
+        num_voters, num_cand, num_dimensions, voters_positions, candidates_positions
     )
     sampler_params["num_voters"] = num_voters
     sampler_params["num_candidates"] = num_cand
