@@ -354,7 +354,7 @@ def random_resampling_profile(num_voters, num_cand, p, phi):
     """
     return prefsampling_wrapper(
         app_samplers.resampling,
-        {"num_voters": num_voters, "num_candidates": num_cand, "phi": phi, "p": p},
+        {"num_voters": num_voters, "num_candidates": num_cand, "phi": phi, "rel_size_central_vote": p},
     )
 
 
@@ -411,8 +411,8 @@ def random_disjoint_resampling_profile(num_voters, num_cand, p, phi=None, num_gr
             "num_voters": num_voters,
             "num_candidates": num_cand,
             "phi": phi,
-            "p": p,
-            "g": num_groups,
+            "rel_size_central_vote": p,
+            "num_central_votes": num_groups,
         },
     )
 
@@ -462,13 +462,13 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
     """
 
     if distance == "hamming":
-        noise_type = app_samplers.NoiseType.HAMMING
+        noise_type = app_samplers.SetDistance.HAMMING
     elif distance == "jaccard":
-        noise_type = app_samplers.NoiseType.JACCARD
+        noise_type = app_samplers.SetDistance.JACCARD
     elif distance == "zelinka":
-        noise_type = app_samplers.NoiseType.ZELINKA
+        noise_type = app_samplers.SetDistance.ZELINKA
     elif distance == "bunke-shearer":
-        noise_type = app_samplers.NoiseType.BUNKE_SHEARER
+        noise_type = app_samplers.SetDistance.BUNKE_SHEARER
     else:
         raise ValueError(f"unknown name of distance: {distance}")
     return prefsampling_wrapper(
@@ -477,8 +477,8 @@ def random_noise_model_profile(num_voters, num_cand, p, phi, distance="hamming")
             "num_voters": num_voters,
             "num_candidates": num_cand,
             "phi": phi,
-            "p": p,
-            "noise_type": noise_type,
+            "rel_size_central_vote": p,
+            "distance": noise_type,
         },
     )
 
@@ -542,24 +542,31 @@ def prefsampling_euclidean_wrapper(
     -------
         abcvoting.preferences.Profile | tuple[abcvoting.preferences.Profile,np.ndarray,np.ndarray]
     """
-    voter_prob_distribution_func = None
-    if voter_prob_distribution is not None:
-        voter_prob_distribution_func = voter_prob_distribution.prefsampling_function()
-    candidate_prob_distribution_func = None
-    if candidate_prob_distribution is not None:
-        candidate_prob_distribution_func = candidate_prob_distribution.prefsampling_function()
+    num_dimensions = -1
+    voters_positions = None
+    if voter_points is None:
+        if voter_prob_distribution is not None:
+            voters_positions = voter_prob_distribution.prefsampling_function()
+            num_dimensions = int(voter_prob_distribution.name[0])
+    else:
+        voters_positions = voter_points
+        num_dimensions = len(voter_points[0])
+    candidates_positions = None
+    if candidate_points is None:
+        if candidate_prob_distribution is not None:
+            candidates_positions = candidate_prob_distribution.prefsampling_function()
+    else:
+        candidates_positions = candidate_points
     voters_pos, candidates_pos = prefsampling_sample_election_positions(
         num_voters,
         num_cand,
-        voter_prob_distribution_func,
-        dict(),
-        candidate_prob_distribution_func,
-        dict(),
-        voter_points,
-        candidate_points,
+        num_dimensions,
+        voters_positions,
+        candidates_positions
     )
     sampler_params["num_voters"] = num_voters
     sampler_params["num_candidates"] = num_cand
+    sampler_params["num_dimensions"] = num_dimensions
     sampler_params["voters_positions"] = voters_pos
     sampler_params["candidates_positions"] = candidates_pos
     profile = prefsampling_wrapper(sampler, sampler_params)
@@ -896,15 +903,15 @@ class PointProbabilityDistribution:
 
     def prefsampling_function(self):
         if self.name == "1d_interval":
-            return lambda num_points: point_samplers.cube(
+            return lambda num_points, num_dimensions: point_samplers.cube(
                 num_points, 1, center_point=self.center_point, widths=self.width
             )
         elif self.name == "1d_gaussian":
-            return lambda num_points: point_samplers.gaussian(
+            return lambda num_points, num_dimensions: point_samplers.gaussian(
                 num_points, 1, center_point=self.center_point, sigmas=self.sigma
             )
         elif self.name == "1d_gaussian_interval":
-            return lambda num_points: point_samplers.gaussian(
+            return lambda num_points, num_dimensions: point_samplers.gaussian(
                 num_points,
                 1,
                 center_point=self.center_point,
@@ -912,19 +919,19 @@ class PointProbabilityDistribution:
                 widths=[self.width],
             )
         elif self.name == "2d_disc":
-            return lambda num_points: point_samplers.ball_uniform(
+            return lambda num_points, num_dimensions: point_samplers.ball_uniform(
                 num_points, 2, center_point=self.center_point, widths=self.width
             )
         elif self.name == "2d_square":
-            return lambda num_points: point_samplers.cube(
+            return lambda num_points, num_dimensions: point_samplers.cube(
                 num_points, 2, center_point=self.center_point, widths=self.width
             )
         elif self.name == "2d_gaussian":
-            return lambda num_points: point_samplers.gaussian(
+            return lambda num_points, num_dimensions: point_samplers.gaussian(
                 num_points, 2, center_point=self.center_point, sigmas=self.sigma
             )
         elif self.name == "2d_gaussian_disc":
-            return lambda num_points: point_samplers.ball_resampling(
+            return lambda num_points, num_dimensions: point_samplers.ball_resampling(
                 num_points,
                 2,
                 lambda: point_samplers.gaussian(
@@ -935,7 +942,7 @@ class PointProbabilityDistribution:
                 width=self.width,
             )
         elif self.name == "3d_cube":
-            return lambda num_points: point_samplers.cube(
+            return lambda num_points, num_dimensions: point_samplers.cube(
                 num_points, 3, center_point=self.center_point, widths=self.width
             )
         else:

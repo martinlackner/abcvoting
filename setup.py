@@ -92,7 +92,7 @@ setuptools.setup(
         "numpy>=1.21",
         "gurobipy>=11.0",
         "preflibtools>=2.0.12",
-        "prefsampling>=0.1.15",
+        "prefsampling>=0.1.18",
     ],
     extras_require={
         "dev": [
