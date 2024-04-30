@@ -202,7 +202,7 @@ def read_preflib_files_from_dir(dir_name, top_ranks=None, setsize=None):
     return profiles
 
 
-def write_profile_to_preflib_cat_file(filename, profile):
+def write_profile_to_preflib_cat_file(filepath, profile):
     """
     Write a profile to a Preflib category file (.cat).
 
@@ -219,9 +219,10 @@ def write_profile_to_preflib_cat_file(filename, profile):
         None
     """
     preflib_inst = preflib.CategoricalInstance()
+    preflib_inst.data_type = "cat"
     preflib_inst.num_categories = 2
     preflib_inst.categories_name = {"1": "Approved", "2": "Not approved"}
-    preflib_inst.file_name = filename
+    preflib_inst.file_name = os.path.basename(filepath)
     preflib_inst.num_alternatives = profile.num_cand
     for cand in profile.candidates:
         preflib_inst.alternatives_name[cand + 1] = profile.cand_names[cand]
@@ -241,7 +242,7 @@ def write_profile_to_preflib_cat_file(filename, profile):
         else:
             preflib_inst.multiplicity[pref] += multiplicity
     preflib_inst.recompute_cardinality_param()
-    preflib_inst.write(filename)
+    preflib_inst.write(filepath)
 
 
 def _yaml_flow_style_list(x):
