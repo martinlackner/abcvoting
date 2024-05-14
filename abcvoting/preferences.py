@@ -10,7 +10,6 @@ Preference profiles and voters.
 
 """
 
-
 from collections import OrderedDict
 from abcvoting import misc
 
