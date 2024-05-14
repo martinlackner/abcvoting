@@ -904,35 +904,36 @@ class PointProbabilityDistribution:
 
     def prefsampling_function(self):
         if self.name == "1d_interval":
-            return lambda num_points, num_dimensions: point_samplers.cube(
-                num_points, 1, center_point=self.center_point, widths=self.width
+            return lambda num_points, num_dimensions, seed=None: point_samplers.cube(
+                num_points, 1, center_point=self.center_point, widths=self.width, seed=seed
             )
         elif self.name == "1d_gaussian":
-            return lambda num_points, num_dimensions: point_samplers.gaussian(
-                num_points, 1, center_point=self.center_point, sigmas=self.sigma
+            return lambda num_points, num_dimensions, seed=None: point_samplers.gaussian(
+                num_points, 1, center_point=self.center_point, sigmas=self.sigma, seed=seed
             )
         elif self.name == "1d_gaussian_interval":
-            return lambda num_points, num_dimensions: point_samplers.gaussian(
+            return lambda num_points, num_dimensions, seed=None: point_samplers.gaussian(
                 num_points,
                 1,
                 center_point=self.center_point,
                 sigmas=self.sigma,
                 widths=[self.width],
+                seed=seed,
             )
         elif self.name == "2d_disc":
-            return lambda num_points, num_dimensions: point_samplers.ball_uniform(
-                num_points, 2, center_point=self.center_point, widths=self.width
+            return lambda num_points, num_dimensions, seed=None: point_samplers.ball_uniform(
+                num_points, 2, center_point=self.center_point, widths=self.width, seed=seed
             )
         elif self.name == "2d_square":
-            return lambda num_points, num_dimensions: point_samplers.cube(
-                num_points, 2, center_point=self.center_point, widths=self.width
+            return lambda num_points, num_dimensions, seed=None: point_samplers.cube(
+                num_points, 2, center_point=self.center_point, widths=self.width, seed=seed
             )
         elif self.name == "2d_gaussian":
-            return lambda num_points, num_dimensions: point_samplers.gaussian(
-                num_points, 2, center_point=self.center_point, sigmas=self.sigma
+            return lambda num_points, num_dimensions, seed=None: point_samplers.gaussian(
+                num_points, 2, center_point=self.center_point, sigmas=self.sigma, seed=seed
             )
         elif self.name == "2d_gaussian_disc":
-            return lambda num_points, num_dimensions: point_samplers.ball_resampling(
+            return lambda num_points, num_dimensions, seed=None: point_samplers.ball_resampling(
                 num_points,
                 2,
                 lambda: point_samplers.gaussian(
@@ -941,10 +942,11 @@ class PointProbabilityDistribution:
                 {},
                 center_point=self.center_point,
                 width=self.width,
+                seed=seed,
             )
         elif self.name == "3d_cube":
-            return lambda num_points, num_dimensions: point_samplers.cube(
-                num_points, 3, center_point=self.center_point, widths=self.width
+            return lambda num_points, num_dimensions, seed=None: point_samplers.cube(
+                num_points, 3, center_point=self.center_point, widths=self.width, seed=seed
             )
         else:
             raise ValueError(f"unknown name of point distribution: {self.name}")
