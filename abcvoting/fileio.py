@@ -208,8 +208,8 @@ def write_profile_to_preflib_cat_file(filepath, profile):
 
     Parameters
     ----------
-        filename : str
-            File name of the Preflib file.
+        filepath : str
+            File path of the Preflib file.
 
         profile : abcvoting.preferences.Profile
             Profile to be written.
