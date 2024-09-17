@@ -842,8 +842,6 @@ class PointProbabilityDistribution:
         from abcvoting.generate import PointProbabilityDistribution
         import matplotlib.pyplot as plt
 
-        plt.rcParams.update({'font.size': 4})
-
         # distributions to generate points in 1- and 2-dimensional space
         distributions = [
             PointProbabilityDistribution("1d_interval", center_point=[0]),
@@ -855,7 +853,7 @@ class PointProbabilityDistribution:
             PointProbabilityDistribution("2d_gaussian_disc", center_point=[6, 2], sigma=0.25),
         ]
 
-        fig, ax = plt.subplots(dpi=600, figsize=(14, 6))
+        fig, ax = plt.subplots(dpi=600, figsize=(7, 3))
         points = []
         for dist in distributions:
             if dist.name.startswith("2d"):
