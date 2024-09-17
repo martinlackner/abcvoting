@@ -69,6 +69,8 @@ jobs:
 
     - name: Upload coverage metrics to codecov
       uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     # tests the package, the release is done in build.yml
     - name: Build a binary wheel and a source tarball
