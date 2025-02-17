@@ -293,12 +293,6 @@ def check_EJR(profile, committee, quota=None, algorithm="fastest"):
     if algorithm == "fastest":
         algorithm = "gurobi"
 
-    if not profile.has_unit_weights() and algorithm == "brute-force":
-        raise NotImplementedError(
-            "For profiles with non-unit weights, "
-            "check_EJR currently only supports the algorithm 'gurobi'."
-        )
-
     if algorithm == "brute-force":
         result, detailed_information = _check_EJR_brute_force(profile, committee, quota)
     elif algorithm == "gurobi":
@@ -408,12 +402,6 @@ def check_PJR(profile, committee, quota=None, algorithm="fastest"):
 
     if algorithm == "fastest":
         algorithm = "gurobi"
-
-    if not profile.has_unit_weights() and algorithm == "brute-force":
-        raise NotImplementedError(
-            "For profiles with non-unit weights, check_PJR "
-            "currently only supports the algorithm 'gurobi'."
-        )
 
     if algorithm == "brute-force":
         result, detailed_information = _check_PJR_brute_force(profile, committee, quota)
@@ -1321,7 +1309,10 @@ def _check_priceability_gurobi(profile, committee, stable=False):
             output.details(f"Budget: {budget.X}")
 
             column_widths = {
-                candidate: max(len(str(payment[voter][candidate].X)) for voter in payment)
+                candidate: max(
+                    len(str(candidate)),
+                    max(len(str(payment[voter][candidate].X)) for voter in payment),
+                )
                 for candidate in profile.candidates
             }
             column_widths["voter"] = len(str(len(profile)))
