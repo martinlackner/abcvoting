@@ -292,10 +292,6 @@ def test_property_functions_with_handcrafted_instances(
     else:
         if algorithm == "brute-force" and property_name in ["priceability", "stable-priceability"]:
             return  # not supported
-        elif (
-            convert_to_weighted and algorithm == "brute-force" and property_name in ["ejr", "pjr"]
-        ):
-            return  # not supported
         else:
             if convert_to_weighted:
                 if len(profile) == profile.total_weight():
