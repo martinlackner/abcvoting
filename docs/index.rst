@@ -3,7 +3,8 @@
 abcvoting
 =========
 
-`abcvoting` is a Python library of approval-based committee (ABC) rules.
+`abcvoting <https://github.com/martinlackner/abcvoting>`_ is a Python library 
+of approval-based committee (ABC) rules.
 ABC rules are also known as approval-based multi-winner rules.
 The input of such rules are
 `approval ballots <https://en.wikipedia.org/wiki/Approval_voting#/media/File:Approval_ballot.svg>`_.
@@ -43,6 +44,7 @@ is useful as a more general introduction to committee voting.
 
    howtocite.rst
    acks.rst
+   GitHub repository <https://github.com/martinlackner/abcvoting>
 
 Indices and tables
 ==================
