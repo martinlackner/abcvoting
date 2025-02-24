@@ -151,7 +151,8 @@ def check_pareto_optimality(profile, committee, algorithm="fastest"):
     committee : iterable of int
         A committee.
     algorithm : str, optional
-        The algorithm to be used.
+        The algorithm to be used. The available algorithms are
+        `gurobi` and `brute-force`.
 
     Returns
     -------
@@ -235,7 +236,8 @@ def check_EJR(profile, committee, quota=None, algorithm="fastest"):
 
         Defaults to n/k, i.e., the number of voters divided by the committee size.
     algorithm : str, optional
-        The algorithm to be used.
+        The algorithm to be used. The available algorithms are
+        `gurobi` and `brute-force`.
 
     Returns
     -------
@@ -350,7 +352,8 @@ def check_PJR(profile, committee, quota=None, algorithm="fastest"):
 
         Defaults to n/k, i.e., the number of voters divided by the committee size.
     algorithm : str, optional
-        The algorithm to be used.
+        The algorithm to be used. The available algorithms are
+        `gurobi` and `brute-force`.
 
     Returns
     -------
@@ -1139,7 +1142,7 @@ def check_priceability(profile, committee, algorithm="fastest", stable=False):
     committee : iterable of int
         A committee.
     algorithm : str, optional
-        The algorithm to be used.
+        The algorithm to be used. Only `gurobi` is available.
     stable : bool, default=False
         Whether to check for stable priceability.
 
@@ -1189,7 +1192,7 @@ def check_stable_priceability(profile, committee, algorithm="fastest"):
     committee : iterable of int
         A committee.
     algorithm : str, optional
-        The algorithm to be used.
+        The algorithm to be used. Only `gurobi` is available.
 
     Returns
     -------
@@ -1366,7 +1369,8 @@ def check_FJR(profile, committee, quota=None, algorithm="fastest"):
 
         Defaults to n/k, i.e., the number of voters divided by the committee size.
     algorithm : str, optional
-        The algorithm to be used.
+        The algorithm to be used. The available algorithms are
+        `gurobi` and `brute-force`.
 
     Returns
     -------
@@ -1573,7 +1577,8 @@ def check_core(profile, committee, quota=None, algorithm="fastest"):
 
         Defaults to n/k, i.e., the number of voters divided by the committee size.
     algorithm : str, optional
-        The algorithm to be used.
+        The algorithm to be used. The available algorithms are
+        `gurobi` and `brute-force`.
 
     Returns
     -------
