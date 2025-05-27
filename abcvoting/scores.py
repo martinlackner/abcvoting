@@ -206,8 +206,8 @@ def av_score_fct(i):
             The corresponding marginal score.
     """
     if i >= 1:
-        return 1
-    return 0
+        return Fraction(1)
+    return Fraction(0)
 
 
 def cc_score_fct(i):
@@ -228,8 +228,8 @@ def cc_score_fct(i):
             The corresponding marginal score.
     """
     if i == 1:
-        return 1
-    return 0
+        return Fraction(1)
+    return Fraction(0)
 
 
 def at_least_ell_fct(i, ell):
@@ -256,8 +256,8 @@ def at_least_ell_fct(i, ell):
             The corresponding marginal score.
     """
     if i == ell:
-        return 1
-    return 0
+        return Fraction(1)
+    return Fraction(0)
 
 
 #
