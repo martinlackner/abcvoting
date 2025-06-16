@@ -199,7 +199,14 @@ def test_read_corrupt_abc_yaml_file(filename):
         print(str(profile))
 
 
-@pytest.mark.parametrize("filename", ["poland_lodz_2020_mileszki.pb", "poland_lodz_2020_nad-nerem.pb", "poland_lodz_2020_nowosolna.pb"])
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "poland_lodz_2020_mileszki.pb",
+        "poland_lodz_2020_nad-nerem.pb",
+        "poland_lodz_2020_nowosolna.pb",
+    ],
+)
 def test_read_and_write_pabulib(filename):
     currdir = os.path.dirname(os.path.abspath(__file__))
     profile, committee_size = fileio.read_pabulib_file(currdir + "/data/" + filename)
