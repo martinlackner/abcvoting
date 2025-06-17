@@ -93,6 +93,7 @@ setuptools.setup(
         "gurobipy>=11.0",
         "preflibtools>=2.0.12",
         "prefsampling>=0.1.19",
+        "pabutools>=1.1.15",
     ],
     extras_require={
         "dev": [

@@ -9,6 +9,8 @@ Two data formats are supported:
 import os
 import ruamel.yaml
 import preflibtools.instances as preflib
+import pabutools.election as pb_election
+
 from abcvoting.preferences import Profile, Voter
 from abcvoting import misc
 
@@ -400,3 +402,106 @@ def write_abcvoting_instance_to_yaml_file(
     yaml.width = 120
     with open(filename, "w") as outfile:
         yaml.dump(data, outfile)
+
+
+def pabutools_to_abcvoting(pb_instance, pb_profile):
+    """
+    Converts an instance and a profile from the pabutools into a profile for abcvoting.
+
+    Parameters
+    ----------
+        pb_instance: pabutools.election.Instance
+            The pabutools instance.
+        pb_profile: pabutools.election.AbstractApprovalProfile
+            The pabutools profile.
+
+    Returns
+    -------
+        profile: abcvoting.preferences.Profile
+            The abcvoting profile.
+    """
+    if not isinstance(pb_profile, pb_election.AbstractApprovalProfile):
+        raise ValueError("Only approval profiles can be converted from the pabutools to abcvoting")
+
+    num_cand = len(pb_instance)
+    projects_to_cand = {p: i for i, p in enumerate(pb_instance)}
+    profile = Profile(num_cand=num_cand, cand_names=[p.name for p in pb_instance])
+
+    for pb_ballot in pb_profile:
+        for _ in range(pb_profile.multiplicity(pb_ballot)):
+            profile.add_voter(Voter([projects_to_cand[a] for a in pb_ballot], num_cand=num_cand))
+
+    return profile
+
+
+def read_pabulib_file(file_path):
+    """
+    Read the content of a pabulib file and returns the corresponding profile. All projects are assumed to have
+    the same cost and the size of the committee is equal to the budget limit of the instance (this does not always
+    make sense).
+
+    Parameters
+    ----------
+        file_path: str
+            The file path.
+
+    Returns
+    -------
+        profile: abcvoting.preferences.Profile
+            The profile.
+        committeesize: int
+            The size of the committee.
+    """
+    instance, pb_profile = pb_election.parse_pabulib(file_path)
+    return pabutools_to_abcvoting(instance, pb_profile), int(instance.budget_limit)
+
+
+def abcvoting_to_pabutools(profile: Profile, committeesize: int):
+    """
+    Converts an abcvoting profile to a pabutools profile.
+
+    Parameters
+    ----------
+        profile: Profile
+            The abcvoting profile.
+        committeesize: int
+            The size of the committee.
+
+    Returns
+    -------
+        instance: pabutools.election.Instance
+            The pabutools instance.
+        profile: pabutools.election.ApprovalProfile
+            The pabutools approval profile.
+    """
+
+    pb_instance = pb_election.Instance()
+    pb_instance.budget_limit = committeesize
+    alt_to_project = {}
+    for alt in profile.candidates:
+        p = pb_election.Project(alt, cost=1)
+        pb_instance.add(p)
+        alt_to_project[alt] = p
+    pb_profile = pb_election.ApprovalProfile()
+    for voter in profile:
+        pb_profile.append(pb_election.ApprovalBallot([alt_to_project[a] for a in voter.approved]))
+    return pb_instance, pb_profile
+
+
+def write_pabulib_file(profile, committeesize, file_path):
+    """
+    Write an abcvoting instance as a pabulib file.
+
+    Parameters
+    ----------
+        file_path: str
+            The file path.
+        profile: Profile
+            The abcvoting profile.
+        committeesize: int
+            The size of the committee.
+    """
+    pb_instance, pb_profile = abcvoting_to_pabutools(profile, committeesize)
+    print(pb_instance)
+    print(pb_profile)
+    pb_election.write_pabulib(pb_instance, pb_profile, file_path)
