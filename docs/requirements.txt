@@ -9,3 +9,5 @@ ruamel.yaml>=0.17
 numpy>=1.21
 gurobipy>=11.0
 preflibtools>=2.0.12
+pabutools>=1.1.15
+prefsampling>=0.1.19
