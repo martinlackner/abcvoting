@@ -1,4 +1,23 @@
-"""Approval-based committee (ABC) voting rules."""
+"""Approval-based committee (ABC) voting rules.
+
+Module Attributes
+-----------------
+MAIN_RULE_IDS : list of str
+    List of rule identifiers (`rule_id`) for the main ABC rules included in abcvoting.
+    This selection is somewhat arbitrary. But all really important rules (that are implemented)
+    are contained in this list.
+
+ALGORITHM_NAMES : dict of str to str
+    A dictionary mapping valid algorithm identifiers to their full names or descriptions.
+    These identifiers are used to select different solver backends and algorithmic approaches
+    within the ABC voting framework.
+
+MAX_NUM_OF_COMMITTEES_DEFAULT : None or int
+    The maximum number of committees that an ABC voting rule may return.
+    If set to `None`, there is no limit on the number of returned committees.
+    This value can be overridden via the `max_num_of_committees` parameter
+    in `compute_*` functions.
+"""
 
 import functools
 import itertools
@@ -15,9 +34,8 @@ try:
 except ImportError:
     mpq = None
 
-########################################################################
 
-
+# List of rule identifiers (`rule_id`)
 MAIN_RULE_IDS = [
     "av",
     "sav",
@@ -47,13 +65,9 @@ MAIN_RULE_IDS = [
     "rsd",
     "eph",
 ]
-"""
-List of rule identifiers (`rule_id`) for the main ABC rules included in abcvoting.
 
-This selection is somewhat arbitrary. But all really important rules (that are implemented)
-are contained in this list.
-"""
-
+# A dictionary containing mapping all valid algorithm identifiers
+# to full names (i.e., descriptions).
 ALGORITHM_NAMES = {
     "gurobi": "Gurobi ILP solver",
     "branch-and-bound": "branch-and-bound",
@@ -70,19 +84,9 @@ ALGORITHM_NAMES = {
     "float-fractions": "Standard algorithm (using floats instead of fractions)",
     "ortools-cp": "OR-Tools CP-SAT solver",
 }
-"""
-A dictionary containing mapping all valid algorithm identifiers to full names (i.e., descriptions).
-"""
 
-
+# The  maximum number of committees that is returned by an ABC voting rule.
 MAX_NUM_OF_COMMITTEES_DEFAULT = None
-"""
-The  maximum number of committees that is returned by an ABC voting rule.
-
-If `MAX_NUM_OF_COMMITTEES_DEFAULT` ist set to `None`, then there is no constraint
-on the maximum number of committees.
-Can be overridden with the parameter `max_num_of_committees` in any `compute` function.
-"""
 
 
 class Rule:
