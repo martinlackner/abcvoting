@@ -2,11 +2,14 @@
 
 import functools
 import itertools
-import mip
 from abcvoting.misc import sorted_committees
 from abcvoting import scores
 from abcvoting.output import output
 
+try:
+    import mip
+except ImportError:
+    mip = None
 
 ACCURACY = 1e-8
 CMP_ACCURACY = 10 * ACCURACY  # when comparing float numbers obtained from a MIP

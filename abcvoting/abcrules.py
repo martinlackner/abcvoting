@@ -525,6 +525,8 @@ def _available_algorithms():
             continue
         if algorithm == "ortools-cp" and not abcrules_ortools.cp_model:
             continue
+        if algorithm.startswith("mip-") and abcrules_mip.mip is None:
+            continue
         available.append(algorithm)
 
     return available

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, "3.10", "3.11", "3.12"]
+        python-version: [3.9, "3.10", "3.11", "3.12",  "3.13"]
       fail-fast: false
 
     steps:
@@ -49,4 +49,4 @@ jobs:
           echo $PYTHONPATH
           export PYTHONPATH=$PYTHONPATH:$PWD
           echo $PYTHONPATH
-          pytest -v --tb=long -m "not mipgurobi and (not gurobipy or not slow) and (not mipcbc or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
+          pytest -v --tb=long -m "not mip and (not gurobipy or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
