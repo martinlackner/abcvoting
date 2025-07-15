@@ -98,7 +98,7 @@ setuptools.setup(
         "dev": [
             "pytest>=6",
             "coverage[toml]>=5.3",
-            "black==22.3.0",
+            "black==25.1",
             "Sphinx>=7.0",
             "sphinx-rtd-theme>=1.0.0",
             "numpydoc>=1.5",

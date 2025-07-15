@@ -1944,7 +1944,7 @@ def _separable_rule_algorithm(
         missing = 0
 
     if resolute:
-        committees = sorted_committees([(certain_cands + possible_cands[:missing])])
+        committees = sorted_committees([certain_cands + possible_cands[:missing]])
     else:
         if max_num_of_committees is None:
             committees = sorted_committees(
@@ -2759,7 +2759,7 @@ def compute_seqphragmen(
             output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
             output.details(
                 f"maximum load increased to {max_load}",
-                indent=" "
+                indent=" ",
                 # f"\n (continuous model: time t_{i+1} = {max_load})"
             )
             output.details(" load distribution:")
@@ -2843,9 +2843,11 @@ def _seqphragmen_resolute(
                 voter.weight * load[v] for v, voter in enumerate(profile) if cand in voter.approved
             )
         new_maxload = [
-            division(approvers_load[cand] + 1, approvers_weight[cand])
-            if approvers_weight[cand] > 0
-            else committeesize + 1
+            (
+                division(approvers_load[cand] + 1, approvers_weight[cand])
+                if approvers_weight[cand] > 0
+                else committeesize + 1
+            )
             for cand in profile.candidates
         ]
         # exclude committees already in the committee
@@ -2921,9 +2923,11 @@ def _seqphragmen_irresolute(
                 voter.weight * load[v] for v, voter in enumerate(profile) if cand in voter.approved
             )
         new_maxload = [
-            division(approvers_load[cand] + 1, approvers_weight[cand])
-            if approvers_weight[cand] > 0
-            else committeesize + 1
+            (
+                division(approvers_load[cand] + 1, approvers_weight[cand])
+                if approvers_weight[cand] > 0
+                else committeesize + 1
+            )
             for cand in profile.candidates
         ]
         # exclude committees already in the committee
@@ -3216,7 +3220,7 @@ def compute_equal_shares(
                 )
                 output.details(
                     f"maximum load increased to {max_load}",
-                    indent=" "
+                    indent=" ",
                     # f"\n (continuous model: time t_{len(committee)} = {max_load})"
                 )
                 output.details(" load distribution:")

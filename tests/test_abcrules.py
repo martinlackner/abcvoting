@@ -1,6 +1,7 @@
 """
 Unit tests for abcvoting/abcrules*.py.
 """
+
 import pytest
 import os
 import re

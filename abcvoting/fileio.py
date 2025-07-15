@@ -436,9 +436,9 @@ def pabutools_to_abcvoting(pb_instance, pb_profile):
 
 def read_pabulib_file(file_path):
     """
-    Read the content of a pabulib file and returns the corresponding profile. All projects are assumed to have
-    the same cost and the size of the committee is equal to the budget limit of the instance (this does not always
-    make sense).
+    Read the content of a pabulib file and returns the corresponding profile.
+    All projects are assumed to have the same cost and the size of the committee is equal to
+    the budget limit of the instance (this does not always make sense).
 
     Parameters
     ----------

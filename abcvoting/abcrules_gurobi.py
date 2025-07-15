@@ -166,7 +166,7 @@ def _gurobi_thiele_methods(
             # maximum number of approved candidates that this voter can have in a committee
             max_in_committee[voter] = min(len(voter.approved), committeesize)
             for x in range(1, max_in_committee[voter] + 1):
-                utility[(voter, x)] = model.addVar(vtype=gb.GRB.BINARY, name=f"utility({i,x})")
+                utility[(voter, x)] = model.addVar(vtype=gb.GRB.BINARY, name=f"utility({i, x})")
 
         # constraint: the committee has the required size
         model.addConstr(in_committee.sum() == committeesize)
