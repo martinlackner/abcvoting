@@ -614,6 +614,7 @@ def compute_thiele_method(
     algorithm="fastest",
     resolute=False,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    lexicographic_tiebreaking=False,
 ):
     """
     Compute winning committees with Thiele methods.
@@ -657,6 +658,9 @@ def compute_thiele_method(
             The default value of `max_num_of_committees` can be modified via the constant
             `MAX_NUM_OF_COMMITTEES_DEFAULT`.
 
+        lexicographic_tiebreaking : bool
+            Require lexicographic tiebreaking among tied committees.
+
     Returns
     -------
         list of CandidateSet
@@ -674,6 +678,8 @@ def compute_thiele_method(
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
     )
+
+    # TODO If lexicographic_tiebreaking is true and max_num_of_committees > 1 compute all and sort lexicographical
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_thiele_methods(
