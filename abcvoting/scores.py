@@ -1,4 +1,4 @@
-"""Calculate all kinds of scores."""
+"""Calculating scores related to the computation of ABC voting rules."""
 
 try:
     from gmpy2 import mpq as Fraction
