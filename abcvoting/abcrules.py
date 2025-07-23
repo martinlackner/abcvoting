@@ -679,8 +679,6 @@ def compute_thiele_method(
         max_num_of_committees=max_num_of_committees,
     )
 
-    # TODO If lexicographic_tiebreaking is true and max_num_of_committees > 1 compute all and sort lexicographical
-
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_thiele_methods(
             scorefct_id=scorefct_id,
@@ -688,6 +686,7 @@ def compute_thiele_method(
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm == "branch-and-bound":
         committees, detailed_info = _thiele_methods_branchandbound(
@@ -834,6 +833,7 @@ def compute_pav(
     algorithm="fastest",
     resolute=False,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    lexicographic_tiebreaking=False,
 ):
     """
     Compute winning committees with Proportional Approval Voting (PAV).
@@ -876,6 +876,9 @@ def compute_pav(
              The default value of `max_num_of_committees` can be modified via the constant
              `MAX_NUM_OF_COMMITTEES_DEFAULT`.
 
+        lexicographic_tiebreaking : bool
+            Require lexicographic tiebreaking among tied committees.
+
     Returns
     -------
         list of CandidateSet
@@ -888,6 +891,7 @@ def compute_pav(
         algorithm=algorithm,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
+        lexicographic_tiebreaking=lexicographic_tiebreaking,
     )
 
 
@@ -897,6 +901,7 @@ def compute_slav(
     algorithm="fastest",
     resolute=False,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    lexicographic_tiebreaking=False,
 ):
     """
     Compute winning committees with Sainte-Lague Approval Voting (SLAV).
@@ -940,6 +945,9 @@ def compute_slav(
              The default value of `max_num_of_committees` can be modified via the constant
              `MAX_NUM_OF_COMMITTEES_DEFAULT`.
 
+        lexicographic_tiebreaking : bool
+            Require lexicographic tiebreaking among tied committees.
+
     Returns
     -------
         list of CandidateSet
@@ -952,6 +960,7 @@ def compute_slav(
         algorithm=algorithm,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
+        lexicographic_tiebreaking=lexicographic_tiebreaking,
     )
 
 
@@ -961,6 +970,7 @@ def compute_cc(
     algorithm="fastest",
     resolute=False,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    lexicographic_tiebreaking=False,
 ):
     """
     Compute winning committees with Approval Chamberlin-Courant (CC).
@@ -1004,6 +1014,9 @@ def compute_cc(
              The default value of `max_num_of_committees` can be modified via the constant
              `MAX_NUM_OF_COMMITTEES_DEFAULT`.
 
+        lexicographic_tiebreaking : bool
+            Require lexicographic tiebreaking among tied committees.
+
     Returns
     -------
         list of CandidateSet
@@ -1016,6 +1029,7 @@ def compute_cc(
         algorithm=algorithm,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
+        lexicographic_tiebreaking=lexicographic_tiebreaking,
     )
 
 
@@ -1025,6 +1039,7 @@ def compute_lexcc(
     algorithm="fastest",
     resolute=False,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    lexicographic_tiebreaking=False,
 ):
     """
     Compute winning committees with a Lexicographic Chamberlin-Courant (lex-CC).
@@ -1073,6 +1088,9 @@ def compute_lexcc(
              The default value of `max_num_of_committees` can be modified via the constant
              `MAX_NUM_OF_COMMITTEES_DEFAULT`.
 
+        lexicographic_tiebreaking : bool
+            Require lexicographic tiebreaking among tied committees.
+
     Returns
     -------
         list of CandidateSet
@@ -1103,6 +1121,7 @@ def compute_lexcc(
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm.startswith("mip-"):
         committees, detailed_info = abcrules_mip._mip_lexcc(
@@ -1122,7 +1141,7 @@ def compute_lexcc(
     output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
     output.details("At-least-ell scores:")
     for ell, score in enumerate(detailed_info["opt_score_vector"]):
-        output.details(f"at-least-{ell+1}: {score}", indent=" ")
+        output.details(f"at-least-{ell + 1}: {score}", indent=" ")
     output.info(
         str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
     )
@@ -1246,7 +1265,7 @@ def compute_seq_thiele_method(
                 tied_cands = detailed_info["tied_cands"][i]
                 delta_score = detailed_info["delta_score"][i]
                 committee.append(next_cand)
-                output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
+                output.details(f"adding candidate number {i + 1}: {profile.cand_names[next_cand]}")
                 output.details(
                     f"score increases by {delta_score} to"
                     f" a total of {scores.thiele_score(scorefct_id, profile, committee)}",
@@ -2108,6 +2127,7 @@ def compute_minimaxav(
     algorithm="fastest",
     resolute=False,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    lexicographic_tiebreaking=False,
 ):
     """
     Compute winning committees with Minimax Approval Voting (MAV).
@@ -2148,6 +2168,9 @@ def compute_minimaxav(
              The default value of `max_num_of_committees` can be modified via the constant
              `MAX_NUM_OF_COMMITTEES_DEFAULT`.
 
+        lexicographic_tiebreaking : bool
+            Require lexicographic tiebreaking among tied committees.
+
     Returns
     -------
         list of CandidateSet
@@ -2171,6 +2194,7 @@ def compute_minimaxav(
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm == "ortools-cp":
         committees = abcrules_ortools._ortools_minimaxav(
@@ -2382,6 +2406,7 @@ def compute_monroe(
     algorithm="fastest",
     resolute=False,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    lexicographic_tiebreaking=False,
 ):
     """
     Compute winning committees with Monroe's rule.
@@ -2422,6 +2447,9 @@ def compute_monroe(
              The default value of `max_num_of_committees` can be modified via the constant
              `MAX_NUM_OF_COMMITTEES_DEFAULT`.
 
+        lexicographic_tiebreaking : bool
+            Require lexicographic tiebreaking among tied committees.
+
     Returns
     -------
         list of CandidateSet
@@ -2448,6 +2476,7 @@ def compute_monroe(
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm == "ortools-cp":
         committees = abcrules_ortools._ortools_monroe(
@@ -2762,7 +2791,7 @@ def compute_seqphragmen(
             max_load = detailed_info["max_load"][i]
             load = detailed_info["load"][i]
             committee.append(next_cand)
-            output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
+            output.details(f"adding candidate number {i + 1}: {profile.cand_names[next_cand]}")
             output.details(
                 f"maximum load increased to {max_load}",
                 indent=" ",
@@ -3186,7 +3215,7 @@ def compute_equal_shares(
             budget = detailed_info["budget"][i]
             cost = detailed_info["cost"][i]
             tied_cands = detailed_info["tied_cands"][i]
-            output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
+            output.details(f"adding candidate number {i + 1}: {profile.cand_names[next_cand]}")
             output.details(f"with maxmimum cost per voter q = {cost}", indent=" ")
             output.details(" remaining budget:")
             msg = "("
@@ -3504,6 +3533,7 @@ def compute_minimaxphragmen(
     algorithm="fastest",
     resolute=False,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    lexicographic_tiebreaking=False,
 ):
     """
     Compute winning committees with Phragmen's minimax rule (minimax-Phragmen).
@@ -3554,6 +3584,9 @@ def compute_minimaxphragmen(
              The default value of `max_num_of_committees` can be modified via the constant
              `MAX_NUM_OF_COMMITTEES_DEFAULT`.
 
+        lexicographic_tiebreaking : bool
+            Require lexicographic tiebreaking among tied committees.
+
     Returns
     -------
         list of CandidateSet
@@ -3570,13 +3603,13 @@ def compute_minimaxphragmen(
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
     )
-
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_minimaxphragmen(
             profile,
             committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm.startswith("mip-"):
         committees = abcrules_mip._mip_minimaxphragmen(
@@ -3602,6 +3635,7 @@ def compute_minimaxphragmen(
     return committees
 
 
+# TODO Is this lexicographic_tiebreaking improveable by the new method?
 def compute_leximaxphragmen(
     profile,
     committeesize,
@@ -3722,6 +3756,7 @@ def compute_leximaxphragmen(
     return committees
 
 
+# TODO lexicographic_tiebreaking still missing
 def compute_maximin_support(
     profile,
     committeesize,
@@ -3816,7 +3851,7 @@ def compute_maximin_support(
             tied_cands = detailed_info["tied_cands"][i]
             support_value = detailed_info["support_value"][i]
             committee.append(next_cand)
-            output.details(f"adding candidate number {i+1}: {profile.cand_names[next_cand]}")
+            output.details(f"adding candidate number {i + 1}: {profile.cand_names[next_cand]}")
             output.details(
                 f"giving a committee with maximin support value {support_value}",
                 indent=" ",
