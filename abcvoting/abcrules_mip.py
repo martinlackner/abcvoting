@@ -366,10 +366,15 @@ def _mip_minimaxphragmen(profile, committeesize, resolute, max_num_of_committees
         if resolute:
             return [approved_candidates | set(remaining_candidates[:num_missing_candidates])]
 
-        return [
+        committees = [
             approved_candidates | set(extra)
             for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
         ]
+
+        if max_num_of_committees:
+            return committees[:max_num_of_committees]
+        else:
+            return committees
 
     committees = _optimize_rule_mip(
         set_opt_model_func,

@@ -15,6 +15,7 @@ from itertools import combinations
 
 MARKS = {
     "gurobi": [pytest.mark.gurobipy],
+    "highs": [],
     "ortools-cp": [pytest.mark.ortools],
     "mip-cbc": [pytest.mark.mip, pytest.mark.mipcbc],
     "mip-gurobi": [pytest.mark.mip, pytest.mark.mipgurobi],
@@ -1616,6 +1617,23 @@ def test_lex_rules_with_abc_yaml_instances(filename, load_abc_yaml_file):
         assert all(comm in results["minimaxav"] for comm in results["lexminimaxav"])
 
 
+def test_minimaxphragmen_with_too_few_approved_candidates_and_max_num_of_committees():
+    profile = Profile(num_cand=5)
+    committeesize = 4
+    approval_sets = [{0, 1, 2}, {1}, {2}, {0}]
+    profile.add_voters(approval_sets)
+
+    committees = abcrules.Rule("minimaxphragmen").compute(
+        profile,
+        committeesize,
+        algorithm="gurobi",
+        resolute=False,
+        max_num_of_committees=1,
+    )
+
+    assert len(committees) == 1
+
+
 """ ################################ """
 """ Test Lexicographic - Tiebreaking """
 """ ################################ """
@@ -1627,28 +1645,40 @@ LEXICOGRAPHIC_TIEBREAKING_RULE_IDS = [
     "cc",
     "lexcc",
     "minimaxav",
+    "lexminimaxav",
     "minimaxphragmen",
+    "leximaxphragmen",  # Very Slow
     "monroe",
+]
+
+LEXICOGRAPHIC_TIEBREAKING_ALGORITHMS = [
+    "gurobi",
+    "highs",
 ]
 
 
 @pytest.mark.slow
 @pytest.mark.parametrize("rule_id", LEXICOGRAPHIC_TIEBREAKING_RULE_IDS)
+@pytest.mark.parametrize("algorithm", LEXICOGRAPHIC_TIEBREAKING_ALGORITHMS)
 @pytest.mark.parametrize("filename", abc_yaml_filenames)
 # test that lexicographic_tiebreaking returns the lexicographic first comittee
 def test_resolute_lexicographic_tiebreaking_with_abc_yaml_instances(
-    rule_id, filename, load_abc_yaml_file
+    rule_id, algorithm, filename, load_abc_yaml_file
 ):
     profile, committeesize, compute_instances = load_abc_yaml_file[filename]
 
     for compute_instance in compute_instances:
-        if compute_instance["rule_id"] == rule_id and compute_instance["resolute"] is False:
+        if (
+            compute_instance["rule_id"] == rule_id
+            and compute_instance["resolute"] is False
+            and compute_instance["result"]
+        ):
             abcrules.compute(
                 rule_id=rule_id,
                 profile=profile,
                 committeesize=committeesize,
                 result=compute_instance["result"][:1],
-                algorithm="gurobi",
+                algorithm=algorithm,
                 resolute=True,
                 lexicographic_tiebreaking=True,
             )
@@ -1656,23 +1686,48 @@ def test_resolute_lexicographic_tiebreaking_with_abc_yaml_instances(
 
 @pytest.mark.slow
 @pytest.mark.parametrize("rule_id", LEXICOGRAPHIC_TIEBREAKING_RULE_IDS)
+@pytest.mark.parametrize("algorithm", LEXICOGRAPHIC_TIEBREAKING_ALGORITHMS)
 @pytest.mark.parametrize("filename", abc_yaml_filenames)
 # test that lexicographic_tiebreaking returns the lexicographic first comittee
 def test_multiple_committees_lexicographic_tiebreaking_with_abc_yaml_instances(
-    rule_id, filename, load_abc_yaml_file
+    rule_id, algorithm, filename, load_abc_yaml_file
 ):
     profile, committeesize, compute_instances = load_abc_yaml_file[filename]
 
     for compute_instance in compute_instances:
-        if compute_instance["rule_id"] == rule_id and compute_instance["resolute"] is False:
+        if (
+            compute_instance["rule_id"] == rule_id
+            and compute_instance["resolute"] is False
+            and compute_instance["result"]
+        ):
             num_of_committees = math.ceil(len(compute_instance["result"]) / 2)
             abcrules.compute(
                 rule_id=rule_id,
                 profile=profile,
                 committeesize=committeesize,
                 result=compute_instance["result"][:num_of_committees],
-                algorithm="gurobi",
+                algorithm=algorithm,
                 resolute=False,
                 lexicographic_tiebreaking=True,
                 max_num_of_committees=num_of_committees,
             )
+
+
+@pytest.mark.parametrize("rule_id", LEXICOGRAPHIC_TIEBREAKING_RULE_IDS)
+@pytest.mark.parametrize("algorithm", LEXICOGRAPHIC_TIEBREAKING_ALGORITHMS)
+def test_lexicographic_tiebreaking_with_toofewcandidates(rule_id, algorithm):
+    profile = Profile(5)
+    committeesize = 4
+    approval_sets = [{0, 1, 2}, {1}, {2}, {0}]
+    profile.add_voters(approval_sets)
+
+    committees = abcrules.Rule(rule_id).compute(
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=True,
+        lexicographic_tiebreaking=True,
+    )
+
+    assert len(committees) == 1
+    assert committees == [{0, 1, 2, 3}]

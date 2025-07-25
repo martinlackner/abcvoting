@@ -25,7 +25,7 @@ import random
 import math
 from fractions import Fraction
 from abcvoting.output import output, DETAILS
-from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, misc, scores
+from abcvoting import abcrules_gurobi, abcrules_highs, abcrules_ortools, abcrules_mip, misc, scores
 from abcvoting.misc import str_committees_with_header, header, str_set_of_candidates
 from abcvoting.misc import sorted_committees, CandidateSet
 
@@ -70,6 +70,7 @@ MAIN_RULE_IDS = [
 # to full names (i.e., descriptions).
 ALGORITHM_NAMES = {
     "gurobi": "Gurobi ILP solver",
+    "highs": "ILP solver via Python PuLP library",
     "branch-and-bound": "branch-and-bound",
     "brute-force": "brute-force",
     "mip-cbc": "CBC ILP solver via Python MIP library",
@@ -102,6 +103,7 @@ class Rule:
     _THIELE_ALGORITHMS = (
         # algorithms sorted by speed
         "gurobi",
+        "highs",
         "mip-gurobi",
         "mip-cbc",
         "branch-and-bound",
@@ -146,6 +148,7 @@ class Rule:
             self.algorithms = (
                 # algorithms sorted by speed
                 "gurobi",
+                "highs",
                 "mip-gurobi",
                 "ortools-cp",
                 "branch-and-bound",
@@ -158,7 +161,7 @@ class Rule:
             self.longname = "Lexicographic Chamberlin-Courant (lex-CC)"
             self.compute_fct = compute_lexcc
             # algorithms sorted by speed
-            self.algorithms = ("gurobi", "brute-force")
+            self.algorithms = ("gurobi", "highs", "brute-force")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "seqpav":
             self.shortname = "seq-PAV"
@@ -194,13 +197,13 @@ class Rule:
             self.shortname = "minimax-Phragmén"
             self.longname = "Phragmén's Minimax Rule (minimax-Phragmén)"
             self.compute_fct = compute_minimaxphragmen
-            self.algorithms = ("gurobi", "mip-gurobi", "mip-cbc")
+            self.algorithms = ("gurobi", "highs", "mip-gurobi", "mip-cbc")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "leximaxphragmen":
             self.shortname = "leximax-Phragmén"
             self.longname = "Phragmén's Leximax Rule (leximax-Phragmén)"
             self.compute_fct = compute_leximaxphragmen
-            self.algorithms = ("gurobi",)  # TODO: "mip-gurobi", "mip-cbc"),
+            self.algorithms = ("gurobi", "highs")  # TODO: "mip-gurobi", "mip-cbc"),
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "maximin-support":
             self.shortname = "Maximin-Support"
@@ -215,6 +218,7 @@ class Rule:
             self.algorithms = (
                 # algorithms sorted by speed
                 "gurobi",
+                "highs",
                 "mip-gurobi",
                 "mip-cbc",
                 "ortools-cp",
@@ -231,7 +235,14 @@ class Rule:
             self.shortname = "minimaxav"
             self.longname = "Minimax Approval Voting (MAV)"
             self.compute_fct = compute_minimaxav
-            self.algorithms = ("gurobi", "mip-gurobi", "ortools-cp", "mip-cbc", "brute-force")
+            self.algorithms = (
+                "gurobi",
+                "highs",
+                "mip-gurobi",
+                "ortools-cp",
+                "mip-cbc",
+                "brute-force",
+            )
             # algorithms sorted by speed. however, for small profiles with a small committee size,
             # brute-force is often the fastest
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
@@ -239,7 +250,7 @@ class Rule:
             self.shortname = "lex-MAV"
             self.longname = "Lexicographic Minimax Approval Voting (lex-MAV)"
             self.compute_fct = compute_lexminimaxav
-            self.algorithms = ("gurobi", "brute-force")
+            self.algorithms = ("gurobi", "highs", "brute-force")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id in ["rule-x", "equal-shares", "equal-shares-with-seqphragmen-completion"]:
             self.shortname = "Equal Shares"
@@ -525,6 +536,8 @@ def _available_algorithms():
     for algorithm in ALGORITHM_NAMES:
         if "gurobi" in algorithm and not abcrules_gurobi.gb:
             continue
+        if "highs" in algorithm and not abcrules_highs.pulp:
+            continue
         if algorithm == "gmpy2-fractions" and not mpq:
             continue
         if algorithm == "ortools-cp" and not abcrules_ortools.cp_model:
@@ -681,6 +694,15 @@ def compute_thiele_method(
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_thiele_methods(
+            scorefct_id=scorefct_id,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
+        )
+    elif algorithm == "highs":
+        committees = abcrules_highs._pulp_thiele_methods(
             scorefct_id=scorefct_id,
             profile=profile,
             committeesize=committeesize,
@@ -1117,6 +1139,14 @@ def compute_lexcc(
         )
     elif algorithm == "gurobi":
         committees, detailed_info = abcrules_gurobi._gurobi_lexcc(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
+        )
+    elif algorithm == "highs":
+        committees, detailed_info = abcrules_highs._pulp_lexcc(
             profile=profile,
             committeesize=committeesize,
             resolute=resolute,
@@ -2196,6 +2226,14 @@ def compute_minimaxav(
             max_num_of_committees=max_num_of_committees,
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
+    elif algorithm == "highs":
+        committees = abcrules_highs._pulp_minimaxav(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
+        )
     elif algorithm == "ortools-cp":
         committees = abcrules_ortools._ortools_minimaxav(
             profile=profile,
@@ -2269,6 +2307,7 @@ def compute_lexminimaxav(
     algorithm="fastest",
     resolute=False,
     max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+    lexicographic_tiebreaking=False,
 ):
     """
     Compute winning committees with Lexicographic Minimax AV (lex-MAV).
@@ -2318,6 +2357,9 @@ def compute_lexminimaxav(
              The default value of `max_num_of_committees` can be modified via the constant
              `MAX_NUM_OF_COMMITTEES_DEFAULT`.
 
+        lexicographic_tiebreaking : bool
+            Require lexicographic tiebreaking among tied committees.
+
     Returns
     -------
         list of CandidateSet
@@ -2351,6 +2393,15 @@ def compute_lexminimaxav(
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
+        )
+    elif algorithm == "highs":
+        committees, detailed_info = abcrules_highs._pulp_lexminimaxav(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     else:
         raise UnknownAlgorithm(rule_id, algorithm)
@@ -2472,6 +2523,14 @@ def compute_monroe(
 
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_monroe(
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
+        )
+    elif algorithm == "highs":
+        committees = abcrules_highs._pulp_monroe(
             profile=profile,
             committeesize=committeesize,
             resolute=resolute,
@@ -3611,6 +3670,14 @@ def compute_minimaxphragmen(
             max_num_of_committees=max_num_of_committees,
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
+    elif algorithm == "highs":
+        committees = abcrules_highs._pulp_minimaxphragmen(
+            profile,
+            committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
+        )
     elif algorithm.startswith("mip-"):
         committees = abcrules_mip._mip_minimaxphragmen(
             profile,
@@ -3635,7 +3702,6 @@ def compute_minimaxphragmen(
     return committees
 
 
-# TODO Is this lexicographic_tiebreaking improveable by the new method?
 def compute_leximaxphragmen(
     profile,
     committeesize,
@@ -3714,20 +3780,13 @@ def compute_leximaxphragmen(
         max_num_of_committees=max_num_of_committees,
     )
 
-    if lexicographic_tiebreaking:
-        if not resolute:
-            raise ValueError(
-                "lexicographic_tiebreaking=True is only valid in "
-                "combination with resolute=True."
-            )
-        resolute = False  # compute all committees to break ties correctly
-
     if algorithm == "gurobi":
         committees = abcrules_gurobi._gurobi_leximaxphragmen(
             profile,
             committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     # elif algorithm.startswith("mip-"):
     #     committees = abcrules_mip._mip_leximaxphragmen(
@@ -3737,11 +3796,16 @@ def compute_leximaxphragmen(
     #         max_num_of_committees=max_num_of_committees,
     #         solver_id=algorithm[4:],
     #     )
+    elif algorithm == "highs":
+        committees = abcrules_highs._pulp_leximaxphragmen(
+            profile,
+            committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
+        )
     else:
         raise UnknownAlgorithm(rule_id, algorithm)
-
-    if lexicographic_tiebreaking:
-        committees = sorted_committees(committees)[:1]
 
     # optional output
     output.info(header(rule.longname), wrap=False)
@@ -3756,7 +3820,6 @@ def compute_leximaxphragmen(
     return committees
 
 
-# TODO lexicographic_tiebreaking still missing
 def compute_maximin_support(
     profile,
     committeesize,
