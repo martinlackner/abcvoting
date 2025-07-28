@@ -3,9 +3,9 @@ repos:
     rev: 22.3.0 # Cf env.yml, can be any tag/version in https://github.com/psf/black/tags
     hooks:
       - id: black
-        language_version: python
+        language_version: python3.12
 
   -   repo: https://github.com/pycqa/flake8
-      rev: 4.0.1
+      rev: 7.3.0
       hooks:
-      -   id: flake8
+      - id: flake8
