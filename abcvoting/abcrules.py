@@ -203,7 +203,7 @@ class Rule:
             self.shortname = "leximax-Phragmén"
             self.longname = "Phragmén's Leximax Rule (leximax-Phragmén)"
             self.compute_fct = compute_leximaxphragmen
-            self.algorithms = ("gurobi", "highs")  # TODO: "mip-gurobi", "mip-cbc"),
+            self.algorithms = ("gurobi",)  # "highs" is too slow
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "maximin-support":
             self.shortname = "Maximin-Support"

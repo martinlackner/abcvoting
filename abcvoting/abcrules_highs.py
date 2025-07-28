@@ -38,9 +38,11 @@ def _optimize_rule_pulp(
     set_opt_model_func(prob, in_committee)
 
     while True:
-        prob.solve(pulp.HiGHS_CMD(msg=False))
-
-        if pulp.LpStatus[prob.status] != "Optimal":
+        try:
+            prob.solve(pulp.HiGHS_CMD(msg=False))
+            if pulp.LpStatus[prob.status] != "Optimal":
+                raise pulp.PulpsolverError("Status not Optimal")
+        except pulp.PulpSolverError:
             if len(committees) == 0:
                 raise RuntimeError(f"HiGHS found no solution (model {name})")
             break
@@ -125,7 +127,7 @@ def _optimize_rule_pulp(
 
         if resolute:
             break
-        if max_num_of_committees and len(committees) >= max_num_of_committees:
+        if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
             return committees, maxscore
 
         # Block previously found committee
@@ -526,7 +528,7 @@ def _pulp_leximaxphragmen(
             max_num_of_committees=None,
             name=f"leximaxphragmen-iteration{iteration}",
         )
-        if math.isclose(neg_loadbound, 0, rel_tol=1e-5, abs_tol=1e-5):
+        if math.isclose(neg_loadbound, 0, rel_tol=1e-4, abs_tol=1e-4):
             break
         loadbounds.append(-neg_loadbound)
 

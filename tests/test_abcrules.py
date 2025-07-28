@@ -15,7 +15,7 @@ from itertools import combinations
 
 MARKS = {
     "gurobi": [pytest.mark.gurobipy],
-    "highs": [],
+    "highs": [pytest.mark.highs],
     "ortools-cp": [pytest.mark.ortools],
     "mip-cbc": [pytest.mark.mip, pytest.mark.mipcbc],
     "mip-gurobi": [pytest.mark.mip, pytest.mark.mipgurobi],
@@ -1547,7 +1547,7 @@ def test_natural_tiebreaking_order_resolute(rule_id, algorithm):
     ]:
         profile.add_voters(approval_sets)
         committeesize = 2
-        if algorithm in ["gurobi", "ortools-cp", "mip-cbc", "mip-gurobi", "fastest"]:
+        if algorithm in ["gurobi", "highs", "ortools-cp", "mip-cbc", "mip-gurobi", "fastest"]:
             return  # ILP solvers do not guarantee a specific solution
         if rule_id in ["rsd"]:
             return  # RSD is randomized
@@ -1577,7 +1577,7 @@ def test_natural_tiebreaking_order_max_num_of_committees(rule_id, algorithm, app
     profile.add_voters(approval_sets)
     print(profile)
     committeesize = 2
-    if algorithm in ["gurobi", "ortools-cp", "mip-cbc", "mip-gurobi", "fastest"]:
+    if algorithm in ["gurobi", "highs", "ortools-cp", "mip-cbc", "mip-gurobi", "fastest"]:
         return  # ILP solvers do not guarantee a specific solution
     if rule_id in ["rsd"]:
         return  # RSD is randomized
@@ -1647,7 +1647,7 @@ LEXICOGRAPHIC_TIEBREAKING_RULE_IDS = [
     "minimaxav",
     "lexminimaxav",
     "minimaxphragmen",
-    "leximaxphragmen",  # Very Slow
+    "leximaxphragmen",
     "monroe",
 ]
 
@@ -1656,14 +1656,23 @@ LEXICOGRAPHIC_TIEBREAKING_ALGORITHMS = [
     "highs",
 ]
 
+lexicographic_yaml_instances = [
+    p
+    for p in abc_yaml_instances
+    if p.values[1] in LEXICOGRAPHIC_TIEBREAKING_RULE_IDS
+    and p.values[2] in LEXICOGRAPHIC_TIEBREAKING_ALGORITHMS
+]
+
 
 @pytest.mark.slow
-@pytest.mark.parametrize("rule_id", LEXICOGRAPHIC_TIEBREAKING_RULE_IDS)
-@pytest.mark.parametrize("algorithm", LEXICOGRAPHIC_TIEBREAKING_ALGORITHMS)
-@pytest.mark.parametrize("filename", abc_yaml_filenames)
+@pytest.mark.parametrize(
+    "filename, rule_id, algorithm",
+    lexicographic_yaml_instances,
+    ids=id_function,
+)
 # test that lexicographic_tiebreaking returns the lexicographic first comittee
 def test_resolute_lexicographic_tiebreaking_with_abc_yaml_instances(
-    rule_id, algorithm, filename, load_abc_yaml_file
+    filename, rule_id, algorithm, load_abc_yaml_file
 ):
     profile, committeesize, compute_instances = load_abc_yaml_file[filename]
 
@@ -1685,12 +1694,14 @@ def test_resolute_lexicographic_tiebreaking_with_abc_yaml_instances(
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("rule_id", LEXICOGRAPHIC_TIEBREAKING_RULE_IDS)
-@pytest.mark.parametrize("algorithm", LEXICOGRAPHIC_TIEBREAKING_ALGORITHMS)
-@pytest.mark.parametrize("filename", abc_yaml_filenames)
+@pytest.mark.parametrize(
+    "filename, rule_id, algorithm",
+    lexicographic_yaml_instances,
+    ids=id_function,
+)
 # test that lexicographic_tiebreaking returns the lexicographic first comittee
 def test_multiple_committees_lexicographic_tiebreaking_with_abc_yaml_instances(
-    rule_id, algorithm, filename, load_abc_yaml_file
+    filename, rule_id, algorithm, load_abc_yaml_file
 ):
     profile, committeesize, compute_instances = load_abc_yaml_file[filename]
 
