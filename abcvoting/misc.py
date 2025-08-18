@@ -443,7 +443,7 @@ def time_it(func):
     def wrapper_function(*args, **kwargs):
         start = perf_counter()
         result = func(*args, **kwargs)
-        print(f"{func.__name__}({kwargs}) needed {perf_counter()-start} seconds")
+        print(f"{func.__name__}({kwargs}) needed {perf_counter() - start} seconds")
         return result
 
     return wrapper_function

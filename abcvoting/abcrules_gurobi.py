@@ -12,6 +12,9 @@ from abcvoting.output import output
 
 ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
 CMP_ACCURACY = 10 * ACCURACY  # when comparing float numbers obtained from a MIP
+LEXICOGRAPHIC_BLOCK_SIZE = (
+    10  # The maximal number of candidates optimized in one step while lexicographic tiebreaking
+)
 
 
 def _set_gurobi_model_parameters(model):
@@ -33,6 +36,7 @@ def _optimize_rule_gurobi(
     max_num_of_committees,
     name="None",
     committeescorefct=None,
+    lexicographic_tiebreaking=False,
 ):
     """Compute rules, which are given in the form of an optimization problem, using Gurobi.
 
@@ -52,6 +56,8 @@ def _optimize_rule_gurobi(
         name of the model, used for error messages
     committeescorefct : callable
         a function used to compute the score of a committee
+    lexicographic_tiebreaking : bool
+        Require lexicographic tiebreaking among tied committees.
 
     Returns
     -------
@@ -127,6 +133,42 @@ def _optimize_rule_gurobi(
             # no longer optimal
             break
 
+        if lexicographic_tiebreaking:
+            lex_model = model.copy()
+            lex_model.addConstr(lex_model.getObjective() == maxscore)
+
+            in_committee_lex = [
+                lex_model.getVarByName(f"in_committee[{cand}]") for cand in range(profile.num_cand)
+            ]
+
+            for step_start in range(0, profile.num_cand, LEXICOGRAPHIC_BLOCK_SIZE):
+                step_end = min(step_start + LEXICOGRAPHIC_BLOCK_SIZE, profile.num_cand)
+                current_block = [in_committee_lex[idx] for idx in range(step_start, step_end)]
+
+                lex_objective_expr = gb.quicksum(
+                    (2 ** (len(current_block) - idx - 1)) * current_block[idx]
+                    for idx in range(len(current_block))
+                )
+
+                lex_model.setObjective(lex_objective_expr, gb.GRB.MAXIMIZE)
+                lex_model.optimize()
+
+                if lex_model.Status != gb.GRB.OPTIMAL:
+                    raise RuntimeError("Lex optimization failed.")
+
+                # Bound the variables of the current block
+                for var in current_block:
+                    val = var.X
+                    if val >= 0.9:
+                        var.lb = 1
+                        var.ub = 1
+                    else:
+                        var.lb = 0
+                        var.ub = 0
+
+            # Recompute Comittee after lexicographic tiebreaking
+            committee = {cand for cand in profile.candidates if in_committee_lex[cand].X == 1}
+
         committees.append(committee)
 
         if resolute:
@@ -146,6 +188,7 @@ def _gurobi_thiele_methods(
     committeesize,
     resolute,
     max_num_of_committees,
+    lexicographic_tiebreaking=False,
 ):
     def set_opt_model_func(model, in_committee):
         # utility[(voter, x)] contains (intended binary) variables counting the number of approved
@@ -211,11 +254,14 @@ def _gurobi_thiele_methods(
         max_num_of_committees=max_num_of_committees,
         name=scorefct_id,
         committeescorefct=functools.partial(scores.thiele_score, scorefct_id),
+        lexicographic_tiebreaking=lexicographic_tiebreaking,
     )
     return sorted_committees(committees)
 
 
-def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
+def _gurobi_lexcc(
+    profile, committeesize, resolute, max_num_of_committees, lexicographic_tiebreaking=False
+):
     def set_opt_model_func(model, in_committee):
         # utility[(voter, x)] contains (intended binary) variables counting the number of approved
         # candidates in the selected committee by `voter`. This utility[(voter, x)] is true for
@@ -287,6 +333,7 @@ def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
         profile=profile,
         committeesize=committeesize,
         resolute=resolute,
+        lexicographic_tiebreaking=lexicographic_tiebreaking,
         max_num_of_committees=max_num_of_committees,
         name="lexcc-final",
         committeescorefct=functools.partial(scores.thiele_score, f"atleast{committeesize}"),
@@ -298,7 +345,9 @@ def _gurobi_lexcc(profile, committeesize, resolute, max_num_of_committees):
     return sorted_committees(committees), detailed_info
 
 
-def _gurobi_monroe(profile, committeesize, resolute, max_num_of_committees):
+def _gurobi_monroe(
+    profile, committeesize, resolute, max_num_of_committees, lexicographic_tiebreaking=False
+):
     def set_opt_model_func(model, in_committee):
         num_voters = len(profile)
 
@@ -360,11 +409,14 @@ def _gurobi_monroe(profile, committeesize, resolute, max_num_of_committees):
         max_num_of_committees=max_num_of_committees,
         name="Monroe",
         committeescorefct=scores.monroescore,
+        lexicographic_tiebreaking=lexicographic_tiebreaking,
     )
     return sorted_committees(committees)
 
 
-def _gurobi_minimaxphragmen(profile, committeesize, resolute, max_num_of_committees):
+def _gurobi_minimaxphragmen(
+    profile, committeesize, resolute, max_num_of_committees, lexicographic_tiebreaking=False
+):
     """ILP for Phragmen's minimax rule (minimax-Phragmen), using Gurobi.
 
     Minimizes the maximum load.
@@ -417,7 +469,7 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute, max_num_of_committ
     if len(profile.approved_candidates()) < committeesize:
         # An insufficient number of candidates is approved:
         # Committees consist of all approved candidates plus
-        #  a correct number of unapproved candidates
+        # a correct number of unapproved candidates
         approved_candidates = profile.approved_candidates()
         remaining_candidates = [
             cand for cand in profile.candidates if cand not in approved_candidates
@@ -427,10 +479,15 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute, max_num_of_committ
         if resolute:
             return [approved_candidates | set(remaining_candidates[:num_missing_candidates])]
 
-        return [
+        committees = [
             approved_candidates | set(extra)
             for extra in itertools.combinations(remaining_candidates, num_missing_candidates)
         ]
+
+        if max_num_of_committees:
+            return committees[:max_num_of_committees]
+        else:
+            return committees
 
     committees, _ = _optimize_rule_gurobi(
         set_opt_model_func=set_opt_model_func,
@@ -439,11 +496,14 @@ def _gurobi_minimaxphragmen(profile, committeesize, resolute, max_num_of_committ
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         name="minimax-Phragmen",
+        lexicographic_tiebreaking=lexicographic_tiebreaking,
     )
     return sorted_committees(committees)
 
 
-def _gurobi_leximaxphragmen(profile, committeesize, resolute, max_num_of_committees):
+def _gurobi_leximaxphragmen(
+    profile, committeesize, resolute, max_num_of_committees, lexicographic_tiebreaking
+):
     def set_opt_model_func(model, in_committee):
         load = {}
         loadbound_constraint = {}
@@ -552,6 +612,7 @@ def _gurobi_leximaxphragmen(profile, committeesize, resolute, max_num_of_committ
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
         name="leximaxphragmen-final",
+        lexicographic_tiebreaking=lexicographic_tiebreaking,
     )
 
     return sorted_committees(committees)
@@ -607,7 +668,9 @@ def _gurobi_maximin_support_scorefct(profile, base_committee):
     return scores
 
 
-def _gurobi_minimaxav(profile, committeesize, resolute, max_num_of_committees):
+def _gurobi_minimaxav(
+    profile, committeesize, resolute, max_num_of_committees, lexicographic_tiebreaking=False
+):
     def set_opt_model_func(model, in_committee):
         max_hamming_distance = model.addVar(
             lb=0,
@@ -641,12 +704,15 @@ def _gurobi_minimaxav(profile, committeesize, resolute, max_num_of_committees):
         max_num_of_committees=max_num_of_committees,
         name="Minimax AV",
         committeescorefct=lambda profile, committee: -scores.minimaxav_score(profile, committee),
-        # negative because _optimize_rule_mip maximizes while minimaxav minimizes
+        # negative because _optimize_rule_gurobi maximizes while minimaxav minimizes
+        lexicographic_tiebreaking=lexicographic_tiebreaking,
     )
     return sorted_committees(committees)
 
 
-def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees):
+def _gurobi_lexminimaxav(
+    profile, committeesize, resolute, max_num_of_committees, lexicographic_tiebreaking=False
+):
     def set_opt_model_func(model, in_committee):
         voteratmostdistances = {}
 
@@ -718,6 +784,7 @@ def _gurobi_lexminimaxav(profile, committeesize, resolute, max_num_of_committees
             committeesize=committeesize,
             resolute=_resolute,
             max_num_of_committees=_max_num_of_committees,
+            lexicographic_tiebreaking=True,
             name=f"lexminimaxav-atmostdistance{distance}",
             committeescorefct=functools.partial(
                 scores.num_voters_with_upper_bounded_hamming_distance, distance
