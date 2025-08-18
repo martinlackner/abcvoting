@@ -1,4 +1,4 @@
-"""ABC rules implemented as integer linear programs (ILPs) with Gurobi."""
+"""ABC rules implemented as integer linear programs (ILPs) with Pulp."""
 
 import functools
 import pulp
