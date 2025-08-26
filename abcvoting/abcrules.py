@@ -25,7 +25,7 @@ import random
 import math
 from fractions import Fraction
 from abcvoting.output import output, DETAILS
-from abcvoting import abcrules_gurobi, abcrules_highs, abcrules_ortools, abcrules_mip, misc, scores
+from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, abcrules_pulp, misc, scores
 from abcvoting.misc import str_committees_with_header, header, str_set_of_candidates
 from abcvoting.misc import sorted_committees, CandidateSet
 
@@ -70,7 +70,7 @@ MAIN_RULE_IDS = [
 # to full names (i.e., descriptions).
 ALGORITHM_NAMES = {
     "gurobi": "Gurobi ILP solver",
-    "highs": "ILP solver via Python PuLP library",
+    "pulp-highs": "ILP solver via Python PuLP library",
     "branch-and-bound": "branch-and-bound",
     "brute-force": "brute-force",
     "mip-cbc": "CBC ILP solver via Python MIP library",
@@ -103,7 +103,7 @@ class Rule:
     _THIELE_ALGORITHMS = (
         # algorithms sorted by speed
         "gurobi",
-        "highs",
+        "pulp-highs",
         "mip-gurobi",
         "mip-cbc",
         "branch-and-bound",
@@ -148,7 +148,7 @@ class Rule:
             self.algorithms = (
                 # algorithms sorted by speed
                 "gurobi",
-                "highs",
+                "pulp-highs",
                 "mip-gurobi",
                 "ortools-cp",
                 "branch-and-bound",
@@ -161,7 +161,7 @@ class Rule:
             self.longname = "Lexicographic Chamberlin-Courant (lex-CC)"
             self.compute_fct = compute_lexcc
             # algorithms sorted by speed
-            self.algorithms = ("gurobi", "highs", "brute-force")
+            self.algorithms = ("gurobi", "pulp-highs", "brute-force")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "seqpav":
             self.shortname = "seq-PAV"
@@ -197,13 +197,13 @@ class Rule:
             self.shortname = "minimax-Phragmén"
             self.longname = "Phragmén's Minimax Rule (minimax-Phragmén)"
             self.compute_fct = compute_minimaxphragmen
-            self.algorithms = ("gurobi", "highs", "mip-gurobi", "mip-cbc")
+            self.algorithms = ("gurobi", "pulp-highs", "mip-gurobi", "mip-cbc")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "leximaxphragmen":
             self.shortname = "leximax-Phragmén"
             self.longname = "Phragmén's Leximax Rule (leximax-Phragmén)"
             self.compute_fct = compute_leximaxphragmen
-            self.algorithms = ("gurobi",)  # "highs" is too slow
+            self.algorithms = ("gurobi",)  # "pulp-highs" is too slow
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "maximin-support":
             self.shortname = "Maximin-Support"
@@ -218,7 +218,7 @@ class Rule:
             self.algorithms = (
                 # algorithms sorted by speed
                 "gurobi",
-                "highs",
+                "pulp-highs",
                 "mip-gurobi",
                 "mip-cbc",
                 "ortools-cp",
@@ -237,7 +237,7 @@ class Rule:
             self.compute_fct = compute_minimaxav
             self.algorithms = (
                 "gurobi",
-                "highs",
+                "pulp-highs",
                 "mip-gurobi",
                 "ortools-cp",
                 "mip-cbc",
@@ -250,7 +250,7 @@ class Rule:
             self.shortname = "lex-MAV"
             self.longname = "Lexicographic Minimax Approval Voting (lex-MAV)"
             self.compute_fct = compute_lexminimaxav
-            self.algorithms = ("gurobi", "highs", "brute-force")
+            self.algorithms = ("gurobi", "pulp-highs", "brute-force")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id in ["rule-x", "equal-shares", "equal-shares-with-seqphragmen-completion"]:
             self.shortname = "Equal Shares"
@@ -536,7 +536,7 @@ def _available_algorithms():
     for algorithm in ALGORITHM_NAMES:
         if "gurobi" in algorithm and not abcrules_gurobi.gb:
             continue
-        if "highs" in algorithm and not abcrules_highs.pulp:
+        if algorithm.startswith("pulp-") and not abcrules_pulp.pulp:
             continue
         if algorithm == "gmpy2-fractions" and not mpq:
             continue
@@ -701,13 +701,14 @@ def compute_thiele_method(
             max_num_of_committees=max_num_of_committees,
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
-    elif algorithm == "highs":
-        committees = abcrules_highs._pulp_thiele_methods(
+    elif algorithm.startswith("pulp-"):
+        committees = abcrules_pulp._pulp_thiele_methods(
             scorefct_id=scorefct_id,
             profile=profile,
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            solver_id=algorithm[5:],
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm == "branch-and-bound":
@@ -1145,12 +1146,13 @@ def compute_lexcc(
             max_num_of_committees=max_num_of_committees,
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
-    elif algorithm == "highs":
-        committees, detailed_info = abcrules_highs._pulp_lexcc(
+    elif algorithm.startswith("pulp-"):
+        committees, detailed_info = abcrules_pulp._pulp_lexcc(
             profile=profile,
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            solver_id=algorithm[5:],
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm.startswith("mip-"):
@@ -2226,12 +2228,13 @@ def compute_minimaxav(
             max_num_of_committees=max_num_of_committees,
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
-    elif algorithm == "highs":
-        committees = abcrules_highs._pulp_minimaxav(
+    elif algorithm.startswith("pulp-"):
+        committees = abcrules_pulp._pulp_minimaxav(
             profile=profile,
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            solver_id=algorithm[5:],
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm == "ortools-cp":
@@ -2395,12 +2398,13 @@ def compute_lexminimaxav(
             max_num_of_committees=max_num_of_committees,
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
-    elif algorithm == "highs":
-        committees, detailed_info = abcrules_highs._pulp_lexminimaxav(
+    elif algorithm.startswith("pulp-"):
+        committees, detailed_info = abcrules_pulp._pulp_lexminimaxav(
             profile=profile,
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            solver_id=algorithm[5:],
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     else:
@@ -2529,12 +2533,13 @@ def compute_monroe(
             max_num_of_committees=max_num_of_committees,
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
-    elif algorithm == "highs":
-        committees = abcrules_highs._pulp_monroe(
+    elif algorithm.startswith("pulp-"):
+        committees = abcrules_pulp._pulp_monroe(
             profile=profile,
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            solver_id=algorithm[5:],
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm == "ortools-cp":
@@ -3670,12 +3675,13 @@ def compute_minimaxphragmen(
             max_num_of_committees=max_num_of_committees,
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
-    elif algorithm == "highs":
-        committees = abcrules_highs._pulp_minimaxphragmen(
+    elif algorithm.startswith("pulp-"):
+        committees = abcrules_pulp._pulp_minimaxphragmen(
             profile,
             committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            solver_id=algorithm[5:],
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm.startswith("mip-"):
@@ -3796,12 +3802,13 @@ def compute_leximaxphragmen(
     #         max_num_of_committees=max_num_of_committees,
     #         solver_id=algorithm[4:],
     #     )
-    elif algorithm == "highs":
-        committees = abcrules_highs._pulp_leximaxphragmen(
+    elif algorithm.startswith("pulp-"):
+        committees = abcrules_pulp._pulp_leximaxphragmen(
             profile,
             committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
+            solver_id=algorithm[5:],
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     else:

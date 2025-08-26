@@ -23,6 +23,7 @@ def _optimize_rule_pulp(
     committeesize,
     resolute,
     max_num_of_committees,
+    solver_id,
     name="None",
     committeescorefct=None,
     lexicographic_tiebreaking=False,
@@ -39,12 +40,12 @@ def _optimize_rule_pulp(
 
     while True:
         try:
-            prob.solve(pulp.HiGHS_CMD(msg=False))
+            prob.solve(get_solver(solver_id))
             if pulp.LpStatus[prob.status] != "Optimal":
                 raise pulp.PulpsolverError("Status not Optimal")
         except pulp.PulpSolverError:
             if len(committees) == 0:
-                raise RuntimeError(f"HiGHS found no solution (model {name})")
+                raise RuntimeError(f"Solver found no solution (model {name})")
             break
 
         committee = {cand for cand in profile.candidates if pulp.value(in_committee[cand]) >= 0.9}
@@ -67,7 +68,7 @@ def _optimize_rule_pulp(
             not committeescorefct and objective_value > maxscore + CMP_ACCURACY
         ):
             raise RuntimeError(
-                "HiGHS found a solution better than a previous optimum. This "
+                "Solver found a solution better than a previous optimum. This "
                 f"should not happen (previous: {maxscore}, new: {objective_value}, model {name})"
             )
         elif (committeescorefct and objective_value < maxscore) or (
@@ -104,7 +105,7 @@ def _optimize_rule_pulp(
                     for idx in range(len(current_block))
                 )
                 lex_prob.setObjective(lex_objective_expr)
-                lex_prob.solve(pulp.HiGHS_CMD(msg=False))
+                lex_prob.solve(get_solver(solver_id))
 
                 if pulp.LpStatus[lex_prob.status] != "Optimal":
                     raise RuntimeError("Lex optimization failed.")
@@ -139,12 +140,20 @@ def _optimize_rule_pulp(
     )
 
 
+def get_solver(solver_id):
+    if solver_id == "highs":
+        return pulp.HiGHS_CMD(msg=False)
+    else:
+        raise ValueError(f"Solver {solver_id} not known in Python Pulp.")
+
+
 def _pulp_thiele_methods(
     scorefct_id,
     profile,
     committeesize,
     resolute,
     max_num_of_committees,
+    solver_id,
     lexicographic_tiebreaking=False,
 ):
     def set_opt_model_func(prob, in_committee):
@@ -195,6 +204,7 @@ def _pulp_thiele_methods(
         committeesize,
         resolute,
         max_num_of_committees,
+        solver_id=solver_id,
         name=scorefct_id,
         committeescorefct=functools.partial(scores.thiele_score, scorefct_id),
         lexicographic_tiebreaking=lexicographic_tiebreaking,
@@ -208,6 +218,7 @@ def _pulp_lexcc(
     committeesize,
     resolute,
     max_num_of_committees,
+    solver_id,
     lexicographic_tiebreaking=False,
 ):
     def set_opt_model_func(prob, in_committee):
@@ -257,6 +268,7 @@ def _pulp_lexcc(
             committeesize=committeesize,
             resolute=True,
             max_num_of_committees=None,
+            solver_id=solver_id,
             name=f"lexcc-atleast{iteration}",
             committeescorefct=functools.partial(scores.thiele_score, f"atleast{iteration}"),
         )
@@ -273,6 +285,7 @@ def _pulp_lexcc(
         resolute=resolute,
         lexicographic_tiebreaking=lexicographic_tiebreaking,
         max_num_of_committees=max_num_of_committees,
+        solver_id=solver_id,
         name="lexcc-final",
         committeescorefct=functools.partial(scores.thiele_score, f"atleast{iteration}"),
     )
@@ -289,6 +302,7 @@ def _pulp_monroe(
     committeesize,
     resolute,
     max_num_of_committees,
+    solver_id,
     lexicographic_tiebreaking=False,
 ):
     def set_opt_model_func(prob, in_committee):
@@ -352,6 +366,7 @@ def _pulp_monroe(
         committeesize=committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
+        solver_id=solver_id,
         name="Monroe",
         committeescorefct=scores.monroescore,
         lexicographic_tiebreaking=lexicographic_tiebreaking,
@@ -365,6 +380,7 @@ def _pulp_minimaxphragmen(
     committeesize,
     resolute,
     max_num_of_committees,
+    solver_id,
     lexicographic_tiebreaking=False,
 ):
     def set_opt_model_func(prob, in_committee):
@@ -426,6 +442,7 @@ def _pulp_minimaxphragmen(
         committeesize=committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
+        solver_id=solver_id,
         name="minimax-Phragmen",
         lexicographic_tiebreaking=lexicographic_tiebreaking,
     )
@@ -438,6 +455,7 @@ def _pulp_leximaxphragmen(
     committeesize,
     resolute,
     max_num_of_committees,
+    solver_id,
     lexicographic_tiebreaking,
 ):
     loadbounds = []
@@ -526,6 +544,7 @@ def _pulp_leximaxphragmen(
             committeesize=committeesize,
             resolute=True,
             max_num_of_committees=None,
+            solver_id=solver_id,
             name=f"leximaxphragmen-iteration{iteration}",
         )
         if math.isclose(neg_loadbound, 0, rel_tol=1e-4, abs_tol=1e-4):
@@ -547,7 +566,12 @@ def _pulp_leximaxphragmen(
 
 
 def _pulp_minimaxav(
-    profile, committeesize, resolute, max_num_of_committees, lexicographic_tiebreaking=False
+    profile,
+    committeesize,
+    resolute,
+    max_num_of_committees,
+    solver_id,
+    lexicographic_tiebreaking=False,
 ):
     def set_opt_model_func(prob, in_committee):
         # Create the max Hamming distance variable
@@ -577,6 +601,7 @@ def _pulp_minimaxav(
         committeesize=committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
+        solver_id=solver_id,
         name="MinimaxAv",
         committeescorefct=lambda profile, committee: -scores.minimaxav_score(profile, committee),
         lexicographic_tiebreaking=lexicographic_tiebreaking,
@@ -585,7 +610,12 @@ def _pulp_minimaxav(
 
 
 def _pulp_lexminimaxav(
-    profile, committeesize, resolute, max_num_of_committees, lexicographic_tiebreaking=False
+    profile,
+    committeesize,
+    resolute,
+    max_num_of_committees,
+    solver_id,
+    lexicographic_tiebreaking=False,
 ):
     hammingdistance_constraints = {}
 
@@ -646,7 +676,9 @@ def _pulp_lexminimaxav(
         prob += pulp.lpSum(new_obj)
 
     # Step 1: Compute baseline from minimaxav
-    committees = _pulp_minimaxav(profile, committeesize, resolute=True, max_num_of_committees=None)
+    committees = _pulp_minimaxav(
+        profile, committeesize, resolute=True, max_num_of_committees=None, solver_id=solver_id
+    )
     maxdistance = scores.minimaxav_score(profile, committees[0])
     hammingdistance_constraints = {maxdistance: len(profile)}
 
@@ -661,7 +693,8 @@ def _pulp_lexminimaxav(
             committeesize=committeesize,
             resolute=_resolute,
             max_num_of_committees=_max_num,
-            lexicographic_tiebreaking=True,
+            solver_id=solver_id,
+            lexicographic_tiebreaking=lexicographic_tiebreaking,
             name=f"lexminimaxav-atmostdistance{distance}",
             committeescorefct=functools.partial(
                 scores.num_voters_with_upper_bounded_hamming_distance, distance

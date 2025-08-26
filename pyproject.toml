@@ -31,7 +31,7 @@ norecursedirs = [
 
 markers = [
     "gurobipy: a test that requires Gurobi (gurpbipy)",
-    "highs: a test that requires Highs (pulp)",
+    "pulphighs: a test that requires pulp and Highs",
     "scip: a test that requires SCIP",
     "glpk_mi: a test that requires glpk_mi",
     "cbc: a test that requires CBC",
