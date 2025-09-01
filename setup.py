@@ -93,7 +93,7 @@ setuptools.setup(
         "preflibtools>=2.0.12",
         "prefsampling>=0.1.19",
         "pabutools>=1.1.15",
-        "pulp[highs]>=3.2",
+        "pulp[open_py]>=3.2",
     ],
     extras_require={
         "dev": [
