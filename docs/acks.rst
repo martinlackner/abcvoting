@@ -13,6 +13,7 @@ scientific questions (in alphabetic order):
 - `Benjamin Krenn <https://github.com/benjaminkrenn>`_,
 - `Florian Lackner <https://github.com/Florian-Lackner>`_,
 - `Martin Lackner <http://martin.lackner.xyz/>`_,
+- `Martin Wustinger <https://github.com/mwustinger>`_,
 - `Dominik Peters <http://dominik-peters.de/>`_,
 - `Peter Regner <https://github.com/lumbric>`_,
 - `Simon Rey <https://simonrey.fr/>`_,
