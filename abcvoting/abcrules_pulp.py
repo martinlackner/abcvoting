@@ -42,7 +42,7 @@ def _optimize_rule_pulp(
         try:
             prob.solve(get_solver(solver_id))
             if pulp.LpStatus[prob.status] != "Optimal":
-                raise pulp.PulpsolverError("Status not Optimal")
+                raise pulp.PulpSolverError("Status not Optimal")
         except pulp.PulpSolverError:
             if len(committees) == 0:
                 raise RuntimeError(f"Solver found no solution (model {name})")
@@ -142,7 +142,7 @@ def _optimize_rule_pulp(
 
 def get_solver(solver_id):
     if solver_id == "highs":
-        return pulp.HiGHS_CMD(msg=False)
+        return pulp.HiGHS(msg=False)
     else:
         raise ValueError(f"Solver {solver_id} not known in Python Pulp.")
 
