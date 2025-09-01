@@ -668,9 +668,11 @@ def _pulp_lexminimaxav(
         # new objective: number of voters with Hamming distance <= new_distance
         new_distance = min(hammingdistance_constraints.keys()) - 1
         new_obj = [
-            voteratmostdistances[(i, new_distance)]
-            if isinstance(voteratmostdistances[(i, new_distance)], pulp.LpVariable)
-            else voteratmostdistances[(i, new_distance)]
+            (
+                voteratmostdistances[(i, new_distance)]
+                if isinstance(voteratmostdistances[(i, new_distance)], pulp.LpVariable)
+                else voteratmostdistances[(i, new_distance)]
+            )
             for i in range(len(profile))
         ]
         prob += pulp.lpSum(new_obj)
