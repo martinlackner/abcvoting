@@ -30,3 +30,4 @@ ignore:
     - "examples"
     - "tests"
     - "setup.py"
+    - "abcrules_mip.py"
