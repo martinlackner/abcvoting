@@ -712,6 +712,7 @@ def compute_thiele_method(
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm == "branch-and-bound":
+        # lexicographic tiebreaking works automatically for brute-force
         committees, detailed_info = _thiele_methods_branchandbound(
             scorefct_id=scorefct_id,
             profile=profile,
@@ -720,6 +721,7 @@ def compute_thiele_method(
             max_num_of_committees=max_num_of_committees,
         )
     elif algorithm == "brute-force":
+        # lexicographic tiebreaking works automatically for brute-force
         committees, detailed_info = _thiele_methods_bruteforce(
             scorefct_id=scorefct_id,
             profile=profile,
@@ -728,6 +730,10 @@ def compute_thiele_method(
             max_num_of_committees=max_num_of_committees,
         )
     elif algorithm.startswith("mip-"):
+        if lexicographic_tiebreaking:
+            raise NotImplementedError(
+                f"Lexicographic tiebreaking is not implemented for {algorithm}."
+            )
         committees = abcrules_mip._mip_thiele_methods(
             scorefct_id=scorefct_id,
             profile=profile,
@@ -737,6 +743,10 @@ def compute_thiele_method(
             solver_id=algorithm[4:],
         )
     elif algorithm == "ortools-cp" and scorefct_id == "cc":
+        if lexicographic_tiebreaking:
+            raise NotImplementedError(
+                f"Lexicographic tiebreaking is not implemented for {algorithm}."
+            )
         committees = abcrules_ortools._ortools_cc(
             profile=profile,
             committeesize=committeesize,
@@ -1132,6 +1142,7 @@ def compute_lexcc(
     )
 
     if algorithm == "brute-force":
+        # Lexicographic tie-breaking works automatically for brute-force
         committees, detailed_info = _lexcc_bruteforce(
             profile=profile,
             committeesize=committeesize,
@@ -1156,6 +1167,7 @@ def compute_lexcc(
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm.startswith("mip-"):
+        # lexicographic tiebreaking works automatically for brute-force
         committees, detailed_info = abcrules_mip._mip_lexcc(
             profile=profile,
             committeesize=committeesize,
@@ -1768,7 +1780,7 @@ def _revseq_thiele_irresolute(scorefct_id, profile, committeesize, max_num_of_co
         comm_scores_next = {}
         for committee, score in comm_scores.items():
             marg_util_cand = scores.marginal_thiele_scores_remove(
-                marginal_scorefct, profile, committee
+                marginal_scorefct, profile, set(committee)
             )
             score_reduction = min(marg_util_cand)
             # find smallest elements in `marg_util_cand` and return indices
@@ -2238,6 +2250,8 @@ def compute_minimaxav(
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm == "ortools-cp":
+        if lexicographic_tiebreaking:
+            raise NotImplementedError(f"Lexicographic tiebreaking not available with {algorithm}.")
         committees = abcrules_ortools._ortools_minimaxav(
             profile=profile,
             committeesize=committeesize,
@@ -2245,6 +2259,8 @@ def compute_minimaxav(
             max_num_of_committees=max_num_of_committees,
         )
     elif algorithm.startswith("mip-"):
+        if lexicographic_tiebreaking:
+            raise NotImplementedError(f"Lexicographic tiebreaking not available with {algorithm}.")
         solver_id = algorithm[4:]
         committees = abcrules_mip._mip_minimaxav(
             profile=profile,
@@ -2254,6 +2270,7 @@ def compute_minimaxav(
             solver_id=solver_id,
         )
     elif algorithm == "brute-force":
+        # Lexicographic tiebreaking works automatically for brute-force
         committees, detailed_info = _minimaxav_bruteforce(
             profile=profile,
             committeesize=committeesize,
@@ -2384,6 +2401,7 @@ def compute_lexminimaxav(
         raise ValueError(f"{rule.shortname} is only defined for unit weights (weight=1)")
 
     if algorithm == "brute-force":
+        # Lexicographic tiebreaking works automatically for brute-force
         committees, detailed_info = _lexminimaxav_bruteforce(
             profile=profile,
             committeesize=committeesize,
@@ -2543,6 +2561,8 @@ def compute_monroe(
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm == "ortools-cp":
+        if lexicographic_tiebreaking:
+            raise NotImplementedError(f"Lexicographic tiebreaking not available with {algorithm}.")
         committees = abcrules_ortools._ortools_monroe(
             profile=profile,
             committeesize=committeesize,
@@ -2550,6 +2570,8 @@ def compute_monroe(
             max_num_of_committees=max_num_of_committees,
         )
     elif algorithm.startswith("mip-"):
+        if lexicographic_tiebreaking:
+            raise NotImplementedError(f"Lexicographic tiebreaking not available with {algorithm}.")
         committees = abcrules_mip._mip_monroe(
             profile=profile,
             committeesize=committeesize,
@@ -2558,6 +2580,7 @@ def compute_monroe(
             solver_id=algorithm[4:],
         )
     elif algorithm == "brute-force":
+        # Lexicographic tiebreaking works automatically for brute-force
         committees, detailed_info = _monroe_bruteforce(
             profile=profile,
             committeesize=committeesize,
@@ -3685,6 +3708,8 @@ def compute_minimaxphragmen(
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
     elif algorithm.startswith("mip-"):
+        if lexicographic_tiebreaking:
+            raise NotImplementedError(f"Lexicographic tiebreaking not available with {algorithm}.")
         committees = abcrules_mip._mip_minimaxphragmen(
             profile,
             committeesize,
@@ -3803,6 +3828,8 @@ def compute_leximaxphragmen(
     #         solver_id=algorithm[4:],
     #     )
     elif algorithm.startswith("pulp-"):
+        if lexicographic_tiebreaking:
+            raise NotImplementedError(f"Lexicographic tiebreaking not available with {algorithm}.")
         committees = abcrules_pulp._pulp_leximaxphragmen(
             profile,
             committeesize,
