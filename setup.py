@@ -94,8 +94,6 @@ setuptools.setup(
         "prefsampling>=0.1.19",
         "pabutools>=1.1.15",
         "pulp[open_py]>=3.2",
-        "mip>=1.15.0",
-        "ortools>=9.0",
     ],
     extras_require={
         "dev": [
