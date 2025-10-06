@@ -692,6 +692,7 @@ def remove_solver_output(out):
         "Set parameter Username.*\n",
         "Set parameter LicenseID to value .*\n",
         "Academic license - for non-commercial use only.*\n",
+        "Restricted license - for non-production use only - expires.*\n",
     )
 
     for filter_pattern in filter_patterns:
