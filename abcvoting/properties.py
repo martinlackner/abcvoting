@@ -2,6 +2,8 @@
 Axiomatic properties of committees.
 """
 
+from collections import defaultdict
+
 import gurobipy as gb
 import itertools
 import math
@@ -500,6 +502,7 @@ def check_JR(profile, committee, quota=None):
     """
 
     if quota is None:
+        # Hare quota
         standard_quota = True
         quota = Fraction(profile.total_weight(), len(committee))
     else:
@@ -1087,28 +1090,25 @@ def _check_EJR_plus(profile, committee, quota):
     bool
     """
 
-    # largest possible ell such that ell-cohesive groups can exist
-    ell_upper_bound = int(profile.total_weight() / quota)
-
     for cand in profile.candidates:
         if cand in committee:
             continue
-        supporters_by_utility = {ell: set() for ell in range(ell_upper_bound + 1)}
+        supporters_by_utility = defaultdict(set)
         for vi, voter in enumerate(profile):
             if cand in voter.approved:
                 utility = len(voter.approved & committee)
                 supporters_by_utility[utility].add(vi)
 
         group = set()
-        for ell in range(ell_upper_bound):
-            # group of supporters of cand with utility <= ell
-            group |= supporters_by_utility[ell]
-            if sum(profile[vi].weight for vi in group) >= (ell + 1) * quota:
+        for ell in range(1, len(committee) + 1):
+            # group of supporters of cand with utility < ell
+            group |= supporters_by_utility[ell - 1]
+            if sum(profile[vi].weight for vi in group) >= ell * quota:
                 # EJR+ requires someone to get utility at least ell + 1, but no one does
                 detailed_information = {
                     "cohesive_group": group,
                     "joint_candidate": cand,
-                    "ell": ell + 1,
+                    "ell": ell,
                 }
                 return False, detailed_information
 
