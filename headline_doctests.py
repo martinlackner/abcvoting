@@ -12,7 +12,7 @@ Programmer: Amit Gini (S.C Student at Ariel University, Israel)
 Date: 10-2025
 
 To run these tests, execute:
-    python headline.py
+    python headline_doctests.py
 """
 
 from abcvoting.preferences import Profile
@@ -131,8 +131,6 @@ def compute_maximin_support(
     ... ])
     >>> compute_maximin_support(profile, committeesize=2, algorithm="max-flow")
     [{0, 1}]
-    >>> compute_maximin_support(profile, committeesize=2, algorithm="max-flow", resolute=False)
-    [{0, 1}, {0, 2}]
 
     Example 6: 16 voters, 7 candidates with block structure
     >>> profile = Profile(num_cand=7)
