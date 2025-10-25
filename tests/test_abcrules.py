@@ -1361,6 +1361,41 @@ def test_maximin_support():
     )
 
 
+@pytest.mark.parametrize("algorithm", ["nx-max-flow"])
+@pytest.mark.parametrize("num_cand", [6, 7, 8])
+def test_maximin_support_nx_maxflow(algorithm, num_cand):
+    """Test nx-max-flow implementation of maximin-support."""
+    """Temporary notes
+    
+    What it test:
+        - Algorithm returns correct committees for known profiles
+        - Works with different num_cand
+        - Different committee sizes work correctly
+        - Resolute and irresolute work correctly
+    """
+    profile = Profile(num_cand)
+    profile.add_voters(
+        [
+            {0, 1},  # Voter 1
+            {0, 2},  # Voter 2
+            {1, 2},  # Voter 3
+            {2},  # Voter 4
+            {1, 3},  # Voter 5
+        ]
+    )
+
+    # Test committee size 2
+    committees = abcrules.compute("maximin-support", profile, committeesize=2, algorithm=algorithm)
+    assert {1, 2} in committees
+
+    # Test committee size 3 + resolute = False
+    committees = abcrules.compute(
+        "maximin-support", profile, committeesize=3, algorithm=algorithm, resolute=False
+    )
+    # Verify it returns a valid committee of size 3
+    assert [{0, 1, 2}] in committees
+
+
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "filename, rule_id, algorithm",
