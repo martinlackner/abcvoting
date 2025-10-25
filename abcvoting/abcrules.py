@@ -25,7 +25,15 @@ import random
 import math
 from fractions import Fraction
 from abcvoting.output import output, DETAILS
-from abcvoting import abcrules_gurobi, abcrules_ortools, abcrules_mip, abcrules_pulp, misc, scores
+from abcvoting import (
+    abcrules_networkx,
+    abcrules_gurobi,
+    abcrules_ortools,
+    abcrules_mip,
+    abcrules_pulp,
+    misc,
+    scores,
+)
 from abcvoting.misc import str_committees_with_header, header, str_set_of_candidates
 from abcvoting.misc import sorted_committees, CandidateSet
 
@@ -75,6 +83,7 @@ ALGORITHM_NAMES = {
     "brute-force": "brute-force",
     "mip-cbc": "CBC ILP solver via Python MIP library",
     "mip-gurobi": "Gurobi ILP solver via Python MIP library",
+    "nx-max-flow": "Max-Flow algorithm via NetworkX library",
     # "cvxpy_gurobi": "Gurobi ILP solver via CVXPY library",
     # "cvxpy_scip": "SCIP ILP solver via CVXPY library",
     # "cvxpy_glpk_mi": "GLPK ILP solver via CVXPY library",
@@ -209,7 +218,7 @@ class Rule:
             self.shortname = "Maximin-Support"
             self.longname = "Maximin Support Method (MMS)"
             self.compute_fct = compute_maximin_support
-            self.algorithms = ("gurobi", "mip-gurobi", "mip-cbc")
+            self.algorithms = ("gurobi", "mip-gurobi", "mip-cbc", "nx-max-flow")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
         elif rule_id == "monroe":
             self.shortname = "Monroe"
@@ -543,6 +552,8 @@ def _available_algorithms():
         if algorithm == "ortools-cp" and not abcrules_ortools.cp_model:
             continue
         if algorithm.startswith("mip-") and abcrules_mip.mip is None:
+            continue
+        if algorithm == "nx-max-flow" and not abcrules_networkx.nx:
             continue
         available.append(algorithm)
 
@@ -3886,7 +3897,7 @@ def compute_maximin_support(
             .. doctest::
 
                 >>> Rule("maximin-support").algorithms
-                ('gurobi', 'mip-gurobi', 'mip-cbc')
+                ('gurobi', 'mip-gurobi', 'mip-cbc', nx-max-flow)
 
         resolute : bool, optional
             Return only one winning committee.
@@ -3925,6 +3936,8 @@ def compute_maximin_support(
         scorefct = functools.partial(
             abcrules_mip._mip_maximin_support_scorefct, solver_id=solver_id
         )
+    elif algorithm == "nx-max-flow":
+        scorefct = abcrules_networkx._nx_maximin_support_scorefct
     else:
         raise UnknownAlgorithm(rule_id, algorithm)
 
