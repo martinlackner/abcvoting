@@ -218,7 +218,12 @@ class Rule:
             self.shortname = "Maximin-Support"
             self.longname = "Maximin Support Method (MMS)"
             self.compute_fct = compute_maximin_support
-            self.algorithms = ("gurobi", "mip-gurobi", "mip-cbc", "nx-max-flow")
+            self.algorithms = (
+                "gurobi",
+                "mip-gurobi",
+                "mip-cbc",
+                "nx-max-flow",
+            )  # TODO: check fastest algorithm and change the order accordingly
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
         elif rule_id == "monroe":
             self.shortname = "Monroe"

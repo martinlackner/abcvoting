@@ -229,6 +229,7 @@ def _compute_maximin_support_via_maxflow(profile, committee) -> float:
     return 0.0  # Empty implementation
 
 
+# TODO: Remove the following test code when integrating into the main package
 if __name__ == "__main__":
     import doctest
 
