@@ -71,6 +71,7 @@ MAIN_RULE_IDS = [
 ALGORITHM_NAMES = {
     "gurobi": "Gurobi ILP solver",
     "pulp-highs": "ILP solver via Python PuLP library",
+    "pulp-cbc": "ILP solver via Python PuLP library",
     "branch-and-bound": "branch-and-bound",
     "brute-force": "brute-force",
     "mip-cbc": "CBC ILP solver via Python MIP library",
@@ -104,6 +105,7 @@ class Rule:
         # algorithms sorted by speed
         "gurobi",
         "pulp-highs",
+        "pulp-cbc",
         "mip-gurobi",
         "mip-cbc",
         "branch-and-bound",
