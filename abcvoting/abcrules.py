@@ -3902,7 +3902,7 @@ def compute_maximin_support(
             .. doctest::
 
                 >>> Rule("maximin-support").algorithms
-                ('gurobi', 'mip-gurobi', 'mip-cbc', nx-max-flow)
+                ('gurobi', 'mip-gurobi', 'mip-cbc', nx-max-flow) #TODO: fix algorithm order according to time complexity (fastest order)
 
         resolute : bool, optional
             Return only one winning committee.
