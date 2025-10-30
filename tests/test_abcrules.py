@@ -694,7 +694,7 @@ def remove_solver_output(out):
         "Set parameter LicenseID to value .*\n",
         "Academic license - for non-commercial use only.*\n",
         "Restricted license - for non-production use only - expires.*\n",
-        "HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();\n"
+        "HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();\n",
     )
 
     for filter_pattern in filter_patterns:
