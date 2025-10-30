@@ -1444,6 +1444,44 @@ def test_maximin_support_nx_weighted_voters(rule_id, algorithm):
     assert committees == [{0, 1}, {1, 2}]
 
 
+"""-------- Resolute and irresolute sanity check for nx-max-flow algorithm --------"""
+
+
+@pytest.mark.parametrize("rule_id", ["maximin-support"])
+@pytest.mark.parametrize("algorithm", ["nx-max-flow"])
+def test_maximin_support_nx_resolute_irresolute_sanity(rule_id, algorithm):
+    """Sanity check: resolute winner should be among irresolute winners for nx-max-flow."""
+    # Small profile with ties to exercise both code paths
+    profile = Profile(4)
+    profile.add_voters([[0, 1], [1, 2], [2, 3], [3, 0]])  # 4 voters, each approves 2 candidates
+    committeesize = 2
+
+    # Compute resolute and irresolute winners
+    resolute_winners = abcrules.compute(
+        rule_id=rule_id,
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=True,
+    )
+    irresolute_winners = abcrules.compute(
+        rule_id=rule_id,
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=False,
+    )
+
+    # Verify resolute and irresolute are not empty
+    assert len(resolute_winners) == 1 and len(irresolute_winners) > 0
+
+    # Verify that all irresolute winners have the correct size
+    assert all(len(comm) == committeesize for comm in irresolute_winners)
+
+    # Verify that the resolute winner is among the irresolute winners
+    assert resolute_winners[0] in irresolute_winners
+
+
 """-------- Big random inputs case for nx-max-flow algorithm --------"""
 
 
@@ -1463,7 +1501,10 @@ def test_maximin_support_nx_random_profiles(rule_id, num_voters, num_cand, commi
     """
     import numpy as np
     from abcvoting import generate
+    from abcvoting.generate import random_profile
+    from numpy.random import default_rng
 
+    rng = default_rng(83)
     # Skip if committeesize > num_cand
     if committeesize > num_cand:
         pytest.skip("committeesize exceeds num_cand")
@@ -1488,7 +1529,7 @@ def test_maximin_support_nx_random_profiles(rule_id, num_voters, num_cand, commi
     assert len(committees_maxflow[0]) == committeesize
 
     # Verify all candidates are valid (within range num_cand)
-    assert all(c < num_cand for c in committees_nx[0])
+    assert all(c < num_cand for c in committees_maxflow[0])
 
     try:
         committees_gurobi = abcrules.compute(
