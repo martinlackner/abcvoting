@@ -143,6 +143,8 @@ def _optimize_rule_pulp(
 def get_solver(solver_id):
     if solver_id == "highs":
         return pulp.HiGHS(msg=False)
+    elif solver_id == "cbc":
+        return pulp.PULP_CBC_CMD(msg=False)
     else:
         raise ValueError(f"Solver {solver_id} not known in Python Pulp.")
 

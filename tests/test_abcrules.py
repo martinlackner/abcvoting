@@ -16,6 +16,7 @@ from itertools import combinations
 MARKS = {
     "gurobi": [pytest.mark.gurobipy],
     "pulp-highs": [pytest.mark.pulphighs],
+    "pulp-cbc": [pytest.mark.pulpcbc],
     "ortools-cp": [pytest.mark.ortools],
     "mip-cbc": [pytest.mark.mip, pytest.mark.mipcbc],
     "mip-gurobi": [pytest.mark.mip, pytest.mark.mipgurobi],
@@ -693,6 +694,7 @@ def remove_solver_output(out):
         "Set parameter LicenseID to value .*\n",
         "Academic license - for non-commercial use only.*\n",
         "Restricted license - for non-production use only - expires.*\n",
+        "HighsMipSolverData::.*\n",
     )
 
     for filter_pattern in filter_patterns:
@@ -1548,7 +1550,15 @@ def test_natural_tiebreaking_order_resolute(rule_id, algorithm):
     ]:
         profile.add_voters(approval_sets)
         committeesize = 2
-        if algorithm in ["gurobi", "pulp-highs", "ortools-cp", "mip-cbc", "mip-gurobi", "fastest"]:
+        if algorithm in [
+            "gurobi",
+            "pulp-highs",
+            "pulp-cbc",
+            "ortools-cp",
+            "mip-cbc",
+            "mip-gurobi",
+            "fastest",
+        ]:
             return  # ILP solvers do not guarantee a specific solution
         if rule_id in ["rsd"]:
             return  # RSD is randomized
@@ -1578,7 +1588,15 @@ def test_natural_tiebreaking_order_max_num_of_committees(rule_id, algorithm, app
     profile.add_voters(approval_sets)
     print(profile)
     committeesize = 2
-    if algorithm in ["gurobi", "pulp-highs", "ortools-cp", "mip-cbc", "mip-gurobi", "fastest"]:
+    if algorithm in [
+        "gurobi",
+        "pulp-highs",
+        "pulp-cbc",
+        "ortools-cp",
+        "mip-cbc",
+        "mip-gurobi",
+        "fastest",
+    ]:
         return  # ILP solvers do not guarantee a specific solution
     if rule_id in ["rsd"]:
         return  # RSD is randomized
