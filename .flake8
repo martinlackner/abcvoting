@@ -10,6 +10,7 @@ exclude =
     setup.py,
     */__init__.py,
     .eggs,
-    .github
+    .github,
+    build,
 max-complexity = 40
 max-line-length = 99
