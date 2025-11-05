@@ -75,7 +75,7 @@ ALGORITHM_NAMES = {
     "branch-and-bound": "branch-and-bound",
     "brute-force": "brute-force",
     "mip-cbc": "CBC ILP solver via Python MIP library",
-    "mip-gurobi": "Gurobi ILP solver via Python MIP library",
+    # "mip-gurobi": "Gurobi ILP solver via Python MIP library",
     # "cvxpy_gurobi": "Gurobi ILP solver via CVXPY library",
     # "cvxpy_scip": "SCIP ILP solver via CVXPY library",
     # "cvxpy_glpk_mi": "GLPK ILP solver via CVXPY library",
@@ -105,9 +105,8 @@ class Rule:
         # algorithms sorted by speed
         "gurobi",
         "pulp-highs",
-        "pulp-cbc",
-        "mip-gurobi",
         "mip-cbc",
+        "pulp-cbc",
         "branch-and-bound",
         "brute-force",
     )
@@ -151,11 +150,11 @@ class Rule:
                 # algorithms sorted by speed
                 "gurobi",
                 "pulp-highs",
-                "mip-gurobi",
                 "ortools-cp",
                 "branch-and-bound",
                 "brute-force",
                 "mip-cbc",
+                "pulp-cbc",
             )
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "lexcc":
@@ -163,7 +162,7 @@ class Rule:
             self.longname = "Lexicographic Chamberlin-Courant (lex-CC)"
             self.compute_fct = compute_lexcc
             # algorithms sorted by speed
-            self.algorithms = ("gurobi", "pulp-highs", "brute-force")
+            self.algorithms = ("gurobi", "pulp-highs", "pulp-cbc", "brute-force")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "seqpav":
             self.shortname = "seq-PAV"
@@ -199,7 +198,12 @@ class Rule:
             self.shortname = "minimax-Phragmén"
             self.longname = "Phragmén's Minimax Rule (minimax-Phragmén)"
             self.compute_fct = compute_minimaxphragmen
-            self.algorithms = ("gurobi", "pulp-highs", "mip-gurobi", "mip-cbc")
+            self.algorithms = (
+                "gurobi",
+                "pulp-highs",
+                "mip-cbc",
+                "pulp-cbc",
+            )
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "leximaxphragmen":
             self.shortname = "leximax-Phragmén"
@@ -211,7 +215,7 @@ class Rule:
             self.shortname = "Maximin-Support"
             self.longname = "Maximin Support Method (MMS)"
             self.compute_fct = compute_maximin_support
-            self.algorithms = ("gurobi", "mip-gurobi", "mip-cbc")
+            self.algorithms = ("gurobi", "mip-cbc")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
         elif rule_id == "monroe":
             self.shortname = "Monroe"
@@ -221,8 +225,8 @@ class Rule:
                 # algorithms sorted by speed
                 "gurobi",
                 "pulp-highs",
-                "mip-gurobi",
                 "mip-cbc",
+                "pulp-highs",
                 "ortools-cp",
                 "brute-force",
             )
@@ -239,10 +243,10 @@ class Rule:
             self.compute_fct = compute_minimaxav
             self.algorithms = (
                 "gurobi",
-                "pulp-highs",
-                "mip-gurobi",
                 "ortools-cp",
+                "pulp-highs",
                 "mip-cbc",
+                "pulp-highs",
                 "brute-force",
             )
             # algorithms sorted by speed. however, for small profiles with a small committee size,
@@ -252,7 +256,7 @@ class Rule:
             self.shortname = "lex-MAV"
             self.longname = "Lexicographic Minimax Approval Voting (lex-MAV)"
             self.compute_fct = compute_lexminimaxav
-            self.algorithms = ("gurobi", "pulp-highs", "brute-force")
+            self.algorithms = ("gurobi", "pulp-highs", "pulp-highs", "brute-force")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id in ["rule-x", "equal-shares", "equal-shares-with-seqphragmen-completion"]:
             self.shortname = "Equal Shares"
@@ -896,7 +900,7 @@ def compute_pav(
             .. doctest::
 
                 >>> Rule("pav").algorithms
-                ('gurobi', 'mip-gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
+                ('gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -965,7 +969,7 @@ def compute_slav(
             .. doctest::
 
                 >>> Rule("slav").algorithms
-                ('gurobi', 'mip-gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
+                ('gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -1033,7 +1037,7 @@ def compute_cc(
             .. doctest::
 
                 >>> Rule("cc").algorithms  # doctest: +NORMALIZE_WHITESPACE
-                ('gurobi', 'mip-gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force',
+                ('gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force',
                  'mip-cbc')
 
         resolute : bool, optional
@@ -1167,15 +1171,6 @@ def compute_lexcc(
             max_num_of_committees=max_num_of_committees,
             solver_id=algorithm[5:],
             lexicographic_tiebreaking=lexicographic_tiebreaking,
-        )
-    elif algorithm.startswith("mip-"):
-        # lexicographic tiebreaking works automatically for brute-force
-        committees, detailed_info = abcrules_mip._mip_lexcc(
-            profile=profile,
-            committeesize=committeesize,
-            resolute=resolute,
-            max_num_of_committees=max_num_of_committees,
-            solver_id=algorithm[4:],
         )
     else:
         raise UnknownAlgorithm(rule_id, algorithm)
@@ -2199,7 +2194,7 @@ def compute_minimaxav(
             .. doctest::
 
                 >>> Rule("minimaxav").algorithms
-                ('gurobi', 'mip-gurobi', 'ortools-cp', 'mip-cbc', 'brute-force')
+                ('gurobi', 'ortools-cp', 'mip-cbc', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -2507,7 +2502,7 @@ def compute_monroe(
             .. doctest::
 
                 >>> Rule("monroe").algorithms
-                ('gurobi', 'mip-gurobi', 'mip-cbc', 'ortools-cp', 'brute-force')
+                ('gurobi', 'mip-cbc', 'ortools-cp', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -3658,7 +3653,7 @@ def compute_minimaxphragmen(
             .. doctest::
 
                 >>> Rule("minimaxphragmen").algorithms
-                ('gurobi', 'mip-gurobi', 'mip-cbc')
+                ('gurobi', 'mip-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -3888,7 +3883,7 @@ def compute_maximin_support(
             .. doctest::
 
                 >>> Rule("maximin-support").algorithms
-                ('gurobi', 'mip-gurobi', 'mip-cbc')
+                ('gurobi', 'mip-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
