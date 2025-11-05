@@ -17,7 +17,11 @@ LEXICOGRAPHIC_BLOCK_SIZE = (
 )
 
 
-def _set_gurobi_model_parameters(model):
+def create_custom_gb_model_without_extranous_output():
+    env = gb.Env(empty=True)
+    env.setParam("OutputFlag", 0)
+    env.start()
+    model = gb.Model(env=env)
     model.setParam("OutputFlag", False)
     model.setParam("FeasibilityTol", ACCURACY)
     model.setParam("OptimalityTol", ACCURACY)
@@ -26,6 +30,7 @@ def _set_gurobi_model_parameters(model):
     model.setParam("PoolSearchMode", 0)
     model.setParam("MIPFocus", 2)  # focus more attention on proving optimality
     model.setParam("IntegralityFocus", 1)
+    return model
 
 
 def _optimize_rule_gurobi(
@@ -73,13 +78,12 @@ def _optimize_rule_gurobi(
     maxscore = None
     committees = []
 
-    model = gb.Model()
+    model = create_custom_gb_model_without_extranous_output()
 
     # `in_committee` is a binary variable indicating whether `cand` is in the committee
     in_committee = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_committee")
 
     set_opt_model_func(model, in_committee)
-    _set_gurobi_model_parameters(model)
 
     while True:
         model.optimize()
@@ -635,8 +639,7 @@ def _gurobi_maximin_support_scorefct(profile, base_committee):
     for added_cand in remaining_candidates:
         committee = set(base_committee) | {added_cand}
 
-        model = gb.Model()
-        _set_gurobi_model_parameters(model)
+        model = create_custom_gb_model_without_extranous_output()
 
         minimum = model.addVar(lb=0, name="minimum")  # named "s" in the paper
 

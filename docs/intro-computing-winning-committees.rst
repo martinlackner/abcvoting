@@ -106,7 +106,7 @@ Most ABC rules can be computed with several algorithms. For example, for PAV, we
 .. doctest::
 
     >>> print(abcrules.get_rule("pav").algorithms)
-    ('gurobi', 'mip-gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
+    ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-cbc', 'branch-and-bound', 'brute-force')
 
 These algorithms are sorted by speed (in approximation). By default, ABC rules are computed with
 `algorithm="fastest"`, which picks the first available algorithm in this list.
@@ -121,10 +121,11 @@ Throughout `abcvoting`, the following kinds of algorithms are used:
     >>> for algo_id, description in abcrules.ALGORITHM_NAMES.items():
     ...     print(f"{algo_id:20s} : {description}")
     gurobi               : Gurobi ILP solver
+    pulp-highs           : ILP solver via Python PuLP library
+    pulp-cbc             : ILP solver via Python PuLP library
     branch-and-bound     : branch-and-bound
     brute-force          : brute-force
     mip-cbc              : CBC ILP solver via Python MIP library
-    mip-gurobi           : Gurobi ILP solver via Python MIP library
     standard             : Standard algorithm
     standard-fractions   : Standard algorithm (using standard Python fractions)
     gmpy2-fractions      : Standard algorithm (using gmpy2 fractions)

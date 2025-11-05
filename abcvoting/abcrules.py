@@ -900,7 +900,7 @@ def compute_pav(
             .. doctest::
 
                 >>> Rule("pav").algorithms
-                ('gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
+                ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -969,7 +969,7 @@ def compute_slav(
             .. doctest::
 
                 >>> Rule("slav").algorithms
-                ('gurobi', 'mip-cbc', 'branch-and-bound', 'brute-force')
+                ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -1037,8 +1037,8 @@ def compute_cc(
             .. doctest::
 
                 >>> Rule("cc").algorithms  # doctest: +NORMALIZE_WHITESPACE
-                ('gurobi', 'ortools-cp', 'branch-and-bound', 'brute-force',
-                 'mip-cbc')
+                ('gurobi', 'pulp-highs', 'ortools-cp', 'branch-and-bound', 'brute-force',
+                 'mip-cbc', 'pulp-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -1112,7 +1112,7 @@ def compute_lexcc(
             .. doctest::
 
                 >>> Rule("lexcc").algorithms
-                ('gurobi', 'brute-force')
+                ('gurobi', 'pulp-highs', 'pulp-cbc', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -2194,7 +2194,7 @@ def compute_minimaxav(
             .. doctest::
 
                 >>> Rule("minimaxav").algorithms
-                ('gurobi', 'ortools-cp', 'mip-cbc', 'brute-force')
+                ('gurobi', 'ortools-cp', 'pulp-highs', 'mip-cbc', 'pulp-highs', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -2359,7 +2359,7 @@ def compute_lexminimaxav(
             .. doctest::
 
                 >>> Rule("lexminimaxav").algorithms
-                ('gurobi', 'brute-force')
+                ('gurobi', 'pulp-highs', 'pulp-highs', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -2502,7 +2502,7 @@ def compute_monroe(
             .. doctest::
 
                 >>> Rule("monroe").algorithms
-                ('gurobi', 'mip-cbc', 'ortools-cp', 'brute-force')
+                ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-highs', 'ortools-cp', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -3653,7 +3653,7 @@ def compute_minimaxphragmen(
             .. doctest::
 
                 >>> Rule("minimaxphragmen").algorithms
-                ('gurobi', 'mip-cbc')
+                ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-cbc')
 
         resolute : bool, optional
             Return only one winning committee.

@@ -5,11 +5,6 @@ ABC rules return committees and these committees may or may not have certain pro
 For an overview of the many properties of committees, we refer to the survey by Lackner and Skowron [1]_.
 Here, we see how one can test a given committee and find out which properties it satisfies.
 
-.. testsetup::
-
-    from abcvoting import abcrules
-    abcrules.available_algorithms = ["brute-force", "standard", "standard-fractions"]
-
 The following example (from [2]_) shows that Phragmén's Sequential Rule (seq-Phragmén) may output committees that fail
 Extended Justified Representation (EJR) [3]_.
 We first compute the winning committee ...
@@ -46,15 +41,12 @@ is printed.
     Priceability                                       : True
     Stable Priceability                                : False
     The core                                           : False
+    >>> print(results)
+    {'pareto': True, 'jr': True, 'pjr': True, 'ejr': False, 'ejr+': False, 'fjr': False, 'priceability': True, 'stable-priceability': False, 'core': False}
 
 In contrast, committees returned by seq-Phragmén always satisfy JR and PJR [2]_.
 Pareto optimality is not necessarily satisfied by seq-Phragmén, but it is satisfied in this instance.
 (The variable `results` is a dictionary containing the respective truth values.)
-
-.. doctest::
-
-    >>> print(results)
-    {'pareto': True, 'jr': True, 'pjr': True, 'ejr': False, 'ejr+': False, 'fjr': False, 'priceability': True, 'stable-priceability': False, 'core': False}
 
 
 .. testcleanup::

@@ -35,6 +35,7 @@ norecursedirs = [
 
 markers = [
     "gurobipy: a test that requires Gurobi (gurpbipy)",
+    "pulp: a test that requires pulp",
     "pulphighs: a test that requires pulp and Highs",
     "pulpcbc: a test that requires pulp and CBC",
     "scip: a test that requires SCIP",
@@ -71,6 +72,7 @@ exclude = '''
     | \.pytest_cache
     | env
     | venv
+    | venv-for-docs
   )/
 )
 '''

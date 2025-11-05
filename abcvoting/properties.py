@@ -10,9 +10,8 @@ import math
 from fractions import Fraction
 from abcvoting.output import output, WARNING
 from abcvoting.misc import str_set_of_candidates, CandidateSet, dominate, powerset
+from abcvoting.abcrules_gurobi import create_custom_gb_model_without_extranous_output
 
-
-ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
 PROPERTY_NAMES = [
     "pareto",
     "jr",
@@ -24,17 +23,6 @@ PROPERTY_NAMES = [
     "stable-priceability",
     "core",
 ]
-
-
-def _set_gurobi_model_parameters(model):
-    model.setParam("OutputFlag", False)
-    model.setParam("FeasibilityTol", ACCURACY)
-    model.setParam("OptimalityTol", ACCURACY)
-    model.setParam("IntFeasTol", ACCURACY)
-    model.setParam("MIPGap", ACCURACY)
-    model.setParam("PoolSearchMode", 0)
-    model.setParam("MIPFocus", 2)  # focus more attention on proving optimality
-    model.setParam("IntegralityFocus", 1)
 
 
 def full_analysis(profile, committee):
@@ -628,7 +616,7 @@ def _check_pareto_optimality_gurobi(profile, committee):
     # array to store number of approved candidates per voter in the query committee
     num_apprvd_cands_query = [len(voter.approved & committee) for voter in profile]
 
-    model = gb.Model()
+    model = create_custom_gb_model_without_extranous_output()
 
     # binary variables: indicate whether voter i approves of
     # at least x candidates in the dominating committee
@@ -679,7 +667,6 @@ def _check_pareto_optimality_gurobi(profile, committee):
         gb.GRB.MAXIMIZE,
     )
 
-    _set_gurobi_model_parameters(model)
     model.optimize()
 
     # return value based on status code
@@ -784,7 +771,7 @@ def _check_EJR_gurobi(profile, committee, quota):
     """
 
     # create the model to be optimized
-    model = gb.Model()
+    model = create_custom_gb_model_without_extranous_output()
 
     # integer variable: ell
     ell = model.addVar(vtype=gb.GRB.INTEGER, name="ell")
@@ -819,7 +806,6 @@ def _check_EJR_gurobi(profile, committee, quota):
                 # in_group[vi] implies not in_cut[cand]
                 model.addConstr(in_cut[cand] <= 1 - in_group[vi])
 
-    _set_gurobi_model_parameters(model)
     model.optimize()
 
     # return value based on status code
@@ -940,7 +926,7 @@ def _check_PJR_gurobi(profile, committee, quota):
     """
 
     # create the model to be optimized
-    model = gb.Model()
+    model = create_custom_gb_model_without_extranous_output()
 
     # integer variable: ell
     ell = model.addVar(vtype=gb.GRB.INTEGER, name="ell")
@@ -984,7 +970,6 @@ def _check_PJR_gurobi(profile, committee, quota):
     # intersected with the input committee, has size strictly less than ell
     model.addConstr(gb.quicksum(in_union[cand] for cand in committee) + 1 <= ell)
 
-    _set_gurobi_model_parameters(model)
     model.optimize()
 
     # return value based on status code
@@ -1225,7 +1210,7 @@ def _check_priceability_gurobi(profile, committee, stable=False):
     <https://www.cs.toronto.edu/~nisarg/papers/priceability.pdf>
     """
 
-    model = gb.Model()
+    model = create_custom_gb_model_without_extranous_output()
 
     approved_candidates = [
         cand for cand in profile.candidates if any(cand in voter.approved for voter in profile)
@@ -1306,7 +1291,6 @@ def _check_priceability_gurobi(profile, committee, stable=False):
                 )
 
     model.setObjective(budget)
-    _set_gurobi_model_parameters(model)
     model.optimize()
 
     if model.Status == gb.GRB.OPTIMAL:
@@ -1510,7 +1494,7 @@ def _check_FJR_gurobi(profile, committee, quota):
     # largest possible size of set T (and beta)
     set_upper_bound = int(profile.total_weight() / quota)
 
-    model = gb.Model()
+    model = create_custom_gb_model_without_extranous_output()
 
     set_of_voters = model.addVars(range(len(profile)), vtype=gb.GRB.BINARY)
     set_of_candidates = model.addVars(range(profile.num_cand), vtype=gb.GRB.BINARY)
@@ -1537,7 +1521,6 @@ def _check_FJR_gurobi(profile, committee, quota):
             >= beta - set_upper_bound * (1 - set_of_voters[i])
         )
 
-    _set_gurobi_model_parameters(model)
     model.optimize()
 
     if model.Status == gb.GRB.OPTIMAL:
@@ -1695,7 +1678,7 @@ def _check_core_gurobi(profile, committee, quota):
     <http://dx.doi.org/10.1007/978-3-031-09016-5>
     """
 
-    model = gb.Model()
+    model = create_custom_gb_model_without_extranous_output()
 
     set_of_voters = model.addVars(range(len(profile)), vtype=gb.GRB.BINARY)
     set_of_candidates = model.addVars(range(profile.num_cand), vtype=gb.GRB.BINARY)
@@ -1717,7 +1700,6 @@ def _check_core_gurobi(profile, committee, quota):
             >> (gb.quicksum(approved) >= len(voter.approved & committee) + 1)
         )
 
-    _set_gurobi_model_parameters(model)
     model.optimize()
 
     if model.Status == gb.GRB.OPTIMAL:

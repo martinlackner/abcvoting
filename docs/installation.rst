@@ -21,7 +21,7 @@ Requirements:
 - The following pip packages are required and installed automatically: `gurobipy`, `mip`, `networkx`, `numpy`, `ruamel.yaml`, `preflibtools`, and `prefsampling`.
 
 - It might be necessary to install header files and static libraries for Python. For example, on Ubuntu,
-you can install them with: `sudo apt-get install python3-dev libffi-dev`. See also `this StackOverflow question <https://stackoverflow.com/questions/21530577/fatal-error-python-h-no-such-file-or-directory>`_.
+  you can install them with: `sudo apt-get install python3-dev libffi-dev`. See also `this StackOverflow question <https://stackoverflow.com/questions/21530577/fatal-error-python-h-no-such-file-or-directory>`_.
 
 Optional requirements:
 
