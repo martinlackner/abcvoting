@@ -15,7 +15,7 @@ from abcvoting.preferences import Profile, Voter
 from abcvoting import misc
 
 
-#: Valid keys for .abc.yaml files
+#: Valid keys for .abc.yaml files.
 ABC_YAML_VALID_KEYS = [
     "profile",
     "num_cand",
