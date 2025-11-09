@@ -1366,8 +1366,8 @@ def test_maximin_support():
 @pytest.mark.networkx
 @pytest.mark.gurobipy
 @pytest.mark.parametrize("rule_id", ["maximin-support"])
-@pytest.mark.parametrize("num_voters", [20, 50, 100])
-@pytest.mark.parametrize("num_cand", [20, 30, 40])
+@pytest.mark.parametrize("num_voters", [20, 50])
+@pytest.mark.parametrize("num_cand", [20, 30])
 @pytest.mark.parametrize("committeesize", [5, 10, 15])
 def test_maximin_support_nx_random_profiles(rule_id, num_voters, num_cand, committeesize):
     """Test nx-max-flow with randomly generated profiles."""

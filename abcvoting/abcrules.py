@@ -77,13 +77,13 @@ MAIN_RULE_IDS = [
 # A dictionary containing mapping all valid algorithm identifiers
 # to full names (i.e., descriptions).
 ALGORITHM_NAMES = {
+    "nx-max-flow": "A Series of Max-Flow algorithms via NetworkX library",
     "gurobi": "Gurobi ILP solver",
     "pulp-highs": "ILP solver via Python PuLP library",
     "branch-and-bound": "branch-and-bound",
     "brute-force": "brute-force",
     "mip-cbc": "CBC ILP solver via Python MIP library",
     "mip-gurobi": "Gurobi ILP solver via Python MIP library",
-    "nx-max-flow": "Max-Flow algorithm via NetworkX library",
     # "cvxpy_gurobi": "Gurobi ILP solver via CVXPY library",
     # "cvxpy_scip": "SCIP ILP solver via CVXPY library",
     # "cvxpy_glpk_mi": "GLPK ILP solver via CVXPY library",
@@ -219,10 +219,10 @@ class Rule:
             self.longname = "Maximin Support Method (MMS)"
             self.compute_fct = compute_maximin_support
             self.algorithms = (
+                "nx-max-flow",
                 "gurobi",
                 "mip-gurobi",
                 "mip-cbc",
-                "nx-max-flow",
             )  # TODO: check fastest algorithm and change the order accordingly
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
         elif rule_id == "monroe":
@@ -3902,7 +3902,7 @@ def compute_maximin_support(
             .. doctest::
 
                 >>> Rule("maximin-support").algorithms
-                ('gurobi', 'mip-gurobi', 'mip-cbc', 'nx-max-flow') #TODO: fix algorithm order according to time complexity (fastest order)
+                ('nx-max-flow', 'gurobi', 'mip-gurobi', 'mip-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
