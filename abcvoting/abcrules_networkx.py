@@ -72,26 +72,26 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
 
         >>> # Iteration 1: Empty committee, test each single candidate
         >>> scores = _nx_maximin_support_scorefct(profile, [])
-        >>> scores[0]
+        >>> scores[0]   # [0]
         0.0
-        >>> scores[1]
+        >>> scores[1]   # [1]
         2.0
-        >>> scores[2]
+        >>> scores[2]   # [2]
         3.0
-        >>> scores[3]
+        >>> scores[3]   # [3]
         1.0
 
         committee: [2]
 
         >>> # Iteration 2: Committee = [2], test adding each remaining candidate
         >>> scores = _nx_maximin_support_scorefct(profile, [2])
-        >>> scores[0]
+        >>> scores[0]   # [2, 0]
         0.0
-        >>> scores[1]
+        >>> scores[1]   # [2, 1]
         1.5
-        >>> scores[2]
+        >>> scores[2]   # [2, 2]
         0
-        >>> scores[3]
+        >>> scores[3]   # [2, 3]
         1.0
 
         Final committee: [2, 1]
@@ -109,30 +109,30 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
 
         >>> # Iteration 1: Empty committee
         >>> scores = _nx_maximin_support_scorefct(profile, [])
-        >>> scores[0]   # {0}
+        >>> scores[0]   # [0]
         2.0
-        >>> scores[1]   # {1}
+        >>> scores[1]   # [1]
         2.0
-        >>> scores[2]   # {2}
+        >>> scores[2]   # [2]
         1.0
-        >>> scores[3]   # {3}
+        >>> scores[3]   # [3]
         3.0
-        >>> scores[4]   # {4}
+        >>> scores[4]   # [4]
         1.0
 
         committee = [3]
 
         >>> # Iteration 2: committee = [3]
         >>> scores = _nx_maximin_support_scorefct(profile, [3])
-        >>> scores[0]   # {3, 0}
+        >>> scores[0]   # [3, 0]
         2.0
-        >>> scores[1]   # {3, 1}
+        >>> scores[1]   # [3, 1]
         1.5
-        >>> scores[2]   # {3, 2}
+        >>> scores[2]   # [3, 2]
         1.0
         >>> scores[3]  # Candidate 3: already in committee
         0
-        >>> scores[4]   # {3, 4}
+        >>> scores[4]   # [3, 4]
         1.0
 
         committee = [3, 0]
@@ -175,9 +175,9 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
 
         # Iteration 2: Committee = [2]
         >>> scores = _nx_maximin_support_scorefct(profile, [2])
-        >>> scores[0]  # Candidate 0: no approvals
+        >>> scores[0]   # [2, 0]
         2.0
-        >>> scores[1]  # S={1,2}, total weight=4, |S|=2, maximin = 4/2 = 2.0
+        >>> scores[1]   # [2, 1]
         2.0
         >>> scores[2]  # Already in committee
         0
