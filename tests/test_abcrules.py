@@ -1367,7 +1367,6 @@ def test_maximin_support():
 @pytest.mark.slow
 @pytest.mark.networkx
 @pytest.mark.gurobipy
-@pytest.mark.parametrize("rule_id", ["maximin-support"])
 @pytest.mark.parametrize("num_voters", [20, 50])
 @pytest.mark.parametrize("num_cand", [20, 30])
 @pytest.mark.parametrize("committeesize", [5, 10, 15])
@@ -1397,7 +1396,7 @@ def test_maximin_support_nx_random_profiles(rule_id, num_voters, num_cand, commi
 
     # Compute with nx-max-flow using irresolute mode for fair comparison with gurobi
     committees_maxflow = abcrules.compute(
-        rule_id=rule_id,
+        rule_id="maximin-support",
         profile=profile,
         committeesize=committeesize,
         algorithm="nx-max-flow",
@@ -1415,7 +1414,7 @@ def test_maximin_support_nx_random_profiles(rule_id, num_voters, num_cand, commi
 
     try:
         committees_gurobi = abcrules.compute(
-            rule_id=rule_id,
+            rule_id="maximin-support",
             profile=profile,
             committeesize=committeesize,
             algorithm="gurobi",
@@ -1671,6 +1670,7 @@ def test_natural_tiebreaking_order_resolute(rule_id, algorithm):
             "nx-max-flow",
             "gurobi",
             "pulp-highs",
+            "pulp-cbc",
             "ortools-cp",
             "mip-cbc",
             "fastest",
@@ -1708,6 +1708,7 @@ def test_natural_tiebreaking_order_max_num_of_committees(rule_id, algorithm, app
         "nx-max-flow",
         "gurobi",
         "pulp-highs",
+        "pulp-cbc",
         "ortools-cp",
         "mip-cbc",
         "fastest",
