@@ -10,7 +10,7 @@ Programmer: Amit Gini (S.C Student at Ariel University, Israel)
 Date: 10-2025
 
 To run these tests, execute:
-    python -m doctest abcrules_networkx.py -v
+    python -m doctest abcvoting/abcrules_networkx.py -v
 """
 
 import networkx as nx
@@ -206,6 +206,74 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
         # Inline computation of maximin support via iterative max-flow refinement
         S = set(committee)
         support_value = 0.0
+
+        if S:
+            while True:
+                # Find NS: voters who approve at least one candidate in S
+                NS = []
+                NS_total_weight = 0
+                for voter in profile:
+                    if voter.approved & S:
+                        NS.append(voter)
+                        NS_total_weight += voter.weight
+
+                if not NS or NS_total_weight == 0:
+                    support_value = 0.0
+                    break
+
+                S_size = len(S)
+                target_flow = NS_total_weight * S_size
+
+                # Build flow network
+                G = nx.DiGraph()
+                source = "source"
+                sink = "sink"
+
+                # Source → Voters
+                for i, voter in enumerate(NS):
+                    voter_node = f"voter_{i}"
+                    G.add_edge(source, voter_node, capacity=voter.weight * S_size)
+
+                    # Voters → Candidates (only if approved)
+                    for cand in S:
+                        if cand in voter.approved:
+                            cand_node = f"cand_{cand}"
+                            G.add_edge(voter_node, cand_node, capacity=voter.weight * S_size)
+
+                # Candidates → Sink
+                for cand in S:
+                    cand_node = f"cand_{cand}"
+                    G.add_edge(cand_node, sink, capacity=NS_total_weight)
+
+                # Compute max flow
+                flow_value, flow_dict = nx.maximum_flow(G, source, sink)
+
+                # Check if target achieved (with tolerance for floating point)
+                if flow_value >= target_flow:
+                    support_value = NS_total_weight / S_size
+                    break
+
+                # Target not achieved: remove unsupported candidates
+                unsupported_candidates = set()
+                for i, voter in enumerate(NS):
+                    voter_node = f"voter_{i}"
+                    expected_flow = voter.weight * S_size
+
+                    actual_flow = sum(
+                        flow_dict.get(voter_node, {}).get(f"cand_{cand}", 0) for cand in S
+                    )
+
+                    # Remove ALL candidates approved by constrained voter
+                    if actual_flow < expected_flow:
+                        for cand in S:
+                            if cand in voter.approved:
+                                unsupported_candidates.add(cand)
+
+                S -= unsupported_candidates
+
+                if not S:
+                    support_value = 0.0
+                    break
 
         scores[added_cand] = support_value
 

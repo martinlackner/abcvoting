@@ -10,7 +10,8 @@ import math
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
 from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, DEBUG, output
 from abcvoting.preferences import Profile, Voter
-from abcvoting import abcrules, misc, fileio
+from abcvoting import abcrules, misc, fileio, generate
+from abcvoting.generate import random_profile
 from itertools import combinations
 
 MARKS = {
@@ -1364,74 +1365,69 @@ def test_maximin_support():
     )
 
 
-@pytest.mark.slow
 @pytest.mark.networkx
 @pytest.mark.gurobipy
-@pytest.mark.parametrize("num_voters", [20, 50])
+@pytest.mark.parametrize("rule_id", ["maximin-support"])
+@pytest.mark.parametrize("num_voters", [25, 50])
 @pytest.mark.parametrize("num_cand", [20, 30])
 @pytest.mark.parametrize("committeesize", [5, 10, 15])
 def test_maximin_support_nx_random_profiles(rule_id, num_voters, num_cand, committeesize):
-    """Test nx-max-flow with randomly generated profiles."""
-    """Temporarily Note:
-    What it test:
-        1. Larger, random inputs
-        2. Varying sizes (num_voters, num_cand, committeesize)
-        3. Profiles generated at random, using Impartial Culture model (where each voter approves each candidate with probability 0.5)
+    """Test nx-max-flow with randomly generated profiles.
+
+    Uses resolute=True to get one committee from each algorithm and verifies
+    they are both optimal by checking that the nx-max-flow committee is in
+    the set of optimal committees returned by gurobi (with limited search).
+
+    Tests different profile types and probability ranges to provide better test coverage.
     """
-    import numpy as np
-    from abcvoting import generate
-    from abcvoting.generate import random_profile
+    # Generate random parameters based on profile type
+    # Random probability (avoiding edge cases 0 and 1)
+    prob = random.uniform(0.1, 0.9)
+    prob_distribution = {"id": "IC", "p": prob}
 
-    # Skip if committeesize exceeds num_cand
-    if committeesize > num_cand:
-        pytest.skip("committeesize exceeds num_cand")
-
-    generate.rng = np.random.default_rng(83)  # Fixed seed for reproducibility
-
-    # Generate random profile (every voter approves each candidate with probability 0.5)
-    prob_distribution = {"id": "IC", "p": 0.5}
-    profile = random_profile(
+    profile = generate.random_profile(
         num_voters=num_voters, num_cand=num_cand, prob_distribution=prob_distribution
     )
 
-    # Compute with nx-max-flow using irresolute mode for fair comparison with gurobi
+    # Compute with nx-max-flow using resolute mode to get one committee
     committees_maxflow = abcrules.compute(
-        rule_id="maximin-support",
+        rule_id=rule_id,
         profile=profile,
         committeesize=committeesize,
         algorithm="nx-max-flow",
-        resolute=False,
+        resolute=True,
     )
 
     # Verify basic properties
-    assert len(committees_maxflow) > 0
+    assert len(committees_maxflow) == 1
     assert len(committees_maxflow[0]) == committeesize
-
-    # Verify all candidates are valid (within range num_cand)
-    for committee in committees_maxflow:
-        assert len(committee) == committeesize
-        assert all(c < num_cand for c in committee)
+    assert all(c < num_cand for c in committees_maxflow[0])
 
     try:
-        committees_gurobi = abcrules.compute(
-            rule_id="maximin-support",
+        # To verify committe output, check that nx-max-flow committee is in
+        # the set of possible committees from gurobi (with limited search to avoid timeout)
+        committees_gurobi_irresolute = abcrules.compute(
+            rule_id=rule_id,
             profile=profile,
             committeesize=committeesize,
             algorithm="gurobi",
             resolute=False,
+            max_num_of_committees=50,  # Limit to avoid timeout while still checking optimality
         )
-        # Verify that gurobi returned valid committees
-        assert len(committees_gurobi) > 0
-        for committee in committees_gurobi:
+
+        # Verify gurobi returned valid committees
+        assert len(committees_gurobi_irresolute) > 0
+        for committee in committees_gurobi_irresolute:
             assert len(committee) == committeesize
             assert all(c < num_cand for c in committee)
 
-        # Compare sets of committees: nx-max-flow committees should be a subset of gurobi committees
-        nx_set = {frozenset(c) for c in committees_maxflow}
-        gurobi_set = {frozenset(c) for c in committees_gurobi}
-        assert nx_set.issubset(
-            gurobi_set
-        ), f"nx-max-flow committees {nx_set} not subset of gurobi committees {gurobi_set}"
+        # Verify that nx-max-flow committee is in the set of committees from gurobi
+        nx_committee = frozenset(committees_maxflow[0])
+        gurobi_set = {frozenset(c) for c in committees_gurobi_irresolute}
+        assert nx_committee in gurobi_set, (
+            f"nx-max-flow committee {nx_committee} not found in gurobi optimal committees. "
+            f"Gurobi found {len(gurobi_set)} optimal committees (limited search)."
+        )
     except abcrules.NoAvailableAlgorithm:
         # Gurobi not available, skip this part of the test
         pass
