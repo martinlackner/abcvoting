@@ -1365,6 +1365,7 @@ def test_maximin_support():
     )
 
 
+@pytest.mark.slow
 @pytest.mark.networkx
 @pytest.mark.gurobipy
 @pytest.mark.parametrize("rule_id", ["maximin-support"])
