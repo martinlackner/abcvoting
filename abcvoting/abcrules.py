@@ -227,9 +227,8 @@ class Rule:
             self.algorithms = (
                 "nx-max-flow",
                 "gurobi",
-                "mip-gurobi",
                 "mip-cbc",
-            )  # TODO: check fastest algorithm and change the order accordingly
+            )
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
         elif rule_id == "monroe":
             self.shortname = "Monroe"
@@ -3899,7 +3898,7 @@ def compute_maximin_support(
             .. doctest::
 
                 >>> Rule("maximin-support").algorithms
-                ('nx-max-flow', 'gurobi', 'mip-gurobi', 'mip-cbc')
+                ('nx-max-flow', 'gurobi', 'mip-cbc')
 
         resolute : bool, optional
             Return only one winning committee.

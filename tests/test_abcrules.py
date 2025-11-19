@@ -14,13 +14,13 @@ from abcvoting import abcrules, misc, fileio
 from itertools import combinations
 
 MARKS = {
+    "nx-max-flow": [pytest.mark.networkx],
     "gurobi": [pytest.mark.gurobipy],
     "pulp-highs": [pytest.mark.pulp, pytest.mark.pulphighs],
     "pulp-cbc": [pytest.mark.pulp, pytest.mark.pulpcbc],
     "ortools-cp": [pytest.mark.ortools],
     "mip-cbc": [pytest.mark.mip, pytest.mark.mipcbc],
     # "mip-gurobi": [pytest.mark.mip, pytest.mark.mipgurobi],
-    "nx-max-flow": [pytest.mark.networkx],
     "brute-force": [],
     "branch-and-bound": [],
     "standard": [],
@@ -1668,15 +1668,14 @@ def test_natural_tiebreaking_order_resolute(rule_id, algorithm):
         profile.add_voters(approval_sets)
         committeesize = 2
         if algorithm in [
+            "nx-max-flow",
             "gurobi",
             "pulp-highs",
             "ortools-cp",
             "mip-cbc",
-            "mip-gurobi",
             "fastest",
-            "nx-max-flow",
         ]:
-            return  # ILP solvers do not guarantee a specific solution, and so does nx-max-flow
+            return  # ILP & max-flow solvers do not guarantee a specific solution
         if rule_id in ["rsd"]:
             return  # RSD is randomized
         committees = abcrules.compute(
@@ -1706,15 +1705,14 @@ def test_natural_tiebreaking_order_max_num_of_committees(rule_id, algorithm, app
     print(profile)
     committeesize = 2
     if algorithm in [
+        "nx-max-flow",
         "gurobi",
         "pulp-highs",
         "ortools-cp",
         "mip-cbc",
-        "mip-gurobi",
         "fastest",
-        "nx-max-flow",
     ]:
-        return  # ILP solvers do not guarantee a specific solution and so does nx-max-flow
+        return  # ILP & max-flow solvers do not guarantee a specific solution
     if rule_id in ["rsd"]:
         return  # RSD is randomized
     committees = abcrules.compute(
