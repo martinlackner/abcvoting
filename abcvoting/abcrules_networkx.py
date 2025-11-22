@@ -23,8 +23,9 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
         Compute maximin support scores using max-flow algorithm.
 
         This function is called iteratively during committee construction.
-        For each candidate not yet in the committee, it computes what the
-        maximin support value would be if that candidate were added.
+        For each candidate not yet in the committee, using max-flow problems
+        iteratively computes what the maximin support value be if that candidate were added,
+        save it in list by index of candidate, and return the support score list.
 
         Parameters
         ----------
@@ -36,26 +37,44 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
                 - voter.approved: set of approved candidates {0, 2, 5, ...}
                 - voter.weight: weight of this voter (usually 1)
 
-        base_committee : list or set
+        base_committee : list
             Current partial committee (can be empty [])
             Example: [0, 3] means candidates 0 and 3 are already in committee
 
         Returns
         -------
         list
-            scores where scores[cand] = maximin support of cand, list length is profile.num_cand
+            scores where scores[candidate_index] = maximin support of candidate represented by candidate_index
 
         Algorithm Overview
         ------------------
-        For each candidate C not in base_committee:
-            1. Form test_committee = base_committee ∪ {C}
-            2. Build max-flow network with integer arithmetic:
-               - Source → Voters: capacity = voter.weight × |S|
-               - Voters → Candidates: capacity = voter.weight × |S|
-               - Candidates → Sink: capacity = |NS| (NOT × |S|!)
-            3. Compute maximum flow and check if target achieved
-            4. If target achieved: maximin = |NS| / |S|
-            5. Otherwise: iteratively remove unsupported candidates if target flow is not achieved
+        Notions:
+        - N = [index∶[candidates]]
+            - Key: Voters index, Value: list of candidates that key voter approved.
+        - NS = {i∈N┤|N∩S≠∅}
+            - Set of voters who approve at least one candidate in S.
+        - S = base_committee ∪ {C}
+            - Tested committee with candidate C added.
+        - |NS_total_weight| = sum(voter.weight for voter in NS)
+            - Total size of NS, with weighted voters.
+        - Flow Value = maximum flow from source to sink returned from max-flow algorithm in networkx.
+        - Target Flow = |NS_total_weight| * |S_size|
+            - total weight of voters in NS * size of committee, needed to achieve maximin-support score for candidate C.
+
+        1. For each candidate C not in base_committee:
+            1.1. Form test_committee = base_committee ∪ {C}
+            1.2. Build new profile of test_committee:
+                - NS = {i∈N┤|N∩S≠∅} : voters who approve at least one candidate in S.
+            1.3. Build max-flow network with integer arithmetic:
+               - Source → Voters: Edge capacity = voter.weight × |S| (might have different weights for voters)
+               - Voters → Candidates: Edge capacity = voter.weight × |S|
+               - Candidates → Sink: Edge capacity = |NS_total_weight| (Sum of weights of voters in NS)
+            1.4. Compute maximum flow using max-flow algorithm in networkx, and return the Flow Value
+            1.5. If Target Flow == Flow Value
+                - Add maximin-support score of candidate C to scores list (which is |NS_total_weight| / |S_size|)
+            1.6. Otherwise:
+                - Iteratively remove unsupported candidates if target flow is not achieved (if none remain score of C is 0)
+        7. Return the maximin-support score list
 
         Examples
         --------
@@ -64,37 +83,33 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
         Voters: A:{1,2}, B:{2,3}, C:{1,2}
         Expected results based on hand calculations:
 
-        >>> # Setup profile
+        # Setup profile
         >>> profile = Profile(4)
         >>> profile.add_voter(Voter([1, 2]))  # A: approves candidates 1,2
         >>> profile.add_voter(Voter([2, 3]))  # B: approves candidates 2,3
         >>> profile.add_voter(Voter([1, 2]))  # C: approves candidates 1,2
 
-        >>> # Iteration 1: Empty committee, test each single candidate
+        # Iteration 1: base_committee = [], test each single candidate
         >>> scores = _nx_maximin_support_scorefct(profile, [])
-        >>> scores[0]   # [0]
+        >>> scores[0]   # committee: [0]
         0.0
-        >>> scores[1]   # [1]
+        >>> scores[1]   # committee: [1]
         2.0
-        >>> scores[2]   # [2]
+        >>> scores[2]   # committee: [2]
         3.0
-        >>> scores[3]   # [3]
+        >>> scores[3]   # committee: [3]
         1.0
 
-        committee: [2]
-
-        >>> # Iteration 2: Committee = [2], test adding each remaining candidate
+        # Iteration 2: base_committee = [2], test adding each remaining candidate
         >>> scores = _nx_maximin_support_scorefct(profile, [2])
-        >>> scores[0]   # [2, 0]
+        >>> scores[0]   # committee: [2, 0]
         0.0
-        >>> scores[1]   # [2, 1]
+        >>> scores[1]   # committee: [2, 1]
         1.5
-        >>> scores[2]   # [2, 2]
+        >>> scores[2]   # committee: [2, 2]
         0
-        >>> scores[3]   # [2, 3]
+        >>> scores[3]   # committee: [2, 3]
         1.0
-
-        Final committee: [2, 1]
 
     ----------------------------------------------------------------
         Example 2: 5 candidates, 4 voters, k=3
@@ -107,82 +122,72 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
         >>> profile.add_voter(Voter([0, 3]))        # C: 2 approvals
         >>> profile.add_voter(Voter([4, 3, 1]))     # D: 3 approval
 
-        >>> # Iteration 1: Empty committee
+        # Iteration 1: base_committee = []
         >>> scores = _nx_maximin_support_scorefct(profile, [])
-        >>> scores[0]   # [0]
+        >>> scores[0]   # committee: [0]
         2.0
-        >>> scores[1]   # [1]
+        >>> scores[1]   # committee: [1]
         2.0
-        >>> scores[2]   # [2]
+        >>> scores[2]   # committee: [2]
         1.0
-        >>> scores[3]   # [3]
+        >>> scores[3]   # committee: [3]
         3.0
-        >>> scores[4]   # [4]
+        >>> scores[4]   # committee: [4]
         1.0
 
-        committee = [3]
-
-        >>> # Iteration 2: committee = [3]
+        # Iteration 2: base_committee = [3]
         >>> scores = _nx_maximin_support_scorefct(profile, [3])
-        >>> scores[0]   # [3, 0]
+        >>> scores[0]   # committee: [3, 0]
         2.0
-        >>> scores[1]   # [3, 1]
+        >>> scores[1]   # committee: [3, 1]
         1.5
-        >>> scores[2]   # [3, 2]
+        >>> scores[2]   # committee: [3, 2]
         1.0
-        >>> scores[3]  # Candidate 3: already in committee
+        >>> scores[3]   # Already in committee
         0
-        >>> scores[4]   # [3, 4]
+        >>> scores[4]   # committee: [3, 4]
         1.0
 
-        committee = [3, 0]
-
-        >>> # Iteration 3: committee = [3, 0]
+        # Iteration 3: base_committee = [3, 0]
         >>> scores = _nx_maximin_support_scorefct(profile, [3, 0])
         >>> scores[0]               # Already in committee
         0
-        >>> round(scores[1], 3)     # [3,0,1]
+        >>> round(scores[1], 3)     # committee: [3,0,1]
         1.333
-        >>> scores[2]               # [3,0,2]
+        >>> scores[2]               # committee: [3,0,2]
         1.0
         >>> scores[3]               # Already in committee
         0
-        >>> scores[4]               # [3,0,4]
+        >>> scores[4]               # committee: [3,0,4]
         1.0
-
-        Final committee: [3, 0, 1]
 
     ----------------------------------------------------------------
         Example 3: Weighted voters
         Testing that voter weights are properly considered
 
-        >>> # Setup profile with weights
+        # Setup profile with weights
         >>> profile = Profile(3)
         >>> profile.add_voter(Voter([1, 2], weight=1))  # Weight 2
         >>> profile.add_voter(Voter([2, 0], weight=2))  # Weight 1
         >>> profile.add_voter(Voter([1, 2], weight=1))  # Weight 1
 
-        >>> # Iteration 1: Empty committee
+        # Iteration 1: base_committee = []
         >>> scores = _nx_maximin_support_scorefct(profile, [])
-        >>> scores[0]  # Candidate 0: no approvals
+        >>> scores[0]  # committee: [0]
         2.0
-        >>> scores[1]  # Candidate 1: approved by voters with total weight 2+1=3
+        >>> scores[1]  # committee: [1]
         2.0
-        >>> scores[2]  # Candidate 2: approved by voters with total weight 2+1+1=4
+        >>> scores[2]  # committee: [2]
         4.0
 
-        committee = [2]
-
-        # Iteration 2: Committee = [2]
+        # Iteration 2: base_committee = [2]
         >>> scores = _nx_maximin_support_scorefct(profile, [2])
-        >>> scores[0]   # [2, 0]
+        >>> scores[0]   # committee: [2, 0]
         2.0
-        >>> scores[1]   # [2, 1]
+        >>> scores[1]   # committee: [2, 1]
         2.0
         >>> scores[2]  # Already in committee
         0
-
-        Final committee: [2, 0] # tiebreaking order: 0, 1
 
         Notes
         -----
@@ -190,7 +195,7 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
         - The algorithm uses integer arithmetic internally (capacities × |S|)
         - When target flow is achieved, all candidates receive equal support
         - Voter weights are properly considered in all capacity calculations
-        - The iterative refinement removes unsupported candidates until convergence
+        - The iterative refinement removes unsupported candidates until target flow is achieved
     """
     # Initialize scores, set to 0 for candidates in base_committee
     scores = [0] * profile.num_cand
@@ -198,23 +203,23 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
     # Get candidates not yet in base_committee
     remaining_candidates = [cand for cand in profile.candidates if cand not in base_committee]
 
-    # For each remaining candidate, compute score
+    # For each remaining candidate, compute maximin support score
     for added_cand in remaining_candidates:
-        # Form test committee with added candidate
-        committee = set(base_committee) | {added_cand}
+        # Form test committee with added candidate (base_committee ∪ {C})
+        S = set(base_committee) | {added_cand}
 
-        # Inline computation of maximin support via iterative max-flow refinement
-        S = set(committee)
+        # maximin support score for added candidate C
         support_value = 0.0
 
         if S:
             while True:
-                # Find NS: voters who approve at least one candidate in S
+                # Compute NS = {i∈N┤|N∩S≠∅} : voters who approve at least one candidate in S.
                 NS = []
                 NS_total_weight = 0
                 for voter in profile:
                     if voter.approved & S:
                         NS.append(voter)
+                        # Compute NS_total_weight = sum(voter.weight for voter in NS)
                         NS_total_weight += voter.weight
 
                 if not NS or NS_total_weight == 0:
@@ -236,6 +241,7 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
 
                     # Voters → Candidates (only if approved)
                     for cand in S:
+                        # only voters from NS (voters who approve at least one candidate in S)
                         if cand in voter.approved:
                             cand_node = f"cand_{cand}"
                             G.add_edge(voter_node, cand_node, capacity=voter.weight * S_size)
@@ -257,24 +263,36 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
                 unsupported_candidates = set()
                 for i, voter in enumerate(NS):
                     voter_node = f"voter_{i}"
-                    expected_flow = voter.weight * S_size
+                    # expected_flow for each voter: their weight should be distributed across all |S| candidates.
+                    # This represents the ideal case where the voter fully supports the committee.
+                    expected_flow_for_voter = voter.weight * S_size
 
-                    actual_flow = sum(
+                    # actual_flow: sum of flow values from this voter to all candidates in S.
+                    # The flow_dict from max-flow contains flow values for each edge (voter_node -> cand_node).
+                    # We sum across all candidates in S to get the total flow from this voter node.
+                    actual_flow_for_voter = sum(
                         flow_dict.get(voter_node, {}).get(f"cand_{cand}", 0) for cand in S
                     )
 
-                    # Remove ALL candidates approved by constrained voter
-                    if actual_flow < expected_flow:
+                    # If actual_flow < expected_flow, this voter is "constrained" - they couldn't send
+                    # their full expected flow due to capacity limits in the network. This indicates that
+                    # the candidates they approve cannot all receive sufficient support. Therefore, we mark
+                    # ALL candidates approved by this constrained voter as unsupported, and they will be
+                    # removed from S in the next iteration to allow the algorithm to converge to target flow.
+                    if actual_flow_for_voter < expected_flow_for_voter:
                         for cand in S:
                             if cand in voter.approved:
                                 unsupported_candidates.add(cand)
 
+                # Remove unsupported candidates from S
                 S -= unsupported_candidates
 
+                # If S is empty after removing unsupported candidates, set support value to 0 and break
                 if not S:
                     support_value = 0.0
                     break
 
+        # Set support value for added candidate
         scores[added_cand] = support_value
 
     return scores
