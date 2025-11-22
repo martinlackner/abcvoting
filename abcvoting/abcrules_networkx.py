@@ -14,10 +14,9 @@ To run these tests, execute:
 """
 
 import networkx as nx
-from abcvoting.preferences import Profile, Voter  # noqa: F401
 
 
-def _nx_maximin_support_scorefct(profile: Profile, base_committee: list) -> list:
+def _nx_maximin_support_scorefct(profile, base_committee):
     """
         Compute maximin support scores using max-flow algorithm.
 
@@ -87,6 +86,8 @@ def _nx_maximin_support_scorefct(profile: Profile, base_committee: list) -> list
 
         Examples
         --------
+        >>> from abcvoting.preferences import Profile, Voter
+
         ----------------------------------------------------------------
         Example 1: 3 candidates, 3 voters, k=2
         Voters: A:{1,2}, B:{2,3}, C:{1,2}
