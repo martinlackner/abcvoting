@@ -14,18 +14,17 @@ To run these tests, execute:
 """
 
 import networkx as nx
-from abcvoting.preferences import Profile, Voter
-from abcvoting import abcrules
+from abcvoting.preferences import Profile, Voter  # noqa: F401
 
 
-def _nx_maximin_support_scorefct(profile, base_committee) -> list:
+def _nx_maximin_support_scorefct(profile: Profile, base_committee: list) -> list:
     """
         Compute maximin support scores using max-flow algorithm.
 
         This function is called iteratively during committee construction.
-        For each candidate not yet in the committee, using max-flow problems
-        iteratively computes what the maximin support value be if that candidate were added,
-        save it in list by index of candidate, and return the support score list.
+        For each candidate not yet in the committee, using max-flow
+        problems iteratively computes what the maximin support score
+        be if that candidate were added, and return the support score list.
 
         Parameters
         ----------
@@ -44,7 +43,8 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
         Returns
         -------
         list
-            scores where scores[candidate_index] = maximin support of candidate represented by candidate_index
+            scores where scores[candidate_index] = maximin support of candidate.
+            represented by candidate_index
 
         Algorithm Overview
         ------------------
@@ -52,28 +52,37 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
         - N = [index∶[candidates]]
             - Key: Voters index, Value: list of candidates that key voter approved.
         - NS = {i∈N┤|N∩S≠∅}
-            - Set of voters who approve at least one candidate in S.
+            - Set of voters who approve at least one candidate
+                in S.
         - S = base_committee ∪ {C}
             - Tested committee with candidate C added.
         - |NS_total_weight| = sum(voter.weight for voter in NS)
             - Total size of NS, with weighted voters.
-        - Flow Value = maximum flow from source to sink returned from max-flow algorithm in networkx.
+        - Flow Value = maximum flow from source to sink returned from max-flow
+          algorithm in networkx.
         - Target Flow = |NS_total_weight| * |S_size|
-            - total weight of voters in NS * size of committee, needed to achieve maximin-support score for candidate C.
+            - total weight of voters in NS * size of committee, needed to
+              achieve maximin-support score for candidate C.
 
         1. For each candidate C not in base_committee:
             1.1. Form test_committee = base_committee ∪ {C}
             1.2. Build new profile of test_committee:
-                - NS = {i∈N┤|N∩S≠∅} : voters who approve at least one candidate in S.
+                - NS = {i∈N┤|N∩S≠∅} : voters who approve at least one
+                  candidate in S.
             1.3. Build max-flow network with integer arithmetic:
-               - Source → Voters: Edge capacity = voter.weight × |S| (might have different weights for voters)
+               - Source → Voters: Edge capacity = voter.weight × |S|
+                 (might have different weights for voters)
                - Voters → Candidates: Edge capacity = voter.weight × |S|
-               - Candidates → Sink: Edge capacity = |NS_total_weight| (Sum of weights of voters in NS)
-            1.4. Compute maximum flow using max-flow algorithm in networkx, and return the Flow Value
+               - Candidates → Sink: Edge capacity = |NS_total_weight|
+                 (Sum of weights of voters in NS)
+            1.4. Compute maximum flow using max-flow algorithm in networkx,
+                and return the Flow Value
             1.5. If Target Flow == Flow Value
-                - Add maximin-support score of candidate C to scores list (which is |NS_total_weight| / |S_size|)
+                - Add maximin-support score of candidate C to scores list
+                  (which is |NS_total_weight| / |S_size|)
             1.6. Otherwise:
-                - Iteratively remove unsupported candidates if target flow is not achieved (if none remain score of C is 0)
+                - Iteratively remove unsupported candidates if target flow is
+                  not achieved (if none remain score of C is 0)
         7. Return the maximin-support score list
 
         Examples
@@ -195,7 +204,7 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
         - The algorithm uses integer arithmetic internally (capacities × |S|)
         - When target flow is achieved, all candidates receive equal support
         - Voter weights are properly considered in all capacity calculations
-        - The iterative refinement removes unsupported candidates until target flow is achieved
+        - The iterative refinement removes unsupported candidates until target flow is achieved.
     """
     # Initialize scores, set to 0 for candidates in base_committee
     scores = [0] * profile.num_cand
@@ -263,22 +272,18 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
                 unsupported_candidates = set()
                 for i, voter in enumerate(NS):
                     voter_node = f"voter_{i}"
-                    # expected_flow for each voter: their weight should be distributed across all |S| candidates.
-                    # This represents the ideal case where the voter fully supports the committee.
+                    # Expected flow: voter weight distributed across all |S|
+                    # candidates (ideal case).
                     expected_flow_for_voter = voter.weight * S_size
 
-                    # actual_flow: sum of flow values from this voter to all candidates in S.
-                    # The flow_dict from max-flow contains flow values for each edge (voter_node -> cand_node).
-                    # We sum across all candidates in S to get the total flow from this voter node.
+                    # Actual flow: sum of flow from this voter to all
+                    # candidates in S (from flow_dict).
                     actual_flow_for_voter = sum(
                         flow_dict.get(voter_node, {}).get(f"cand_{cand}", 0) for cand in S
                     )
 
-                    # If actual_flow < expected_flow, this voter is "constrained" - they couldn't send
-                    # their full expected flow due to capacity limits in the network. This indicates that
-                    # the candidates they approve cannot all receive sufficient support. Therefore, we mark
-                    # ALL candidates approved by this constrained voter as unsupported, and they will be
-                    # removed from S in the next iteration to allow the algorithm to converge to target flow.
+                    # If actual < expected, voter is constrained. Mark all
+                    # their approved candidates as unsupported for removal.
                     if actual_flow_for_voter < expected_flow_for_voter:
                         for cand in S:
                             if cand in voter.approved:
@@ -287,7 +292,8 @@ def _nx_maximin_support_scorefct(profile, base_committee) -> list:
                 # Remove unsupported candidates from S
                 S -= unsupported_candidates
 
-                # If S is empty after removing unsupported candidates, set support value to 0 and break
+                # If S is empty after removing unsupported candidates, set
+                # support value to 0 and break
                 if not S:
                     support_value = 0.0
                     break
