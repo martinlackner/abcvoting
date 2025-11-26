@@ -1373,11 +1373,11 @@ def compute_adams(
 
     output.details(
         f"Optimal CC-score (primary objective): "
-        f"{scores.thiele_score("cc", profile, committees[0])}\n"
+        f"{scores.thiele_score('cc', profile, committees[0])}\n"
     )
     output.details(
         f"Optimal Adams-score (secondary objective): "
-        f"{scores.thiele_score("adams", profile, committees[0])}\n"
+        f"{scores.thiele_score('adams', profile, committees[0])}\n"
     )
     output.info(
         str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
