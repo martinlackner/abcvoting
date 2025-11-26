@@ -16,7 +16,7 @@ Latest development version from source:
 
 Requirements:
 
-- Python 3.8+
+- Python 3.10+
 
 - The following pip packages are required and installed automatically: `gurobipy`, `mip`, `networkx`, `numpy`, `ruamel.yaml`, `preflibtools`, and `prefsampling`.
 
