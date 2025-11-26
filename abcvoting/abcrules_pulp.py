@@ -715,3 +715,75 @@ def _pulp_lexminimaxav(
         "opt_distances": [misc.hamming(voter.approved, committees[0]) for voter in profile],
     }
     return committees, detailed_info
+
+
+def _pulp_adams(profile, committeesize, resolute, max_num_of_committees, solver_id):
+    """
+    PULP implementation of Adams rule.
+
+    Uses a single ILP with weighted objective combining both phases.
+    """
+
+    omega = 2 * profile.total_weight()  # large constant
+    weights = [omega] + [1.0 / i for i in range(1, committeesize)]
+
+    if weights[-1] < ACCURACY:
+        output.warning(
+            f"Adams rule uses small weights (min={weights[-1]}) "
+            f"which may cause numerical issues with PULP accuracy ({ACCURACY})."
+        )
+
+    def set_opt_model(prob, in_committee):
+        # Constraint: committee has exactly committeesize members
+        prob += pulp.lpSum(in_committee[cand] for cand in profile.candidates) == committeesize
+
+        # Variables for voter utility levels
+        voter_utility = {}
+        for voter_idx, voter in enumerate(profile):
+            voter_utility[voter_idx] = {}
+            max_utility = min(committeesize, len(voter.approved))
+            for util_level in range(1, max_utility + 1):
+                voter_utility[voter_idx][util_level] = pulp.LpVariable(
+                    f"util_{voter_idx}_{util_level}", cat="Binary"
+                )
+
+        # Constraints: utility matches approved candidates
+        for voter_idx, voter in enumerate(profile):
+            if len(voter.approved) == 0:
+                continue
+
+            max_utility = min(committeesize, len(voter.approved))
+
+            prob += pulp.lpSum(
+                voter_utility[voter_idx][u] for u in range(1, max_utility + 1)
+            ) == pulp.lpSum(in_committee[cand] for cand in voter.approved)
+
+            for util_level in range(1, max_utility):
+                prob += (
+                    voter_utility[voter_idx][util_level]
+                    >= voter_utility[voter_idx][util_level + 1]
+                )
+
+        # Objective: maximize weighted sum
+        objective = pulp.lpSum(
+            voter.weight
+            * pulp.lpSum(
+                weights[util_level - 1] * voter_utility[voter_idx][util_level]
+                for util_level in range(1, min(committeesize, len(voter.approved)) + 1)
+            )
+            for voter_idx, voter in enumerate(profile)
+            if len(voter.approved) > 0
+        )
+        prob.setObjective(objective)
+
+    committees, _ = _optimize_rule_pulp(
+        set_opt_model,
+        profile,
+        committeesize,
+        resolute,
+        max_num_of_committees,
+        solver_id,
+        name="Adams",
+    )
+
+    return [misc.CandidateSet(comm, num_cand=profile.num_cand) for comm in committees]

@@ -184,3 +184,9 @@ compute:
 - rule_id: eph
   result: [[8, 3, 5, 6]]
   resolute: true
+- rule_id: adams
+  result: [[8, 3, 5, 6]]
+  resolute: false
+- rule_id: adams
+  result: [[8, 3, 5, 6]]
+  resolute: true

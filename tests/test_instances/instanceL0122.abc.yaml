@@ -1,5 +1,5 @@
-description: "profile generated via prob_distribution={'id': 'Truncated Mallows', 'setsize': 2, 'dispersion': 0.2}, num_voters=12,\
-  \ num_cand=8"
+description: "profile generated via prob_distribution={'id': 'Truncated Mallows', 'setsize': 2, 'dispersion': 0.2}, num_voters=12,
+  num_cand=8"
 profile: [[1, 2], [1, 2], [1, 2], [1, 2], [0, 2], [1, 2], [1, 2], [1, 2], [1, 5], [1, 2], [1, 2], [1, 2]]
 num_cand: 8
 committeesize: 3
@@ -171,5 +171,11 @@ compute:
   result: [[0, 1, 2], [1, 2, 5]]
   resolute: false
 - rule_id: eph
+  result: [[0, 1, 2], [1, 2, 5]]
+  resolute: true
+- rule_id: adams
+  result: [[0, 1, 2], [1, 2, 5]]
+  resolute: false
+- rule_id: adams
   result: [[0, 1, 2], [1, 2, 5]]
   resolute: true

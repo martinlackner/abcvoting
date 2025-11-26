@@ -102,6 +102,13 @@ Lexicographic Chamberlin-Courant (lex-CC)
  {1, 3, 4, 5}
  {2, 3, 4, 5}
 
+---------------------
+Adams Approval Voting
+---------------------
+
+1 winning committee:
+ {0, 1, 2, 3}
+
 -------------------------------------------------
 Sequential Proportional Approval Voting (seq-PAV)
 -------------------------------------------------

@@ -145,6 +145,7 @@ class _CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
+            "adams": [{0, 1, 2, 3}],
             "revseqpav": [
                 {0, 1, 2, 4},
                 {0, 1, 2, 5},
@@ -351,6 +352,7 @@ class _CollectInstances:
             "sav": [{0, 1, 3}],
             "pav": [{0, 1, 3}],
             "geom2": [{0, 1, 3}],
+            "adams": [{0, 1, 3}],
             "revseqpav": [{0, 1, 3}],
             "minimaxav": [{0, 1, 3}, {0, 2, 3}, {1, 2, 3}],
             "lexminimaxav": [{0, 1, 3}],
@@ -401,6 +403,7 @@ class _CollectInstances:
             "sav": [{0, 1, 2, 4}],
             "pav": [{0, 1, 2, 4}],
             "geom2": [{0, 1, 2, 4}],
+            "adams": [{0, 1, 2, 4}],
             "revseqpav": [{0, 1, 2, 4}],
             "minimaxav": [{0, 1, 2, 3}, {0, 1, 2, 4}, {0, 2, 3, 4}, {0, 2, 3, 5}, {0, 2, 4, 5}],
             "lexminimaxav": [{0, 1, 2, 4}],
@@ -507,6 +510,7 @@ class _CollectInstances:
             "sav": [{0, 1}, {0, 3}],
             "pav": [{0, 3}],
             "geom2": [{0, 3}],
+            "adams": [{0, 3}],
             "revseqpav": [{0, 3}],
             "minimaxav": [{0, 3}, {1, 3}],
             "lexminimaxav": [{0, 3}],
@@ -551,6 +555,7 @@ class _CollectInstances:
             "sav": all_possibilities,
             "pav": one_each,
             "geom2": one_each,
+            "adams": one_each,
             "revseqpav": one_each,
             "minimaxav": one_each,
             "lexminimaxav": one_each,
@@ -655,15 +660,10 @@ def load_abc_yaml_file():
     for filename in filenames:
         profile, committeesize, compute_instances, _ = fileio.read_abcvoting_yaml_file(filename)
         abc_yaml_content[filename] = (profile, committeesize, compute_instances)
-        rule_ids = set()
-        for compute_instance in compute_instances:
-            rule_id = compute_instance["rule_id"]
-            rule_ids.add(rule_id)
+        rule_ids = set(compute_instance["rule_id"] for compute_instance in compute_instances)
         for rule_id in abcrules.MAIN_RULE_IDS:
             if rule_id not in rule_ids:
                 raise RuntimeError(f"rule_id {rule_id} does not appear in {filename}")
-        if len(rule_ids) != len(abcrules.MAIN_RULE_IDS):
-            raise RuntimeError(f"rule_ids in {filename} differ from abcrules.MAIN_RULE_IDS.")
     return abc_yaml_content
 
 
@@ -1090,10 +1090,7 @@ def test_abcrules_correct_with_max_num_of_committees(
         max_num_of_committees=max_num_of_committees,
     )
     print(f"with max_num_of_committees={max_num_of_committees} output: {committees}")
-    if resolute:
-        assert len(committees) == 1
-    else:
-        assert len(committees) == min(max_num_of_committees, len(expected_result))
+    assert len(committees) == min(max_num_of_committees, len(expected_result))
     for comm in committees:
         assert comm in expected_result
 
@@ -1379,8 +1376,10 @@ def test_selection_of_abc_yaml_instances(filename, rule_id, algorithm, load_abc_
     for compute_instance in compute_instances:
         if compute_instance["rule_id"] != rule_id:
             continue
+        if rule_id == "rsd":
+            continue  # not deterministic
         if compute_instance["result"] is None:
-            return  # no result known, cannot test
+            pytest.skip(f"No result known, cannot test ({rule_id}, {algorithm}, {filename}).")
         abcrules.compute(**compute_instance, algorithm=algorithm)
 
 

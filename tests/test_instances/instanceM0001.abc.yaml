@@ -164,3 +164,9 @@ compute:
 - rule_id: eph
   result: [[2, 4, 5]]
   resolute: true
+- rule_id: adams
+  result: [[0, 2, 5], [1, 2, 5]]
+  resolute: false
+- rule_id: adams
+  result: [[0, 2, 5], [1, 2, 5]]
+  resolute: true
