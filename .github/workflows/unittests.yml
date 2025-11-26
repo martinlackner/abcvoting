@@ -75,7 +75,9 @@ jobs:
 
     # tests the package, the release is done in build.yml
     - name: Build a binary wheel and a source tarball
-      run: python setup.py bdist_wheel
+      run: |
+        pip install build
+        python -m build
       env:
         # does not increment on re-run... :(
         # this means this will fail in the last step, when uploading the same package again to PyPI

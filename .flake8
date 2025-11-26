@@ -7,7 +7,6 @@ exclude =
     venv*,
     scratch*,
     benchmark,
-    setup.py,
     */__init__.py,
     .eggs,
     .github,
