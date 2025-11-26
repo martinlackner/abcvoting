@@ -181,3 +181,9 @@ def test_generating_random_profiles_py(check_output):
 # noinspection PyUnresolvedReferences
 def test_axiomatic_properties(check_output):
     from examples import axiomatic_properties  # noqa: F401
+
+
+# noinspection PyUnresolvedReferences
+@pytest.mark.slow
+def test_apportionment(check_output):
+    from examples import apportionment  # noqa: F401

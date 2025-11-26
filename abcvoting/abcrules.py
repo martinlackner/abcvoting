@@ -63,7 +63,6 @@ MAIN_RULE_IDS = [
     "phragmen-enestroem",
     "consensus-rule",
     "trivial",
-    "rsd",
     "eph",
 ]
 
