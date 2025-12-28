@@ -403,26 +403,6 @@ def dominate(profile, committee1, committee2):
     return False
 
 
-def binom(n, k):
-    """
-    Compute a binomial coefficient (n choose k).
-
-    Parameters
-    ----------
-        n, k : int
-            Positive integers.
-
-    Returns
-    -------
-        int
-    """
-    # could be replace by math.comb(n, k) in Python >= 3.8
-    try:
-        return math.factorial(n) // math.factorial(k) // math.factorial(n - k)
-    except ValueError:
-        return 0
-
-
 def isclose(x, y):
     """
     Compare two floats using the abcvoting default values for absolute and relative tolerance.

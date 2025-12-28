@@ -52,6 +52,7 @@ MAIN_RULE_IDS = [
     "cc",
     "lexcc",
     "geom2",
+    "adams",
     "seqpav",
     "revseqpav",
     "seqslav",
@@ -70,7 +71,6 @@ MAIN_RULE_IDS = [
     "phragmen-enestroem",
     "consensus-rule",
     "trivial",
-    "rsd",
     "eph",
 ]
 
@@ -172,6 +172,19 @@ class Rule:
             self.compute_fct = compute_lexcc
             # algorithms sorted by speed
             self.algorithms = ("gurobi", "pulp-highs", "pulp-cbc", "brute-force")
+            self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
+        elif rule_id == "adams":
+            self.shortname = "Adams-Thiele"
+            self.longname = "Adams Approval Voting"
+            self.compute_fct = compute_adams
+            # algorithms sorted by speed
+            self.algorithms = (
+                "gurobi",
+                "pulp-highs",
+                "mip-cbc",
+                "pulp-cbc",
+                "brute-force",
+            )
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "seqpav":
             self.shortname = "seq-PAV"
@@ -1231,6 +1244,161 @@ def _lexcc_bruteforce(profile, committeesize, resolute, max_num_of_committees):
     if max_num_of_committees is not None:
         committees = committees[:max_num_of_committees]
     return committees, detailed_info
+
+
+def _adams_bruteforce(profile, committeesize, resolute, max_num_of_committees):
+    """Brute-force enumeration for Adams rule."""
+    # Phase 1: Find committees that maximize covered voters (CC)
+    best_committees = []
+    best_coverage = -1
+
+    for committee in itertools.combinations(profile.candidates, committeesize):
+        # Use atleast1 Thiele score to count covered voters
+        coverage = scores.thiele_score("cc", profile, committee)
+
+        if coverage > best_coverage:
+            best_committees = [committee]
+            best_coverage = coverage
+        elif coverage == best_coverage:
+            best_committees.append(committee)
+
+    # Phase 2: Among best committees, maximize Adams score
+    final_committees = []
+    best_score = -1
+
+    for committee in best_committees:
+        # Use pav Thiele score for tiebreaking
+        score = scores.thiele_score("adams", profile, committee)
+
+        if score > best_score:
+            final_committees = [committee]
+            best_score = score
+        elif score == best_score:
+            final_committees.append(committee)
+
+    committees = [misc.CandidateSet(comm, num_cand=profile.num_cand) for comm in final_committees]
+
+    if resolute:
+        committees = committees[:1]
+    if max_num_of_committees is not None:
+        committees = committees[:max_num_of_committees]
+
+    return committees
+
+
+def compute_adams(
+    profile,
+    committeesize,
+    algorithm="fastest",
+    resolute=False,
+    max_num_of_committees=MAX_NUM_OF_COMMITTEES_DEFAULT,
+):
+    """
+    Compute winning committees with Adams Approval Voting.
+
+    Adams is a two-phase voting rule:
+    1. Maximize the number of covered voters (voters with ≥1 approved candidate)
+    2. Among optimal committees from phase 1, maximize a modified PAV score
+
+    Parameters
+    ----------
+        profile : abcvoting.preferences.Profile
+            A profile.
+
+        committeesize : int
+            The desired committee size.
+
+        algorithm : str, optional
+            The algorithm to be used.
+
+            The following algorithms are available:
+
+            .. doctest::
+
+                >>> Rule("adams").algorithms
+                ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-cbc', 'brute-force')
+
+        resolute : bool, optional
+            Return only one winning committee.
+
+            If `resolute=False`, all winning committees are computed (subject to
+            `max_num_of_committees`).
+
+        max_num_of_committees : int, optional
+             At most `max_num_of_committees` winning committees are computed.
+
+             If `max_num_of_committees=None`, the number of winning committees is not restricted.
+
+    Returns
+    -------
+        list of CandidateSet
+            A list of winning committees.
+
+    Examples
+    --------
+    .. doctest::
+
+        >>> from abcvoting import abcrules
+        >>> from abcvoting.preferences import Profile
+        >>> profile = Profile(4)
+        >>> profile.add_voters([[0, 1], [0, 1], [2], [3]])
+        >>> abcrules.compute_adams(profile, committeesize=2, algorithm="brute-force")
+        [{0, 2}, {0, 3}, {1, 2}, {1, 3}]
+    """
+    rule_id = "adams"
+    rule = Rule(rule_id)
+    if algorithm == "fastest":
+        algorithm = rule.fastest_available_algorithm()
+    rule.verify_compute_parameters(
+        profile=profile,
+        committeesize=committeesize,
+        algorithm=algorithm,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+    )
+
+    if algorithm == "gurobi":
+        from abcvoting.abcrules_gurobi import _gurobi_adams
+
+        committees = _gurobi_adams(profile, committeesize, resolute, max_num_of_committees)
+    elif algorithm in ["pulp-highs", "pulp-cbc"]:
+        from abcvoting.abcrules_pulp import _pulp_adams
+
+        solver_id = "highs" if algorithm == "pulp-highs" else "cbc"
+        committees = _pulp_adams(
+            profile, committeesize, resolute, max_num_of_committees, solver_id
+        )
+    elif algorithm == "mip-cbc":
+        from abcvoting.abcrules_mip import _mip_adams
+
+        committees = _mip_adams(
+            profile, committeesize, resolute, max_num_of_committees, solver_id="cbc"
+        )
+    elif algorithm == "brute-force":
+        committees = _adams_bruteforce(profile, committeesize, resolute, max_num_of_committees)
+    else:
+        raise UnknownAlgorithm(rule_id, algorithm)
+
+    # optional output
+    output.info(header(rule.longname), wrap=False)
+    if resolute:
+        output.info("Computing only one winning committee (resolute=True)\n")
+    output.details(f"Algorithm: {ALGORITHM_NAMES[algorithm]}\n")
+
+    output.details(
+        f"Optimal CC-score (primary objective): "
+        f"{scores.thiele_score('cc', profile, committees[0])}\n"
+    )
+    output.details(
+        f"Optimal Adams-score (secondary objective): "
+        f"{scores.thiele_score('adams', profile, committees[0])}\n"
+    )
+    output.info(
+        str_committees_with_header(committees, cand_names=profile.cand_names, winning=True)
+    )
+    # end of optional output
+
+    return sorted_committees(committees)
 
 
 def compute_seq_thiele_method(

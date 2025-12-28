@@ -478,3 +478,78 @@ def _mip_minimaxav(profile, committeesize, resolute, max_num_of_committees, solv
         * -1,  # negative because _optimize_rule_mip maximizes while minimaxav minimizes
     )
     return sorted_committees(committees)
+
+
+def _mip_adams(profile, committeesize, resolute, max_num_of_committees, solver_id):
+    """
+    MIP implementation of Adams rule.
+
+    Uses a single ILP with weighted objective combining both phases.
+    """
+
+    omega = 2 * profile.total_weight()  # large constant
+    weights = [omega] + [1.0 / i for i in range(1, committeesize)]
+
+    if weights[-1] < ACCURACY:
+        output.warning(
+            f"Adams rule uses small weights (min={weights[-1]}) "
+            f"which may cause numerical issues with MIP accuracy ({ACCURACY})."
+        )
+
+    def set_opt_model(model, profile, in_committee, committeesize):
+        # Constraint: committee has exactly committeesize members
+        model += mip.xsum(in_committee[cand] for cand in profile.candidates) == committeesize
+
+        # Variables for voter utility levels
+        voter_utility = {}
+        for voter_idx, voter in enumerate(profile):
+            voter_utility[voter_idx] = {}
+            max_utility = min(committeesize, len(voter.approved))
+            for util_level in range(1, max_utility + 1):
+                voter_utility[voter_idx][util_level] = model.add_var(
+                    var_type=mip.BINARY, name=f"util_{voter_idx}_{util_level}"
+                )
+
+        # Constraints: utility matches approved candidates
+        for voter_idx, voter in enumerate(profile):
+            if len(voter.approved) == 0:
+                continue
+
+            max_utility = min(committeesize, len(voter.approved))
+
+            # Sum of utility levels = number of approved candidates in committee
+            model += mip.xsum(
+                voter_utility[voter_idx][u] for u in range(1, max_utility + 1)
+            ) == mip.xsum(in_committee[cand] for cand in voter.approved)
+
+            # Utility levels are non-increasing
+            for util_level in range(1, max_utility):
+                model += (
+                    voter_utility[voter_idx][util_level]
+                    >= voter_utility[voter_idx][util_level + 1]
+                )
+
+        # Objective: maximize weighted sum
+        objective = mip.xsum(
+            voter.weight
+            * mip.xsum(
+                weights[util_level - 1] * voter_utility[voter_idx][util_level]
+                for util_level in range(1, min(committeesize, len(voter.approved)) + 1)
+            )
+            for voter_idx, voter in enumerate(profile)
+            if len(voter.approved) > 0
+        )
+        model.objective = mip.maximize(objective)
+
+    from abcvoting import misc
+
+    committees = _optimize_rule_mip(
+        set_opt_model,
+        profile,
+        committeesize,
+        resolute=resolute,
+        max_num_of_committees=max_num_of_committees,
+        solver_id=solver_id,
+        name="adams",
+    )
+    return [misc.CandidateSet(comm, num_cand=profile.num_cand) for comm in committees]

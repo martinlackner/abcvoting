@@ -1,9 +1,59 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
+requires = ["setuptools>=64", "setuptools-scm>=8", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "abcvoting"
+dynamic = ["version"]
+authors = [{name = "Martin Lackner", email = "unexpected@sent.at"}]
+description = "A Python library of approval-based committee (ABC) rules"
+readme = "README.md"
+license = {text = "MIT License"}
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+]
+dependencies = [
+    "networkx[default]>=2.6.3",
+    "ruamel.yaml>=0.17",
+    "numpy>=1.21",
+    "gurobipy>=11.0",
+    "preflibtools>=2.0.12",
+    "prefsampling>=0.1.19",
+    "pabutools>=1.1.15",
+    "pulp[open_py]>=3.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6",
+    "coverage[toml]>=5.3",
+    "black==25.1",
+    "flake8==7.3.0",
+    "Sphinx>=7.0",
+    "sphinx-rtd-theme>=1.0.0",
+    "numpydoc>=1.5",
+    "sphinx-codeautolink>=0.15",
+    "matplotlib>=3.4.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/martinlackner/abcvoting/"
+"Bug Tracker" = "https://github.com/martinlackner/abcvoting/issues"
+
+[tool.setuptools]
+packages = ["abcvoting"]
+
+[tool.setuptools_scm]
+# Automatically get version from git tags
+# Strips 'v' prefix from tags (v2.0.0 -> 2.0.0)
 
 [tool.pytest.ini_options]
 # https://docs.pytest.org/en/stable/customize.html
@@ -64,7 +114,7 @@ fail_under = 0
 [tool.black]
 # https://black.readthedocs.io/en/stable/pyproject_toml.html
 line-length = 99
-target-version = ['py38']
+target-version = ['py310']
 exclude = '''
 (
   /(

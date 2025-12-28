@@ -1,0 +1,69 @@
+Weights: [790, 70, 60, 30, 20, 10]
+Committee size: 20
+
+Grouping by seat allocation:
+
+(20, 0, 0, 0, 0, 0) = Majority
+    - av
+    - eph
+    - sav
+    - trivial
+
+(18, 1, 1, 0, 0, 0) = D'Hondt (Jefferson)
+    - equal-shares
+    - equal-shares-with-av-completion
+    - equal-shares-with-increment-completion
+    - leximaxphragmen
+    - maximin-support
+    - minimaxphragmen
+    - pav
+    - revseqpav
+    - seqpav
+    - seqphragmen
+
+(17, 1, 1, 1, 0, 0) = Sainte-Laguë (Webster)
+    - seqslav
+    - slav
+
+(16, 2, 1, 1, 0, 0) = Largest Remainder
+    - phragmen-enestroem
+
+(16, 1, 1, 1, 1, 0) = Frege's apportionment
+    - consensus-rule
+
+(15, 1, 1, 1, 1, 1) = Huntington-Hill
+    - seqcc
+
+(14, 2, 1, 1, 1, 1) = Adams
+    - adams
+
+(7, 4, 4, 2, 2, 1)
+    - geom2
+
+(5, 4, 3, 4, 2, 2)
+    - cc
+
+(4, 4, 3, 3, 3, 3)
+    - lexcc
+
+(3, 3, 3, 5, 3, 3)
+    - minimaxav
+
+Rules with errors:
+  monroe: Error: Monroe is only defined for unit weights (weight=1)
+  greedy-monroe: Error: Greedy Monroe is only defined for unit weights (weight=1)
+  lexminimaxav: Error: lex-MAV is only defined for unit weights (weight=1)
+
+Verification of rule_to_apportionment mapping:
+
+  av: OK (matches Majority)
+  pav: OK (matches D'Hondt (Jefferson))
+  seqpav: OK (matches D'Hondt (Jefferson))
+  revseqpav: OK (matches D'Hondt (Jefferson))
+  seqphragmen: OK (matches D'Hondt (Jefferson))
+  equal-shares: OK (matches D'Hondt (Jefferson))
+  leximaxphragmen: OK (matches D'Hondt (Jefferson))
+  consensus-rule: OK (matches Frege's apportionment)
+  adams: OK (matches Adams)
+  slav: OK (matches Sainte-Laguë (Webster))
+  seqslav: OK (matches Sainte-Laguë (Webster))

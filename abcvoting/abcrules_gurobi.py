@@ -129,7 +129,7 @@ def _optimize_rule_gurobi(
             raise RuntimeError(
                 "Gurobi found a solution better than a previous optimum. This "
                 f"should not happen (previous optimal score: {maxscore}, "
-                f"new optimal score: {model.objVal}, model {name})."
+                f"new optimal score: {objective_value}, model {name}."
             )
         elif (committeescorefct is not None and objective_value < maxscore) or (
             committeescorefct is None and objective_value < maxscore - CMP_ACCURACY
@@ -803,3 +803,75 @@ def _gurobi_lexminimaxav(
         "opt_distances": [misc.hamming(voter.approved, committees[0]) for voter in profile],
     }
     return committees, detailed_info
+
+
+def _gurobi_adams(profile, committeesize, resolute, max_num_of_committees):
+    """
+    Gurobi implementation of Adams rule.
+
+    Uses a single ILP with weighted objective combining both phases:
+    - Large weight ω on coverage (phase 1)
+    - PAV weights 1/1, 1/2, ..., 1/(k-1) on utility (phase 2)
+    """
+
+    omega = 2 * profile.total_weight()  # large constant
+    weights = [omega] + [1.0 / i for i in range(1, committeesize)]
+
+    def set_opt_model(model, in_committee):
+        # Constraint: committee has exactly committeesize members
+        model.addConstr(
+            gb.quicksum(in_committee[cand] for cand in profile.candidates) == committeesize
+        )
+
+        # Variables for voter utility levels
+        voter_utility = {}
+        for voter_idx, voter in enumerate(profile):
+            voter_utility[voter_idx] = {}
+            max_utility = min(committeesize, len(voter.approved))
+            for util_level in range(1, max_utility + 1):
+                voter_utility[voter_idx][util_level] = model.addVar(
+                    vtype=gb.GRB.BINARY, name=f"util_{voter_idx}_{util_level}"
+                )
+
+        # Constraints: utility matches approved candidates in committee
+        for voter_idx, voter in enumerate(profile):
+            if len(voter.approved) == 0:
+                continue
+
+            max_utility = min(committeesize, len(voter.approved))
+
+            # Sum of utility levels = number of approved candidates in committee
+            model.addConstr(
+                gb.quicksum(voter_utility[voter_idx][u] for u in range(1, max_utility + 1))
+                == gb.quicksum(in_committee[cand] for cand in voter.approved)
+            )
+
+            # Utility levels are non-increasing (if u_i = 1, then u_{i-1} = 1)
+            for util_level in range(1, max_utility):
+                model.addConstr(
+                    voter_utility[voter_idx][util_level]
+                    >= voter_utility[voter_idx][util_level + 1]
+                )
+
+        # Objective: maximize weighted sum
+        objective = gb.quicksum(
+            voter.weight
+            * gb.quicksum(
+                weights[util_level - 1] * voter_utility[voter_idx][util_level]
+                for util_level in range(1, min(committeesize, len(voter.approved)) + 1)
+            )
+            for voter_idx, voter in enumerate(profile)
+            if len(voter.approved) > 0
+        )
+        model.setObjective(objective, gb.GRB.MAXIMIZE)
+
+    committees, _ = _optimize_rule_gurobi(
+        set_opt_model,
+        profile,
+        committeesize,
+        resolute,
+        max_num_of_committees,
+        name="Adams",
+    )
+
+    return [misc.CandidateSet(comm, num_cand=profile.num_cand) for comm in committees]

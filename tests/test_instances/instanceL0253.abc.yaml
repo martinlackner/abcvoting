@@ -172,3 +172,9 @@ compute:
 - rule_id: eph
   result: [[0, 4, 6]]
   resolute: true
+- rule_id: adams
+  result: [[0, 4, 6]]
+  resolute: false
+- rule_id: adams
+  result: [[0, 4, 6]]
+  resolute: true

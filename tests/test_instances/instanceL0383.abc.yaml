@@ -1,5 +1,5 @@
-description: "profile generated via prob_distribution={'id': 'Urn fixed-size', 'setsize': 3, 'replace': 0.5}, num_voters=12,\
-  \ num_cand=9"
+description: "profile generated via prob_distribution={'id': 'Urn fixed-size', 'setsize': 3, 'replace': 0.5}, num_voters=12,
+  num_cand=9"
 profile: [[0, 2, 5], [2, 5, 7], [0, 2, 5], [0, 3, 5], [0, 1, 7], [2, 5, 7], [2, 4, 5], [0, 1, 7], [8, 4, 6], [0, 2, 5], [
     2, 4, 5], [0, 2, 5]]
 num_cand: 9
@@ -233,4 +233,10 @@ compute:
   resolute: false
 - rule_id: eph
   result: [[0, 1, 2, 4, 5, 7]]
+  resolute: true
+- rule_id: adams
+  result: [[0, 1, 2, 4, 5, 7], [0, 2, 4, 5, 6, 7], [0, 2, 4, 5, 7, 8]]
+  resolute: false
+- rule_id: adams
+  result: [[0, 1, 2, 4, 5, 7], [0, 2, 4, 5, 6, 7], [0, 2, 4, 5, 7, 8]]
   resolute: true

@@ -45,6 +45,8 @@ def get_marginal_scorefct(scorefct_id, committeesize=None):
     """
     if scorefct_id == "pav":
         return pav_score_fct
+    if scorefct_id == "adams":
+        return adams_score_fct
     if scorefct_id == "slav":
         return slav_score_fct
     if scorefct_id == "cc":
@@ -155,6 +157,30 @@ def pav_score_fct(i):
     if i == 0:
         return 0
     return Fraction(1, i)
+
+
+def adams_score_fct(i):
+    """
+    Adams marginal score function (secondary objective after CC).
+
+    This is the additional (marginal) score from a voter for the `i`-th approved candidate
+    in the committee. The sequence is (1,1,1/2,1/3,1/4,...).
+
+    Parameters
+    ----------
+        i : int
+            We are calculating the score for the `i`-th approved candidate in the committee.
+
+    Returns
+    -------
+        Fraction
+            The corresponding marginal score.
+    """
+    if i == 0:
+        return 0
+    if i == 1:
+        return 1
+    return Fraction(1, i - 1)
 
 
 def slav_score_fct(i):

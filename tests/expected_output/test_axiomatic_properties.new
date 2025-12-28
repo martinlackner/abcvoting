@@ -1,8 +1,0 @@
-Input: profile with 6 voters and 16 candidates:
- voter 0:   {1, 2, 3, 4},
- voter 1:   {1, 2, 3, 5},
- voter 2:   {1, 2, 3, 6},
- voter 3:   {7, 8, 9},
- voter 4:   {10, 11, 12},
- voter 5:   {13, 14, 15}
-
