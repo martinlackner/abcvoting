@@ -86,3 +86,4 @@ venv*
 scratchpad
 *_py.new
 benchmark
+example.py

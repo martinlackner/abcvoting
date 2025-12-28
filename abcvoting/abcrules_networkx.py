@@ -4,9 +4,9 @@ Max-Flow Implementation for Maximin Support Method
 Based on: "Efficient, traceable, and numerical error-free"
 https://arxiv.org/abs/2309.15104 (October 17, 2023)
 By Luis Sánchez-Fernández
-From Universidad Carlos III de Madrid, Spain
+From Carlos III University, Madrid, Spain
 
-Programmer: Amit Gini (S.C Student at Ariel University, Israel)
+Programmer: Amit Gini (B.Sc Computer Science Student at Ariel University, Israel)
 Date: 10-2025
 
 To run these tests, execute:
@@ -14,6 +14,9 @@ To run these tests, execute:
 """
 
 import networkx as nx
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def _compute_support_value(profile, S):
@@ -116,6 +119,7 @@ def _compute_support_value(profile, S):
     - The iterative refinement removes unsupported candidates until target
       flow is achieved or no candidates remain
     """
+    logger.info("[_compute_support_value] Computing support for S=%s", sorted(list(S)))
     support_value = 0.0
 
     if S:
@@ -129,10 +133,26 @@ def _compute_support_value(profile, S):
                     NS_total_weight += i_voter.weight
 
             if not NS or NS_total_weight == 0:
+                logger.warning(
+                    "[iteration] No supportive voters found "
+                    "(NS is empty or has zero weight), support_value=0.0"
+                )
                 support_value = 0.0
                 break
 
             k_S_size = len(S)  # size of the test committee
+            target_flow = NS_total_weight * k_S_size
+
+            logger.info(
+                "[iteration] NS voters count=%d, NS_total_weight=%g, S_size=%d",
+                len(NS),
+                NS_total_weight,
+                k_S_size,
+            )
+            logger.debug(
+                "[iteration] NS voters: %s",
+                [{"approved": sorted(list(v.approved)), "weight": v.weight} for v in NS],
+            )
 
             # Build flow network
             G = nx.DiGraph()
@@ -159,10 +179,18 @@ def _compute_support_value(profile, S):
             # Compute max flow
             flow_value, flow_dict = nx.maximum_flow(G, source, sink)
 
+            logger.debug("[iteration] target_flow=%g, flow_value=%g", target_flow, flow_value)
+
             # Check if target achieved (with tolerance for floating point)
             # The opposite check than the condition checked in the article
             if flow_value >= (NS_total_weight * k_S_size):  # target flow
                 support_value = NS_total_weight / k_S_size
+                logger.info(
+                    "[iteration] Target reached, support_value=%g (NS_total_weight=%g, S_size=%d)",
+                    support_value,
+                    NS_total_weight,
+                    k_S_size,
+                )
                 break
 
             # Target not achieved: remove unsupported candidates
@@ -184,19 +212,38 @@ def _compute_support_value(profile, S):
                 # why not [3]?
                 # 3∉[1,2], means 3 not approved by voter_i therefore is not contained.
                 if actual_flow_for_voter < expected_flow_for_voter:
+                    approved_in_S = sorted([c for c in S if c in i_voter.approved])
+                    logger.debug(
+                        "[iteration] voter_%d constrained: expected_flow=%g, "
+                        "actual_flow=%g -> approved_in_S=%s",
+                        i,
+                        expected_flow_for_voter,
+                        actual_flow_for_voter,
+                        approved_in_S,
+                    )
                     for c_cand in S:
                         if c_cand in i_voter.approved:
                             unsupported_candidates.add(c_cand)
 
             # Remove unsupported candidates from S
+            logger.info(
+                "[iteration] Removed %d unsupported candidates: %s",
+                len(unsupported_candidates),
+                sorted(list(unsupported_candidates)),
+            )
             S -= unsupported_candidates
 
             # If S is empty after removing unsupported candidates,
             # set support value to 0 and break
             if not S:
+                logger.warning(
+                    "[iteration] S became empty after removing unsupported "
+                    "candidates, returning 0.0"
+                )
                 support_value = 0.0
                 break
 
+    logger.info("[_compute_support_value] Final support_value=%g", support_value)
     return support_value
 
 
@@ -341,8 +388,16 @@ def _nx_maximin_support_scorefct(profile, base_committee):
     # Get candidates not yet in base_committee
     remaining_candidates = [cand for cand in profile.candidates if cand not in base_committee]
 
+    logger.info(
+        "[_nx_maximin_support_scorefct] base_committee=%s, remaining=%s",
+        base_committee,
+        remaining_candidates,
+    )
+
     # For each remaining candidate, compute maximin support score
     for added_cand in remaining_candidates:
+        logger.info("[_nx_maximin_support_scorefct] Evaluating candidate %d", added_cand)
+
         # Form test committee of the existing committee and
         # the remaining candidates (base_committee ∪ {C})
         S = set(base_committee) | {added_cand}
@@ -352,5 +407,11 @@ def _nx_maximin_support_scorefct(profile, base_committee):
 
         # Set support value for added candidate
         scores[added_cand] = support_value
+
+    logger.info(
+        "[_nx_maximin_support_scorefct] Computed scores for %d candidates",
+        len(remaining_candidates),
+    )
+    logger.debug("[_nx_maximin_support_scorefct] Final scores=%s", scores)
 
     return scores
