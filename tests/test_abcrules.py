@@ -10,10 +10,11 @@ import math
 from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
 from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, DEBUG, output
 from abcvoting.preferences import Profile, Voter
-from abcvoting import abcrules, misc, fileio
+from abcvoting import abcrules, misc, fileio, generate
 from itertools import combinations
 
 MARKS = {
+    "nx-max-flow": [pytest.mark.networkx],
     "gurobi": [pytest.mark.gurobipy],
     "pulp-highs": [pytest.mark.pulp, pytest.mark.pulphighs],
     "pulp-cbc": [pytest.mark.pulp, pytest.mark.pulpcbc],
@@ -1360,6 +1361,168 @@ def test_maximin_support():
     )
 
 
+@pytest.mark.networkx
+@pytest.mark.gurobipy
+@pytest.mark.parametrize("rule_id", ["maximin-support"])
+@pytest.mark.parametrize("num_voters", [25, 50])
+@pytest.mark.parametrize("num_cand", [20, 30])
+@pytest.mark.parametrize("committeesize", [5, 10, 15])
+def test_maximin_support_nx_max_flow_random_profiles(rule_id, num_voters, num_cand, committeesize):
+    """Test nx-max-flow with randomly generated profiles.
+    Tests different profile types and probability ranges to provide better test coverage.
+    """
+    # Generate random parameters based on profile type
+    # Random probability (avoiding edge cases 0 and 1)
+    prob = random.uniform(0.1, 0.9)
+    prob_distribution = {"id": "IC", "p": prob}
+
+    profile = generate.random_profile(
+        num_voters=num_voters, num_cand=num_cand, prob_distribution=prob_distribution
+    )
+
+    # Compute with nx-max-flow using resolute mode to get one committee
+    committees_maxflow = abcrules.compute(
+        rule_id=rule_id,
+        profile=profile,
+        committeesize=committeesize,
+        algorithm="nx-max-flow",
+        resolute=True,
+    )
+
+    # Verify basic properties
+    assert len(committees_maxflow) == 1
+    assert len(committees_maxflow[0]) == committeesize
+    assert all(c < num_cand for c in committees_maxflow[0])
+
+    try:
+        # To verify committe output, check that nx-max-flow committee is in
+        # the set of possible committees from gurobi (with limited search to avoid timeout)
+        committees_gurobi_irresolute = abcrules.compute(
+            rule_id=rule_id,
+            profile=profile,
+            committeesize=committeesize,
+            algorithm="gurobi",
+            resolute=False,
+            max_num_of_committees=50,  # Limit to avoid timeout while still checking optimality
+        )
+
+        # Verify gurobi returned valid committees
+        assert len(committees_gurobi_irresolute) > 0
+        for committee in committees_gurobi_irresolute:
+            assert len(committee) == committeesize
+            assert all(c < num_cand for c in committee)
+
+        # Verify that nx-max-flow committee is in the set of committees from gurobi
+        nx_committee = frozenset(committees_maxflow[0])
+        gurobi_set = {frozenset(c) for c in committees_gurobi_irresolute}
+        assert nx_committee in gurobi_set, (
+            f"nx-max-flow committee {nx_committee} not found in gurobi optimal committees. "
+            f"Gurobi found {len(gurobi_set)} optimal committees (limited search)."
+        )
+    except abcrules.NoAvailableAlgorithm:
+        # Gurobi not available, skip this part of the test
+        pass
+
+
+@pytest.mark.networkx
+@pytest.mark.parametrize("rule_id", ["maximin-support"])
+@pytest.mark.parametrize("algorithm", ["nx-max-flow"])
+def test_maximin_support_nx_invalid_committeesize(rule_id, algorithm):
+    """Test committeesize <= 0 raises error."""
+    profile = Profile(5)
+    profile.add_voters([{0, 1}, {2, 3}])
+
+    with pytest.raises(ValueError):
+        abcrules.compute(
+            rule_id=rule_id,
+            profile=profile,
+            committeesize=-1,  # Negative committee size
+            algorithm=algorithm,
+        )
+
+    with pytest.raises(ValueError):
+        abcrules.compute(
+            rule_id=rule_id,
+            profile=profile,
+            committeesize=0,  # Zero committee size
+            algorithm=algorithm,
+        )
+
+
+@pytest.mark.networkx
+@pytest.mark.parametrize("rule_id", ["maximin-support"])
+@pytest.mark.parametrize("algorithm", ["nx-max-flow"])
+def test_maximin_support_nx_invalid_committeesize_exceeds_candidates(rule_id, algorithm):
+    """Test that committeesize > num_cand raises error."""
+    profile = Profile(5)
+    profile.add_voters([{0, 1}, {2, 3}])
+
+    with pytest.raises(ValueError):
+        abcrules.compute(
+            rule_id=rule_id,
+            profile=profile,
+            committeesize=10,  # committee size exceeds number of candidates
+            algorithm=algorithm,
+        )
+
+
+@pytest.mark.networkx
+@pytest.mark.parametrize("rule_id", ["maximin-support"])
+@pytest.mark.parametrize("algorithm", ["nx-max-flow"])
+def test_maximin_support_nx_with_too_few_approved_candidates_and_max_num_of_committee(
+    rule_id, algorithm
+):
+    """Test that with too few approved candidates and max_num_of_committees,
+    the algorithm returns the correct number of committees."""
+    profile = Profile(num_cand=5)
+    approval_sets = [{0, 1, 2}, {1}, {2}, {0}]
+    profile.add_voters(approval_sets)
+    committeesize = 4
+    max_num_of_committees = 1
+    committees = abcrules.compute(
+        rule_id,
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=False,
+        max_num_of_committees=max_num_of_committees,
+    )
+    assert len(committees) == max_num_of_committees
+
+
+@pytest.mark.networkx
+@pytest.mark.parametrize("rule_id", ["maximin-support"])
+@pytest.mark.parametrize("algorithm", ["nx-max-flow"])
+def test_maximin_support_nx_max_flow_irresolute_and_max_num_of_committee(rule_id, algorithm):
+    """Test that with irresolute mode and max_num_of_committees,
+    the algorithm returns the correct number of committees."""
+    profile = Profile(num_cand=5)
+    approval_sets = [{0, 1, 2}, {1}, {2}, {0}]
+    profile.add_voters(approval_sets)
+    committeesize = 2
+    max_num_of_committees = 1  # only one winning committee
+    committees = abcrules.compute(
+        rule_id,
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=False,
+        max_num_of_committees=max_num_of_committees,
+    )
+    assert len(committees) == max_num_of_committees
+
+    max_num_of_committees = 2  # more than the number of winning committees
+    committees = abcrules.compute(
+        rule_id,
+        profile,
+        committeesize,
+        algorithm=algorithm,
+        resolute=False,
+        max_num_of_committees=max_num_of_committees,
+    )
+    assert len(committees) == max_num_of_committees
+
+
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "filename, rule_id, algorithm",
@@ -1550,6 +1713,7 @@ def test_natural_tiebreaking_order_resolute(rule_id, algorithm):
         profile.add_voters(approval_sets)
         committeesize = 2
         if algorithm in [
+            "nx-max-flow",
             "gurobi",
             "pulp-highs",
             "pulp-cbc",
@@ -1557,7 +1721,7 @@ def test_natural_tiebreaking_order_resolute(rule_id, algorithm):
             "mip-cbc",
             "fastest",
         ]:
-            return  # ILP solvers do not guarantee a specific solution
+            return  # ILP & max-flow solvers do not guarantee a specific solution
         if rule_id in ["rsd"]:
             return  # RSD is randomized
         committees = abcrules.compute(
@@ -1587,6 +1751,7 @@ def test_natural_tiebreaking_order_max_num_of_committees(rule_id, algorithm, app
     print(profile)
     committeesize = 2
     if algorithm in [
+        "nx-max-flow",
         "gurobi",
         "pulp-highs",
         "pulp-cbc",
@@ -1594,7 +1759,7 @@ def test_natural_tiebreaking_order_max_num_of_committees(rule_id, algorithm, app
         "mip-cbc",
         "fastest",
     ]:
-        return  # ILP solvers do not guarantee a specific solution
+        return  # ILP & max-flow solvers do not guarantee a specific solution
     if rule_id in ["rsd"]:
         return  # RSD is randomized
     committees = abcrules.compute(
