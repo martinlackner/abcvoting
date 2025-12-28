@@ -215,7 +215,8 @@ def _nx_maximin_support_scorefct(profile, base_committee):
 
     # For each remaining candidate, compute maximin support score
     for added_cand in remaining_candidates:
-        # Form test committee with added candidate (base_committee ∪ {C})
+        # Form test committee of the existing committee and
+        # the remaining candidates (base_committee ∪ {C})
         S = set(base_committee) | {added_cand}
 
         # maximin support score for added candidate C
@@ -223,13 +224,12 @@ def _nx_maximin_support_scorefct(profile, base_committee):
 
         if S:
             while True:
-                # Compute NS = {i∈N┤|N∩S≠∅} : voters who approve at least one candidate in S.
+                # NS = {voter∈N|voter.approved ∩ S ≠ ∅}
                 NS = []
                 NS_total_weight = 0
                 for voter in profile:
                     if voter.approved & S:
                         NS.append(voter)
-                        # Compute NS_total_weight = sum(voter.weight for voter in NS)
                         NS_total_weight += voter.weight
 
                 if not NS or NS_total_weight == 0:
@@ -249,9 +249,9 @@ def _nx_maximin_support_scorefct(profile, base_committee):
                     voter_node = f"voter_{i}"
                     G.add_edge(source, voter_node, capacity=voter.weight * S_size)
 
-                    # Voters → Candidates (only if approved)
+                    # Voters → Candidates
+                    # (candidates in the test committee AND approved by at least one voter in NS)
                     for cand in S:
-                        # only voters from NS (voters who approve at least one candidate in S)
                         if cand in voter.approved:
                             cand_node = f"cand_{cand}"
                             G.add_edge(voter_node, cand_node, capacity=voter.weight * S_size)
@@ -273,18 +273,20 @@ def _nx_maximin_support_scorefct(profile, base_committee):
                 unsupported_candidates = set()
                 for i, voter in enumerate(NS):
                     voter_node = f"voter_{i}"
-                    # Expected flow: voter weight distributed across all |S|
-                    # candidates (ideal case).
+                    # Expected flow: voter edge capacity (voter.weight * S_size)
                     expected_flow_for_voter = voter.weight * S_size
 
-                    # Actual flow: sum of flow from this voter to all
-                    # candidates in S (from flow_dict).
+                    # Actual flow: sum of flow from voter_i to all candidates in S.
                     actual_flow_for_voter = sum(
                         flow_dict.get(voter_node, {}).get(f"cand_{cand}", 0) for cand in S
                     )
 
-                    # If actual < expected, voter is constrained. Mark all
-                    # their approved candidates as unsupported for removal.
+                    # If actual < expected, voter is constrained, can't send the expected flow.
+                    # Mark their approved candidates as unsupported for removal.
+                    # e.x. S=[2,3], voter_i.approved=[1,2] => voter_i constrained by [2]
+                    #   => [2] is unsupported candidate and needs to be removed
+                    # why not [3]?
+                    # 3∉[1,2], means 3 not approved by voter_i therefore is not contained.
                     if actual_flow_for_voter < expected_flow_for_voter:
                         for cand in S:
                             if cand in voter.approved:
@@ -293,8 +295,8 @@ def _nx_maximin_support_scorefct(profile, base_committee):
                 # Remove unsupported candidates from S
                 S -= unsupported_candidates
 
-                # If S is empty after removing unsupported candidates, set
-                # support value to 0 and break
+                # If S is empty after removing unsupported candidates,
+                # set support value to 0 and break
                 if not S:
                     support_value = 0.0
                     break

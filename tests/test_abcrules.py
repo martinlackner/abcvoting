@@ -11,7 +11,6 @@ from abcvoting.abcrules_gurobi import _gurobi_thiele_methods
 from abcvoting.output import VERBOSITY_TO_NAME, WARNING, INFO, DETAILS, DEBUG, output
 from abcvoting.preferences import Profile, Voter
 from abcvoting import abcrules, misc, fileio, generate
-from abcvoting.generate import random_profile
 from itertools import combinations
 
 MARKS = {
@@ -1365,7 +1364,6 @@ def test_maximin_support():
     )
 
 
-@pytest.mark.slow
 @pytest.mark.networkx
 @pytest.mark.gurobipy
 @pytest.mark.parametrize("rule_id", ["maximin-support"])
@@ -1477,7 +1475,8 @@ def test_maximin_support_nx_invalid_committeesize_exceeds_candidates(rule_id, al
 def test_maximin_support_nx_with_too_few_approved_candidates_and_max_num_of_committee(
     rule_id, algorithm
 ):
-    """Test that with too few approved candidates and max_num_of_committees, the algorithm returns the correct number of committees."""
+    """Test that with too few approved candidates and max_num_of_committees,
+    the algorithm returns the correct number of committees."""
     profile = Profile(num_cand=5)
     approval_sets = [{0, 1, 2}, {1}, {2}, {0}]
     profile.add_voters(approval_sets)
@@ -1498,7 +1497,8 @@ def test_maximin_support_nx_with_too_few_approved_candidates_and_max_num_of_comm
 @pytest.mark.parametrize("rule_id", ["maximin-support"])
 @pytest.mark.parametrize("algorithm", ["nx-max-flow"])
 def test_maximin_support_nx_max_flow_irresolute_and_max_num_of_committee(rule_id, algorithm):
-    """Test that with irresolute mode and max_num_of_committees, the algorithm returns the correct number of committees."""
+    """Test that with irresolute mode and max_num_of_committees,
+    the algorithm returns the correct number of committees."""
     profile = Profile(num_cand=5)
     approval_sets = [{0, 1, 2}, {1}, {2}, {0}]
     profile.add_voters(approval_sets)
