@@ -49,28 +49,28 @@ def _compute_support_value(profile, S):
     ------------------
     Notions:
     - S: Test committee (set of candidate indices)
-    - k_S_size = |S|: Size of the test committee
+    - committee_size = |S|: Size of the test committee
     - NS = {voter∈N | voter.approved ∩ S ≠ ∅}
         Set of voters who approve at least one candidate in S
     - NS_total_weight = sum(voter.weight for voter in NS)
         Total weight of voters in NS (with weighted voters)
     - Flow Value: Maximum flow from source to sink returned from max-flow
         algorithm in networkx
-    - Target Flow = NS_total_weight × k_S_size
+    - Target Flow = NS_total_weight × committee_size
         Total weight of voters in NS × size of committee, needed to
         achieve maximin-support score
 
     Steps:
     1. Build NS: Find all voters who approve at least one candidate in S
     2. Build max-flow network with integer arithmetic:
-       - Source → Voters: Edge capacity = voter.weight × k_S_size
+       - Source → Voters: Edge capacity = voter.weight × committee_size
          (might have different weights for voters)
-       - Voters → Candidates: Edge capacity = voter.weight × k_S_size
+       - Voters → Candidates: Edge capacity = voter.weight × committee_size
        - Candidates → Sink: Edge capacity = NS_total_weight
          (Sum of weights of voters in NS)
     3. Compute maximum flow using max-flow algorithm in networkx
     4. If Flow Value >= Target Flow:
-       - Return maximin-support score = NS_total_weight / k_S_size
+       - Return maximin-support score = NS_total_weight / committee_size
     5. Otherwise:
        - Identify unsupported candidates (candidates that cannot receive
          sufficient flow from constrained voters)
@@ -113,12 +113,13 @@ def _compute_support_value(profile, S):
 
     Notes
     -----
-    - The algorithm uses integer arithmetic internally (capacities × k_S_size)
+    - The algorithm uses integer arithmetic internally (capacities × committee_size)
     - When target flow is achieved, all candidates receive equal support
     - Voter weights are properly considered in all capacity calculations
     - The iterative refinement removes unsupported candidates until target
       flow is achieved or no candidates remain
     """
+    S = set(S)  # Create a copy to avoid modifying the caller's variable
     logger.info("[_compute_support_value] Computing support for S=%s", sorted(list(S)))
     support_value = 0.0
 
@@ -140,14 +141,14 @@ def _compute_support_value(profile, S):
                 support_value = 0.0
                 break
 
-            k_S_size = len(S)  # size of the test committee
-            target_flow = NS_total_weight * k_S_size
+            committee_size = len(S)  # size of the test committee
+            target_flow = NS_total_weight * committee_size
 
             logger.info(
                 "[iteration] NS voters count=%d, NS_total_weight=%g, S_size=%d",
                 len(NS),
                 NS_total_weight,
-                k_S_size,
+                committee_size,
             )
             logger.debug(
                 "[iteration] NS voters: %s",
@@ -162,14 +163,16 @@ def _compute_support_value(profile, S):
             # Source → Voters
             for i, i_voter in enumerate(NS):
                 i_voter_node = f"voter_{i}"
-                G.add_edge(source, i_voter_node, capacity=i_voter.weight * k_S_size)
+                G.add_edge(source, i_voter_node, capacity=i_voter.weight * committee_size)
 
                 # Voters → Candidates
                 # (candidates in the test committee AND approved by at least one voter in NS)
                 for c_cand in S:
                     if c_cand in i_voter.approved:
                         c_cand_node = f"cand_{c_cand}"
-                        G.add_edge(i_voter_node, c_cand_node, capacity=i_voter.weight * k_S_size)
+                        G.add_edge(
+                            i_voter_node, c_cand_node, capacity=i_voter.weight * committee_size
+                        )
 
             # Candidates → Sink
             for c_cand in S:
@@ -183,13 +186,13 @@ def _compute_support_value(profile, S):
 
             # Check if target achieved (with tolerance for floating point)
             # The opposite check than the condition checked in the article
-            if flow_value >= (NS_total_weight * k_S_size):  # target flow
-                support_value = NS_total_weight / k_S_size
+            if flow_value >= (NS_total_weight * committee_size):  # target flow
+                support_value = NS_total_weight / committee_size
                 logger.info(
                     "[iteration] Target reached, support_value=%g (NS_total_weight=%g, S_size=%d)",
                     support_value,
                     NS_total_weight,
-                    k_S_size,
+                    committee_size,
                 )
                 break
 
@@ -198,7 +201,7 @@ def _compute_support_value(profile, S):
             for i, i_voter in enumerate(NS):
                 i_voter_node = f"voter_{i}"
                 # Expected flow: voter edge capacity (voter.weight * S_size)
-                expected_flow_for_voter = i_voter.weight * k_S_size
+                expected_flow_for_voter = i_voter.weight * committee_size
 
                 # Actual flow: sum of flow from voter_i to all candidates in S.
                 actual_flow_for_voter = sum(
@@ -353,8 +356,8 @@ def _nx_maximin_support_scorefct(profile, base_committee):
 
         # Setup profile with weights
         >>> profile = Profile(3)
-        >>> profile.add_voter(Voter([1, 2], weight=1))  # Weight 2
-        >>> profile.add_voter(Voter([2, 0], weight=2))  # Weight 1
+        >>> profile.add_voter(Voter([1, 2], weight=1))  # Weight 1
+        >>> profile.add_voter(Voter([2, 0], weight=2))  # Weight 2
         >>> profile.add_voter(Voter([1, 2], weight=1))  # Weight 1
 
         # Iteration 1: base_committee = []
