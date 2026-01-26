@@ -18,6 +18,7 @@ scientific questions (in alphabetic order):
 - `Peter Regner <https://github.com/lumbric>`_,
 - `Simon Rey <https://simonrey.fr/>`_,
 - `Piotr Skowron <https://www.mimuw.edu.pl/~ps219737/>`_,
-- `Stanisław Szufa <http://ww2.ii.uj.edu.pl/~szufa/>`_.
+- `Stanisław Szufa <http://ww2.ii.uj.edu.pl/~szufa/>`_,
+- `Amit Gini <https://github.com/AmitGini>`_.
 
 The development of this module has been supported by the Austrian Science Fund FWF, grant P31890.
