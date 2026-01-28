@@ -1,0 +1,3 @@
+# Pabulib participatory budgeting data files (https://pabulib.org/)
+# are misidentified as PureBasic by GitHub Linguist.
+*.pb linguist-detectable=false
