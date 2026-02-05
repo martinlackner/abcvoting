@@ -1315,7 +1315,7 @@ def compute_adams(
         >>> profile = Profile(4)
         >>> profile.add_voters([[0, 1], [0, 1], [2], [3]])
         >>> abcrules.compute_adams(profile, committeesize=2, algorithm="brute-force")
-        [{0, 2}, {0, 3}, {1, 2}, {1, 3}]
+        [CandidateSet({0, 2}), CandidateSet({0, 3}), CandidateSet({1, 2}), CandidateSet({1, 3})]
     """
     rule_id = "adams"
     rule = Rule(rule_id)

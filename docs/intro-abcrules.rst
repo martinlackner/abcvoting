@@ -32,6 +32,7 @@ The main ABC rules implemented in `abcvoting` are the following:
     cc                                      Approval Chamberlin-Courant (CC)
     lexcc                                   Lexicographic Chamberlin-Courant (lex-CC)
     geom2                                   2-Geometric Rule
+    adams                                   Adams Approval Voting
     seqpav                                  Sequential Proportional Approval Voting (seq-PAV)
     revseqpav                               Reverse Sequential Proportional Approval Voting (revseq-PAV)
     seqslav                                 Sequential Sainte-Laguë Approval Voting (seq-SLAV)
@@ -50,7 +51,6 @@ The main ABC rules implemented in `abcvoting` are the following:
     phragmen-enestroem                      Method of Phragmén-Eneström
     consensus-rule                          Consensus Rule
     trivial                                 Trivial Rule
-    rsd                                     Random Serial Dictator
     eph                                     E Pluribus Hugo (EPH)
 
 
