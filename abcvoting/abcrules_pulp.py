@@ -28,6 +28,41 @@ def _optimize_rule_pulp(
     committeescorefct=None,
     lexicographic_tiebreaking=False,
 ):
+    if lexicographic_tiebreaking:
+        return _enumerate_committees_lex_pulp(
+            set_opt_model_func=set_opt_model_func,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            solver_id=solver_id,
+            name=name,
+            committeescorefct=committeescorefct,
+        )
+    else:
+        return _enumerate_committees_standard_pulp(
+            set_opt_model_func=set_opt_model_func,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            solver_id=solver_id,
+            name=name,
+            committeescorefct=committeescorefct,
+        )
+
+
+def _enumerate_committees_standard_pulp(
+    set_opt_model_func,
+    profile,
+    committeesize,
+    resolute,
+    max_num_of_committees,
+    solver_id,
+    name,
+    committeescorefct,
+):
+    """Enumerate optimal committees using standard (non-lexicographic) enumeration."""
     maxscore = None
     committees = []
 
@@ -52,7 +87,7 @@ def _optimize_rule_pulp(
 
         if len(committee) != committeesize:
             raise RuntimeError(
-                f"_optimize_rule_pulp() produced a committee with incorrect size "
+                f"_enumerate_committees_standard_pulp() produced a committee with incorrect size "
                 f"(model {name}).\n"
                 + "\n".join(f"({v.name}, {pulp.value(v)})" for v in in_committee)
             )
@@ -76,54 +111,6 @@ def _optimize_rule_pulp(
         ):
             break  # no longer optimal
 
-        if lexicographic_tiebreaking:
-            # Build new problem to lex-optimize
-            lex_prob = pulp.LpProblem(name + "_lex", pulp.LpMaximize)
-            in_committee_lex = [
-                pulp.LpVariable(f"in_committee_lex[{cand}]", cat="Binary")
-                for cand in profile.candidates
-            ]
-
-            # Add Blocking Constraints
-            for comm in committees:
-                lex_prob += (
-                    pulp.lpSum(in_committee_lex[cand] for cand in comm) <= committeesize - 1
-                )
-
-            # Add all Modelspecific Constraints
-            set_opt_model_func(lex_prob, in_committee_lex)
-
-            # Make old Objective to Constraint
-            lex_prob += (lex_prob.objective == maxscore), "FixObjectiveValue"
-
-            for step_start in range(0, profile.num_cand, LEXICOGRAPHIC_BLOCK_SIZE):
-                step_end = min(step_start + LEXICOGRAPHIC_BLOCK_SIZE, profile.num_cand)
-                current_block = [in_committee_lex[i] for i in range(step_start, step_end)]
-
-                lex_objective_expr = pulp.lpSum(
-                    2 ** (len(current_block) - idx - 1) * current_block[idx]
-                    for idx in range(len(current_block))
-                )
-                lex_prob.setObjective(lex_objective_expr)
-                lex_prob.solve(get_solver(solver_id))
-
-                if pulp.LpStatus[lex_prob.status] != "Optimal":
-                    raise RuntimeError("Lex optimization failed.")
-
-                # Fix current block
-                for var in current_block:
-                    val = pulp.value(var)
-                    if val >= 0.9:
-                        var.lowBound = 1
-                        var.upBound = 1
-                    else:
-                        var.lowBound = 0
-                        var.upBound = 0
-
-            committee = {
-                cand for cand in profile.candidates if pulp.value(in_committee_lex[cand]) >= 0.9
-            }
-
         committees.append(committee)
 
         if resolute:
@@ -134,10 +121,113 @@ def _optimize_rule_pulp(
         # Block previously found committee
         prob += pulp.lpSum(in_committee[cand] for cand in committee) <= committeesize - 1
 
-    return (
-        sorted_committees(committees) if lexicographic_tiebreaking else committees,
-        maxscore,
-    )
+    return committees, maxscore
+
+
+def _enumerate_committees_lex_pulp(
+    set_opt_model_func,
+    profile,
+    committeesize,
+    resolute,
+    max_num_of_committees,
+    solver_id,
+    name,
+    committeescorefct,
+):
+    """Enumerate optimal committees using lexicographic tiebreaking."""
+    committees = []
+
+    # First, find maxscore by solving the original problem
+    prob = pulp.LpProblem(name=name, sense=pulp.LpMaximize)
+    in_committee = {
+        cand: pulp.LpVariable(f"in_committee[{cand}]", cat="Binary") for cand in profile.candidates
+    }
+    set_opt_model_func(prob, in_committee)
+
+    try:
+        prob.solve(get_solver(solver_id))
+        if pulp.LpStatus[prob.status] != "Optimal":
+            raise pulp.PulpSolverError("Status not Optimal")
+    except pulp.PulpSolverError:
+        raise RuntimeError(f"Solver found no solution (model {name})")
+
+    initial_committee = {
+        cand for cand in profile.candidates if pulp.value(in_committee[cand]) >= 0.9
+    }
+    if committeescorefct is not None:
+        maxscore = committeescorefct(profile, initial_committee)
+    else:
+        maxscore = pulp.value(prob.objective)
+
+    # Now enumerate committees with lex tiebreaking
+    while True:
+        # Build problem for lex optimization
+        lex_prob = pulp.LpProblem(name + "_lex", pulp.LpMaximize)
+        in_committee_lex = [
+            pulp.LpVariable(f"in_committee_lex[{cand}]", cat="Binary")
+            for cand in profile.candidates
+        ]
+
+        # Add blocking constraints for previously found committees
+        for comm in committees:
+            lex_prob += pulp.lpSum(in_committee_lex[cand] for cand in comm) <= committeesize - 1
+
+        # Add model-specific constraints and objective
+        set_opt_model_func(lex_prob, in_committee_lex)
+
+        # Fix objective to maxscore
+        lex_prob += (lex_prob.objective == maxscore), "FixObjectiveValue"
+
+        # Lexicographic optimization: process candidates in blocks
+        for step_start in range(0, profile.num_cand, LEXICOGRAPHIC_BLOCK_SIZE):
+            step_end = min(step_start + LEXICOGRAPHIC_BLOCK_SIZE, profile.num_cand)
+            current_block = [in_committee_lex[i] for i in range(step_start, step_end)]
+
+            lex_objective_expr = pulp.lpSum(
+                2 ** (len(current_block) - idx - 1) * current_block[idx]
+                for idx in range(len(current_block))
+            )
+            lex_prob.setObjective(lex_objective_expr)
+
+            try:
+                lex_prob.solve(get_solver(solver_id))
+                if pulp.LpStatus[lex_prob.status] != "Optimal":
+                    raise pulp.PulpSolverError("Status not Optimal")
+            except pulp.PulpSolverError:
+                if len(committees) == 0:
+                    raise RuntimeError(f"Solver found no solution (model {name})")
+                # No more optimal committees
+                return sorted_committees(committees), maxscore
+
+            # Fix current block variables for next iteration
+            for var in current_block:
+                val = pulp.value(var)
+                if val >= 0.9:
+                    var.lowBound = 1
+                    var.upBound = 1
+                else:
+                    var.lowBound = 0
+                    var.upBound = 0
+
+        committee = {
+            cand for cand in profile.candidates if pulp.value(in_committee_lex[cand]) >= 0.9
+        }
+
+        if len(committee) != committeesize:
+            raise RuntimeError(
+                f"_enumerate_committees_lex_pulp() produced a committee with incorrect size "
+                f"(model {name}).\n"
+                + "\n".join(f"({v.name}, {pulp.value(v)})" for v in in_committee_lex)
+            )
+
+        committees.append(committee)
+
+        if resolute:
+            break
+        if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
+            return sorted_committees(committees), maxscore
+
+    return sorted_committees(committees), maxscore
 
 
 def get_solver(solver_id):
@@ -560,6 +650,7 @@ def _pulp_leximaxphragmen(
         committeesize=committeesize,
         resolute=resolute,
         max_num_of_committees=max_num_of_committees,
+        solver_id=solver_id,
         name="leximaxphragmen-final",
         lexicographic_tiebreaking=lexicographic_tiebreaking,
     )

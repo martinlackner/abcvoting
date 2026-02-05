@@ -74,7 +74,38 @@ def _optimize_rule_gurobi(
         best objective value returned by ILP
 
     """
+    if lexicographic_tiebreaking:
+        return _enumerate_committees_lex_gurobi(
+            set_opt_model_func=set_opt_model_func,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            name=name,
+            committeescorefct=committeescorefct,
+        )
+    else:
+        return _enumerate_committees_standard_gurobi(
+            set_opt_model_func=set_opt_model_func,
+            profile=profile,
+            committeesize=committeesize,
+            resolute=resolute,
+            max_num_of_committees=max_num_of_committees,
+            name=name,
+            committeescorefct=committeescorefct,
+        )
 
+
+def _enumerate_committees_standard_gurobi(
+    set_opt_model_func,
+    profile,
+    committeesize,
+    resolute,
+    max_num_of_committees,
+    name,
+    committeescorefct,
+):
+    """Enumerate optimal committees using standard (non-lexicographic) enumeration."""
     maxscore = None
     committees = []
 
@@ -109,7 +140,7 @@ def _optimize_rule_gurobi(
         }
         if len(committee) != committeesize:
             raise RuntimeError(
-                "_optimize_rule_gurobi() produced a committee with "
+                "_enumerate_committees_standard_gurobi() produced a committee with "
                 f"fewer than `committeesize` members (model {name}).\n"
                 + "\n".join(
                     f"({v.varName}, {v.x})" for v in model.getVars() if "in_committee" in v.varName
@@ -137,42 +168,6 @@ def _optimize_rule_gurobi(
             # no longer optimal
             break
 
-        if lexicographic_tiebreaking:
-            lex_model = model.copy()
-            lex_model.addConstr(lex_model.getObjective() == maxscore)
-
-            in_committee_lex = [
-                lex_model.getVarByName(f"in_committee[{cand}]") for cand in range(profile.num_cand)
-            ]
-
-            for step_start in range(0, profile.num_cand, LEXICOGRAPHIC_BLOCK_SIZE):
-                step_end = min(step_start + LEXICOGRAPHIC_BLOCK_SIZE, profile.num_cand)
-                current_block = [in_committee_lex[idx] for idx in range(step_start, step_end)]
-
-                lex_objective_expr = gb.quicksum(
-                    (2 ** (len(current_block) - idx - 1)) * current_block[idx]
-                    for idx in range(len(current_block))
-                )
-
-                lex_model.setObjective(lex_objective_expr, gb.GRB.MAXIMIZE)
-                lex_model.optimize()
-
-                if lex_model.Status != gb.GRB.OPTIMAL:
-                    raise RuntimeError("Lex optimization failed.")
-
-                # Bound the variables of the current block
-                for var in current_block:
-                    val = var.X
-                    if val >= 0.9:
-                        var.lb = 1
-                        var.ub = 1
-                    else:
-                        var.lb = 0
-                        var.ub = 0
-
-            # Recompute Comittee after lexicographic tiebreaking
-            committee = {cand for cand in profile.candidates if in_committee_lex[cand].X == 1}
-
         committees.append(committee)
 
         if resolute:
@@ -182,6 +177,110 @@ def _optimize_rule_gurobi(
 
         # find a new committee that has not been found yet by excluding previously found committees
         model.addConstr(gb.quicksum(in_committee[cand] for cand in committee) <= committeesize - 1)
+
+    return committees, maxscore
+
+
+def _enumerate_committees_lex_gurobi(
+    set_opt_model_func,
+    profile,
+    committeesize,
+    resolute,
+    max_num_of_committees,
+    name,
+    committeescorefct,
+):
+    """Enumerate optimal committees using lexicographic tiebreaking."""
+    committees = []
+
+    # First, find maxscore by solving the original problem
+    model = create_custom_gb_model_without_extranous_output()
+    in_committee = model.addVars(profile.num_cand, vtype=gb.GRB.BINARY, name="in_committee")
+    set_opt_model_func(model, in_committee)
+
+    model.optimize()
+
+    if model.Status not in [gb.GRB.OPTIMAL, gb.GRB.INFEASIBLE]:
+        raise RuntimeError(
+            f"Gurobi returned an unexpected status code: {model.Status}\n"
+            f"Warning: solutions may be incomplete or not optimal (model {name})."
+        )
+    if model.Status != gb.GRB.OPTIMAL:
+        raise RuntimeError(f"Gurobi found no solution (model {name})")
+
+    initial_committee = {cand for cand in profile.candidates if in_committee[cand].Xn >= 0.9}
+    if committeescorefct is not None:
+        maxscore = committeescorefct(profile, initial_committee)
+    else:
+        maxscore = model.objVal
+
+    # Now enumerate committees with lex tiebreaking
+    while True:
+        # Build model for lex optimization (copy base model and add constraints)
+        lex_model = model.copy()
+
+        # Add blocking constraints for previously found committees
+        in_committee_lex = [
+            lex_model.getVarByName(f"in_committee[{cand}]") for cand in range(profile.num_cand)
+        ]
+        for comm in committees:
+            lex_model.addConstr(
+                gb.quicksum(in_committee_lex[cand] for cand in comm) <= committeesize - 1
+            )
+
+        # Fix objective to maxscore
+        lex_model.addConstr(lex_model.getObjective() == maxscore)
+
+        # Lexicographic optimization: process candidates in blocks
+        for step_start in range(0, profile.num_cand, LEXICOGRAPHIC_BLOCK_SIZE):
+            step_end = min(step_start + LEXICOGRAPHIC_BLOCK_SIZE, profile.num_cand)
+            current_block = [in_committee_lex[idx] for idx in range(step_start, step_end)]
+
+            lex_objective_expr = gb.quicksum(
+                (2 ** (len(current_block) - idx - 1)) * current_block[idx]
+                for idx in range(len(current_block))
+            )
+
+            lex_model.setObjective(lex_objective_expr, gb.GRB.MAXIMIZE)
+            lex_model.optimize()
+
+            if lex_model.Status == gb.GRB.INFEASIBLE:
+                if len(committees) == 0:
+                    raise RuntimeError(f"Gurobi found no solution (model {name})")
+                # No more optimal committees
+                return committees, maxscore
+
+            if lex_model.Status != gb.GRB.OPTIMAL:
+                raise RuntimeError(
+                    f"Gurobi returned an unexpected status code during lex optimization: "
+                    f"{lex_model.Status} (model {name})."
+                )
+
+            # Bound the variables of the current block
+            for var in current_block:
+                val = var.X
+                if val >= 0.9:
+                    var.lb = 1
+                    var.ub = 1
+                else:
+                    var.lb = 0
+                    var.ub = 0
+
+        committee = {cand for cand in profile.candidates if in_committee_lex[cand].X >= 0.9}
+
+        if len(committee) != committeesize:
+            raise RuntimeError(
+                "_enumerate_committees_lex_gurobi() produced a committee with "
+                f"fewer than `committeesize` members (model {name}).\n"
+                + "\n".join(f"({v.varName}, {v.X})" for v in in_committee_lex)
+            )
+
+        committees.append(committee)
+
+        if resolute:
+            break
+        if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
+            return committees, maxscore
 
     return committees, maxscore
 
