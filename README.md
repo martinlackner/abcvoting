@@ -98,7 +98,7 @@ pip install -e ".[dev]"
 Basic unit tests can be run by excluding tests which require additional dependencies:
 
 ```bash
-pytest  -m "not mip and not ortools and not gmpy2 and not slow" tests/
+pytest  -m "not ortools and not gmpy2 and not slow" tests/
 ```
 
 For development, configure the black formatter and pre-commit hooks - see below. Also installing

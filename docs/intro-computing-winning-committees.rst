@@ -106,7 +106,7 @@ Most ABC rules can be computed with several algorithms. For example, for PAV, we
 .. doctest::
 
     >>> print(abcrules.get_rule("pav").algorithms)
-    ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-cbc', 'branch-and-bound', 'brute-force')
+    ('gurobi', 'pulp-highs', 'pulp-cbc', 'branch-and-bound', 'brute-force')
 
 These algorithms are sorted by speed (in approximation). By default, ABC rules are computed with
 `algorithm="fastest"`, which picks the first available algorithm in this list.
@@ -125,23 +125,10 @@ Throughout `abcvoting`, the following kinds of algorithms are used:
     pulp-cbc             : ILP solver via Python PuLP library
     branch-and-bound     : branch-and-bound
     brute-force          : brute-force
-    mip-cbc              : CBC ILP solver via Python MIP library
     standard             : Standard algorithm
     standard-fractions   : Standard algorithm (using standard Python fractions)
     gmpy2-fractions      : Standard algorithm (using gmpy2 fractions)
     float-fractions      : Standard algorithm (using floats instead of fractions)
     ortools-cp           : OR-Tools CP-SAT solver
 
-In addition to the dependencies of abcvoting [#]_, some algorithms have additional requirements:
-
-- `gurobi` and `mip-gurobi` require Gurobi
-  (`installation <https://support.gurobi.com/hc/en-us/articles/360044290292-How-do-I-install-Gurobi-for-Python->`_)
-
-- `gmpy2-fractions` requires the Python module `gmpy2`.
-
-- All other algorithms work "out of the box".
-
-
-.. [#] If `abcvoting` is installed via
-    ``pip install abcvoting``, then all dependencies are installed automatically. If `abcvoting` is installed
-    from source, run ``pip install .``.
+In addition to the dependencies of abcvoting, `gmpy2-fractions` requires the Python module `gmpy2`. All other algorithms work "out of the box".

@@ -37,4 +37,4 @@ jobs:
           echo $PYTHONPATH
           export PYTHONPATH=$PYTHONPATH:$PWD
           echo $PYTHONPATH
-          python -m pytest -q --tb=short -m "not mip and (not gurobipy or not slow) and not veryslow" -ra tests/
+          python -m pytest -q --tb=short -m "(not gurobipy or not slow) and not veryslow" -ra tests/

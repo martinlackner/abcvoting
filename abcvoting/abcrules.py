@@ -29,7 +29,6 @@ from abcvoting import (
     abcrules_networkx,
     abcrules_gurobi,
     abcrules_ortools,
-    abcrules_mip,
     abcrules_pulp,
     misc,
     scores,
@@ -83,8 +82,6 @@ ALGORITHM_NAMES = {
     "pulp-cbc": "ILP solver via Python PuLP library",
     "branch-and-bound": "branch-and-bound",
     "brute-force": "brute-force",
-    "mip-cbc": "CBC ILP solver via Python MIP library",
-    # "mip-gurobi": "Gurobi ILP solver via Python MIP library",
     # "cvxpy_gurobi": "Gurobi ILP solver via CVXPY library",
     # "cvxpy_scip": "SCIP ILP solver via CVXPY library",
     # "cvxpy_glpk_mi": "GLPK ILP solver via CVXPY library",
@@ -114,7 +111,6 @@ class Rule:
         # algorithms sorted by speed
         "gurobi",
         "pulp-highs",
-        "mip-cbc",
         "pulp-cbc",
         "branch-and-bound",
         "brute-force",
@@ -162,7 +158,6 @@ class Rule:
                 "ortools-cp",
                 "branch-and-bound",
                 "brute-force",
-                "mip-cbc",
                 "pulp-cbc",
             )
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
@@ -181,7 +176,6 @@ class Rule:
             self.algorithms = (
                 "gurobi",
                 "pulp-highs",
-                "mip-cbc",
                 "pulp-cbc",
                 "brute-force",
             )
@@ -223,7 +217,6 @@ class Rule:
             self.algorithms = (
                 "gurobi",
                 "pulp-highs",
-                "mip-cbc",
                 "pulp-cbc",
             )
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
@@ -237,11 +230,7 @@ class Rule:
             self.shortname = "Maximin-Support"
             self.longname = "Maximin Support Method (MMS)"
             self.compute_fct = compute_maximin_support
-            self.algorithms = (
-                "nx-max-flow",
-                "gurobi",
-                "mip-cbc",
-            )
+            self.algorithms = ("nx-max-flow", "gurobi")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
         elif rule_id == "monroe":
             self.shortname = "Monroe"
@@ -251,8 +240,7 @@ class Rule:
                 # algorithms sorted by speed
                 "gurobi",
                 "pulp-highs",
-                "mip-cbc",
-                "pulp-highs",
+                "pulp-cbc",
                 "ortools-cp",
                 "brute-force",
             )
@@ -271,8 +259,7 @@ class Rule:
                 "gurobi",
                 "ortools-cp",
                 "pulp-highs",
-                "mip-cbc",
-                "pulp-highs",
+                "pulp-cbc",
                 "brute-force",
             )
             # algorithms sorted by speed. however, for small profiles with a small committee size,
@@ -574,8 +561,6 @@ def _available_algorithms():
             continue
         if algorithm == "ortools-cp" and not abcrules_ortools.cp_model:
             continue
-        if algorithm.startswith("mip-") and abcrules_mip.mip is None:
-            continue
         if algorithm == "nx-max-flow" and not abcrules_networkx.nx:
             continue
         available.append(algorithm)
@@ -763,19 +748,6 @@ def compute_thiele_method(
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
         )
-    elif algorithm.startswith("mip-"):
-        if lexicographic_tiebreaking:
-            raise NotImplementedError(
-                f"Lexicographic tiebreaking is not implemented for {algorithm}."
-            )
-        committees = abcrules_mip._mip_thiele_methods(
-            scorefct_id=scorefct_id,
-            profile=profile,
-            committeesize=committeesize,
-            resolute=resolute,
-            max_num_of_committees=max_num_of_committees,
-            solver_id=algorithm[4:],
-        )
     elif algorithm == "ortools-cp" and scorefct_id == "cc":
         if lexicographic_tiebreaking:
             raise NotImplementedError(
@@ -928,7 +900,7 @@ def compute_pav(
             .. doctest::
 
                 >>> Rule("pav").algorithms
-                ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-cbc', 'branch-and-bound', 'brute-force')
+                ('gurobi', 'pulp-highs', 'pulp-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -997,7 +969,7 @@ def compute_slav(
             .. doctest::
 
                 >>> Rule("slav").algorithms
-                ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-cbc', 'branch-and-bound', 'brute-force')
+                ('gurobi', 'pulp-highs', 'pulp-cbc', 'branch-and-bound', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -1066,7 +1038,7 @@ def compute_cc(
 
                 >>> Rule("cc").algorithms  # doctest: +NORMALIZE_WHITESPACE
                 ('gurobi', 'pulp-highs', 'ortools-cp', 'branch-and-bound', 'brute-force',
-                 'mip-cbc', 'pulp-cbc')
+                 'pulp-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -1316,7 +1288,7 @@ def compute_adams(
             .. doctest::
 
                 >>> Rule("adams").algorithms
-                ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-cbc', 'brute-force')
+                ('gurobi', 'pulp-highs', 'pulp-cbc', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -1367,12 +1339,6 @@ def compute_adams(
         solver_id = "highs" if algorithm == "pulp-highs" else "cbc"
         committees = _pulp_adams(
             profile, committeesize, resolute, max_num_of_committees, solver_id
-        )
-    elif algorithm == "mip-cbc":
-        from abcvoting.abcrules_mip import _mip_adams
-
-        committees = _mip_adams(
-            profile, committeesize, resolute, max_num_of_committees, solver_id="cbc"
         )
     elif algorithm == "brute-force":
         committees = _adams_bruteforce(profile, committeesize, resolute, max_num_of_committees)
@@ -2377,7 +2343,7 @@ def compute_minimaxav(
             .. doctest::
 
                 >>> Rule("minimaxav").algorithms
-                ('gurobi', 'ortools-cp', 'pulp-highs', 'mip-cbc', 'pulp-highs', 'brute-force')
+                ('gurobi', 'ortools-cp', 'pulp-highs', 'pulp-cbc', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -2437,17 +2403,6 @@ def compute_minimaxav(
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
-        )
-    elif algorithm.startswith("mip-"):
-        if lexicographic_tiebreaking:
-            raise NotImplementedError(f"Lexicographic tiebreaking not available with {algorithm}.")
-        solver_id = algorithm[4:]
-        committees = abcrules_mip._mip_minimaxav(
-            profile=profile,
-            committeesize=committeesize,
-            resolute=resolute,
-            max_num_of_committees=max_num_of_committees,
-            solver_id=solver_id,
         )
     elif algorithm == "brute-force":
         # Lexicographic tiebreaking works automatically for brute-force
@@ -2685,7 +2640,7 @@ def compute_monroe(
             .. doctest::
 
                 >>> Rule("monroe").algorithms
-                ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-highs', 'ortools-cp', 'brute-force')
+                ('gurobi', 'pulp-highs', 'pulp-cbc', 'ortools-cp', 'brute-force')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -2748,16 +2703,6 @@ def compute_monroe(
             committeesize=committeesize,
             resolute=resolute,
             max_num_of_committees=max_num_of_committees,
-        )
-    elif algorithm.startswith("mip-"):
-        if lexicographic_tiebreaking:
-            raise NotImplementedError(f"Lexicographic tiebreaking not available with {algorithm}.")
-        committees = abcrules_mip._mip_monroe(
-            profile=profile,
-            committeesize=committeesize,
-            resolute=resolute,
-            max_num_of_committees=max_num_of_committees,
-            solver_id=algorithm[4:],
         )
     elif algorithm == "brute-force":
         # Lexicographic tiebreaking works automatically for brute-force
@@ -3836,7 +3781,7 @@ def compute_minimaxphragmen(
             .. doctest::
 
                 >>> Rule("minimaxphragmen").algorithms
-                ('gurobi', 'pulp-highs', 'mip-cbc', 'pulp-cbc')
+                ('gurobi', 'pulp-highs', 'pulp-cbc')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -3886,16 +3831,6 @@ def compute_minimaxphragmen(
             max_num_of_committees=max_num_of_committees,
             solver_id=algorithm[5:],
             lexicographic_tiebreaking=lexicographic_tiebreaking,
-        )
-    elif algorithm.startswith("mip-"):
-        if lexicographic_tiebreaking:
-            raise NotImplementedError(f"Lexicographic tiebreaking not available with {algorithm}.")
-        committees = abcrules_mip._mip_minimaxphragmen(
-            profile,
-            committeesize,
-            resolute=resolute,
-            max_num_of_committees=max_num_of_committees,
-            solver_id=algorithm[4:],
         )
     else:
         raise UnknownAlgorithm(rule_id, algorithm)
@@ -3999,14 +3934,6 @@ def compute_leximaxphragmen(
             max_num_of_committees=max_num_of_committees,
             lexicographic_tiebreaking=lexicographic_tiebreaking,
         )
-    # elif algorithm.startswith("mip-"):
-    #     committees = abcrules_mip._mip_leximaxphragmen(
-    #         profile,
-    #         committeesize,
-    #         resolute=resolute,
-    #         max_num_of_committees=max_num_of_committees,
-    #         solver_id=algorithm[4:],
-    #     )
     elif algorithm.startswith("pulp-"):
         if lexicographic_tiebreaking:
             raise NotImplementedError(f"Lexicographic tiebreaking not available with {algorithm}.")
@@ -4066,7 +3993,7 @@ def compute_maximin_support(
             .. doctest::
 
                 >>> Rule("maximin-support").algorithms
-                ('nx-max-flow', 'gurobi', 'mip-cbc')
+                ('nx-max-flow', 'gurobi')
 
         resolute : bool, optional
             Return only one winning committee.
@@ -4100,11 +4027,6 @@ def compute_maximin_support(
 
     if algorithm == "gurobi":
         scorefct = abcrules_gurobi._gurobi_maximin_support_scorefct
-    elif algorithm.startswith("mip-"):
-        solver_id = algorithm[4:]
-        scorefct = functools.partial(
-            abcrules_mip._mip_maximin_support_scorefct, solver_id=solver_id
-        )
     elif algorithm == "nx-max-flow":
         scorefct = abcrules_networkx._nx_maximin_support_scorefct
     else:

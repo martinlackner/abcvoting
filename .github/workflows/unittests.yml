@@ -63,7 +63,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        coverage run --source=. -m pytest -q --tb=short -m "not mip and (not gurobipy or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
+        coverage run --source=. -m pytest -q --tb=short -m "(not gurobipy or not slow) and (not ortools or not slow) and not veryslow" -ra tests/
 
     - name: Generate coverage report
       run: coverage xml

@@ -93,9 +93,6 @@ markers = [
     "cbc: a test that requires CBC",
     "cvxpy: a test that requires cvxpy",
     "ortools: a test that requires ortools",
-    "mip: a test that requires mip",
-    "mipgurobi: a test that requires mip and Gurobi",
-    "mipcbc: a test that requires mip and CBC",
     "gmpy2: a test that requires gmpy2",
     "slow: a test with a rather long runtime",
     "veryslow: a test with a VERY long runtime"

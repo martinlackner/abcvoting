@@ -18,7 +18,7 @@ Requirements:
 
 - Python 3.10+
 
-- The following pip packages are required and installed automatically: `gurobipy`, `mip`, `networkx`, `numpy`, `ruamel.yaml`, `preflibtools`, and `prefsampling`.
+- The following pip packages are required and installed automatically: `gurobipy`, `networkx`, `numpy`, `ruamel.yaml`, `preflibtools`, and `prefsampling`.
 
 - It might be necessary to install header files and static libraries for Python. For example, on Ubuntu,
   you can install them with: `sudo apt-get install python3-dev libffi-dev`. See also `this StackOverflow question <https://stackoverflow.com/questions/21530577/fatal-error-python-h-no-such-file-or-directory>`_.
@@ -47,8 +47,7 @@ Optional requirements:
   `gurobipy <https://www.gurobi.com/documentation/quickstart.html>`_.
   While `gurobipy` is installed by default (together with abcvoting), it requires a license to solve larger instances
   (`academic licenses <https://www.gurobi.com/academia/academic-program-and-licenses/>`_ are available).
-  If Gurobi is not available, the open-source solver `CBC <https://github.com/coin-or/Cbc>`_ is a slower alternative
-  (that is installed automatically as part of `mip`).
+  If Gurobi is not available, the open-source solver HiGHS (via PuLP) is an alternative.
 
 Developer tools (unit testing, etc):
 

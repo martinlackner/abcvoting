@@ -19,8 +19,6 @@ MARKS = {
     "pulp-highs": [pytest.mark.pulp, pytest.mark.pulphighs],
     "pulp-cbc": [pytest.mark.pulp, pytest.mark.pulpcbc],
     "ortools-cp": [pytest.mark.ortools],
-    "mip-cbc": [pytest.mark.mip, pytest.mark.mipcbc],
-    # "mip-gurobi": [pytest.mark.mip, pytest.mark.mipgurobi],
     "brute-force": [],
     "branch-and-bound": [],
     "standard": [],
@@ -627,12 +625,8 @@ def _list_abc_yaml_compute_instances():
                     marks = [pytest.mark.slow, pytest.mark.veryslow]
                 elif "instanceS" in filename:
                     marks = []  # small instances, rather fast
-                    if algorithm in ["mip-cbc"]:
-                        marks = [pytest.mark.slow]
                 elif "instanceVL" in filename:
                     marks = [pytest.mark.slow, pytest.mark.veryslow]  # very large instances
-                elif rule_id == "monroe" and algorithm in ["mip-cbc"]:
-                    marks = [pytest.mark.slow, pytest.mark.veryslow]
                 else:
                     marks = [pytest.mark.slow]
                 _abc_yaml_instances.append(
@@ -1526,11 +1520,6 @@ def test_maximin_support_nx_max_flow_irresolute_and_max_num_of_committee(rule_id
     ids=id_function,
 )
 def test_selection_of_abc_yaml_instances(filename, rule_id, algorithm, load_abc_yaml_file):
-    # skip tests involving CBC and minimaxphragmen that are known to fail
-    if rule_id == "minimaxphragmen" and algorithm == "mip-cbc":
-        if "instanceL0145.abc.yaml" in filename or "instanceL0153.abc.yaml" in filename:
-            pytest.skip(f"This test is known to fail ({rule_id}, {algorithm}, {filename}).")
-
     profile, committeesize, compute_instances = load_abc_yaml_file[filename]
     for compute_instance in compute_instances:
         if compute_instance["rule_id"] != rule_id:
@@ -1558,11 +1547,6 @@ only_defined_for_unit_weights = [
 def test_converted_to_weighted_abc_yaml_instances(
     filename, rule_id, algorithm, load_abc_yaml_file
 ):
-    # skip tests involving CBC and minimaxphragmen that are known to fail
-    if rule_id == "minimaxphragmen" and algorithm == "mip-cbc":
-        if "instanceL0145.abc.yaml" in filename or "instanceL0153.abc.yaml" in filename:
-            pytest.skip(f"This test is known to fail ({rule_id}, {algorithm}, {filename}).")
-
     profile, committeesize, compute_instances = load_abc_yaml_file[filename]
     if rule_id in only_defined_for_unit_weights:
         return
@@ -1714,7 +1698,6 @@ def test_natural_tiebreaking_order_resolute(rule_id, algorithm):
             "pulp-highs",
             "pulp-cbc",
             "ortools-cp",
-            "mip-cbc",
             "fastest",
         ]:
             return  # ILP & max-flow solvers do not guarantee a specific solution
@@ -1752,7 +1735,6 @@ def test_natural_tiebreaking_order_max_num_of_committees(rule_id, algorithm, app
         "pulp-highs",
         "pulp-cbc",
         "ortools-cp",
-        "mip-cbc",
         "fastest",
     ]:
         return  # ILP & max-flow solvers do not guarantee a specific solution
