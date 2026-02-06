@@ -523,10 +523,9 @@ def _pulp_minimaxphragmen(
             approved_candidates | set(extra)
             for extra in itertools.combinations(remaining_candidates, num_missing)
         ]
-        if max_num_of_committees:
-            return committees[:max_num_of_committees]
-        else:
-            return committees
+        if max_num_of_committees is not None:
+            committees = committees[:max_num_of_committees]
+        return committees
 
     committees, _ = _optimize_rule_pulp(
         set_opt_model_func=set_opt_model_func,
@@ -623,10 +622,13 @@ def _pulp_leximaxphragmen(
         if resolute:
             return [approved_candidates | set(remaining_candidates[:num_missing])]
 
-        return [
+        committees = [
             approved_candidates | set(extra)
             for extra in itertools.combinations(remaining_candidates, num_missing)
         ]
+        if max_num_of_committees is not None:
+            committees = committees[:max_num_of_committees]
+        return committees
 
     # Iterative refinement: enforce tighter bounds
     for iteration in range(len(profile) - 1):
