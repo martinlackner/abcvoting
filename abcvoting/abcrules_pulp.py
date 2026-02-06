@@ -10,7 +10,7 @@ from abcvoting import misc
 from abcvoting.output import output
 
 
-ACCURACY = 1e-5  # 1e-9 causes problems (some unit tests fail)
+ACCURACY = 1e-7  # 1e-9 causes problems (some unit tests fail)
 CMP_ACCURACY = 10 * ACCURACY  # when comparing float numbers obtained from a MIP
 LEXICOGRAPHIC_BLOCK_SIZE = (
     10  # The maximal number of candidates optimized in one step while lexicographic tiebreaking
@@ -175,8 +175,9 @@ def _enumerate_committees_lex_pulp(
         # Add model-specific constraints and objective
         set_opt_model_func(lex_prob, in_committee_lex)
 
-        # Fix objective to maxscore
-        lex_prob += (lex_prob.objective == maxscore), "FixObjectiveValue"
+        # Require objective to be at least maxscore (within tolerance)
+        # Using >= instead of == to avoid CBC solver precision bugs with equality constraints
+        lex_prob += (lex_prob.objective >= maxscore - ACCURACY), "FixObjectiveValue"
 
         # Lexicographic optimization: process candidates in blocks
         for step_start in range(0, profile.num_cand, LEXICOGRAPHIC_BLOCK_SIZE):
@@ -225,7 +226,11 @@ def _enumerate_committees_lex_pulp(
         if resolute:
             break
         if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
-            return sorted_committees(committees), maxscore
+            break
+
+    # Filter out suboptimal committees that may have been returned due to numerical errors
+    if committeescorefct is not None:
+        committees = [c for c in committees if committeescorefct(profile, c) >= maxscore]
 
     return sorted_committees(committees), maxscore
 

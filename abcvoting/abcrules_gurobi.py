@@ -228,8 +228,9 @@ def _enumerate_committees_lex_gurobi(
                 gb.quicksum(in_committee_lex[cand] for cand in comm) <= committeesize - 1
             )
 
-        # Fix objective to maxscore
-        lex_model.addConstr(lex_model.getObjective() == maxscore)
+        # Require objective to be at least maxscore (within tolerance)
+        # Using >= instead of == to avoid solver precision issues with equality constraints
+        lex_model.addConstr(lex_model.getObjective() >= maxscore - ACCURACY)
 
         # Lexicographic optimization: process candidates in blocks
         for step_start in range(0, profile.num_cand, LEXICOGRAPHIC_BLOCK_SIZE):
@@ -280,7 +281,11 @@ def _enumerate_committees_lex_gurobi(
         if resolute:
             break
         if max_num_of_committees is not None and len(committees) >= max_num_of_committees:
-            return committees, maxscore
+            break
+
+    # Filter out suboptimal committees that may have been returned due to numerical errors
+    if committeescorefct is not None:
+        committees = [c for c in committees if committeescorefct(profile, c) >= maxscore]
 
     return committees, maxscore
 
