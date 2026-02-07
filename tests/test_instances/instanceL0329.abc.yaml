@@ -100,12 +100,6 @@ compute:
       5, 7, 8], [1, 4, 5, 7, 8], [2, 3, 4, 5, 7], [2, 3, 4, 5, 8], [2, 3, 4, 7, 8], [2, 3, 5, 7, 8], [2, 4, 5, 7, 8], [3,
       4, 5, 7, 8]]
   resolute: true
-- rule_id: leximaxphragmen
-  result: [[1, 2, 3, 4, 8], [1, 2, 3, 5, 8]]
-  resolute: false
-- rule_id: leximaxphragmen
-  result: [[1, 2, 3, 4, 8], [1, 2, 3, 5, 8]]
-  resolute: true
 - rule_id: maximin-support
   result: [[1, 2, 3, 4, 8], [1, 2, 3, 5, 8], [1, 2, 3, 7, 8]]
   resolute: true
@@ -226,4 +220,10 @@ compute:
   resolute: false
 - rule_id: adams
   result: [[1, 2, 3, 4, 8], [1, 2, 3, 5, 8], [1, 2, 3, 7, 8]]
+  resolute: true
+- rule_id: leximaxphragmen
+  result: [[1, 2, 3, 4, 8], [1, 2, 3, 5, 8]]
+  resolute: false
+- rule_id: leximaxphragmen
+  result: [[1, 2, 3, 4, 8], [1, 2, 3, 5, 8]]
   resolute: true

@@ -87,12 +87,6 @@ compute:
 - rule_id: minimaxphragmen
   result: [[0, 2, 3, 4]]
   resolute: true
-- rule_id: leximaxphragmen
-  result:
-  resolute: false
-- rule_id: leximaxphragmen
-  result:
-  resolute: true
 - rule_id: maximin-support
   result: [[0, 2, 3, 4]]
   resolute: true
@@ -169,4 +163,10 @@ compute:
   resolute: false
 - rule_id: adams
   result: [[0, 2, 3, 4]]
+  resolute: true
+- rule_id: leximaxphragmen
+  result:
+  resolute: false
+- rule_id: leximaxphragmen
+  result:
   resolute: true
