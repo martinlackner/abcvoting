@@ -251,7 +251,8 @@ def _enumerate_committees_lex_gurobi(
                 # No more optimal committees
                 return committees, maxscore
 
-            if lex_model.Status != gb.GRB.OPTIMAL:
+            # SUBOPTIMAL (13) can occur due to numerical precision issues in MIP problems.
+            if lex_model.Status not in [gb.GRB.OPTIMAL, gb.GRB.SUBOPTIMAL]:
                 raise RuntimeError(
                     f"Gurobi returned an unexpected status code during lex optimization: "
                     f"{lex_model.Status} (model {name})."
