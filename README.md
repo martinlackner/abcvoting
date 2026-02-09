@@ -12,9 +12,10 @@
 
 > [!NOTE]
 > - [**Documentation**](https://abcvoting.readthedocs.io/)
-> - [**Installation**](https://abcvoting.readthedocs.io/en/latest/installation.html)  
+> - [**Installation**](https://abcvoting.readthedocs.io/en/latest/installation.html)
 > - [**How to cite the abcvoting library**](https://abcvoting.readthedocs.io/en/latest/howtocite.html)
 > - [**Acknowledgements and contributors**](https://abcvoting.readthedocs.io/en/latest/acks.html)
+> - [**Benchmark Results**](https://martinlackner.github.io/abcvoting/)
 > - [**► abcvoting web app**](https://pref.tools/abcvoting/)
 
 For an overview of other software tools related to Computational Social Choice, see the [COMSOC community page](https://comsoc-community.org/tools).

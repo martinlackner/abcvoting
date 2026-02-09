@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>abcvoting Benchmark Dashboard</title>
+    
+<style>
+    * {
+        box-sizing: border-box;
+    }
+    body {
+        font-family: system-ui, -apple-system, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f5f5;
+        color: #333;
+    }
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    header h1 {
+        margin: 0 0 15px 0;
+        font-size: 2em;
+    }
+    .metadata {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        font-size: 0.9em;
+        opacity: 0.9;
+    }
+    .metadata-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .metadata-label {
+        font-weight: bold;
+    }
+    .controls {
+        background: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .controls label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+    .controls input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+    }
+    .section {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .section h2 {
+        margin-top: 0;
+        color: #1a1a2e;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9em;
+    }
+    th, td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+    }
+    th.sortable {
+        cursor: pointer;
+        user-select: none;
+    }
+    th.sortable:hover {
+        background-color: #e9ecef;
+    }
+    th.sortable::after {
+        content: ' \2195';
+        opacity: 0.3;
+    }
+    th.sort-asc::after {
+        content: ' \2191';
+        opacity: 1;
+    }
+    th.sort-desc::after {
+        content: ' \2193';
+        opacity: 1;
+    }
+    tr:hover {
+        background-color: #f8f9fa;
+    }
+    .status-green {
+        background-color: #90EE90;
+    }
+    .status-yellow {
+        background-color: #FFD700;
+    }
+    .status-red {
+        background-color: #FF6B6B;
+    }
+    .status-skipped {
+        background-color: #D3D3D3;
+    }
+    .cell-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .cell-count {
+        font-weight: 600;
+    }
+    .cell-time {
+        font-size: 0.85em;
+        color: #666;
+    }
+    .algorithm-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        background-color: #e9ecef;
+        font-size: 0.85em;
+        margin-left: 8px;
+    }
+    .fastest-badge {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .nav-links {
+        margin-top: 15px;
+    }
+    .nav-links a {
+        color: rgba(255,255,255,0.9);
+        text-decoration: none;
+        margin-right: 20px;
+    }
+    .nav-links a:hover {
+        text-decoration: underline;
+    }
+    .legend {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .legend-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+    }
+    .hidden {
+        display: none;
+    }
+    .all-algorithms-row {
+        background-color: #fafafa;
+    }
+    @media (max-width: 768px) {
+        body {
+            padding: 10px;
+        }
+        table {
+            font-size: 0.8em;
+        }
+        th, td {
+            padding: 6px 8px;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>abcvoting Benchmark Dashboard</h1>
+            <div class="metadata">
+                <div class="metadata-item">
+                    <span class="metadata-label">CPU:</span>
+                    <span>Intel(R) Core(TM) Ultra 7 155U</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">RAM:</span>
+                    <span>31.0 GB</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">OS:</span>
+                    <span>Linux 6.8.0-90-generic</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Generated:</span>
+                    <span>2026-02-10</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Timeout:</span>
+                    <span>30s</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">abcvoting:</span>
+                    <span>v2.16.1.dev12+g0e06c6867.d20260206</span>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="data/benchmark_results.json">Raw JSON Data</a>
+            </div>
+        </header>
+
+        <div class="controls">
+            <label>
+                <input type="checkbox" id="showAllAlgorithms">
+                Show all algorithms (default: fastest only)
+            </label>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color status-green"></div>
+                <span>Green: ≥90% completed</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color status-yellow"></div>
+                <span>Yellow: 50-89% completed</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color status-red"></div>
+                <span>Red: <50% completed</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color status-skipped"></div>
+                <span>Gray: Skipped</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Resolute Mode</h2>
+            
+    <table id="resolute-table">
+        <thead>
+            <tr>
+                <th class="sortable" onclick="sortTable('resolute-table', 0, false)">Rule</th>
+                <th class="sortable" onclick="sortTable('resolute-table', 1, false)">Algorithm</th>
+                <th class="sortable" onclick="sortTable('resolute-table', 2, true)">Completed</th>
+                <th class="sortable" onclick="sortTable('resolute-table', 3, true)">Runtime</th>
+            </tr>
+        </thead>
+        <tbody>
+    <tr class=""><td><strong>AV</strong><br><small>Approval Voting (AV)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0002">0ms</td></tr><tr class=""><td><strong>SAV</strong><br><small>Satisfaction Approval Voting (SAV)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0001">0ms</td></tr><tr class=""><td><strong>PAV</strong><br><small>Proportional Approval Voting (PAV)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>branch-and-bound</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0013">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0097">10ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0134">13ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0131">13ms</td></tr><tr class=""><td><strong>SLAV</strong><br><small>Sainte-Laguë Approval Voting (SLAV)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0006">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>branch-and-bound</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.001">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0068">7ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0111">11ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0163">16ms</td></tr><tr class=""><td><strong>CC</strong><br><small>Approval Chamberlin-Courant (CC)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>branch-and-bound</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0013">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0054">5ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>ortools-cp</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0099">10ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0125">12ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0147">15ms</td></tr><tr class=""><td><strong>lex-CC</strong><br><small>Lexicographic Chamberlin-Courant (lex-CC)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0016">2ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0223">22ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.056">56ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0463">46ms</td></tr><tr class=""><td><strong>2-Geometric</strong><br><small>2-Geometric Rule</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0006">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>branch-and-bound</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0017">2ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.006">6ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0126">13ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0141">14ms</td></tr><tr class=""><td><strong>Adams-Thiele</strong><br><small>Adams Approval Voting</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0005">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0102">10ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0133">13ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0172">17ms</td></tr><tr class=""><td><strong>seq-PAV</strong><br><small>Sequential Proportional Approval Voting (seq-PAV)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr><tr class=""><td><strong>revseq-PAV</strong><br><small>Reverse Sequential Proportional Approval Voting (revseq-PAV)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0005">0ms</td></tr><tr class=""><td><strong>seq-SLAV</strong><br><small>Sequential Sainte-Laguë Approval Voting (seq-SLAV)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0002">0ms</td></tr><tr class=""><td><strong>seq-CC</strong><br><small>Sequential Approval Chamberlin-Courant (seq-CC)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr><tr class=""><td><strong>seq-Phragmén</strong><br><small>Phragmén's Sequential Rule (seq-Phragmén)</small></td><td>float-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gmpy2-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0002">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0005">0ms</td></tr><tr class=""><td><strong>minimax-Phragmén</strong><br><small>Phragmén's Minimax Rule (minimax-Phragmén)</small></td><td>gurobi<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0128">13ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0217">22ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0145">14ms</td></tr><tr class=""><td><strong>leximax-Phragmén</strong><br><small>Phragmén's Leximax Rule (leximax-Phragmén)</small></td><td>gurobi<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-red" data-sort-value="0">0/4</td><td class="status-red" data-sort-value="999999">timeout</td></tr><tr class=""><td><strong>Maximin-Support</strong><br><small>Maximin Support Method (MMS)</small></td><td>nx-max-flow<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0733">73ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0505">50ms</td></tr><tr class=""><td><strong>Monroe</strong><br><small>Monroe's Approval Rule (Monroe)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0501">50ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0165">16ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>ortools-cp</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0198">20ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0356">36ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0342">34ms</td></tr><tr class=""><td><strong>Greedy Monroe</strong><br><small>Greedy Monroe</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0018">2ms</td></tr><tr class=""><td><strong>minimaxav</strong><br><small>Minimax Approval Voting (MAV)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0073">7ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>ortools-cp</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0101">10ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0192">19ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.016">16ms</td></tr><tr class=""><td><strong>lex-MAV</strong><br><small>Lexicographic Minimax Approval Voting (lex-MAV)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0669">67ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0883">88ms</td></tr><tr class=""><td><strong>Equal Shares</strong><br><small>Method of Equal Shares (aka Rule X) with Phragmén phase</small></td><td>float-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0005">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gmpy2-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0009">1ms</td></tr><tr class=""><td><strong>Equal Shares with AV completion</strong><br><small>Method of Equal Shares (aka Rule X) with AV completion</small></td><td>float-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0005">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gmpy2-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0008">1ms</td></tr><tr class=""><td><strong>Equal Shares with increment completion</strong><br><small>Method of Equal Shares (aka Rule X) with increment completion</small></td><td>gmpy2-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.001">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>float-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0012">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0018">2ms</td></tr><tr class=""><td><strong>Phragmén-Eneström</strong><br><small>Method of Phragmén-Eneström</small></td><td>float-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0002">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gmpy2-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0002">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr><tr class=""><td><strong>Consensus Rule</strong><br><small>Consensus Rule</small></td><td>float-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gmpy2-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0002">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0005">0ms</td></tr><tr class=""><td><strong>Trivial Rule</strong><br><small>Trivial Rule</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0001">0ms</td></tr><tr class=""><td><strong>E Pluribus Hugo</strong><br><small>E Pluribus Hugo (EPH)</small></td><td>gmpy2-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0002">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>float-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr>
+        </tbody>
+    </table>
+    
+        </div>
+
+        <div class="section">
+            <h2>Irresolute Mode</h2>
+            
+    <table id="irresolute-table">
+        <thead>
+            <tr>
+                <th class="sortable" onclick="sortTable('irresolute-table', 0, false)">Rule</th>
+                <th class="sortable" onclick="sortTable('irresolute-table', 1, false)">Algorithm</th>
+                <th class="sortable" onclick="sortTable('irresolute-table', 2, true)">Completed</th>
+                <th class="sortable" onclick="sortTable('irresolute-table', 3, true)">Runtime</th>
+            </tr>
+        </thead>
+        <tbody>
+    <tr class=""><td><strong>AV</strong><br><small>Approval Voting (AV)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0001">0ms</td></tr><tr class=""><td><strong>SAV</strong><br><small>Satisfaction Approval Voting (SAV)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0">0ms</td></tr><tr class=""><td><strong>PAV</strong><br><small>Proportional Approval Voting (PAV)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>branch-and-bound</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.001">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0103">10ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0502">50ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0386">39ms</td></tr><tr class=""><td><strong>SLAV</strong><br><small>Sainte-Laguë Approval Voting (SLAV)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>branch-and-bound</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.001">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0117">12ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0307">31ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0399">40ms</td></tr><tr class=""><td><strong>CC</strong><br><small>Approval Chamberlin-Courant (CC)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>branch-and-bound</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0014">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0397">40ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>ortools-cp</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0561">56ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.1454">145ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.1661">166ms</td></tr><tr class=""><td><strong>lex-CC</strong><br><small>Lexicographic Chamberlin-Courant (lex-CC)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0018">2ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0235">24ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0642">64ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0764">76ms</td></tr><tr class=""><td><strong>2-Geometric</strong><br><small>2-Geometric Rule</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0006">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>branch-and-bound</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0017">2ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0118">12ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0379">38ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0424">42ms</td></tr><tr class=""><td><strong>Adams-Thiele</strong><br><small>Adams Approval Voting</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0006">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0166">17ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.041">41ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0459">46ms</td></tr><tr class=""><td><strong>seq-PAV</strong><br><small>Sequential Proportional Approval Voting (seq-PAV)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class=""><td><strong>revseq-PAV</strong><br><small>Reverse Sequential Proportional Approval Voting (revseq-PAV)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class=""><td><strong>seq-SLAV</strong><br><small>Sequential Sainte-Laguë Approval Voting (seq-SLAV)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class=""><td><strong>seq-CC</strong><br><small>Sequential Approval Chamberlin-Courant (seq-CC)</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0005">0ms</td></tr><tr class=""><td><strong>seq-Phragmén</strong><br><small>Phragmén's Sequential Rule (seq-Phragmén)</small></td><td>float-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gmpy2-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0004">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0013">1ms</td></tr><tr class=""><td><strong>minimax-Phragmén</strong><br><small>Phragmén's Minimax Rule (minimax-Phragmén)</small></td><td>gurobi<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0626">63ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.1821">182ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.1737">174ms</td></tr><tr class=""><td><strong>leximax-Phragmén</strong><br><small>Phragmén's Leximax Rule (leximax-Phragmén)</small></td><td>gurobi<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-red" data-sort-value="0">0/4</td><td class="status-red" data-sort-value="999999">timeout</td></tr><tr class=""><td><strong>Maximin-Support</strong><br><small>Maximin Support Method (MMS)</small></td><td>nx-max-flow<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0549">55ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.2177">218ms</td></tr><tr class=""><td><strong>Monroe</strong><br><small>Monroe's Approval Rule (Monroe)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0471">47ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.1129">113ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>ortools-cp</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.1577">158ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="1.1643">1.16s</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.5806">581ms</td></tr><tr class=""><td><strong>minimaxav</strong><br><small>Minimax Approval Voting (MAV)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0384">38ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>ortools-cp</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0624">62ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-cbc</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.1579">158ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.1402">140ms</td></tr><tr class=""><td><strong>lex-MAV</strong><br><small>Lexicographic Minimax Approval Voting (lex-MAV)</small></td><td>brute-force<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gurobi</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0731">73ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>pulp-highs</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.1271">127ms</td></tr><tr class=""><td><strong>Equal Shares</strong><br><small>Method of Equal Shares (aka Rule X) with Phragmén phase</small></td><td>float-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0006">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gmpy2-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0007">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.002">2ms</td></tr><tr class=""><td><strong>Equal Shares with AV completion</strong><br><small>Method of Equal Shares (aka Rule X) with AV completion</small></td><td>float-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0006">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gmpy2-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0007">1ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0016">2ms</td></tr><tr class=""><td><strong>Phragmén-Eneström</strong><br><small>Method of Phragmén-Eneström</small></td><td>float-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0002">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gmpy2-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0002">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0006">1ms</td></tr><tr class=""><td><strong>Consensus Rule</strong><br><small>Consensus Rule</small></td><td>float-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0003">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>gmpy2-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0005">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0008">1ms</td></tr><tr class=""><td><strong>Trivial Rule</strong><br><small>Trivial Rule</small></td><td>standard<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0002">0ms</td></tr><tr class=""><td><strong>E Pluribus Hugo</strong><br><small>E Pluribus Hugo (EPH)</small></td><td>gmpy2-fractions<span class="algorithm-badge fastest-badge">fastest</span></td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0001">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>float-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0001">0ms</td></tr><tr class="all-algorithms-row hidden"><td></td><td>standard-fractions</td><td class="status-green" data-sort-value="4">4/4</td><td class="status-green" data-sort-value="0.0002">0ms</td></tr>
+        </tbody>
+    </table>
+    
+        </div>
+    </div>
+    
+<script>
+    // Toggle between fastest algorithm and all algorithms
+    function toggleAlgorithms() {
+        const showAll = document.getElementById('showAllAlgorithms').checked;
+        const allAlgoRows = document.querySelectorAll('.all-algorithms-row');
+        allAlgoRows.forEach(row => {
+            row.classList.toggle('hidden', !showAll);
+        });
+    }
+
+    // Sort table by column
+    function sortTable(tableId, columnIndex, isNumeric) {
+        const table = document.getElementById(tableId);
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const header = table.querySelectorAll('th')[columnIndex];
+
+        // Determine sort direction
+        const isAsc = header.classList.contains('sort-asc');
+
+        // Remove sort classes from all headers
+        table.querySelectorAll('th').forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+        });
+
+        // Add appropriate sort class
+        header.classList.add(isAsc ? 'sort-desc' : 'sort-asc');
+
+        // Sort rows
+        rows.sort((a, b) => {
+            let aVal = a.cells[columnIndex].getAttribute('data-sort-value') ||
+                       a.cells[columnIndex].textContent.trim();
+            let bVal = b.cells[columnIndex].getAttribute('data-sort-value') ||
+                       b.cells[columnIndex].textContent.trim();
+
+            if (isNumeric) {
+                aVal = parseFloat(aVal) || 0;
+                bVal = parseFloat(bVal) || 0;
+            }
+
+            if (aVal < bVal) return isAsc ? 1 : -1;
+            if (aVal > bVal) return isAsc ? -1 : 1;
+            return 0;
+        });
+
+        // Reorder rows
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up checkbox listener
+        const checkbox = document.getElementById('showAllAlgorithms');
+        if (checkbox) {
+            checkbox.addEventListener('change', toggleAlgorithms);
+        }
+    });
+</script>
+
+</body>
+</html>
