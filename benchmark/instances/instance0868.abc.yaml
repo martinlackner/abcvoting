@@ -1,0 +1,5 @@
+description: "Benchmark instance 0868\nDistribution: Urn fixed-size (setsize=2, replace=0.5)\nVoters: 11, Candidates: 88,
+  Committee size: 25"
+profile: [[37, 79], [12, 85], [12, 85], [76, 46], [37, 79], [12, 85], [37, 79], [37, 79], [12, 85], [37, 79], [37, 79]]
+num_cand: 88
+committeesize: 25

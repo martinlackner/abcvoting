@@ -31,6 +31,9 @@ def prefsampling_wrapper(sampler, sampler_params):
     -------
         abcvoting.preferences.Profile
     """
+    # Pass the module's RNG to prefsampling for deterministic generation
+    if "seed" not in sampler_params:
+        sampler_params["seed"] = rng
     samples = sampler(**sampler_params)
     num_candidates = sampler_params["num_candidates"]
     profile = Profile(num_candidates)

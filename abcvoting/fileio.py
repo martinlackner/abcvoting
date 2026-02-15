@@ -356,7 +356,11 @@ def write_abcvoting_instance_to_yaml_file(
     data = {}
     if description is not None:
         data["description"] = description
-    data["profile"] = _yaml_flow_style_list([list(voter.approved) for voter in profile])
+    # Convert to native Python ints to ensure YAML serialization works
+    # (numpy integers from generated profiles are not YAML-serializable)
+    data["profile"] = _yaml_flow_style_list(
+        [[int(c) for c in voter.approved] for voter in profile]
+    )
     if not profile.has_unit_weights():
         data["voter_weights"] = _yaml_flow_style_list([voter.weight for voter in profile])
     data["num_cand"] = profile.num_cand
@@ -372,8 +376,9 @@ def write_abcvoting_instance_to_yaml_file(
                 if compute_instance["result"] is None:
                     mod_compute_instance["result"] = None
                 else:
+                    # Convert to native Python ints to ensure YAML serialization
                     mod_compute_instance["result"] = _yaml_flow_style_list(
-                        [list(committee) for committee in compute_instance["result"]]
+                        [[int(c) for c in committee] for committee in compute_instance["result"]]
                     )  # TODO: would be nicer to store committees in set notation (curly braces)
             if "profile" in compute_instance.keys():  # this is superfluous information
                 # check that the profile is the same as the main profile

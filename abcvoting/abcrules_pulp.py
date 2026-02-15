@@ -103,7 +103,7 @@ def _enumerate_committees_standard_pulp(
             not committeescorefct and objective_value > maxscore + CMP_ACCURACY
         ):
             raise RuntimeError(
-                "Solver found a solution better than a previous optimum. This "
+                f"Solver {solver_id} found a solution better than a previous optimum. This "
                 f"should not happen (previous: {maxscore}, new: {objective_value}, model {name})"
             )
         elif (committeescorefct and objective_value < maxscore) or (
