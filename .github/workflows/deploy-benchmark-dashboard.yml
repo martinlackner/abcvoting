@@ -31,10 +31,29 @@ jobs:
     - name: Setup Pages
       uses: actions/configure-pages@v4
 
+    - name: Prepare site structure
+      run: |
+        mkdir -p _site/benchmark
+        cp -r docs/benchmark/* _site/benchmark/
+        cat > _site/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta http-equiv="refresh" content="0; url=https://abcvoting.readthedocs.io/">
+          <link rel="canonical" href="https://abcvoting.readthedocs.io/">
+          <title>Redirecting to abcvoting documentation</title>
+        </head>
+        <body>
+          <p>Redirecting to <a href="https://abcvoting.readthedocs.io/">abcvoting documentation</a>...</p>
+        </body>
+        </html>
+        EOF
+
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: 'docs/benchmark'
+        path: '_site'
 
     - name: Deploy to GitHub Pages
       id: deployment
