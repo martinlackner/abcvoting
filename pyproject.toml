@@ -102,6 +102,7 @@ markers = [
 [tool.coverage.run]
 # https://coverage.readthedocs.io/en/latest/config.html
 branch = true
+omit = ["benchmark/*"]
 
 [tool.coverage.report]
 show_missing = true
