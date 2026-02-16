@@ -643,8 +643,17 @@ def generate_table_html(data, mode, table_id):
             "fastest_algorithm"
         )
         library_fastest = rule_data.get("library_fastest")
-        fastest_differs = library_fastest is not None and fastest_algo != library_fastest
         algorithms = rule_data.get("algorithms", {})
+        fastest_differs = library_fastest is not None and fastest_algo != library_fastest
+        # No warning if both algorithms finished the same number of instances due to timeout (tie)
+        if fastest_differs and library_fastest in algorithms:
+            fastest_data = algorithms.get(fastest_algo, {}).get(mode, {})
+            library_data = algorithms.get(library_fastest, {}).get(mode, {})
+            fastest_finished = fastest_data.get("finished", 0)
+            library_finished = library_data.get("finished", 0)
+            total = fastest_data.get("total", 0)
+            if fastest_finished == library_finished < total:
+                fastest_differs = False
 
         # Sort algorithms to put the fastest one first
         algo_list = list(algorithms.items())
