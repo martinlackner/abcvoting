@@ -1,0 +1,7 @@
+description: "Benchmark instance 0846\nDistribution: IC fixed-size (setsize=3)\nVoters: 18, Candidates: 86, Committee size:
+  26"
+profile: [[72, 56, 2], [26, 84, 47], [56, 60, 13], [16, 78, 46], [27, 67, 28], [42, 39, 63], [40, 12, 36], [74, 59, 82], [
+    32, 11, 76], [34, 3, 4], [48, 7, 31], [13, 21, 62], [81, 3, 44], [9, 54, 22], [18, 45, 21], [18, 5, 70], [45, 22, 71],
+  [2, 58, 70]]
+num_cand: 86
+committeesize: 26

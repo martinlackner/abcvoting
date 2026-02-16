@@ -1,0 +1,5 @@
+description: "Benchmark instance 0444\nDistribution: Truncated Mallows (setsize=3, dispersion=0.5)\nVoters: 13, Candidates:
+  47, Committee size: 4"
+profile: [[0, 4], [1, 3], [0, 1], [0, 2], [0, 1], [0, 4], [1, 2], [0, 1], [0, 2], [2, 3], [0, 2], [0, 4], [2, 3]]
+num_cand: 47
+committeesize: 4

@@ -134,10 +134,6 @@ def _compute_support_value(profile, S):
                     NS_total_weight += i_voter.weight
 
             if not NS or NS_total_weight == 0:
-                logger.warning(
-                    "[iteration] No supportive voters found "
-                    "(NS is empty or has zero weight), support_value=0.0"
-                )
                 support_value = 0.0
                 break
 

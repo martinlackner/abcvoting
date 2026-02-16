@@ -1,0 +1,1224 @@
+{
+  "metadata": {
+    "timestamp": "2026-02-14T21:58:08.233022+00:00",
+    "hardware": {
+      "cpu": "Intel(R) Core(TM) Ultra 7 155U",
+      "ram_gb": 32.5,
+      "os": "Linux 6.8.0-100-generic",
+      "python_version": "3.12.3"
+    },
+    "timeout_seconds": 300,
+    "max_num_of_committees": 10,
+    "abcvoting_version": "2.16.1.dev12+g0e06c6867.d20260206",
+    "categories": [
+      "G"
+    ]
+  },
+  "results": {
+    "av": {
+      "shortname": "AV",
+      "longname": "Approval Voting (AV)",
+      "fastest_algorithm": "standard",
+      "library_fastest": "standard",
+      "algorithms": {
+        "standard": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 0.0986
+          },
+          "irresolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 0.1702
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "standard",
+      "fastest_algorithm_irresolute": "standard",
+      "fastest_differs_from_library": false
+    },
+    "sav": {
+      "shortname": "SAV",
+      "longname": "Satisfaction Approval Voting (SAV)",
+      "fastest_algorithm": "standard",
+      "library_fastest": "standard",
+      "algorithms": {
+        "standard": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 0.1343
+          },
+          "irresolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 0.1801
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "standard",
+      "fastest_algorithm_irresolute": "standard",
+      "fastest_differs_from_library": false
+    },
+    "pav": {
+      "shortname": "PAV",
+      "longname": "Proportional Approval Voting (PAV)",
+      "fastest_algorithm": "gurobi",
+      "library_fastest": "gurobi",
+      "algorithms": {
+        "gurobi": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 21.0959
+          },
+          "irresolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 54.8564
+          }
+        },
+        "pulp-highs": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 196.6629
+          },
+          "irresolute": {
+            "finished": 673,
+            "total": 1000,
+            "cumulative_runtime": 296.3904
+          }
+        },
+        "pulp-cbc": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 99.8785
+          },
+          "irresolute": {
+            "finished": 998,
+            "total": 1000,
+            "cumulative_runtime": 299.9735
+          }
+        },
+        "branch-and-bound": {
+          "resolute": {
+            "finished": 279,
+            "total": 1000,
+            "cumulative_runtime": 146.4719
+          },
+          "irresolute": {
+            "finished": 279,
+            "total": 1000,
+            "cumulative_runtime": 150.2253
+          }
+        },
+        "brute-force": {
+          "resolute": {
+            "finished": 243,
+            "total": 1000,
+            "cumulative_runtime": 292.4002
+          },
+          "irresolute": {
+            "finished": 244,
+            "total": 1000,
+            "cumulative_runtime": 298.4648
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "gurobi",
+      "fastest_algorithm_irresolute": "gurobi",
+      "fastest_differs_from_library": false
+    },
+    "slav": {
+      "shortname": "SLAV",
+      "longname": "Sainte-Lagu\u00eb Approval Voting (SLAV)",
+      "fastest_algorithm": "gurobi",
+      "library_fastest": "gurobi",
+      "algorithms": {
+        "gurobi": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 25.0772
+          },
+          "irresolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 61.0644
+          }
+        },
+        "pulp-highs": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 247.1365
+          },
+          "irresolute": {
+            "finished": 578,
+            "total": 1000,
+            "cumulative_runtime": 292.3963
+          }
+        },
+        "pulp-cbc": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 137.6008
+          },
+          "irresolute": {
+            "finished": 843,
+            "total": 1000,
+            "cumulative_runtime": 297.2828
+          }
+        },
+        "branch-and-bound": {
+          "resolute": {
+            "finished": 279,
+            "total": 1000,
+            "cumulative_runtime": 247.2757
+          },
+          "irresolute": {
+            "finished": 279,
+            "total": 1000,
+            "cumulative_runtime": 245.522
+          }
+        },
+        "brute-force": {
+          "resolute": {
+            "finished": 237,
+            "total": 1000,
+            "cumulative_runtime": 235.0197
+          },
+          "irresolute": {
+            "finished": 242,
+            "total": 1000,
+            "cumulative_runtime": 298.9216
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "gurobi",
+      "fastest_algorithm_irresolute": "gurobi",
+      "fastest_differs_from_library": false
+    },
+    "cc": {
+      "shortname": "CC",
+      "longname": "Approval Chamberlin-Courant (CC)",
+      "fastest_algorithm": "gurobi",
+      "library_fastest": "gurobi",
+      "algorithms": {
+        "gurobi": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 13.8656
+          },
+          "irresolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 75.1936
+          }
+        },
+        "pulp-highs": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 122.9968
+          },
+          "irresolute": {
+            "finished": 403,
+            "total": 1000,
+            "cumulative_runtime": 299.3909
+          }
+        },
+        "ortools-cp": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 27.6109
+          },
+          "irresolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 195.4451
+          }
+        },
+        "branch-and-bound": {
+          "resolute": {
+            "finished": 258,
+            "total": 1000,
+            "cumulative_runtime": 299.3196
+          },
+          "irresolute": {
+            "finished": 258,
+            "total": 1000,
+            "cumulative_runtime": 299.1142
+          }
+        },
+        "brute-force": {
+          "resolute": {
+            "finished": 246,
+            "total": 1000,
+            "cumulative_runtime": 295.8592
+          },
+          "irresolute": {
+            "finished": 245,
+            "total": 1000,
+            "cumulative_runtime": 276.7074
+          }
+        },
+        "pulp-cbc": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 65.6019
+          },
+          "irresolute": {
+            "finished": 619,
+            "total": 1000,
+            "cumulative_runtime": 289.4936
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "gurobi",
+      "fastest_algorithm_irresolute": "gurobi",
+      "fastest_differs_from_library": false
+    },
+    "lexcc": {
+      "shortname": "lex-CC",
+      "longname": "Lexicographic Chamberlin-Courant (lex-CC)",
+      "fastest_algorithm": "gurobi",
+      "library_fastest": "gurobi",
+      "algorithms": {
+        "gurobi": {
+          "resolute": {
+            "finished": 692,
+            "total": 1000,
+            "cumulative_runtime": 299.912
+          },
+          "irresolute": {
+            "finished": 665,
+            "total": 1000,
+            "cumulative_runtime": 299.2184
+          }
+        },
+        "pulp-highs": {
+          "resolute": {
+            "finished": 408,
+            "total": 1000,
+            "cumulative_runtime": 283.6788
+          },
+          "irresolute": {
+            "finished": 371,
+            "total": 1000,
+            "cumulative_runtime": 297.0308
+          }
+        },
+        "pulp-cbc": {
+          "resolute": {
+            "finished": 259,
+            "total": 1000,
+            "cumulative_runtime": 262.8093
+          },
+          "irresolute": {
+            "finished": 245,
+            "total": 1000,
+            "cumulative_runtime": 280.2514
+          }
+        },
+        "brute-force": {
+          "resolute": {
+            "finished": 205,
+            "total": 1000,
+            "cumulative_runtime": 253.5595
+          },
+          "irresolute": {
+            "finished": 205,
+            "total": 1000,
+            "cumulative_runtime": 261.0429
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "gurobi",
+      "fastest_algorithm_irresolute": "gurobi",
+      "fastest_differs_from_library": false
+    },
+    "geom2": {
+      "shortname": "2-Geometric",
+      "longname": "2-Geometric Rule",
+      "fastest_algorithm": "gurobi",
+      "library_fastest": "gurobi",
+      "algorithms": {
+        "gurobi": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 180.3646
+          },
+          "irresolute": {
+            "finished": 934,
+            "total": 1000,
+            "cumulative_runtime": 247.3311
+          }
+        },
+        "pulp-highs": {
+          "resolute": {
+            "finished": 578,
+            "total": 1000,
+            "cumulative_runtime": 298.2311
+          },
+          "irresolute": {
+            "finished": 454,
+            "total": 1000,
+            "cumulative_runtime": 294.8034
+          }
+        },
+        "pulp-cbc": {
+          "resolute": {
+            "finished": 673,
+            "total": 1000,
+            "cumulative_runtime": 294.8825
+          },
+          "irresolute": {
+            "finished": 522,
+            "total": 1000,
+            "cumulative_runtime": 290.0363
+          }
+        },
+        "branch-and-bound": {
+          "resolute": {
+            "finished": 279,
+            "total": 1000,
+            "cumulative_runtime": 280.0341
+          },
+          "irresolute": {
+            "finished": 279,
+            "total": 1000,
+            "cumulative_runtime": 279.2672
+          }
+        },
+        "brute-force": {
+          "resolute": {
+            "finished": 237,
+            "total": 1000,
+            "cumulative_runtime": 281.7215
+          },
+          "irresolute": {
+            "finished": 237,
+            "total": 1000,
+            "cumulative_runtime": 290.5864
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "gurobi",
+      "fastest_algorithm_irresolute": "gurobi",
+      "fastest_differs_from_library": false
+    },
+    "adams": {
+      "shortname": "Adams-Thiele",
+      "longname": "Adams Approval Voting",
+      "fastest_algorithm": "gurobi",
+      "library_fastest": "gurobi",
+      "algorithms": {
+        "gurobi": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 57.954
+          },
+          "irresolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 141.9323
+          }
+        },
+        "pulp-highs": {
+          "resolute": {
+            "finished": 619,
+            "total": 1000,
+            "cumulative_runtime": 290.6789
+          },
+          "irresolute": {
+            "finished": 232,
+            "total": 1000,
+            "cumulative_runtime": 144.107
+          }
+        },
+        "pulp-cbc": {
+          "resolute": {
+            "finished": 943,
+            "total": 1000,
+            "cumulative_runtime": 299.9182
+          },
+          "irresolute": {
+            "finished": 483,
+            "total": 1000,
+            "cumulative_runtime": 297.5359
+          }
+        },
+        "brute-force": {
+          "resolute": {
+            "finished": 244,
+            "total": 1000,
+            "cumulative_runtime": 293.027
+          },
+          "irresolute": {
+            "finished": 244,
+            "total": 1000,
+            "cumulative_runtime": 281.6158
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "gurobi",
+      "fastest_algorithm_irresolute": "gurobi",
+      "fastest_differs_from_library": false
+    },
+    "seqpav": {
+      "shortname": "seq-PAV",
+      "longname": "Sequential Proportional Approval Voting (seq-PAV)",
+      "fastest_algorithm": "standard",
+      "library_fastest": "standard",
+      "algorithms": {
+        "standard": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 7.3443
+          },
+          "irresolute": {
+            "finished": 555,
+            "total": 1000,
+            "cumulative_runtime": 295.4014
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "standard",
+      "fastest_algorithm_irresolute": "standard",
+      "fastest_differs_from_library": false
+    },
+    "revseqpav": {
+      "shortname": "revseq-PAV",
+      "longname": "Reverse Sequential Proportional Approval Voting (revseq-PAV)",
+      "fastest_algorithm": "standard",
+      "library_fastest": "standard",
+      "algorithms": {
+        "standard": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 47.4523
+          },
+          "irresolute": {
+            "finished": 224,
+            "total": 1000,
+            "cumulative_runtime": 279.1448
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "standard",
+      "fastest_algorithm_irresolute": "standard",
+      "fastest_differs_from_library": false
+    },
+    "seqslav": {
+      "shortname": "seq-SLAV",
+      "longname": "Sequential Sainte-Lagu\u00eb Approval Voting (seq-SLAV)",
+      "fastest_algorithm": "standard",
+      "library_fastest": "standard",
+      "algorithms": {
+        "standard": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 7.4708
+          },
+          "irresolute": {
+            "finished": 724,
+            "total": 1000,
+            "cumulative_runtime": 273.3288
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "standard",
+      "fastest_algorithm_irresolute": "standard",
+      "fastest_differs_from_library": false
+    },
+    "seqcc": {
+      "shortname": "seq-CC",
+      "longname": "Sequential Approval Chamberlin-Courant (seq-CC)",
+      "fastest_algorithm": "standard",
+      "library_fastest": "standard",
+      "algorithms": {
+        "standard": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 5.0742
+          },
+          "irresolute": {
+            "finished": 970,
+            "total": 1000,
+            "cumulative_runtime": 14.0656
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "standard",
+      "fastest_algorithm_irresolute": "standard",
+      "fastest_differs_from_library": false
+    },
+    "seqphragmen": {
+      "shortname": "seq-Phragm\u00e9n",
+      "longname": "Phragm\u00e9n's Sequential Rule (seq-Phragm\u00e9n)",
+      "fastest_algorithm": "float-fractions",
+      "library_fastest": "float-fractions",
+      "algorithms": {
+        "float-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 5.2521
+          },
+          "irresolute": {
+            "finished": 643,
+            "total": 1000,
+            "cumulative_runtime": 96.221
+          }
+        },
+        "gmpy2-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 7.1432
+          },
+          "irresolute": {
+            "finished": 643,
+            "total": 1000,
+            "cumulative_runtime": 137.3207
+          }
+        },
+        "standard-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 18.8401
+          },
+          "irresolute": {
+            "finished": 543,
+            "total": 1000,
+            "cumulative_runtime": 156.6937
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "float-fractions",
+      "fastest_algorithm_irresolute": "float-fractions",
+      "fastest_differs_from_library": false
+    },
+    "minimaxphragmen": {
+      "shortname": "minimax-Phragm\u00e9n",
+      "longname": "Phragm\u00e9n's Minimax Rule (minimax-Phragm\u00e9n)",
+      "fastest_algorithm": "gurobi",
+      "library_fastest": "gurobi",
+      "algorithms": {
+        "gurobi": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 256.0209
+          },
+          "irresolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 222.6392
+          }
+        },
+        "pulp-highs": {
+          "resolute": {
+            "finished": 576,
+            "total": 1000,
+            "cumulative_runtime": 263.4662
+          },
+          "irresolute": {
+            "finished": 251,
+            "total": 1000,
+            "cumulative_runtime": 299.9803
+          }
+        },
+        "pulp-cbc": {
+          "resolute": {
+            "finished": 368,
+            "total": 1000,
+            "cumulative_runtime": 144.4776
+          },
+          "irresolute": {
+            "finished": 212,
+            "total": 1000,
+            "cumulative_runtime": 277.2451
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "gurobi",
+      "fastest_algorithm_irresolute": "gurobi",
+      "fastest_differs_from_library": false
+    },
+    "leximaxphragmen": {
+      "shortname": "leximax-Phragm\u00e9n",
+      "longname": "Phragm\u00e9n's Leximax Rule (leximax-Phragm\u00e9n)",
+      "fastest_algorithm": "gurobi",
+      "library_fastest": "gurobi",
+      "algorithms": {
+        "gurobi": {
+          "resolute": {
+            "finished": 1,
+            "total": 1000,
+            "cumulative_runtime": 2.6852
+          },
+          "irresolute": {
+            "finished": 1,
+            "total": 1000,
+            "cumulative_runtime": 11.4229
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "gurobi",
+      "fastest_algorithm_irresolute": "gurobi",
+      "fastest_differs_from_library": false
+    },
+    "maximin-support": {
+      "shortname": "Maximin-Support",
+      "longname": "Maximin Support Method (MMS)",
+      "fastest_algorithm": "nx-max-flow",
+      "library_fastest": "nx-max-flow",
+      "algorithms": {
+        "nx-max-flow": {
+          "resolute": {
+            "finished": 492,
+            "total": 1000,
+            "cumulative_runtime": 298.2467
+          },
+          "irresolute": {
+            "finished": 314,
+            "total": 1000,
+            "cumulative_runtime": 270.7994
+          }
+        },
+        "gurobi": {
+          "resolute": {
+            "finished": 324,
+            "total": 1000,
+            "cumulative_runtime": 299.0328
+          },
+          "irresolute": {
+            "finished": 249,
+            "total": 1000,
+            "cumulative_runtime": 299.4211
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "nx-max-flow",
+      "fastest_algorithm_irresolute": "nx-max-flow",
+      "fastest_differs_from_library": false
+    },
+    "monroe": {
+      "shortname": "Monroe",
+      "longname": "Monroe's Approval Rule (Monroe)",
+      "fastest_algorithm": "gurobi",
+      "library_fastest": "gurobi",
+      "algorithms": {
+        "gurobi": {
+          "resolute": {
+            "finished": 576,
+            "total": 1000,
+            "cumulative_runtime": 260.2001
+          },
+          "irresolute": {
+            "finished": 257,
+            "total": 1000,
+            "cumulative_runtime": 285.5098
+          }
+        },
+        "pulp-highs": {
+          "resolute": {
+            "finished": 158,
+            "total": 1000,
+            "cumulative_runtime": 285.6455
+          },
+          "irresolute": {
+            "finished": 76,
+            "total": 1000,
+            "cumulative_runtime": 269.6873
+          }
+        },
+        "pulp-cbc": {
+          "resolute": {
+            "finished": 118,
+            "total": 1000,
+            "cumulative_runtime": 299.8038
+          },
+          "irresolute": {
+            "finished": 58,
+            "total": 1000,
+            "cumulative_runtime": 254.8711
+          }
+        },
+        "ortools-cp": {
+          "resolute": {
+            "finished": 345,
+            "total": 1000,
+            "cumulative_runtime": 295.8744
+          },
+          "irresolute": {
+            "finished": 166,
+            "total": 1000,
+            "cumulative_runtime": 299.6375
+          }
+        },
+        "brute-force": {
+          "resolute": {
+            "finished": 118,
+            "total": 1000,
+            "cumulative_runtime": 289.8823
+          },
+          "irresolute": {
+            "finished": 118,
+            "total": 1000,
+            "cumulative_runtime": 290.2681
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "gurobi",
+      "fastest_algorithm_irresolute": "gurobi",
+      "fastest_differs_from_library": false
+    },
+    "greedy-monroe": {
+      "shortname": "Greedy Monroe",
+      "longname": "Greedy Monroe",
+      "fastest_algorithm": "standard",
+      "library_fastest": "standard",
+      "algorithms": {
+        "standard": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 30.7517
+          },
+          "irresolute": {}
+        }
+      },
+      "fastest_algorithm_resolute": "standard",
+      "fastest_algorithm_irresolute": null,
+      "fastest_differs_from_library": false
+    },
+    "minimaxav": {
+      "shortname": "minimaxav",
+      "longname": "Minimax Approval Voting (MAV)",
+      "fastest_algorithm": "gurobi",
+      "library_fastest": "gurobi",
+      "algorithms": {
+        "gurobi": {
+          "resolute": {
+            "finished": 983,
+            "total": 1000,
+            "cumulative_runtime": 175.1054
+          },
+          "irresolute": {
+            "finished": 526,
+            "total": 1000,
+            "cumulative_runtime": 239.0728
+          }
+        },
+        "ortools-cp": {
+          "resolute": {
+            "finished": 782,
+            "total": 1000,
+            "cumulative_runtime": 202.3555
+          },
+          "irresolute": {
+            "finished": 526,
+            "total": 1000,
+            "cumulative_runtime": 277.2404
+          }
+        },
+        "pulp-highs": {
+          "resolute": {
+            "finished": 878,
+            "total": 1000,
+            "cumulative_runtime": 248.6654
+          },
+          "irresolute": {
+            "finished": 526,
+            "total": 1000,
+            "cumulative_runtime": 207.2092
+          }
+        },
+        "pulp-cbc": {
+          "resolute": {
+            "finished": 526,
+            "total": 1000,
+            "cumulative_runtime": 174.9439
+          },
+          "irresolute": {
+            "finished": 302,
+            "total": 1000,
+            "cumulative_runtime": 299.8955
+          }
+        },
+        "brute-force": {
+          "resolute": {
+            "finished": 244,
+            "total": 1000,
+            "cumulative_runtime": 297.2478
+          },
+          "irresolute": {
+            "finished": 244,
+            "total": 1000,
+            "cumulative_runtime": 299.8708
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "gurobi",
+      "fastest_algorithm_irresolute": "pulp-highs",
+      "fastest_differs_from_library": false
+    },
+    "lexminimaxav": {
+      "shortname": "lex-MAV",
+      "longname": "Lexicographic Minimax Approval Voting (lex-MAV)",
+      "fastest_algorithm": "brute-force",
+      "library_fastest": "gurobi",
+      "algorithms": {
+        "gurobi": {
+          "resolute": {
+            "finished": 162,
+            "total": 1000,
+            "cumulative_runtime": 294.3247
+          },
+          "irresolute": {
+            "finished": 145,
+            "total": 1000,
+            "cumulative_runtime": 299.7493
+          }
+        },
+        "pulp-highs": {
+          "resolute": {
+            "finished": 146,
+            "total": 1000,
+            "cumulative_runtime": 296.4779
+          },
+          "irresolute": {
+            "finished": 127,
+            "total": 1000,
+            "cumulative_runtime": 290.0809
+          }
+        },
+        "brute-force": {
+          "resolute": {
+            "finished": 237,
+            "total": 1000,
+            "cumulative_runtime": 269.0054
+          },
+          "irresolute": {
+            "finished": 237,
+            "total": 1000,
+            "cumulative_runtime": 274.9364
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "brute-force",
+      "fastest_algorithm_irresolute": "brute-force",
+      "fastest_differs_from_library": true
+    },
+    "equal-shares": {
+      "shortname": "Equal Shares",
+      "longname": "Method of Equal Shares (aka Rule X) with Phragm\u00e9n phase",
+      "fastest_algorithm": "float-fractions",
+      "library_fastest": "float-fractions",
+      "algorithms": {
+        "float-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 7.6336
+          },
+          "irresolute": {
+            "finished": 317,
+            "total": 1000,
+            "cumulative_runtime": 106.7722
+          }
+        },
+        "gmpy2-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 9.5708
+          },
+          "irresolute": {
+            "finished": 317,
+            "total": 1000,
+            "cumulative_runtime": 112.7011
+          }
+        },
+        "standard-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 26.5936
+          },
+          "irresolute": {
+            "finished": 317,
+            "total": 1000,
+            "cumulative_runtime": 185.5339
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "float-fractions",
+      "fastest_algorithm_irresolute": "float-fractions",
+      "fastest_differs_from_library": false
+    },
+    "equal-shares-with-av-completion": {
+      "shortname": "Equal Shares with AV completion",
+      "longname": "Method of Equal Shares (aka Rule X) with AV completion",
+      "fastest_algorithm": "standard-fractions",
+      "library_fastest": "float-fractions",
+      "algorithms": {
+        "float-fractions": {
+          "resolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 227.3676
+          },
+          "irresolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 218.3551
+          }
+        },
+        "gmpy2-fractions": {
+          "resolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 227.7025
+          },
+          "irresolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 235.0942
+          }
+        },
+        "standard-fractions": {
+          "resolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 221.5444
+          },
+          "irresolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 228.8822
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "standard-fractions",
+      "fastest_algorithm_irresolute": "float-fractions",
+      "fastest_differs_from_library": true
+    },
+    "equal-shares-with-increment-completion": {
+      "shortname": "Equal Shares with increment completion",
+      "longname": "Method of Equal Shares (aka Rule X) with increment completion",
+      "fastest_algorithm": "gmpy2-fractions",
+      "library_fastest": "float-fractions",
+      "algorithms": {
+        "float-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 69.3857
+          },
+          "irresolute": {}
+        },
+        "gmpy2-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 66.4651
+          },
+          "irresolute": {}
+        },
+        "standard-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 113.7305
+          },
+          "irresolute": {}
+        }
+      },
+      "fastest_algorithm_resolute": "gmpy2-fractions",
+      "fastest_algorithm_irresolute": null,
+      "fastest_differs_from_library": true
+    },
+    "phragmen-enestroem": {
+      "shortname": "Phragm\u00e9n-Enestr\u00f6m",
+      "longname": "Method of Phragm\u00e9n-Enestr\u00f6m",
+      "fastest_algorithm": "float-fractions",
+      "library_fastest": "float-fractions",
+      "algorithms": {
+        "float-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 3.3312
+          },
+          "irresolute": {
+            "finished": 847,
+            "total": 1000,
+            "cumulative_runtime": 22.5112
+          }
+        },
+        "gmpy2-fractions": {
+          "resolute": {
+            "finished": 696,
+            "total": 1000,
+            "cumulative_runtime": 269.7091
+          },
+          "irresolute": {
+            "finished": 612,
+            "total": 1000,
+            "cumulative_runtime": 226.8642
+          }
+        },
+        "standard-fractions": {
+          "resolute": {
+            "finished": 575,
+            "total": 1000,
+            "cumulative_runtime": 195.1941
+          },
+          "irresolute": {
+            "finished": 575,
+            "total": 1000,
+            "cumulative_runtime": 200.8681
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "float-fractions",
+      "fastest_algorithm_irresolute": "float-fractions",
+      "fastest_differs_from_library": false
+    },
+    "consensus-rule": {
+      "shortname": "Consensus Rule",
+      "longname": "Consensus Rule",
+      "fastest_algorithm": "float-fractions",
+      "library_fastest": "float-fractions",
+      "algorithms": {
+        "float-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 3.7608
+          },
+          "irresolute": {
+            "finished": 970,
+            "total": 1000,
+            "cumulative_runtime": 90.5438
+          }
+        },
+        "gmpy2-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 4.414
+          },
+          "irresolute": {
+            "finished": 970,
+            "total": 1000,
+            "cumulative_runtime": 99.0039
+          }
+        },
+        "standard-fractions": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 8.0881
+          },
+          "irresolute": {
+            "finished": 970,
+            "total": 1000,
+            "cumulative_runtime": 221.8701
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "float-fractions",
+      "fastest_algorithm_irresolute": "float-fractions",
+      "fastest_differs_from_library": false
+    },
+    "trivial": {
+      "shortname": "Trivial Rule",
+      "longname": "Trivial Rule",
+      "fastest_algorithm": "standard",
+      "library_fastest": "standard",
+      "algorithms": {
+        "standard": {
+          "resolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 0.0267
+          },
+          "irresolute": {
+            "finished": 1000,
+            "total": 1000,
+            "cumulative_runtime": 0.137
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "standard",
+      "fastest_algorithm_irresolute": "standard",
+      "fastest_differs_from_library": false
+    },
+    "eph": {
+      "shortname": "E Pluribus Hugo",
+      "longname": "E Pluribus Hugo (EPH)",
+      "fastest_algorithm": "float-fractions",
+      "library_fastest": "float-fractions",
+      "algorithms": {
+        "float-fractions": {
+          "resolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 91.938
+          },
+          "irresolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 97.0429
+          }
+        },
+        "gmpy2-fractions": {
+          "resolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 97.5866
+          },
+          "irresolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 96.7863
+          }
+        },
+        "standard-fractions": {
+          "resolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 100.2764
+          },
+          "irresolute": {
+            "finished": 400,
+            "total": 1000,
+            "cumulative_runtime": 97.7942
+          }
+        }
+      },
+      "fastest_algorithm_resolute": "float-fractions",
+      "fastest_algorithm_irresolute": "gmpy2-fractions",
+      "fastest_differs_from_library": false
+    }
+  }
+}
