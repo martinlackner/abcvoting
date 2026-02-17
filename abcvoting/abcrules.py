@@ -169,7 +169,7 @@ class Rule:
             self.algorithms = ("gurobi", "pulp-highs", "pulp-cbc", "brute-force")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id == "adams":
-            self.shortname = "Adams-Thiele"
+            self.shortname = "Adams-AV"
             self.longname = "Adams Approval Voting"
             self.compute_fct = compute_adams
             # algorithms sorted by speed
@@ -273,7 +273,7 @@ class Rule:
             self.resolute_values = self._RESOLUTE_VALUES_FOR_OPTIMIZATION_BASED_RULES
         elif rule_id in ["rule-x", "equal-shares", "equal-shares-with-seqphragmen-completion"]:
             self.shortname = "Equal Shares"
-            self.longname = "Method of Equal Shares (aka Rule X) with Phragmén phase"
+            self.longname = "Method of Equal Shares (aka Rule X) with Phragmén completion"
             self.compute_fct = compute_equal_shares
             self.algorithms = ("float-fractions", "gmpy2-fractions", "standard-fractions")
             self.resolute_values = self._RESOLUTE_VALUES_FOR_SEQUENTIAL_RULES
