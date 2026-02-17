@@ -191,9 +191,14 @@ def run_single_benchmark(
             kwargs["max_num_of_committees"] = max_num_of_committees
         committees = rule.compute(profile, committeesize, **kwargs)
         if resolute and len(committees) != 1:
-            raise RuntimeError(f"Expected exactly one committee in resolute mode, got {len(committees)}.")
+            raise RuntimeError(
+                f"Expected exactly one committee in resolute mode, got {len(committees)}."
+            )
         elif not resolute and len(committees) != max_num_of_committees:
-            raise RuntimeError(f"Expected {max_num_of_committees} committees in irresolute mode, got {len(committees)}.")
+            raise RuntimeError(
+                f"Expected {max_num_of_committees} committees in irresolute mode, "
+                f"got {len(committees)}."
+            )
         elapsed = time.perf_counter() - start_time
         return elapsed
     except TimeoutException:
