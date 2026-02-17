@@ -278,7 +278,7 @@ class _CollectInstances:
                 {1, 3, 4, 5},
                 {2, 3, 4, 5},
             ],
-            "equal-shares-without-phragmen-phase": [{4, 5}],
+            "equal-shares-without-completion": [{4, 5}],
             "phragmen-enestroem": [
                 {0, 1, 4, 5},
                 {0, 2, 4, 5},
@@ -370,7 +370,7 @@ class _CollectInstances:
             "equal-shares": [{0, 1, 3}],
             "equal-shares-with-av-completion": [{0, 1, 3}],
             "equal-shares-with-increment-completion": [{0, 1, 3}],
-            "equal-shares-without-phragmen-phase": [{0, 1, 3}],
+            "equal-shares-without-completion": [{0, 1, 3}],
             "phragmen-enestroem": [{0, 1, 3}],
             "consensus-rule": [{0, 1, 3}],
             "trivial": [
@@ -485,7 +485,6 @@ class _CollectInstances:
             "equal-shares": [{0, 1, 2, 4}],
             "equal-shares-with-av-completion": [{0, 1, 2, 4}, {0, 2, 3, 4}],
             "equal-shares-with-increment-completion": [{0, 1, 2, 4}],
-            "equal-shares-without-phragmen-phase": [{0, 2}],
             "equal-shares-without-completion": [{0, 2}],
             "phragmen-enestroem": [{0, 1, 2, 4}],
             "consensus-rule": [{0, 1, 2, 4}],
@@ -528,7 +527,7 @@ class _CollectInstances:
             "equal-shares": [{0, 3}],
             "equal-shares-with-av-completion": [{0, 1}, {0, 3}],
             "equal-shares-with-increment-completion": [{0, 1}, {0, 3}],
-            "equal-shares-without-phragmen-phase": [{0}],
+            "equal-shares-without-completion": [{0}],
             "phragmen-enestroem": [{0, 3}],
             "consensus-rule": [{0, 3}],
             "trivial": [
@@ -573,7 +572,7 @@ class _CollectInstances:
             "equal-shares": one_each,
             "equal-shares-with-av-completion": one_each,
             "equal-shares-with-increment-completion": one_each,
-            "equal-shares-without-phragmen-phase": one_each,
+            "equal-shares-without-completion": one_each,
             "phragmen-enestroem": one_each,
             "consensus-rule": one_each,
             "trivial": [

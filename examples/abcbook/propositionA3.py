@@ -121,7 +121,7 @@ monotonicity_instances = [
         committees_after=[{1, 2, 4}],
     ),
     MonotonicityInstance(
-        rule_id="equal-shares-without-phragmen-phase",
+        rule_id="equal-shares-without-completion",
         committeesize=4,
         approval_sets=[
             {0, 1, 2},

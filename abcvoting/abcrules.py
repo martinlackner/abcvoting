@@ -291,7 +291,7 @@ class Rule:
             self.resolute_values = (True,)  # this rule is ill-defined for resolute=False
         elif rule_id in [
             "rule-x-without-phragmen-phase",
-            "equal-shares-without-phragmen-phase",
+            "equal-shares-without-completion",
             "equal-shares-without-completion",
         ]:
             self.shortname = "Equal Shares without completion"
