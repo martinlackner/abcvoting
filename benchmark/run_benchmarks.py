@@ -189,7 +189,11 @@ def run_single_benchmark(
         kwargs = {"algorithm": algorithm, "resolute": resolute}
         if not resolute and max_num_of_committees is not None:
             kwargs["max_num_of_committees"] = max_num_of_committees
-        rule.compute(profile, committeesize, **kwargs)
+        committees = rule.compute(profile, committeesize, **kwargs)
+        if resolute and len(committees) != 1:
+            raise RuntimeError(f"Expected exactly one committee in resolute mode, got {len(committees)}.")
+        elif not resolute and len(committees) != max_num_of_committees:
+            raise RuntimeError(f"Expected {max_num_of_committees} committees in irresolute mode, got {len(committees)}.")
         elapsed = time.perf_counter() - start_time
         return elapsed
     except TimeoutException:
@@ -280,6 +284,7 @@ def run_benchmarks_for_rule(
             }
 
             algorithm_stats_by_mode[mode_name][algorithm] = (finished, cumulative_runtime)
+            tprint(f"    finished {finished}/{total} instances in {cumulative_runtime:.2f}s")
 
     # Determine fastest algorithm per mode (empirically measured)
     # Priority: 1) more finished instances, 2) lower runtime (for equal finished)

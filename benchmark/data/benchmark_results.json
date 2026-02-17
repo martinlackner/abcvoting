@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp": "2026-02-14T21:58:08.233022+00:00",
+    "timestamp": "2026-02-17T10:52:44.876978+00:00",
     "hardware": {
       "cpu": "Intel(R) Core(TM) Ultra 7 155U",
       "ram_gb": 32.5,
@@ -417,7 +417,7 @@
       "fastest_differs_from_library": false
     },
     "adams": {
-      "shortname": "Adams-Thiele",
+      "shortname": "Adams-AV",
       "longname": "Adams Approval Voting",
       "fastest_algorithm": "gurobi",
       "library_fastest": "gurobi",
@@ -977,49 +977,49 @@
     "equal-shares-with-av-completion": {
       "shortname": "Equal Shares with AV completion",
       "longname": "Method of Equal Shares (aka Rule X) with AV completion",
-      "fastest_algorithm": "standard-fractions",
+      "fastest_algorithm": "float-fractions",
       "library_fastest": "float-fractions",
       "algorithms": {
         "float-fractions": {
           "resolute": {
-            "finished": 400,
+            "finished": 1000,
             "total": 1000,
-            "cumulative_runtime": 227.3676
+            "cumulative_runtime": 5.6242
           },
           "irresolute": {
-            "finished": 400,
+            "finished": 696,
             "total": 1000,
-            "cumulative_runtime": 218.3551
+            "cumulative_runtime": 243.1463
           }
         },
         "gmpy2-fractions": {
           "resolute": {
-            "finished": 400,
+            "finished": 1000,
             "total": 1000,
-            "cumulative_runtime": 227.7025
+            "cumulative_runtime": 7.2544
           },
           "irresolute": {
-            "finished": 400,
+            "finished": 603,
             "total": 1000,
-            "cumulative_runtime": 235.0942
+            "cumulative_runtime": 284.6365
           }
         },
         "standard-fractions": {
           "resolute": {
-            "finished": 400,
+            "finished": 1000,
             "total": 1000,
-            "cumulative_runtime": 221.5444
+            "cumulative_runtime": 21.8645
           },
           "irresolute": {
-            "finished": 400,
+            "finished": 575,
             "total": 1000,
-            "cumulative_runtime": 228.8822
+            "cumulative_runtime": 100.4742
           }
         }
       },
-      "fastest_algorithm_resolute": "standard-fractions",
+      "fastest_algorithm_resolute": "float-fractions",
       "fastest_algorithm_irresolute": "float-fractions",
-      "fastest_differs_from_library": true
+      "fastest_differs_from_library": false
     },
     "equal-shares-with-increment-completion": {
       "shortname": "Equal Shares with increment completion",
@@ -1181,43 +1181,43 @@
       "algorithms": {
         "float-fractions": {
           "resolute": {
-            "finished": 400,
+            "finished": 1000,
             "total": 1000,
-            "cumulative_runtime": 91.938
+            "cumulative_runtime": 3.4074
           },
           "irresolute": {
-            "finished": 400,
+            "finished": 1000,
             "total": 1000,
-            "cumulative_runtime": 97.0429
+            "cumulative_runtime": 3.4415
           }
         },
         "gmpy2-fractions": {
           "resolute": {
-            "finished": 400,
+            "finished": 1000,
             "total": 1000,
-            "cumulative_runtime": 97.5866
+            "cumulative_runtime": 6.1711
           },
           "irresolute": {
-            "finished": 400,
+            "finished": 1000,
             "total": 1000,
-            "cumulative_runtime": 96.7863
+            "cumulative_runtime": 6.2051
           }
         },
         "standard-fractions": {
           "resolute": {
-            "finished": 400,
+            "finished": 1000,
             "total": 1000,
-            "cumulative_runtime": 100.2764
+            "cumulative_runtime": 14.7733
           },
           "irresolute": {
-            "finished": 400,
+            "finished": 1000,
             "total": 1000,
-            "cumulative_runtime": 97.7942
+            "cumulative_runtime": 14.8801
           }
         }
       },
       "fastest_algorithm_resolute": "float-fractions",
-      "fastest_algorithm_irresolute": "gmpy2-fractions",
+      "fastest_algorithm_irresolute": "float-fractions",
       "fastest_differs_from_library": false
     }
   }
