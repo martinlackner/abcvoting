@@ -85,3 +85,4 @@ venv*
 /coverage.sh
 scratchpad
 *_py.new
+CLAUDE.md
