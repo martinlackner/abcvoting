@@ -676,7 +676,7 @@ def generate_table_html(data, mode, table_id):
                     badges.append(
                         f'<span class="algorithm-badge differs-badge" '
                         f"title=\"Library expects '{library_fastest}' to be fastest\">"
-                        f"⚠ differs from library</span>"
+                        f'⚠ differs from "fastest"-default</span>'
                     )
             algo_badge = "".join(badges)
 
