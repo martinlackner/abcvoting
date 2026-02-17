@@ -929,7 +929,7 @@
     },
     "equal-shares": {
       "shortname": "Equal Shares",
-      "longname": "Method of Equal Shares (aka Rule X) with Phragm\u00e9n phase",
+      "longname": "Method of Equal Shares with Phragm\u00e9n completion",
       "fastest_algorithm": "float-fractions",
       "library_fastest": "float-fractions",
       "algorithms": {
