@@ -1738,16 +1738,20 @@ def test_natural_tiebreaking_order_max_num_of_committees(rule_id, algorithm, app
         "fastest",
     ]:
         return  # ILP & max-flow solvers do not guarantee a specific solution
-    if rule_id in ["rsd"]:
+    if rule_id == "rsd":
         return  # RSD is randomized
+    elif rule_id == "eph":
+        return  # EPH does not have this tiebreaking order
+    max_num_of_committees = 6
     committees = abcrules.compute(
         rule_id,
         profile,
         committeesize,
         resolute=False,
         algorithm=algorithm,
-        max_num_of_committees=6,
+        max_num_of_committees=max_num_of_committees,
     )
+    assert len(committees) == max_num_of_committees
     assert committees == [{0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {1, 2}]
 
 

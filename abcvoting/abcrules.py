@@ -3558,10 +3558,9 @@ def _equal_shares_algorithm(
                 profile=profile,
                 committeesize=committeesize,
                 algorithm=algorithm,
-                max_num_of_committees=None,
-                # TODO: would be nice to have max_num_of_committees=max_num_of_committees
-                #       but there is the issue that some of these committees might be
-                #       already contained in `winning_committees` - so we need more
+                max_num_of_committees=max_num_of_committees,
+                # TODO: verify whether returing only max_num_of_committees many committees
+                # is fine here
                 partial_committee=list(_committee),
                 start_load=start_load,
             )
@@ -3578,7 +3577,7 @@ def _equal_shares_algorithm(
                 profile=profile,
                 committeesize=num_missing,
                 resolute=False,
-                max_num_of_committees=None,
+                max_num_of_committees=max_num_of_committees,
             )
             for comm in av_committees:
                 new_comm = set(_committee).union(comm)
@@ -4775,17 +4774,24 @@ def _eph_algorithm(rule_id, profile, algorithm, committeesize, resolute, max_num
             or (algorithm == "float-fractions" and misc.isclose(sdv_score[cand], cutoff_sdv))
         ]
         cutoff_av = min(av_score[cand] for cand in elimination_cands)
+
+        # candidates to be eliminated from the committeee
         elimination_cands = [cand for cand in elimination_cands if av_score[cand] <= cutoff_av]
+        # tiebreaking in favor of candidates with smaller index
+        # (candidates with larger index get deleted first)
+        elimination_cands.reverse()
+
         if len(remaining_candidates) - len(elimination_cands) <= committeesize:
             num_cands_to_be_eliminated = len(remaining_candidates) - committeesize
             committees = sorted_committees(
                 [
                     (remaining_candidates - set(selection))
-                    for selection in itertools.combinations(
-                        elimination_cands, num_cands_to_be_eliminated
+                    for selection in itertools.islice(
+                        itertools.combinations(elimination_cands, num_cands_to_be_eliminated),
+                        max_num_of_committees,
                     )
                 ]
             )
             detailed_info = {}
-            return committees[:max_num_of_committees], detailed_info
+            return committees, detailed_info
         remaining_candidates -= set(elimination_cands)
