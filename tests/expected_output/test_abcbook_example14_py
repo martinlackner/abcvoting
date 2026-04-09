@@ -17,14 +17,14 @@ Satisfaction Approval Voting (SAV)
 Algorithm: Standard algorithm
 
 Scores of candidates:
-a: 1.0
-b: 0.75
-c: 0.75
-d: 0.75
-e: 0.75
+a: 1
+b: 3/4
+c: 3/4
+d: 3/4
+e: 3/4
 
 Candidates are contained in winning committees
-if their score is >= 1.0.
+if their score is >= 1.
 
 The following candidates are contained in
 every winning committee:
