@@ -10,7 +10,7 @@ compute:
   result: [[0, 2, 3, 5]]
   resolute: true
 - rule_id: sav
-  result: [[0, 2, 3, 4]]
+  result: [[0, 2, 3, 4], [0, 3, 4, 5]]
   resolute: false
 - rule_id: sav
   result: [[0, 2, 3, 4]]
