@@ -2137,7 +2137,11 @@ def _separable_rule_algorithm(
         for cand in voter.approved:
             if rule_id == "sav":
                 # Satisfaction Approval Voting
-                score[cand] += voter.weight / len(voter.approved)
+                # Use Fraction for exact arithmetic so that the result is
+                # independent of the order of voters (floating-point addition
+                # is not associative and could otherwise break ties
+                # inconsistently).
+                score[cand] += Fraction(voter.weight, len(voter.approved))
             elif rule_id == "av":
                 # (Classic) Approval Voting
                 score[cand] += voter.weight
