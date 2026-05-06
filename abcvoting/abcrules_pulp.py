@@ -68,7 +68,8 @@ def _enumerate_committees_standard_pulp(
 
     prob = pulp.LpProblem(name=name, sense=pulp.LpMaximize)
     in_committee = {
-        cand: pulp.LpVariable(f"in_committee[{cand}]", cat="Binary") for cand in profile.candidates
+        cand: prob.add_variable(f"in_committee[{cand}]", cat="Binary")
+        for cand in profile.candidates
     }
 
     set_opt_model_func(prob, in_committee)
@@ -140,7 +141,8 @@ def _enumerate_committees_lex_pulp(
     # First, find maxscore by solving the original problem
     prob = pulp.LpProblem(name=name, sense=pulp.LpMaximize)
     in_committee = {
-        cand: pulp.LpVariable(f"in_committee[{cand}]", cat="Binary") for cand in profile.candidates
+        cand: prob.add_variable(f"in_committee[{cand}]", cat="Binary")
+        for cand in profile.candidates
     }
     set_opt_model_func(prob, in_committee)
 
@@ -164,7 +166,7 @@ def _enumerate_committees_lex_pulp(
         # Build problem for lex optimization
         lex_prob = pulp.LpProblem(name + "_lex", pulp.LpMaximize)
         in_committee_lex = [
-            pulp.LpVariable(f"in_committee_lex[{cand}]", cat="Binary")
+            lex_prob.add_variable(f"in_committee_lex[{cand}]", cat="Binary")
             for cand in profile.candidates
         ]
 
@@ -260,7 +262,7 @@ def _pulp_thiele_methods(
         for i, voter in enumerate(profile):
             max_in_committee[voter] = min(len(voter.approved), committeesize)
             for x in range(1, max_in_committee[voter] + 1):
-                utility[(voter, x)] = pulp.LpVariable(f"utility({i},{x})", cat="Binary")
+                utility[(voter, x)] = prob.add_variable(f"utility({i},{x})", cat="Binary")
 
         # Constraint: committee size
         prob += pulp.lpSum(in_committee) == committeesize
@@ -327,7 +329,7 @@ def _pulp_lexcc(
         for i, voter in enumerate(profile):
             max_in_committee[voter] = min(len(voter.approved), committeesize)
             for x in range(1, max_in_committee[voter] + 1):
-                utility[(voter, x)] = pulp.LpVariable(f"utility({i},{x})", cat="Binary")
+                utility[(voter, x)] = prob.add_variable(f"utility({i},{x})", cat="Binary")
 
         # Committee size constraint
         prob += pulp.lpSum(in_committee) == committeesize
@@ -407,7 +409,7 @@ def _pulp_monroe(
         candidates = profile.candidates
 
         # Satisfaction variable
-        satisfaction = pulp.LpVariable(
+        satisfaction = prob.add_variable(
             "satisfaction", lowBound=0, upBound=num_voters, cat="Integer"
         )
 
@@ -416,7 +418,7 @@ def _pulp_monroe(
 
         # Partition variables: how voters are assigned to candidates
         partition = {
-            (c, i): pulp.LpVariable(f"partition({c},{i})", lowBound=0, cat="Integer")
+            (c, i): prob.add_variable(f"partition({c},{i})", lowBound=0, cat="Integer")
             for c in candidates
             for i in range(num_voters)
         }
@@ -485,7 +487,7 @@ def _pulp_minimaxphragmen(
         for cand in profile.candidates:
             for i, voter in enumerate(profile):
                 if cand in voter.approved:
-                    load[(voter, cand)] = pulp.LpVariable(
+                    load[(voter, cand)] = prob.add_variable(
                         f"load({i},{cand})", lowBound=0, upBound=1
                     )
                 else:
@@ -506,7 +508,7 @@ def _pulp_minimaxphragmen(
             )
 
         # Loadbound variable for maximum voter load
-        loadbound = pulp.LpVariable("loadbound", lowBound=0, upBound=committeesize)
+        loadbound = prob.add_variable("loadbound", lowBound=0, upBound=committeesize)
 
         # Constraint: Each voter's total load must be below loadbound
         for voter in profile:
@@ -566,7 +568,7 @@ def _pulp_leximaxphragmen(
         for cand in candidates:
             for i, voter in enumerate(profile):
                 if cand in voter.approved:
-                    load[(voter, cand)] = pulp.LpVariable(
+                    load[(voter, cand)] = prob.add_variable(
                         f"load({i},{cand})", lowBound=0.0, upBound=1.0
                     )
                 else:
@@ -575,7 +577,7 @@ def _pulp_leximaxphragmen(
         # Define binary constraint indicator variables
         for i in range(num_voters):
             for j in range(num_voters):
-                loadbound_constraint[(i, j)] = pulp.LpVariable(
+                loadbound_constraint[(i, j)] = prob.add_variable(
                     f"loadbound_constraint({i},{j})", cat="Binary"
                 )
 
@@ -607,7 +609,7 @@ def _pulp_leximaxphragmen(
                 )
 
         # Final loadbound (current lex level)
-        newloadbound = pulp.LpVariable("newloadbound", lowBound=0.0, upBound=committeesize)
+        newloadbound = prob.add_variable("newloadbound", lowBound=0.0, upBound=committeesize)
         for j, voter in enumerate(profile):
             prob += pulp.lpSum(
                 load[(voter, cand)] for cand in voter.approved
@@ -675,7 +677,7 @@ def _pulp_minimaxav(
 ):
     def set_opt_model_func(prob, in_committee):
         # Create the max Hamming distance variable
-        max_hamming_distance = pulp.LpVariable(
+        max_hamming_distance = prob.add_variable(
             "max_hamming_distance", lowBound=0, upBound=profile.num_cand, cat="Integer"
         )
 
@@ -729,7 +731,7 @@ def _pulp_lexminimaxav(
                 elif dist < abs(len(voter.approved) - committeesize):
                     voteratmostdistances[(i, dist)] = 0
                 else:
-                    voteratmostdistances[(i, dist)] = pulp.LpVariable(
+                    voteratmostdistances[(i, dist)] = prob.add_variable(
                         f"atmostdistance({i},{dist})", cat="Binary"
                     )
 
@@ -841,7 +843,7 @@ def _pulp_adams(profile, committeesize, resolute, max_num_of_committees, solver_
             voter_utility[voter_idx] = {}
             max_utility = min(committeesize, len(voter.approved))
             for util_level in range(1, max_utility + 1):
-                voter_utility[voter_idx][util_level] = pulp.LpVariable(
+                voter_utility[voter_idx][util_level] = prob.add_variable(
                     f"util_{voter_idx}_{util_level}", cat="Binary"
                 )
 
