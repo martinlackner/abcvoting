@@ -6,7 +6,6 @@ from abcvoting.preferences import Profile
 from abcvoting import abcrules, properties
 from abcvoting.output import output, INFO
 
-
 output.set_verbosity(INFO)
 
 

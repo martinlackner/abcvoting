@@ -27,7 +27,6 @@ if project_root not in sys.path:
 from abcvoting import fileio  # noqa: E402
 from abcvoting.abcrules import MAIN_RULE_IDS, Rule, UnknownRuleIDError  # noqa: E402
 
-
 # Configuration
 DEFAULT_TIMEOUT = 300  # 5 minutes
 DEFAULT_MAX_NUM_OF_COMMITTEES = 10

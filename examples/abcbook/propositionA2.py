@@ -12,7 +12,6 @@ from abcvoting import misc
 from abcvoting.output import output
 from abcvoting.output import DETAILS
 
-
 output.set_verbosity(DETAILS)
 
 print(misc.header("Proposition A.2", "*"))

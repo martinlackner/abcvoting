@@ -9,7 +9,6 @@ from abcvoting import scores
 from abcvoting import misc
 from abcvoting.output import output
 
-
 ACCURACY = 1e-8  # 1e-9 causes problems (some unit tests fail)
 CMP_ACCURACY = 10 * ACCURACY  # when comparing float numbers obtained from a MIP
 LEXICOGRAPHIC_BLOCK_SIZE = (

@@ -11,7 +11,6 @@ from abcvoting.preferences import Profile
 from abcvoting import misc
 from collections import namedtuple
 
-
 print(misc.header("Proposition A.4", "*"))
 
 num_cand = 6

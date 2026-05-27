@@ -8,7 +8,6 @@ from abcvoting import abcrules
 from abcvoting.misc import str_sets_of_candidates
 from abcvoting.preferences import Profile
 
-
 currdir = os.path.dirname(os.path.abspath(__file__))
 
 

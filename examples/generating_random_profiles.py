@@ -3,7 +3,6 @@
 from abcvoting import generate
 import numpy as np
 
-
 generate.rng = np.random.default_rng(24121838)  # seed for random number generator (optional)
 
 # specify dimensions of generated profiles
