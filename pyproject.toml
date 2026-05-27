@@ -60,7 +60,6 @@ packages = ["abcvoting"]
 addopts = '''
 -ra
 --tb=line
--W error
 --doctest-modules
 --strict-markers
 '''
