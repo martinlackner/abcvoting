@@ -240,7 +240,13 @@ def get_solver(solver_id):
     if solver_id == "highs":
         return pulp.HiGHS(msg=False)
     elif solver_id == "cbc":
-        return pulp.COIN_CMD(msg=False)
+        # Use the stable bundled CBC binary rather than any system `cbc`
+        # (e.g. cbcbox), which may be an unstable build that crashes in
+        # symmetry detection when re-solving a modified problem.
+        # TODO: remove the path override once cbcbox ships a stable CBC build
+        from pulp.apis.coin_api import pulp_cbc_path
+
+        return pulp.COIN_CMD(msg=False, path=pulp_cbc_path)
     else:
         raise ValueError(f"Solver {solver_id} not known in Python Pulp.")
 
